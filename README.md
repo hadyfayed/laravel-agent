@@ -1,193 +1,180 @@
 # Laravel Agent
 
-> An AI Laravel developer on drugs - thinks like an architect, codes like a craftsman, deploys like DevOps.
+> AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.
 
-A Claude Code plugin marketplace providing **16 specialized Laravel development agents** that cover the entire development lifecycle. The architect analyzes every request, decides the optimal implementation approach, enforces SOLID/DRY principles, and delegates to specialized builders.
+A Claude Code plugin with **22 specialized agents** and **32 commands** covering the entire Laravel development lifecycle.
 
 ## Features
 
-- **Intelligent Architecture Decisions** - Automatically decides between Feature, Module, Service, or Action
+- **Single Plugin Install** - One command installs everything
+- **22 Specialized Agents** - Architecture, features, APIs, testing, security, deployment, and more
+- **32 Commands** - Direct access to all capabilities
 - **SOLID/DRY Enforcement** - Every generated code follows best practices
 - **Pattern Limit** - Max 5 design patterns per project to prevent complexity
-- **Laravel Boost Integration** - Uses MCP tools when available for superior context
-- **Full Lifecycle Coverage** - From database to frontend to deployment
-- **Multi-Tenancy Support** - Optional tenant isolation with Laratrust
-- **Comprehensive Testing** - Pest tests generated for everything
+- **Multi-Tenancy Support** - Optional tenant isolation (opt-in, not forced)
+- **50+ Package Integrations** - Detects and adapts to installed packages
 
 ## Installation
 
-### Step 1: Add the Marketplace
-
 ```bash
+# Add the marketplace
 /plugin marketplace add hadyfayed/laravel-agent
+
+# Install the plugin
+/plugin install laravel-agent@hadyfayed-laravel-agent
 ```
 
-### Step 2: Install Plugins
+That's it! All 22 agents and 32 commands are now available.
 
-**Core Plugins (Recommended):**
-```bash
-/plugin install laravel-architect@hadyfayed      # Brain - decides everything
-/plugin install laravel-feature-builder@hadyfayed
-/plugin install laravel-module-builder@hadyfayed
-/plugin install laravel-service-builder@hadyfayed
-/plugin install laravel-refactor@hadyfayed
-```
+## Available Commands
 
-**API & Testing:**
-```bash
-/plugin install laravel-api-builder@hadyfayed    # Versioned APIs with OpenAPI
-/plugin install laravel-testing@hadyfayed        # Pest testing suite
-```
+### Core
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:build` | Intelligent build - architect analyzes and delegates |
+| `/laravel-agent:patterns` | View current pattern usage (max 5) |
 
-**Database & Auth:**
-```bash
-/plugin install laravel-database@hadyfayed       # Migrations, optimization
-/plugin install laravel-auth@hadyfayed           # Policies, Laratrust
-```
+### Builders
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:feature:make` | Create complete feature (CRUD, views, API, tests) |
+| `/laravel-agent:module:make` | Create reusable domain module |
+| `/laravel-agent:service:make` | Create service or action |
 
-**Frontend (TALL + Filament):**
-```bash
-/plugin install laravel-livewire@hadyfayed       # Livewire 3 components
-/plugin install laravel-filament@hadyfayed       # Filament admin panels
-```
+### API
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:api:make` | Create versioned API resource |
+| `/laravel-agent:api:docs` | Generate OpenAPI documentation |
 
-**Async Operations:**
-```bash
-/plugin install laravel-queue@hadyfayed          # Jobs, events, notifications
-```
+### Testing
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:test:make` | Generate Pest tests |
+| `/laravel-agent:test:coverage` | Run coverage analysis |
 
-**AI & LLM:**
-```bash
-/plugin install laravel-ai@hadyfayed             # Prism PHP, MCP servers
-```
+### Database
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:db:optimize` | Optimize queries and indexes |
+| `/laravel-agent:db:diagram` | Generate ER diagram |
 
-**DevOps & Security:**
-```bash
-/plugin install laravel-deploy@hadyfayed         # Forge, Vapor, Docker, Bref
-/plugin install laravel-cicd@hadyfayed           # GitHub Actions, GitLab CI
-/plugin install laravel-security@hadyfayed       # OWASP audits, security headers
-```
+### Frontend
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:livewire:make` | Create Livewire 3 component |
+| `/laravel-agent:filament:make` | Create Filament resource |
 
-### Step 3: Initialize Your Project
+### Auth & Security
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:auth:setup` | Setup authentication |
+| `/laravel-agent:security:audit` | Run OWASP security audit |
 
-```bash
-/init
-```
+### Async
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:job:make` | Create queued job |
+| `/laravel-agent:broadcast:make` | Create broadcast event |
 
-## All Plugins
+### AI
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:ai:make` | Create AI-powered feature (Prism PHP) |
+| `/laravel-agent:bug:fix` | AI-assisted bug fixing |
+| `/laravel-agent:docs:generate` | Generate documentation |
 
-| Plugin | Description | Commands |
-|--------|-------------|----------|
-| **laravel-architect** | Brain - analyzes, decides, delegates | `/build`, `/init`, `/patterns` |
-| **laravel-feature-builder** | Complete features with CRUD/views/API | `/feature:make` |
-| **laravel-module-builder** | Reusable domain modules | - |
-| **laravel-service-builder** | Services and actions | - |
-| **laravel-refactor** | SOLID/DRY improvements | `/refactor` |
-| **laravel-api-builder** | REST, GraphQL (Lighthouse), OAuth2 | `/api:make` |
-| **laravel-testing** | Pest tests (unit/feature/API/browser) | `/test:make` |
-| **laravel-database** | Migrations, optimization, relationships | `/db:optimize` |
-| **laravel-auth** | Policies, Laratrust/Spatie, Socialite | - |
-| **laravel-livewire** | Livewire 3 reactive components | `/livewire:make` |
-| **laravel-filament** | Filament 3/4 admin with Shield RBAC | `/filament:make` |
-| **laravel-queue** | Jobs, events, notifications, Horizon | `/job:make` |
-| **laravel-ai** | AI features with Prism PHP & MCP | `/ai:make` |
-| **laravel-deploy** | Forge, Vapor, Docker, Bref deployment | `/deploy:setup` |
-| **laravel-cicd** | GitHub Actions, GitLab CI, Bitbucket | `/cicd:setup` |
-| **laravel-security** | OWASP audits, security headers, CSP | `/security:audit` |
+### DevOps
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:deploy:setup` | Setup deployment (Forge, Vapor, Docker) |
+| `/laravel-agent:cicd:setup` | Setup CI/CD pipeline |
+| `/laravel-agent:reverb:setup` | Setup Laravel Reverb WebSockets |
+| `/laravel-agent:feature-flag:make` | Create feature flag (Pennant) |
+| `/laravel-agent:migrate:from-legacy` | Migrate from legacy codebase |
 
-## Usage
+### Code Review & Git
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:review:staged` | Review staged changes |
+| `/laravel-agent:review:pr` | Review pull request |
+| `/laravel-agent:review:audit` | Full code audit |
+| `/laravel-agent:refactor` | Refactor code for SOLID/DRY |
+| `/laravel-agent:git:commit` | Create conventional commit |
+| `/laravel-agent:git:pr` | Create pull request |
+| `/laravel-agent:git:release` | Create release |
+
+## Usage Examples
 
 ### Intelligent Build (Recommended)
 
-Let the architect decide:
+Let the architect decide the best approach:
 
 ```bash
-/build invoice management system
+/laravel-agent:build invoice management system with PDF export
 ```
 
 The architect will:
 1. Analyze the request
 2. Scan your codebase for existing patterns
-3. Decide implementation type
+3. Decide implementation type (Feature/Module/Service/Action)
 4. Delegate to appropriate builder
-5. Verify with tests
-
-### Examples by Type
-
-```bash
-# Feature (CRUD + views + API)
-/build product catalog with categories
-
-# Module (reusable logic, no UI)
-/build pricing calculation engine
-
-# Action (single operation)
-/build send welcome email after registration
-
-# Service (orchestrates operations)
-/build payment processing with Stripe
-```
+5. Generate tests and verify
 
 ### Direct Commands
 
 ```bash
-# Create feature directly
-/feature:make Orders with line items and status
+# Create a complete feature
+/laravel-agent:feature:make Products with categories and variants
 
-# Create versioned API
-/api:make Products v2 with filtering
+# Create API with versioning
+/laravel-agent:api:make Products v2
 
 # Generate tests
-/test:make OrderService unit comprehensive
+/laravel-agent:test:make OrderService
 
 # Create Livewire component
-/livewire:make Products table
+/laravel-agent:livewire:make ProductsTable
 
-# Create Filament resource
-/filament:make Products
+# Create Filament admin resource
+/laravel-agent:filament:make Products
 
-# Create queued job
-/job:make ProcessOrder
+# Security audit
+/laravel-agent:security:audit
 
-# Optimize database
-/db:optimize OrderController
+# Setup deployment
+/laravel-agent:deploy:setup vapor
 
-# Refactor code
-/refactor app/Http/Controllers/OrderController.php
-
-# Check pattern usage
-/patterns
-
-# DevOps commands
-/deploy:setup vapor           # Configure Vapor deployment
-/cicd:setup github            # Setup GitHub Actions
-/security:audit               # Run security audit
+# Review staged changes
+/laravel-agent:review:staged
 ```
 
-## How It Works
+## Agents
 
-```
-┌─────────────────┐
-│  /build <desc>  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────────────────┐
-│         laravel-architect           │
-│  • Analyzes request                 │
-│  • Scans codebase                   │
-│  • Checks pattern registry (max 5)  │
-│  • Decides implementation type      │
-│  • Enforces SOLID/DRY               │
-└────────┬────────────────────────────┘
-         │
-         ▼ Delegates to:
-┌────────┴────────┬─────────────┬──────────────┐
-│                 │             │              │
-▼                 ▼             ▼              ▼
-Feature       Module        Service        Others...
-Builder       Builder       Builder
-```
+| Agent | Purpose |
+|-------|---------|
+| `laravel-architect` | Decision maker - analyzes requests, delegates to builders |
+| `laravel-feature-builder` | Builds complete features with CRUD, views, API |
+| `laravel-module-builder` | Builds reusable domain modules |
+| `laravel-service-builder` | Builds services and actions |
+| `laravel-refactor` | Code improvement and refactoring |
+| `laravel-api-builder` | REST APIs with versioning, OpenAPI |
+| `laravel-testing` | Pest tests - unit, feature, API, browser |
+| `laravel-database` | Migrations, optimization, relationships |
+| `laravel-auth` | Authentication, authorization, policies |
+| `laravel-livewire` | Livewire 3 reactive components |
+| `laravel-filament` | Filament admin panels |
+| `laravel-queue` | Jobs, events, notifications |
+| `laravel-ai` | AI features with Prism PHP |
+| `laravel-deploy` | Forge, Vapor, Docker, Bref deployment |
+| `laravel-cicd` | GitHub Actions, GitLab CI pipelines |
+| `laravel-security` | OWASP audits, security headers |
+| `laravel-reverb` | WebSockets with Laravel Reverb |
+| `laravel-pennant` | Feature flags and A/B testing |
+| `laravel-migration` | Laravel/PHP version upgrades |
+| `laravel-review` | Code review orchestrator |
+| `laravel-validator` | Review validation and false positive filtering |
+| `laravel-git` | Git workflow automation |
 
 ## Architecture Decision Matrix
 
@@ -198,157 +185,28 @@ Builder       Builder       Builder
 | Orchestrates operations | Service | `app/Services/` |
 | Single operation | Action | `app/Actions/<Domain>/` |
 
-## Laravel Boost Integration
-
-Works best with [Laravel Boost](https://github.com/laravel/boost) installed:
-
-```bash
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-The agents use Boost's MCP tools for:
-- `mcp__laravel-boost__models` - Existing models
-- `mcp__laravel-boost__schema` - Database structure
-- `mcp__laravel-boost__routes` - Route conflicts
-- `mcp__laravel-boost__docs` - Best practices
-
-**Note:** Laravel Boost generates its own `CLAUDE.md` with Livewire, Tailwind, Filament guidelines. This plugin uses separate agent files to avoid conflicts.
-
-## Development Lifecycle Coverage
-
-### Planning & Architecture
-- ✅ Architectural decisions
-- ✅ Pattern management (max 5)
-- ✅ SOLID/DRY enforcement
-
-### Backend Development
-- ✅ Features (CRUD + views + API)
-- ✅ Modules (reusable domain logic)
-- ✅ Services & Actions
-- ✅ Database (migrations, optimization)
-- ✅ Authentication & Authorization
-- ✅ API (versioning, OpenAPI docs)
-
-### Frontend Development
-- ✅ Livewire 3 components
-- ✅ Filament admin panels
-- ✅ Alpine.js integration
-
-### Async Operations
-- ✅ Queued jobs
-- ✅ Events & Listeners
-- ✅ Notifications (mail, SMS, push)
-- ✅ Broadcasting (WebSockets)
-
-### Quality Assurance
-- ✅ Pest testing (unit, feature, API, browser)
-- ✅ Code refactoring
-- ✅ Query optimization
-
-### Project Templates
-
-Start with production-ready templates:
-
-```bash
-# SaaS starter with multi-tenancy, billing, teams
-/project:init saas
-
-# API-only with versioning, OpenAPI docs
-/project:init api
-```
-
 ## Package Integrations
 
-The agents are aware of and integrate with **35+ Laravel packages**:
+The agents detect and adapt to 50+ packages including:
 
-### Architecture & Structure
-| Package | Integration |
-|---------|-------------|
-| **nwidart/laravel-modules** | Use nwidart module structure instead of app/Modules |
-| **lorisleiva/laravel-actions** | AsAction pattern for multi-context actions |
-| **spatie/laravel-package-tools** | Distributable package development |
-
-### AI & LLM
-| Package | Integration |
-|---------|-------------|
-| **prism-php/prism** | AI text generation, embeddings, tool calling |
-| **laravel/mcp** | MCP server creation for AI clients |
-
-### API & GraphQL
-| Package | Integration |
-|---------|-------------|
-| **nuwave/lighthouse** | GraphQL schema-driven API development |
-| **laravel/passport** | OAuth2 server with scopes and token management |
-| **laravel/sanctum** | SPA and API token authentication |
-| **spatie/laravel-query-builder** | Advanced API filtering and sorting |
-
-### Authentication & Authorization
-| Package | Integration |
-|---------|-------------|
-| **spatie/laravel-permission** | Role-based access control (alternative to Laratrust) |
-| **bezhansalleh/filament-shield** | Filament RBAC with auto-generated permissions |
-| **socialiteproviders/manager** | Social login (Google, GitHub, Apple, etc.) |
-
-### Billing & Subscriptions
-| Package | Integration |
-|---------|-------------|
-| **laravel/cashier** | Stripe subscriptions, invoices, webhooks |
-
-### Development Tools
-| Package | Integration |
-|---------|-------------|
-| **barryvdh/laravel-ide-helper** | Auto-run after model creation, PHPDoc generation |
-| **barryvdh/laravel-debugbar** | Query profiling during refactoring |
-| **larastan/larastan** | Static analysis with Laravel-specific rules |
-| **laravel/pint** | Code formatting after generation |
-| **laravel/prompts** | Beautiful CLI interfaces for artisan commands |
-| **laravel/tinker** | Quick prototyping and debugging |
-
-### Database & Utilities
-| Package | Integration |
-|---------|-------------|
-| **kitloong/laravel-migrations-generator** | Reverse engineer existing databases |
-| **spatie/laravel-tags** | Model tagging functionality |
-| **spatie/laravel-sluggable** | Automatic slug generation |
-| **spatie/laravel-settings** | Type-safe application settings |
-
-### Performance & Monitoring
-| Package | Integration |
-|---------|-------------|
-| **laravel/octane** | Stateless service patterns, parallel operations |
-| **laravel/horizon** | Redis queue dashboard and monitoring |
-| **laravel/telescope** | Debug dashboard and request profiling |
-| **spatie/laravel-health** | Application health checks and monitoring |
-
-### Media & Files
-| Package | Integration |
-|---------|-------------|
-| **spatie/laravel-medialibrary** | File uploads with conversions |
-| **spatie/laravel-activitylog** | Audit trail for model changes |
-| **spatie/laravel-backup** | Automated database/file backups |
-
-### Search
-| Package | Integration |
-|---------|-------------|
-| **laravel/scout** | Full-text search with Algolia/Meilisearch |
-
-### Deployment & DevOps
-| Package | Integration |
-|---------|-------------|
-| **bref/laravel-bridge** | AWS Lambda serverless deployment |
-| **laravel/vapor-core** | Laravel Vapor serverless |
-
-When these packages are detected, the agents automatically:
-- Adjust code generation patterns
-- Recommend package-specific commands
-- Follow package conventions
+- **Architecture**: nwidart/laravel-modules, lorisleiva/laravel-actions
+- **AI/LLM**: prism-php/prism, laravel/mcp
+- **API**: nuwave/lighthouse, laravel/passport, laravel/sanctum
+- **Auth**: spatie/laravel-permission, santigarcor/laratrust
+- **Billing**: laravel/cashier
+- **Admin**: filament/filament, bezhansalleh/filament-shield
+- **Testing**: pestphp/pest, laravel/dusk
+- **Database**: spatie/laravel-medialibrary, spatie/laravel-activitylog
+- **Performance**: laravel/octane, laravel/horizon
+- **WebSockets**: laravel/reverb
+- **Feature Flags**: laravel/pennant
+- **Multi-Tenancy**: stancl/tenancy
+- **Deployment**: bref/laravel-bridge, laravel/vapor-core
 
 ## Requirements
 
-- Claude Code with Plugin support (public beta)
+- Claude Code with Plugin support
 - Laravel 10+ project
-- Optional: Laravel Boost, Laratrust, Pest, Filament
 
 ## License
 
@@ -356,9 +214,8 @@ MIT
 
 ## Contributing
 
-Contributions welcome! Please read the contributing guidelines first.
+Contributions welcome! Please open an issue or pull request.
 
 ## Credits
 
-- Inspired by [Laravel Boost](https://github.com/laravel/boost)
-- Built for [Claude Code](https://claude.ai/code)
+Built for [Claude Code](https://claude.ai/code)
