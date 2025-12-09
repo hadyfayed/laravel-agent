@@ -7,7 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "review", "code-review", "pr-review", "audit", "quality"],
-  "category": "quality",
-  "homepage": "https://github.com/hadyfayed/laravel-agent",
-  "dependencies": []
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

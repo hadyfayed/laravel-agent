@@ -7,7 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "reverb", "websocket", "broadcasting", "echo", "realtime"],
-  "category": "development",
-  "homepage": "https://github.com/hadyfayed/laravel-agent",
-  "dependencies": []
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

@@ -7,7 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "cicd", "github-actions", "gitlab-ci", "pipelines"],
-  "category": "deployment",
-  "homepage": "https://github.com/hadyfayed/laravel-agent",
-  "dependencies": []
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

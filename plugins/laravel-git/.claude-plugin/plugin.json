@@ -7,7 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "git", "commit", "pr", "release", "changelog", "conventional-commits"],
-  "category": "workflow",
-  "homepage": "https://github.com/hadyfayed/laravel-agent",
-  "dependencies": []
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

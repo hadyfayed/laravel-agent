@@ -7,7 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "deploy", "forge", "vapor", "docker", "bref", "devops"],
-  "category": "deployment",
-  "homepage": "https://github.com/hadyfayed/laravel-agent",
-  "dependencies": []
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

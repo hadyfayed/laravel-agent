@@ -7,7 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "migration", "upgrade", "php", "rector", "modernization"],
-  "category": "development",
-  "homepage": "https://github.com/hadyfayed/laravel-agent",
-  "dependencies": []
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

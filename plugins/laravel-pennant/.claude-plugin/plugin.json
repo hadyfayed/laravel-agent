@@ -7,7 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "pennant", "feature-flags", "ab-testing", "rollout"],
-  "category": "development",
-  "homepage": "https://github.com/hadyfayed/laravel-agent",
-  "dependencies": []
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

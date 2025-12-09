@@ -7,5 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "feature", "crud", "generator"],
-  "category": "development"
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

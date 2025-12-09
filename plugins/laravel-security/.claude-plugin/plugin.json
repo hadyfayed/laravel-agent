@@ -7,7 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "security", "owasp", "audit", "csp", "xss", "sql-injection"],
-  "category": "security",
-  "homepage": "https://github.com/hadyfayed/laravel-agent",
-  "dependencies": []
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

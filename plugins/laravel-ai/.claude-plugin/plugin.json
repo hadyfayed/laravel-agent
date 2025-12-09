@@ -2,6 +2,11 @@
   "name": "laravel-ai",
   "version": "1.0.0",
   "description": "Build AI-powered Laravel features using Prism PHP and Laravel MCP",
-  "agents": ["agents/laravel-ai.md"],
-  "commands": ["commands/ai:make.md"]
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "ai", "llm", "prism", "openai", "anthropic"],
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

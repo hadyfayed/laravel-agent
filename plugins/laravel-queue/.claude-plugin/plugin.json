@@ -7,5 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "queue", "jobs", "events", "notifications", "broadcasting"],
-  "category": "development"
+  "agents": "./agents/",
+  "commands": "./commands/"
 }

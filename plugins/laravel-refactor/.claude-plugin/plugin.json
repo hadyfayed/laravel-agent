@@ -7,5 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "refactor", "solid", "dry", "clean-code"],
-  "category": "development"
+  "agents": "./agents/",
+  "commands": "./commands/"
 }
