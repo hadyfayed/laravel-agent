@@ -1,0 +1,13 @@
+{
+  "name": "laravel-security",
+  "description": "Security specialist - OWASP audits, security headers, CSP, rate limiting, secure coding",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "security", "owasp", "audit", "csp", "xss", "sql-injection"],
+  "category": "security",
+  "homepage": "https://github.com/hadyfayed/laravel-agent",
+  "dependencies": []
+}

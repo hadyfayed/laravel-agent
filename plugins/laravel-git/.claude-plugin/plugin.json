@@ -1,0 +1,13 @@
+{
+  "name": "laravel-git",
+  "description": "Git workflow automation - conventional commits, smart PR creation, changelog generation",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "git", "commit", "pr", "release", "changelog", "conventional-commits"],
+  "category": "workflow",
+  "homepage": "https://github.com/hadyfayed/laravel-agent",
+  "dependencies": []
+}

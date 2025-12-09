@@ -1,0 +1,13 @@
+{
+  "name": "laravel-pennant",
+  "description": "Feature flags - Laravel Pennant, A/B testing, gradual rollouts, user segmentation",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "pennant", "feature-flags", "ab-testing", "rollout"],
+  "category": "development",
+  "homepage": "https://github.com/hadyfayed/laravel-agent",
+  "dependencies": []
+}

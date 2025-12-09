@@ -1,0 +1,13 @@
+{
+  "name": "laravel-deploy",
+  "description": "DevOps specialist for Laravel deployments - Forge, Vapor, Docker, Bref, zero-downtime",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "deploy", "forge", "vapor", "docker", "bref", "devops"],
+  "category": "deployment",
+  "homepage": "https://github.com/hadyfayed/laravel-agent",
+  "dependencies": []
+}

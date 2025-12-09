@@ -1,0 +1,13 @@
+{
+  "name": "laravel-cicd",
+  "description": "CI/CD pipelines for Laravel - GitHub Actions, GitLab CI, Bitbucket Pipelines",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "cicd", "github-actions", "gitlab-ci", "pipelines"],
+  "category": "deployment",
+  "homepage": "https://github.com/hadyfayed/laravel-agent",
+  "dependencies": []
+}
