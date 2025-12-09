@@ -86,10 +86,10 @@ final class <Singular> extends Model
 ```php
 Schema::create('<slug>', function (Blueprint $table) {
     $table->id();
-    // Tenancy (if enabled)
-    $table->unsignedBigInteger('created_for_id')->index();
-    $table->unsignedBigInteger('created_by_id')->index();
-    // Spec columns
+    // Only add if Tenancy: Yes
+    // $table->unsignedBigInteger('created_for_id')->index();
+    // $table->unsignedBigInteger('created_by_id')->index();
+    // Spec columns go here
     $table->timestamps();
     $table->softDeletes();
 });
