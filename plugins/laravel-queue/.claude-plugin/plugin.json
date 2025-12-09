@@ -1,0 +1,11 @@
+{
+  "name": "laravel-queue",
+  "description": "Build queued jobs, events, listeners, notifications, and broadcasting",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "queue", "jobs", "events", "notifications", "broadcasting"],
+  "category": "development"
+}

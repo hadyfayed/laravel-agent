@@ -1,0 +1,11 @@
+{
+  "name": "laravel-api-builder",
+  "description": "Build production-ready APIs with versioning, OpenAPI docs, rate limiting, and transformers",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "api", "rest", "openapi", "swagger", "versioning"],
+  "category": "development"
+}

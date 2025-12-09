@@ -1,0 +1,13 @@
+{
+  "name": "laravel-architect",
+  "description": "Senior Laravel architect AI - thinks before coding, decides optimal implementation approach",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "architecture", "solid", "dry", "patterns"],
+  "category": "development",
+  "homepage": "https://github.com/hadyfayed/laravel-agent",
+  "dependencies": []
+}

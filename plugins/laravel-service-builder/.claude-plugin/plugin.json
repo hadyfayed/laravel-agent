@@ -1,0 +1,11 @@
+{
+  "name": "laravel-service-builder",
+  "description": "Builds Laravel services and single-purpose actions following SRP",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "service", "action", "srp"],
+  "category": "development"
+}

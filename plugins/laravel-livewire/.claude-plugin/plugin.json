@@ -1,0 +1,11 @@
+{
+  "name": "laravel-livewire",
+  "description": "Build reactive Livewire components - forms, tables, modals, and real-time features",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "livewire", "alpine", "tall-stack", "components"],
+  "category": "development"
+}

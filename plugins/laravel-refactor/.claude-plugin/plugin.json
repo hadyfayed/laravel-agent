@@ -1,0 +1,11 @@
+{
+  "name": "laravel-refactor",
+  "description": "Analyzes and refactors Laravel code for SOLID/DRY compliance",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "refactor", "solid", "dry", "clean-code"],
+  "category": "development"
+}

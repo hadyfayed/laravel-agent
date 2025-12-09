@@ -1,0 +1,164 @@
+{
+  "name": "laravel-agent",
+  "description": "AI-powered Laravel development agents with 7-phase workflow, parallel code review, security hooks, and git automation. Supports 50+ packages including Prism, Lighthouse, Cashier, Reverb, Pennant, Stancl Tenancy, and more.",
+  "owner": {
+    "name": "Laravel Agent",
+    "url": "https://github.com/hadyfayed/laravel-agent"
+  },
+  "features": {
+    "7-phase-workflow": "Discovery → Exploration → Questions → Architecture → Implementation → Review → Summary",
+    "parallel-review": "4 specialized reviewers (security, quality, laravel, testing) with confidence scoring",
+    "security-hooks": "PreToolUse/PostToolUse hooks for real-time security validation",
+    "progressive-disclosure": "3-tier skill loading (metadata → core → references)",
+    "git-automation": "Conventional commits, smart PR creation, changelog generation"
+  },
+  "plugins": [
+    {
+      "name": "laravel-architect",
+      "source": "./plugins/laravel-architect",
+      "description": "Senior architect AI with 7-phase workflow (Discovery → Implementation → Review). Analyzes requests, decides approach, enforces SOLID/DRY, delegates to builders, and validates output",
+      "version": "2.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-feature-builder",
+      "source": "./plugins/laravel-feature-builder",
+      "description": "Builds complete Laravel features with CRUD, views, API, tests, and multi-tenancy support",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-module-builder",
+      "source": "./plugins/laravel-module-builder",
+      "description": "Builds reusable domain modules with contracts, services, DTOs, and tests",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-service-builder",
+      "source": "./plugins/laravel-service-builder",
+      "description": "Builds services and actions following single-responsibility principle",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-refactor",
+      "source": "./plugins/laravel-refactor",
+      "description": "Analyzes and refactors code for SOLID/DRY compliance with incremental improvements",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-api-builder",
+      "source": "./plugins/laravel-api-builder",
+      "description": "Build production-ready APIs with versioning, OpenAPI docs, rate limiting, and filtering",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-testing",
+      "source": "./plugins/laravel-testing",
+      "description": "Comprehensive Pest testing - unit, feature, API, browser, and mutation testing",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-database",
+      "source": "./plugins/laravel-database",
+      "description": "Database expert - migrations, query optimization, relationships, indexing, and seeders",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-auth",
+      "source": "./plugins/laravel-auth",
+      "description": "Authentication and authorization - guards, policies, Laratrust roles/permissions, 2FA",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-livewire",
+      "source": "./plugins/laravel-livewire",
+      "description": "Build reactive Livewire 3 components - forms, tables, modals, and real-time features",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-filament",
+      "source": "./plugins/laravel-filament",
+      "description": "Build Filament 3 admin panels - resources, pages, widgets, forms, tables, and actions",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-queue",
+      "source": "./plugins/laravel-queue",
+      "description": "Build async systems with queued jobs, events, listeners, notifications, and broadcasting",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-ai",
+      "source": "./plugins/laravel-ai",
+      "description": "Build AI-powered features using Prism PHP for LLM integration, Laravel MCP servers, embeddings, and tool calling",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-deploy",
+      "source": "./plugins/laravel-deploy",
+      "description": "DevOps specialist for deployments - Laravel Forge, Vapor, Docker, Bref, and zero-downtime scripts",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-cicd",
+      "source": "./plugins/laravel-cicd",
+      "description": "CI/CD pipelines - GitHub Actions, GitLab CI, Bitbucket Pipelines with testing and deployment",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-security",
+      "source": "./plugins/laravel-security",
+      "description": "Security specialist - OWASP audits, security headers, CSP, rate limiting, and secure coding practices",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-reverb",
+      "source": "./plugins/laravel-reverb",
+      "description": "WebSocket specialist - Laravel Reverb setup, broadcasting events, presence channels, and Echo integration",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-pennant",
+      "source": "./plugins/laravel-pennant",
+      "description": "Feature flags - Laravel Pennant setup, A/B testing, gradual rollouts, and user segmentation",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-migration",
+      "source": "./plugins/laravel-migration",
+      "description": "Migration specialist - Laravel version upgrades, PHP upgrades, framework migrations, and code modernization",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-review",
+      "source": "./plugins/laravel-review",
+      "description": "Code review orchestrator with 4 parallel reviewers (security, quality, laravel, testing). Confidence scoring (80%+ threshold) and validator subagent for false positive filtering",
+      "version": "1.0.0",
+      "category": "laravel"
+    },
+    {
+      "name": "laravel-git",
+      "source": "./plugins/laravel-git",
+      "description": "Git workflow automation - conventional commits, smart PR creation, changelog generation, and release management",
+      "version": "1.0.0",
+      "category": "laravel"
+    }
+  ]
+}

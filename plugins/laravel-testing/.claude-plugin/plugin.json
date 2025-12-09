@@ -1,0 +1,11 @@
+{
+  "name": "laravel-testing",
+  "description": "Comprehensive testing with Pest - unit, feature, API, browser, and mutation testing",
+  "version": "1.0.0",
+  "author": {
+    "name": "Laravel Agent"
+  },
+  "license": "MIT",
+  "keywords": ["laravel", "testing", "pest", "phpunit", "dusk", "tdd"],
+  "category": "development"
+}
