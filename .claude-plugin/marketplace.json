@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "laravel-agent",
-      "source": "./",
+      "source": "../",
       "description": "Complete Laravel development assistant with 22 specialized agents for architecture, features, modules, services, APIs, testing, database, auth, Livewire, Filament, queues, AI/LLM, deployment, CI/CD, security, WebSockets, feature flags, migrations, code review, and git workflow automation",
       "version": "2.0.0"
     }
