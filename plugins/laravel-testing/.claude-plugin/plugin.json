@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "testing", "pest", "phpunit", "dusk", "tdd"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-testing.md"],
+  "commands": ["./commands/test:make.md", "./commands/test:coverage.md"]
 }

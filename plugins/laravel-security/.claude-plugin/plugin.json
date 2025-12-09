@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "security", "owasp", "audit", "csp", "xss", "sql-injection"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-security.md"],
+  "commands": ["./commands/security:audit.md"]
 }

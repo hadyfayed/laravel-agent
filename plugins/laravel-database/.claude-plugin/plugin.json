@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "database", "migration", "eloquent", "optimization"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-database.md"],
+  "commands": ["./commands/db:optimize.md", "./commands/db:diagram.md"]
 }

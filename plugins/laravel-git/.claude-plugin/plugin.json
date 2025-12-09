@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "git", "commit", "pr", "release", "changelog", "conventional-commits"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-git.md"],
+  "commands": ["./commands/git:commit.md", "./commands/git:pr.md", "./commands/git:release.md"]
 }

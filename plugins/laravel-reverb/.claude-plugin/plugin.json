@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "reverb", "websocket", "broadcasting", "echo", "realtime"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-reverb.md"],
+  "commands": ["./commands/reverb:setup.md", "./commands/broadcast:make.md"]
 }

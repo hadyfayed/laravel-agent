@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "ai", "llm", "prism", "openai", "anthropic"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-ai.md"],
+  "commands": ["./commands/ai:make.md", "./commands/bug:fix.md", "./commands/docs:generate.md"]
 }

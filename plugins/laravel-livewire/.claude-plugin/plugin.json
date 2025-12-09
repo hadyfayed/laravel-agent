@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "livewire", "alpine", "tall-stack", "components"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-livewire.md"],
+  "commands": ["./commands/livewire:make.md"]
 }

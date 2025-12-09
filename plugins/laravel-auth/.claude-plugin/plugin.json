@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "auth", "authorization", "laratrust", "policies", "guards"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-auth.md"],
+  "commands": ["./commands/auth:setup.md"]
 }

@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "feature", "crud", "generator"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-feature-builder.md"],
+  "commands": ["./commands/feature:make.md"]
 }

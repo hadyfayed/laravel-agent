@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "deploy", "forge", "vapor", "docker", "bref", "devops"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-deploy.md"],
+  "commands": ["./commands/deploy:setup.md"]
 }

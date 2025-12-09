@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "api", "rest", "openapi", "swagger", "versioning"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-api-builder.md"],
+  "commands": ["./commands/api:make.md", "./commands/api:docs.md"]
 }

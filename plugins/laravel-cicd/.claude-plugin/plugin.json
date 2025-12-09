@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "cicd", "github-actions", "gitlab-ci", "pipelines"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-cicd.md"],
+  "commands": ["./commands/cicd:setup.md"]
 }

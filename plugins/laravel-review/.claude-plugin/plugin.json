@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "review", "code-review", "pr-review", "audit", "quality"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-review.md", "./agents/laravel-validator.md"],
+  "commands": ["./commands/review:pr.md", "./commands/review:audit.md", "./commands/review:staged.md"]
 }

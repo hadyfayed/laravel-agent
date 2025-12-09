@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "filament", "admin", "crud", "panel"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-filament.md"],
+  "commands": ["./commands/filament:make.md"]
 }

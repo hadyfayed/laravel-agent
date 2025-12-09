@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "module", "domain", "ddd"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-module-builder.md"],
+  "commands": ["./commands/module:make.md"]
 }

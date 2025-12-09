@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "queue", "jobs", "events", "notifications", "broadcasting"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-queue.md"],
+  "commands": ["./commands/job:make.md"]
 }

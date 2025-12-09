@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "architecture", "solid", "dry", "patterns"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-architect.md"],
+  "commands": ["./commands/build.md", "./commands/init.md", "./commands/patterns.md"]
 }

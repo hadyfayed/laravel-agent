@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "service", "action", "srp"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-service-builder.md"],
+  "commands": ["./commands/service:make.md"]
 }

@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "migration", "upgrade", "php", "rector", "modernization"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-migration.md"],
+  "commands": ["./commands/migrate:from-legacy.md"]
 }

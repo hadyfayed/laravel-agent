@@ -7,6 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["laravel", "pennant", "feature-flags", "ab-testing", "rollout"],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "agents": ["./agents/laravel-pennant.md"],
+  "commands": ["./commands/feature-flag:make.md"]
 }
