@@ -164,23 +164,32 @@ final class TenantScope implements Scope
 ## Laravel Agent Initialized
 
 ### Structure Created
-- app/Features/     (self-contained business features)
-- app/Modules/      (reusable domain logic)
-- app/Services/     (orchestration services)
-- app/Actions/      (single-purpose actions)
-- app/Support/      (utilities, tenancy)
-- .ai/patterns/     (pattern registry)
+- `app/Features/`     - Self-contained business features
+- `app/Modules/`      - Reusable domain logic
+- `app/Services/`     - Orchestration services
+- `app/Actions/`      - Single-purpose actions
+- `app/Support/`      - Utilities, tenancy
+- `.ai/patterns/`     - Pattern registry (max 5)
 
-### Pattern Limit: 5 patterns max
+### Available Commands
 
-### Commands Available
-- /build <description>  - Intelligent build
-- /feature:make <Name>  - Create feature directly
-- /refactor <target>    - Improve code quality
-- /patterns             - View pattern usage
+**Core:**
+- `/laravel-architect:build` - Intelligent build (architect decides approach)
+- `/laravel-architect:patterns` - View pattern usage
+
+**Builders:**
+- `/laravel-feature-builder:feature:make` - Create complete feature
+- `/laravel-module-builder:module:make` - Create reusable module
+- `/laravel-service-builder:service:make` - Create service/action
+
+**Quality:**
+- `/laravel-refactor:refactor` - Improve code quality
+- `/laravel-review:review:staged` - Review staged changes
+- `/laravel-testing:test:make` - Generate tests
 
 ### Next Steps
-1. Install Laravel Boost if not installed
-2. Configure TenantMiddleware for your auth
-3. Start building: /build <description>
+
+1. Install recommended dependencies if needed
+2. Configure TenantMiddleware if using multi-tenancy
+3. Try: `/laravel-architect:build create a user management feature`
 ```
