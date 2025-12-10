@@ -4,7 +4,7 @@ description: >
   Build complete Laravel features as self-contained modules under app/Features/<Name>.
   Creates ServiceProvider, routes (web+api), controllers, requests, resources, views,
   models, factories, seeders, migrations, policies, and tests. Supports multi-tenancy.
-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
+tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
 ---
 
 # ROLE
@@ -124,8 +124,33 @@ final class <Name>Controller extends Controller
 }
 ```
 
-## API Controller
-Similar but returns JSON Resources with proper status codes (201 created, 204 deleted).
+## API Controller - DELEGATE TO laravel-api-builder
+
+For API endpoints, delegate to laravel-api-builder using Task tool:
+
+```
+Use the Task tool with subagent_type="laravel-api-builder" to implement API:
+
+Name: <Name>
+Version: v1
+Spec: <same spec as feature>
+Features: [filtering, sorting, pagination, includes]
+```
+
+The api-builder will create:
+- `app/Http/Controllers/Api/V1/<Name>Controller.php`
+- `app/Http/Resources/V1/<Name>Resource.php`
+- `app/Http/Resources/V1/<Name>Collection.php`
+- `routes/api/v1.php` entries
+- OpenAPI documentation annotations
+
+**Why delegate?** The api-builder has specialized knowledge of:
+- API versioning strategies
+- OpenAPI/Swagger documentation
+- Rate limiting configuration
+- Query filtering with Spatie Query Builder
+- GraphQL with Lighthouse (if installed)
+- OAuth2 with Passport (if installed)
 
 ## Policy (Laratrust)
 ```php
@@ -192,29 +217,65 @@ vendor/bin/pest --filter=<Name>
 # EXECUTION STEPS
 
 1. Create directory structure
-2. Generate all files from templates
-3. Register ServiceProvider in config/app.php
-4. Run post-build commands (IDE helper, Pint, migrations)
-5. Run tests
-6. Output summary
+2. Generate all files from templates (model, migration, controllers, views, policy, tests)
+3. **DELEGATE API to laravel-api-builder** (using Task tool)
+4. Register ServiceProvider in config/app.php
+5. Run post-build commands (IDE helper, Pint, migrations)
+6. Run tests
+7. Output summary with standardized format
 
 # OUTPUT FORMAT
 
 ```markdown
-## Feature Built: <Name>
+## laravel-feature-builder Complete
 
-### Location
-app/Features/<Name>/
+### Summary
+- **Type**: Feature
+- **Name**: <Name>
+- **Status**: Success|Partial|Failed
+
+### Files Created
+- `app/Features/<Name>/<Name>ServiceProvider.php` - Feature registration
+- `app/Features/<Name>/Domain/Models/<Singular>.php` - Eloquent model
+- `app/Features/<Name>/Http/Controllers/<Name>Controller.php` - Web controller
+- `app/Features/<Name>/Http/Requests/Store<Singular>Request.php` - Validation
+- `app/Features/<Name>/Http/Requests/Update<Singular>Request.php` - Validation
+- `app/Features/<Name>/Policies/<Singular>Policy.php` - Authorization
+- `app/Features/<Name>/Views/*.blade.php` - Blade views
+- `app/Features/<Name>/Database/Migrations/*_create_<slug>_table.php` - Schema
+- `app/Features/<Name>/Database/Factories/<Singular>Factory.php` - Test data
+- `app/Features/<Name>/Tests/Feature/<Name>Test.php` - Pest tests
+
+### Files Modified
+- `config/app.php` - ServiceProvider registered
+
+### Commands Run
+```bash
+composer dump-autoload
+php artisan migrate
+vendor/bin/pint app/Features/<Name>/
+vendor/bin/pest --filter=<Name>
+```
+
+### Tests
+- [x] Feature tests created
+- [ ] Tests passing (run manually)
 
 ### Routes
-- Web: /<slug> (resource)
-- API: /api/<slug> (apiResource)
+- Web: `/<slug>` (resource routes)
+- API: `/api/v1/<slug>` (delegated to api-builder)
 
 ### Permissions (Laratrust)
-- read-<slug>, create-<slug>, update-<slug>, delete-<slug>
+- `read-<slug>`, `create-<slug>`, `update-<slug>`, `delete-<slug>`
 
-### Test Results
-vendor/bin/pest --filter=<Name>
+### Delegated To
+- **laravel-api-builder** for API endpoints - [status]
+
+### Next Steps
+1. Run `php artisan migrate`
+2. Run `vendor/bin/pest --filter=<Name>`
+3. Add permissions to roles via Laratrust
+4. Customize views as needed
 ```
 
 # BILLING WITH LARAVEL CASHIER

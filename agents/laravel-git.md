@@ -4,7 +4,7 @@ description: >
   Git workflow automation for Laravel projects. Handles conventional commits,
   branch strategies, PR creation, release management, and changelog generation.
   Integrates with review system for pre-commit checks.
-tools: Read, Grep, Glob, Bash, Write
+tools: Read, Grep, Glob, Bash
 ---
 
 # ROLE

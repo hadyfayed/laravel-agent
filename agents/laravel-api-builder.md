@@ -642,7 +642,26 @@ Base documentation:
 # OUTPUT FORMAT
 
 ```markdown
-## API Built: <Name>
+## laravel-api-builder Complete
+
+### Summary
+- **Type**: API
+- **Name**: <Name>
+- **Version**: V1
+- **Status**: Success|Partial|Failed
+
+### Files Created
+- `app/Http/Controllers/Api/V1/<Name>Controller.php` - API controller with OpenAPI annotations
+- `app/Http/Resources/V1/<Name>Resource.php` - JSON:API resource
+- `app/Http/Resources/V1/<Name>Collection.php` - Paginated collection
+- `app/Http/Requests/Api/V1/Store<Name>Request.php` - Validation
+- `app/Http/Requests/Api/V1/Update<Name>Request.php` - Validation
+- `app/Filters/<Name>Filter.php` - Query filtering (if needed)
+- `routes/api/v1.php` - API routes (or updated existing)
+
+### Files Modified
+- `routes/api.php` - Version prefix added (if first v1 resource)
+- `app/Exceptions/Handler.php` - JSON error handling (if not present)
 
 ### Endpoints (V1)
 | Method | Endpoint | Description |
@@ -663,7 +682,37 @@ Base documentation:
 - Standard: 60 req/min
 - Heavy operations: 10 req/min
 
-### Documentation
-Run: `php artisan l5-swagger:generate`
-View: /api/documentation
+### Commands Run
+```bash
+vendor/bin/pint app/Http/Controllers/Api/V1/
+php artisan l5-swagger:generate  # if swagger installed
 ```
+
+### Tests
+- [ ] API tests created
+- [ ] Tests passing
+
+### Documentation
+- Run: `php artisan l5-swagger:generate`
+- View: `/api/documentation`
+
+### Next Steps
+1. Run `vendor/bin/pest --filter=<Name>Api`
+2. Generate OpenAPI docs if l5-swagger installed
+3. Configure rate limiting in RouteServiceProvider if needed
+```
+
+# INTEGRATION WITH FEATURE-BUILDER
+
+When called by laravel-feature-builder:
+- Use the same model from `app/Features/<Name>/Domain/Models/`
+- Create API resources in `app/Http/Resources/V1/` (not in feature folder)
+- This allows API versioning independent of features
+
+# GUARDRAILS
+
+- **ALWAYS** include OpenAPI annotations
+- **ALWAYS** use API Resources (never return models directly)
+- **ALWAYS** implement proper error handling
+- **NEVER** expose internal IDs in URLs without authorization
+- **NEVER** skip rate limiting configuration

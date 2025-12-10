@@ -749,3 +749,257 @@ On first run, create `.ai/patterns/registry.json` if missing:
   "history": []
 }
 ```
+
+# AGENT SELECTION DECISION TREE
+
+Use this decision tree to select the correct agent for any request:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    AGENT SELECTION DECISION TREE                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+START: What is the primary goal?
+
+├── BUILD something new
+│   ├── Complete business capability (CRUD + UI + API)?
+│   │   └── YES → laravel-feature-builder
+│   │       └── Feature will delegate to laravel-api-builder for API routes
+│   │
+│   ├── Reusable domain logic (no UI)?
+│   │   └── YES → laravel-module-builder
+│   │
+│   ├── Single service or action?
+│   │   └── YES → laravel-service-builder
+│   │
+│   ├── API-only (no web views)?
+│   │   └── YES → laravel-api-builder
+│   │
+│   ├── Admin panel?
+│   │   └── YES → laravel-filament
+│   │       └── Filament will use laravel-auth for permissions
+│   │
+│   ├── Livewire component?
+│   │   └── YES → laravel-livewire
+│   │
+│   ├── Queued job / Event / Notification?
+│   │   └── YES → laravel-queue
+│   │
+│   ├── WebSocket / Real-time?
+│   │   └── YES → laravel-reverb
+│   │
+│   ├── Feature flag / A/B test?
+│   │   └── YES → laravel-pennant
+│   │
+│   └── AI/LLM feature?
+│       └── YES → laravel-ai
+
+├── SETUP / CONFIGURE
+│   ├── Authentication system?
+│   │   └── YES → laravel-auth
+│   │
+│   ├── Database schema / migrations / optimization?
+│   │   └── YES → laravel-database
+│   │
+│   ├── Laravel/PHP version upgrade?
+│   │   └── YES → laravel-database (handles upgrades too)
+│   │
+│   ├── Deployment (Forge/Vapor/Docker)?
+│   │   └── YES → laravel-deploy
+│   │
+│   └── CI/CD pipeline?
+│       └── YES → laravel-cicd
+
+├── IMPROVE existing code
+│   ├── Refactor for SOLID/DRY?
+│   │   └── YES → laravel-refactor
+│   │
+│   └── Security audit / OWASP?
+│       └── YES → laravel-security
+
+├── TEST
+│   └── Generate tests?
+│       └── YES → laravel-testing
+
+├── REVIEW
+│   ├── Review staged changes?
+│   │   └── YES → laravel-review → uses laravel-validator
+│   │
+│   └── Review pull request?
+│       └── YES → laravel-review
+
+└── GIT operations
+    └── Commit / PR / Release?
+        └── YES → laravel-git
+```
+
+# AGENT CAPABILITY MATRIX
+
+| Agent | Creates Files | Modifies Files | Runs Commands | Delegates To |
+|-------|--------------|----------------|---------------|--------------|
+| laravel-architect | Pattern registry | - | Environment checks | All builders |
+| laravel-feature-builder | Feature structure | config/app.php | migrations, tests | laravel-api-builder |
+| laravel-module-builder | Module structure | - | - | - |
+| laravel-service-builder | Services/Actions | - | - | - |
+| laravel-api-builder | API controllers, routes | - | - | - |
+| laravel-auth | Policies, middleware | config/auth.php | - | - |
+| laravel-database | Migrations, models | Various | migrate, rector, pint | - |
+| laravel-filament | Resources, pages | - | - | laravel-auth |
+| laravel-livewire | Components | - | - | - |
+| laravel-queue | Jobs, events | - | - | - |
+| laravel-reverb | Broadcasting | config/broadcasting.php | reverb:install | - |
+| laravel-pennant | Feature classes | - | - | - |
+| laravel-ai | AI services | - | - | - |
+| laravel-deploy | Deploy configs | - | - | - |
+| laravel-cicd | CI/CD workflows | - | - | - |
+| laravel-security | - | - | - | - |
+| laravel-refactor | - | Target files | pint | - |
+| laravel-testing | Test files | - | pest | - |
+| laravel-review | - | - | - | laravel-validator |
+| laravel-validator | - | - | - | - |
+| laravel-git | - | - | git commands | - |
+
+# AGENT INTERACTION WORKFLOWS
+
+## Workflow 1: Build Complete Feature with API
+
+```
+User: "Build invoice management system"
+
+laravel-architect (analyzes)
+    │
+    ├── Decides: Feature (has CRUD + views + API)
+    │
+    └── Delegates to: laravel-feature-builder
+                          │
+                          ├── Creates: Models, Controllers, Views, Tests
+                          │
+                          └── Delegates API to: laravel-api-builder
+                                                    │
+                                                    └── Creates: API Controllers, Resources, Routes
+```
+
+## Workflow 2: Build Admin Panel with Auth
+
+```
+User: "Build admin panel for products"
+
+laravel-architect (analyzes)
+    │
+    ├── Decides: Admin panel
+    │
+    └── Delegates to: laravel-filament
+                          │
+                          ├── Creates: Filament Resource, Pages
+                          │
+                          └── Delegates auth to: laravel-auth
+                                                    │
+                                                    └── Creates: Policies, Permissions
+```
+
+## Workflow 3: Code Review Flow
+
+```
+User: "Review my staged changes"
+
+laravel-review (orchestrates)
+    │
+    ├── Spawns parallel reviewers:
+    │   ├── Security Reviewer
+    │   ├── Quality Reviewer
+    │   ├── Laravel Best Practices Reviewer
+    │   └── Test Coverage Reviewer
+    │
+    └── Validates with: laravel-validator
+                            │
+                            └── Filters false positives (confidence >= 80%)
+```
+
+## Workflow 4: Database + Migration
+
+```
+User: "Optimize database and upgrade to Laravel 11"
+
+laravel-architect (analyzes)
+    │
+    ├── For optimization → laravel-database
+    │                          │
+    │                          └── Adds indexes, fixes N+1, optimizes queries
+    │
+    └── For upgrade → laravel-migration
+                          │
+                          └── Updates dependencies, runs rector, fixes deprecations
+```
+
+# ERROR RECOVERY PROTOCOLS
+
+## If an agent fails mid-execution:
+
+1. **Check state**: What files were created/modified?
+2. **Rollback strategy**:
+   - If git available: `git checkout -- .` to restore
+   - If no git: Check for `.backup` files
+3. **Resume strategy**:
+   - Run same agent with `--continue` flag in spec
+   - Or manually complete remaining steps
+
+## If agents conflict:
+
+1. **Same file modified by multiple agents**:
+   - Last write wins (agents should coordinate via architect)
+   - Review changes before committing
+
+2. **Incompatible patterns suggested**:
+   - Architect makes final decision
+   - Document in `.ai/patterns/registry.json`
+
+## Standard Error Output Format:
+
+```json
+{
+  "agent": "laravel-feature-builder",
+  "status": "failed",
+  "step": "migration_creation",
+  "error": "Table already exists",
+  "files_created": ["app/Models/Invoice.php"],
+  "files_modified": [],
+  "recovery": "Drop table or use --force flag"
+}
+```
+
+# STANDARDIZED OUTPUT FORMAT
+
+All builder agents should output in this format:
+
+```markdown
+## [Agent Name] Complete
+
+### Summary
+- **Type**: [Feature|Module|Service|Action|API|etc.]
+- **Name**: [Name]
+- **Status**: [Success|Partial|Failed]
+
+### Files Created
+- `path/to/file.php` - Description
+
+### Files Modified
+- `path/to/file.php` - What changed
+
+### Commands Run
+```bash
+# List of commands executed
+```
+
+### Tests
+- [ ] Unit tests created
+- [ ] Feature tests created
+- [ ] Tests passing
+
+### Next Steps
+1. Run `php artisan migrate`
+2. Run `vendor/bin/pest`
+3. [Additional steps]
+
+### Delegated To
+- [Agent name] for [purpose] - [status]
+```

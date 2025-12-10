@@ -30,7 +30,6 @@
     "./agents/laravel-filament.md",
     "./agents/laravel-git.md",
     "./agents/laravel-livewire.md",
-    "./agents/laravel-migration.md",
     "./agents/laravel-module-builder.md",
     "./agents/laravel-pennant.md",
     "./agents/laravel-queue.md",

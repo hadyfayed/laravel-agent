@@ -4,7 +4,7 @@ description: >
   Build Filament 3/4 admin panels with resources, custom pages, widgets, forms,
   tables, and actions. Supports Filament Shield for RBAC. Creates complete CRUD
   with relationships, filters, and bulk actions.
-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
+tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
 ---
 
 # ROLE
@@ -658,7 +658,25 @@ Tables\Actions\Action::make('approve')
     ->visible(fn (<Name> $record) => $record->status === 'pending'),
 ```
 
-# AUTHORIZATION
+# AUTHORIZATION - DELEGATE TO laravel-auth
+
+For complex authorization setups, delegate to laravel-auth using Task tool:
+
+```
+Use the Task tool with subagent_type="laravel-auth" to implement authorization:
+
+Resource: <Name>
+Type: filament-resource
+Permissions: [view, view_any, create, update, delete, export, approve]
+Use Shield: Yes|No
+```
+
+The auth agent will create:
+- Policies with proper permission checks
+- Shield configuration (if Shield installed)
+- Role seeders with appropriate permissions
+
+**Simple inline authorization (for basic cases):**
 
 ```php
 // In Resource
@@ -683,6 +701,13 @@ public static function canDelete(Model $record): bool
 }
 ```
 
+**Why delegate for complex auth?** The auth agent has specialized knowledge of:
+- Laratrust vs Spatie Permission integration
+- Shield configuration for Filament
+- Team-based permissions
+- Policy generation with proper gates
+- Custom permission prefixes
+
 # MULTI-TENANCY
 
 ```php
@@ -702,25 +727,58 @@ public static function getEloquentQuery(): Builder
 # OUTPUT FORMAT
 
 ```markdown
-## Filament Resource: <Name>
+## laravel-filament Complete
+
+### Summary
+- **Type**: Filament Resource
+- **Name**: <Name>
+- **Status**: Success|Partial|Failed
 
 ### Files Created
-- app/Filament/Resources/<Name>Resource.php
-- app/Filament/Resources/<Name>Resource/Pages/...
+- `app/Filament/Resources/<Name>Resource.php` - Main resource
+- `app/Filament/Resources/<Name>Resource/Pages/List<Names>.php` - List page
+- `app/Filament/Resources/<Name>Resource/Pages/Create<Name>.php` - Create page
+- `app/Filament/Resources/<Name>Resource/Pages/Edit<Name>.php` - Edit page
+- `app/Filament/Resources/<Name>Resource/RelationManagers/` - (if relations)
+- `app/Filament/Widgets/<Name>StatsWidget.php` - (if widgets requested)
 
 ### Features
 - [x] CRUD operations
 - [x] Search & filters
 - [x] Bulk actions
 - [x] Relation managers
-- [x] Authorization
+- [ ] Authorization (delegated to laravel-auth)
 
 ### Access
-URL: /admin/<names>
+- URL: `/admin/<names>`
+- Navigation Group: Management
+
+### Commands Run
+```bash
+vendor/bin/pint app/Filament/Resources/<Name>Resource/
+php artisan shield:generate-permissions --resource=<Name>Resource  # if Shield
+```
+
+### Delegated To
+- **laravel-auth** for permissions/policies - [status]
 
 ### Permissions Required
-- read-<names>
-- create-<names>
-- update-<names>
-- delete-<names>
+- `view_<name>`, `view_any_<name>`
+- `create_<name>`, `update_<name>`
+- `delete_<name>`, `delete_any_<name>`
+- `force_delete_<name>`, `restore_<name>`
+
+### Next Steps
+1. Run `php artisan shield:generate-permissions` (if using Shield)
+2. Assign permissions to roles
+3. Customize form fields and table columns
+4. Add relation managers if needed
 ```
+
+# GUARDRAILS
+
+- **ALWAYS** use Filament's built-in form/table builders
+- **ALWAYS** implement proper authorization
+- **ALWAYS** use Resource conventions (singular model, plural resource)
+- **NEVER** bypass Filament's validation
+- **NEVER** expose sensitive data without authorization
