@@ -20,10 +20,20 @@ All notable changes to Laravel Agent will be documented in this file.
 - **laravel-queue** - Background jobs & notifications (triggers: "queue", "job", "notification", "async")
 - **laravel-websocket** - Real-time features (triggers: "websocket", "real-time", "Reverb", "broadcast")
 
-#### Hooks
-- **pre-commit.sh** - PHP syntax checking, Laravel Pint formatting, PHPStan analysis
+#### Hooks (7 scripts)
+- **pre-commit.sh** - Comprehensive pre-commit: syntax, Pint, PHPStan, security, Blade, migrations
 - **post-edit.sh** - Auto-format PHP files, update IDE helper for models
-- **hooks.example.json** - Sample Claude Code hooks configuration
+- **security-scan.sh** - Detects secrets, API keys, passwords, debug functions
+- **migration-safety.sh** - Warns about destructive operations, missing down()
+- **blade-lint.sh** - Validates CSRF, XSS prevention, unclosed directives
+- **test-runner.sh** - Runs related tests on file changes
+- **env-check.sh** - Validates .env files, blocks secret commits
+- **hooks.example.json** - Full Claude Code hooks configuration
+
+#### Skill Improvements
+- **laravel-feature** - Added complete code examples (Model, Controller, Request, Action, Test)
+- **laravel-api** - Added QueryBuilder, rate limiting, error handling, API tests
+- All skills now include "Common Pitfalls" section with anti-patterns
 
 #### MCP Extension
 - **laravel-agent/mcp-extension** - Complements Laravel Boost with additional tools

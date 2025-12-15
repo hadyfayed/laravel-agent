@@ -253,20 +253,19 @@ The agents detect and adapt to 70+ packages including:
 - **Security**: spatie/crypto
 - **Dev Tools**: grazulex/laravel-devtoolbox
 
-## Hooks
+## Hooks (7 Scripts)
 
 Pre-configured hooks for Laravel code quality:
 
-### Pre-Commit Hook
-Runs before git commit:
-- PHP syntax checking
-- Laravel Pint formatting
-- PHPStan static analysis
-
-### Post-Edit Hook
-Runs after file edits:
-- Auto-format PHP files with Pint
-- Update IDE helper for models
+| Hook | Purpose |
+|------|---------|
+| `pre-commit.sh` | Comprehensive checks: syntax, Pint, PHPStan, security, Blade, migrations |
+| `post-edit.sh` | Auto-format PHP, update IDE helper |
+| `security-scan.sh` | Detect secrets, API keys, debug functions |
+| `migration-safety.sh` | Warn about destructive operations |
+| `blade-lint.sh` | Validate CSRF, XSS, directives |
+| `test-runner.sh` | Run related tests on changes |
+| `env-check.sh` | Block .env commits, validate examples |
 
 See `hooks/README.md` for installation instructions.
 

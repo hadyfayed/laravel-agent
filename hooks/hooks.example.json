@@ -1,24 +1,66 @@
 {
   "$schema": "https://claude.ai/code/hooks-schema.json",
-  "description": "Laravel Agent hooks for code quality",
+  "description": "Laravel Agent hooks for comprehensive code quality",
   "hooks": {
     "UserPromptSubmit": [
       {
         "matcher": "git commit",
-        "description": "Run Laravel linting before commit",
+        "description": "Run comprehensive pre-commit checks",
         "command": "bash .claude-plugins/laravel-agent/hooks/scripts/pre-commit.sh"
       }
     ],
     "PostToolUse": [
       {
         "matcher": "Edit",
-        "description": "Auto-format PHP files after editing",
+        "description": "Auto-format PHP files and update IDE helper",
         "command": "bash .claude-plugins/laravel-agent/hooks/scripts/post-edit.sh \"$TOOL_INPUT_FILE_PATH\""
       },
       {
         "matcher": "Write",
         "description": "Auto-format new PHP files",
         "command": "bash .claude-plugins/laravel-agent/hooks/scripts/post-edit.sh \"$TOOL_INPUT_FILE_PATH\""
+      },
+      {
+        "matcher": "Edit",
+        "description": "Scan for security issues",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/security-scan.sh \"$TOOL_INPUT_FILE_PATH\""
+      },
+      {
+        "matcher": "Write",
+        "description": "Scan new files for security issues",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/security-scan.sh \"$TOOL_INPUT_FILE_PATH\""
+      },
+      {
+        "matcher": "Edit",
+        "description": "Lint Blade templates",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/blade-lint.sh \"$TOOL_INPUT_FILE_PATH\""
+      },
+      {
+        "matcher": "Write",
+        "description": "Lint new Blade templates",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/blade-lint.sh \"$TOOL_INPUT_FILE_PATH\""
+      },
+      {
+        "matcher": "Edit",
+        "description": "Check migration safety",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/migration-safety.sh \"$TOOL_INPUT_FILE_PATH\""
+      },
+      {
+        "matcher": "Write",
+        "description": "Check new migration safety",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/migration-safety.sh \"$TOOL_INPUT_FILE_PATH\""
+      },
+      {
+        "matcher": "Edit",
+        "description": "Validate environment files",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/env-check.sh \"$TOOL_INPUT_FILE_PATH\""
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "description": "Run related tests before bash commands",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/test-runner.sh \"$TOOL_INPUT_COMMAND\""
       }
     ]
   }
