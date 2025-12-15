@@ -6,6 +6,16 @@ All notable changes to Laravel Agent will be documented in this file.
 
 ### Added
 
+#### Skills (8 Auto-Invoked)
+- **laravel-feature** - Complete feature development (triggers: "build feature", "create feature")
+- **laravel-api** - REST API development (triggers: "build api", "create endpoint")
+- **laravel-database** - Database operations & optimization (triggers: "migration", "query", "N+1")
+- **laravel-testing** - Writing Pest tests (triggers: "test", "pest", "coverage")
+- **laravel-auth** - Authentication & authorization (triggers: "auth", "permission", "role")
+- **laravel-livewire** - Livewire 3 components (triggers: "livewire", "reactive", "component")
+- **laravel-filament** - Admin panel development (triggers: "filament", "admin panel")
+- **laravel-performance** - Performance optimization (triggers: "slow", "optimize", "cache")
+
 #### New Agents
 - **laravel-migration** - Laravel/PHP version upgrade specialist (9→10→11→12, PHP 8.1→8.4)
 - **laravel-package** - Laravel package development with Testbench, Packagist publishing

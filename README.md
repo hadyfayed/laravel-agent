@@ -2,13 +2,14 @@
 
 > AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.
 
-A Claude Code plugin with **23 specialized agents** and **42 commands** covering the entire Laravel development lifecycle.
+A Claude Code plugin with **23 specialized agents**, **42 commands**, and **8 auto-invoked skills** covering the entire Laravel development lifecycle.
 
 ## Features
 
 - **Single Plugin Install** - One command installs everything
 - **23 Specialized Agents** - Architecture, features, APIs, testing, security, deployment, performance, packages, and more
 - **42 Commands** - Direct access to all capabilities
+- **8 Auto-Invoked Skills** - Claude automatically applies Laravel expertise based on context
 - **SOLID/DRY Enforcement** - Every generated code follows best practices
 - **Pattern Limit** - Max 5 design patterns per project to prevent complexity
 - **Multi-Tenancy Support** - Optional tenant isolation (opt-in, not forced)
@@ -24,7 +25,7 @@ A Claude Code plugin with **23 specialized agents** and **42 commands** covering
 /plugin install laravel-agent@hadyfayed-laravel-agent
 ```
 
-That's it! All 23 agents and 42 commands are now available.
+That's it! All 23 agents, 42 commands, and 8 skills are now available.
 
 ## Available Commands
 
@@ -190,6 +191,21 @@ The architect will:
 | `laravel-git` | Git workflow automation |
 | `laravel-package` | Laravel package development |
 | `laravel-performance` | Performance optimization specialist |
+
+## Skills (Auto-Invoked)
+
+Skills are automatically activated based on context - no commands needed.
+
+| Skill | Triggers | Purpose |
+|-------|----------|---------|
+| `laravel-feature` | "build feature", "create feature" | Complete feature development |
+| `laravel-api` | "build api", "create endpoint" | REST API development |
+| `laravel-database` | "migration", "query", "N+1" | Database operations & optimization |
+| `laravel-testing` | "test", "pest", "coverage" | Writing Pest tests |
+| `laravel-auth` | "auth", "permission", "role" | Authentication & authorization |
+| `laravel-livewire` | "livewire", "reactive", "component" | Livewire 3 components |
+| `laravel-filament` | "filament", "admin panel" | Admin panel development |
+| `laravel-performance` | "slow", "optimize", "cache" | Performance optimization |
 
 ## Architecture Decision Matrix
 
