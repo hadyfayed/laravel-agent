@@ -2,14 +2,16 @@
 
 > AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.
 
-A Claude Code plugin with **23 specialized agents**, **42 commands**, and **8 auto-invoked skills** covering the entire Laravel development lifecycle.
+A Claude Code plugin with **23 specialized agents**, **42 commands**, and **12 auto-invoked skills** covering the entire Laravel development lifecycle.
 
 ## Features
 
 - **Single Plugin Install** - One command installs everything
 - **23 Specialized Agents** - Architecture, features, APIs, testing, security, deployment, performance, packages, and more
 - **42 Commands** - Direct access to all capabilities
-- **8 Auto-Invoked Skills** - Claude automatically applies Laravel expertise based on context
+- **12 Auto-Invoked Skills** - Claude automatically applies Laravel expertise based on context
+- **Pre-configured Hooks** - Laravel linting and auto-formatting on file changes
+- **MCP Extension** - Complements Laravel Boost with testing, queue, and performance tools
 - **SOLID/DRY Enforcement** - Every generated code follows best practices
 - **Pattern Limit** - Max 5 design patterns per project to prevent complexity
 - **Multi-Tenancy Support** - Optional tenant isolation (opt-in, not forced)
@@ -25,7 +27,7 @@ A Claude Code plugin with **23 specialized agents**, **42 commands**, and **8 au
 /plugin install laravel-agent@hadyfayed-laravel-agent
 ```
 
-That's it! All 23 agents, 42 commands, and 8 skills are now available.
+That's it! All 23 agents, 42 commands, and 12 skills are now available.
 
 ## Available Commands
 
@@ -206,6 +208,10 @@ Skills are automatically activated based on context - no commands needed.
 | `laravel-livewire` | "livewire", "reactive", "component" | Livewire 3 components |
 | `laravel-filament` | "filament", "admin panel" | Admin panel development |
 | `laravel-performance` | "slow", "optimize", "cache" | Performance optimization |
+| `laravel-security` | "security", "vulnerability", "XSS" | Security audits & fixes |
+| `laravel-deploy` | "deploy", "production", "server" | Deployment & hosting |
+| `laravel-queue` | "queue", "job", "notification" | Background jobs & notifications |
+| `laravel-websocket` | "websocket", "real-time", "Reverb" | Real-time features |
 
 ## Architecture Decision Matrix
 
@@ -246,6 +252,40 @@ The agents detect and adapt to 70+ packages including:
 - **Model Features**: spatie/eloquent-sortable, spatie/laravel-schemaless-attributes
 - **Security**: spatie/crypto
 - **Dev Tools**: grazulex/laravel-devtoolbox
+
+## Hooks
+
+Pre-configured hooks for Laravel code quality:
+
+### Pre-Commit Hook
+Runs before git commit:
+- PHP syntax checking
+- Laravel Pint formatting
+- PHPStan static analysis
+
+### Post-Edit Hook
+Runs after file edits:
+- Auto-format PHP files with Pint
+- Update IDE helper for models
+
+See `hooks/README.md` for installation instructions.
+
+## MCP Extension
+
+Complements [Laravel Boost](https://github.com/laravel/boost) with additional tools:
+
+| Category | Tools |
+|----------|-------|
+| Testing | `test:run`, `test:coverage` |
+| Queue | `queue:status`, `queue:failed` |
+| Cache | `cache:status` |
+| Performance | `perf:queries` |
+| Migrations | `migrate:status` |
+| Events | `event:list` |
+| Schedule | `schedule:list` |
+| Security | `security:deps` |
+
+See `mcp/README.md` for details.
 
 ## Requirements
 

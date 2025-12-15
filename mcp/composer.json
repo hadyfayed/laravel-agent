@@ -1,0 +1,59 @@
+{
+    "name": "laravel-agent/mcp-extension",
+    "description": "MCP extension for Laravel Agent - complements Laravel Boost with additional tools",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "mcp",
+        "ai",
+        "claude",
+        "model-context-protocol"
+    ],
+    "authors": [
+        {
+            "name": "Laravel Agent",
+            "email": "hello@laravel-agent.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "pestphp/pest": "^2.0|^3.0"
+    },
+    "suggest": {
+        "php-mcp/laravel": "Required for MCP server functionality",
+        "laravel/boost": "Recommended - provides core Laravel MCP tools",
+        "laravel/horizon": "For advanced queue monitoring",
+        "laravel/telescope": "For request/query profiling",
+        "laravel/pulse": "For production monitoring"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaravelAgent\\Mcp\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaravelAgent\\Mcp\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaravelAgent\\Mcp\\LaravelAgentMcpServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

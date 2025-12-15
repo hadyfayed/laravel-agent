@@ -6,7 +6,7 @@ All notable changes to Laravel Agent will be documented in this file.
 
 ### Added
 
-#### Skills (8 Auto-Invoked)
+#### Skills (12 Auto-Invoked)
 - **laravel-feature** - Complete feature development (triggers: "build feature", "create feature")
 - **laravel-api** - REST API development (triggers: "build api", "create endpoint")
 - **laravel-database** - Database operations & optimization (triggers: "migration", "query", "N+1")
@@ -15,6 +15,26 @@ All notable changes to Laravel Agent will be documented in this file.
 - **laravel-livewire** - Livewire 3 components (triggers: "livewire", "reactive", "component")
 - **laravel-filament** - Admin panel development (triggers: "filament", "admin panel")
 - **laravel-performance** - Performance optimization (triggers: "slow", "optimize", "cache")
+- **laravel-security** - Security audits & fixes (triggers: "security", "vulnerability", "XSS", "OWASP")
+- **laravel-deploy** - Deployment & hosting (triggers: "deploy", "production", "server", "Forge", "Vapor")
+- **laravel-queue** - Background jobs & notifications (triggers: "queue", "job", "notification", "async")
+- **laravel-websocket** - Real-time features (triggers: "websocket", "real-time", "Reverb", "broadcast")
+
+#### Hooks
+- **pre-commit.sh** - PHP syntax checking, Laravel Pint formatting, PHPStan analysis
+- **post-edit.sh** - Auto-format PHP files, update IDE helper for models
+- **hooks.example.json** - Sample Claude Code hooks configuration
+
+#### MCP Extension
+- **laravel-agent/mcp-extension** - Complements Laravel Boost with additional tools
+- Testing tools: `test:run`, `test:coverage`
+- Queue tools: `queue:status`, `queue:failed`
+- Cache tools: `cache:status`
+- Performance tools: `perf:queries`
+- Migration tools: `migrate:status`
+- Event tools: `event:list`
+- Schedule tools: `schedule:list`
+- Security tools: `security:deps`
 
 #### New Agents
 - **laravel-migration** - Laravel/PHP version upgrade specialist (9→10→11→12, PHP 8.1→8.4)
