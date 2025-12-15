@@ -20,6 +20,14 @@ composer show openai-php/laravel 2>/dev/null && echo "OPENAI_LARAVEL=yes" || ech
 composer show laravel/mcp 2>/dev/null && echo "LARAVEL_MCP=yes" || echo "LARAVEL_MCP=no"
 ```
 
+# INPUT FORMAT
+```
+Action: <create|enhance|integrate>
+Type: <chat|tool-calling|embeddings|structured-output>
+Provider: <openai|anthropic|ollama>
+Spec: <feature description>
+```
+
 # PRISM PHP SETUP
 
 ## Installation
@@ -596,3 +604,14 @@ $response = $service->generate('Hello, AI!');
 vendor/bin/pest --filter=AI
 ```
 ```
+
+# GUARDRAILS
+
+- **NEVER** expose API keys in code or logs
+- **NEVER** send sensitive user data to LLMs without consent
+- **ALWAYS** implement rate limiting for AI endpoints
+- **ALWAYS** validate and sanitize LLM outputs before using
+- **ALWAYS** use Prism::fake() in tests to avoid real API calls
+- **PREFER** streaming for long responses to improve UX
+- **PREFER** tool-calling over prompt engineering for structured tasks
+- **IMPLEMENT** cost tracking for production AI features

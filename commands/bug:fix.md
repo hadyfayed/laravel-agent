@@ -110,3 +110,60 @@ Examples:
 - Guard configuration
 - Middleware order
 - Session problems
+
+## Interactive Prompts
+
+When run without arguments, prompt:
+
+1. **Error source?**
+   - Latest from laravel.log
+   - Paste error message
+   - Specific exception type
+   - Telescope exceptions
+
+2. **Error type?**
+   - Database/Query error
+   - Class/Method not found
+   - Validation error
+   - Authentication error
+   - Other
+
+3. **Apply fix automatically?**
+   - Yes (create migration/edit files)
+   - No (show suggestions only)
+
+## Output
+
+```markdown
+## Bug Analysis: <Error Type>
+
+### Error
+```
+<Full error message>
+```
+
+### Root Cause
+<Explanation of why this error occurred>
+
+### Stack Trace
+| # | File | Line | Method |
+|---|------|------|--------|
+| 1 | app/Models/User.php | 45 | scopeForTenant |
+| 2 | app/Services/UserService.php | 23 | getUsers |
+
+### Solution
+
+**Recommended Fix:**
+<Code changes with explanations>
+
+**Alternative Approaches:**
+1. <Alternative 1>
+2. <Alternative 2>
+
+### Prevention
+- <How to prevent this in the future>
+- <Related tests to add>
+
+### Files Modified
+- app/Models/User.php (line 45)
+```

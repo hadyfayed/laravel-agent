@@ -709,6 +709,134 @@ When called by laravel-feature-builder:
 - Create API resources in `app/Http/Resources/V1/` (not in feature folder)
 - This allows API versioning independent of features
 
+# SPATIE/LARAVEL-FRACTAL (API Transformers)
+
+If `spatie/laravel-fractal` or `spatie/fractalistic` is installed:
+
+## Install
+```bash
+composer require spatie/laravel-fractal
+```
+
+## Create Transformer
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Transformers;
+
+use App\Models\Order;
+use League\Fractal\TransformerAbstract;
+
+final class OrderTransformer extends TransformerAbstract
+{
+    protected array $availableIncludes = [
+        'customer',
+        'items',
+    ];
+
+    protected array $defaultIncludes = [];
+
+    public function transform(Order $order): array
+    {
+        return [
+            'id' => $order->id,
+            'number' => $order->number,
+            'status' => $order->status,
+            'total' => [
+                'amount' => $order->total_cents,
+                'formatted' => $order->total_formatted,
+                'currency' => $order->currency,
+            ],
+            'created_at' => $order->created_at->toIso8601String(),
+            'updated_at' => $order->updated_at->toIso8601String(),
+            'links' => [
+                'self' => route('api.orders.show', $order),
+            ],
+        ];
+    }
+
+    public function includeCustomer(Order $order): \League\Fractal\Resource\Item
+    {
+        return $this->item($order->customer, new CustomerTransformer);
+    }
+
+    public function includeItems(Order $order): \League\Fractal\Resource\Collection
+    {
+        return $this->collection($order->items, new OrderItemTransformer);
+    }
+}
+```
+
+## Use in Controller
+```php
+use Spatie\Fractal\Fractal;
+
+public function index(): JsonResponse
+{
+    $orders = Order::with(['customer', 'items'])->paginate();
+
+    return fractal($orders, new OrderTransformer())
+        ->parseIncludes(request()->input('include', ''))
+        ->respond();
+}
+
+public function show(Order $order): JsonResponse
+{
+    return fractal($order, new OrderTransformer())
+        ->parseIncludes(['customer', 'items'])
+        ->respond();
+}
+
+// Or use the facade
+return Fractal::create()
+    ->collection($orders)
+    ->transformWith(new OrderTransformer)
+    ->includeCustomer()
+    ->toArray();
+```
+
+## Generate Transformer Command
+```bash
+php artisan make:transformer OrderTransformer
+```
+
+## Pagination with Fractal
+```php
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+
+$paginator = Order::paginate(15);
+
+return fractal()
+    ->collection($paginator->getCollection())
+    ->transformWith(new OrderTransformer)
+    ->paginateWith(new IlluminatePaginatorAdapter($paginator))
+    ->respond();
+```
+
+## Custom Serializers
+```php
+// config/fractal.php
+return [
+    'default_serializer' => \League\Fractal\Serializer\DataArraySerializer::class,
+    // Or use JSON:API format
+    // 'default_serializer' => \League\Fractal\Serializer\JsonApiSerializer::class,
+];
+```
+
+## Fractal vs Laravel Resources
+
+| Feature | Fractal | Laravel Resources |
+|---------|---------|-------------------|
+| Includes | Dynamic via URL | Manual loading |
+| Transformation | Dedicated classes | Mixed in resources |
+| Serializers | Multiple formats | JSON only |
+| Nested data | Built-in | Manual |
+| Learning curve | Higher | Lower |
+
+**Recommendation**: Use Fractal for complex APIs with deep relationships. Use Laravel Resources for simpler APIs.
+
 # GUARDRAILS
 
 - **ALWAYS** include OpenAPI annotations

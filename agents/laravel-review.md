@@ -40,10 +40,11 @@ and synthesize their findings into actionable, confidence-scored reports.
                                 │
                                 ▼
                     ┌───────────────────┐
-                    │    VALIDATOR      │
-                    │    SUBAGENT       │
+                    │   SECURITY        │
+                    │   VALIDATION      │
                     │ (false positive   │
                     │   filtering)      │
+                    │ (laravel-security)│
                     └───────────────────┘
                                 │
                                 ▼
@@ -112,14 +113,18 @@ Use Task tool with subagent_type="general-purpose" to run testing review:
 
 ## Step 3: Validate Findings
 
-For each issue found, run validation:
+Use the `laravel-security` agent's validation pipeline to filter false positives:
 
 ```
-VALIDATION CRITERIA:
-- Is the issue actually present in the code? (not a false positive)
-- Is the fix suggestion actionable?
-- What is the confidence level (0-100)?
-- What is the severity (critical/warning/suggestion)?
+VALIDATION CRITERIA (from laravel-security):
+1. CODE EXISTS? - Verify the flagged code actually exists at the location
+2. CONTEXT OK? - Check if issue is valid in context (not in test files, not using constants)
+3. CONFIDENCE >= 80? - Only report high-confidence issues
+
+Apply False Positive Catalog:
+- SQL Injection: Check if using query builder bindings, constants, or safe values
+- XSS: Check if using HTMLPurifier, json_encode, or trusted icon libraries
+- Mass Assignment: Check if $fillable is properly configured
 ```
 
 Only include issues with confidence >= 80%
@@ -449,4 +454,83 @@ claude /review:pr 123
 ## Full Codebase Audit
 ```bash
 claude /review:audit app/
+```
+
+# GRAZULEX/LARAVEL-DEVTOOLBOX INTEGRATION
+
+If `grazulex/laravel-devtoolbox` is installed, enhance reviews with automated analysis:
+
+## Pre-Review Analysis
+Before manual review, run devtoolbox commands to gather data:
+
+```bash
+# Comprehensive scan
+php artisan dev:scan --all --format=json --output=.review/scan.json
+
+# Security issues
+php artisan dev:security:unprotected-routes --format=json > .review/security.json
+
+# N+1 detection
+php artisan dev:db:n1 --format=json > .review/n1.json
+
+# Unused routes
+php artisan dev:routes:unused --format=json > .review/unused-routes.json
+
+# Model relationships
+php artisan dev:model:graph --format=mermaid --output=.review/relationships.mmd
+```
+
+## Devtoolbox Review Checklist
+
+### Database & Performance
+- [ ] Run `php artisan dev:db:n1` - Check for N+1 queries
+- [ ] Run `php artisan dev:db:slow` - Identify slow queries
+- [ ] Run `php artisan dev:db:duplicates` - Find duplicate queries
+
+### Security
+- [ ] Run `php artisan dev:security:unprotected-routes` - Find missing auth
+- [ ] Run `php artisan dev:security:audit` - General security scan
+
+### Code Quality
+- [ ] Run `php artisan dev:routes:unused` - Remove dead routes
+- [ ] Run `php artisan dev:models` - Verify model structure
+- [ ] Run `php artisan dev:container:dependencies` - Check DI patterns
+
+### Performance
+- [ ] Run `php artisan dev:perf:cache` - Cache efficiency
+- [ ] Run `php artisan dev:providers:timeline` - Boot time analysis
+
+## Automated PR Review
+```bash
+# In CI/CD pipeline
+php artisan dev:scan --all --format=json | \
+  jq '.issues | length' | \
+  xargs -I {} test {} -eq 0 || exit 1
+```
+
+## Review Report Enhancement
+Include devtoolbox findings in the review report:
+
+```markdown
+## Automated Analysis (devtoolbox)
+
+### N+1 Queries Detected
+| Location | Query | Suggested Fix |
+|----------|-------|---------------|
+| OrderController:index | User relationship | Add `->with('user')` |
+
+### Unprotected Routes
+| Route | Controller | Recommendation |
+|-------|------------|----------------|
+| /admin/reports | ReportController | Add `auth:admin` middleware |
+
+### Model Analysis
+- Total Models: 25
+- Models without factories: 3
+- Missing relationships: 2
+
+### Performance Metrics
+- Average boot time: 125ms
+- Cache hit ratio: 85%
+- Slow queries: 2
 ```

@@ -344,6 +344,28 @@ protected $listen = [
 
 # NOTIFICATIONS
 
+## Laravel Notification Channels
+
+55+ notification channels available at https://laravel-notification-channels.com/
+
+### Popular Channels
+| Channel | Package | Use Case |
+|---------|---------|----------|
+| Telegram | laravel-notification-channels/telegram | Bot alerts |
+| Discord | laravel-notification-channels/discord | Team notifications |
+| Twilio | laravel-notification-channels/twilio | SMS |
+| Slack | Built-in | Team notifications |
+| FCM | laravel-notification-channels/fcm | Mobile push |
+| WebPush | laravel-notification-channels/webpush | Browser push |
+| Teams | laravel-notification-channels/microsoft-teams | Enterprise |
+
+### Install Channel
+```bash
+composer require laravel-notification-channels/telegram
+composer require laravel-notification-channels/discord
+composer require laravel-notification-channels/twilio
+```
+
 ```php
 <?php
 
@@ -358,6 +380,9 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\VonageMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Telegram\TelegramMessage;
+use NotificationChannels\Discord\DiscordMessage;
+use NotificationChannels\Twilio\TwilioSmsMessage;
 
 final class OrderShippedNotification extends Notification implements ShouldQueue
 {
@@ -416,9 +441,89 @@ final class OrderShippedNotification extends Notification implements ShouldQueue
             ->content('Your order #' . $this->order->number . ' has shipped! Track: ' . $this->order->tracking_url);
     }
 
+    /**
+     * Telegram notification (laravel-notification-channels/telegram)
+     */
+    public function toTelegram(object $notifiable): TelegramMessage
+    {
+        return TelegramMessage::create()
+            ->to($notifiable->telegram_chat_id)
+            ->content("*Order Shipped!*\n\nYour order #{$this->order->number} has shipped.")
+            ->button('Track Order', $this->order->tracking_url);
+    }
+
+    /**
+     * Discord notification (laravel-notification-channels/discord)
+     */
+    public function toDiscord(object $notifiable): DiscordMessage
+    {
+        return DiscordMessage::create()
+            ->body("Order #{$this->order->number} has shipped!")
+            ->embed([
+                'title' => 'Order Details',
+                'description' => "Tracking: {$this->order->tracking_number}",
+                'color' => 0x00FF00,
+                'fields' => [
+                    ['name' => 'Customer', 'value' => $notifiable->name, 'inline' => true],
+                    ['name' => 'Total', 'value' => $this->order->total_formatted, 'inline' => true],
+                ],
+            ]);
+    }
+
+    /**
+     * Twilio SMS notification (laravel-notification-channels/twilio)
+     */
+    public function toTwilio(object $notifiable): TwilioSmsMessage
+    {
+        return (new TwilioSmsMessage)
+            ->content("Your order #{$this->order->number} has shipped! Track: {$this->order->tracking_url}");
+    }
+
     public function shouldSend(object $notifiable, string $channel): bool
     {
         return $notifiable->notification_preferences[$channel] ?? true;
+    }
+}
+
+## User Model for Notification Channels
+
+Add routing methods to User model for each channel:
+
+```php
+class User extends Authenticatable
+{
+    use Notifiable;
+
+    /**
+     * Route for Telegram notifications.
+     */
+    public function routeNotificationForTelegram(): ?string
+    {
+        return $this->telegram_chat_id;
+    }
+
+    /**
+     * Route for Discord notifications.
+     */
+    public function routeNotificationForDiscord(): ?string
+    {
+        return $this->discord_webhook_url ?? config('services.discord.webhook');
+    }
+
+    /**
+     * Route for Twilio SMS notifications.
+     */
+    public function routeNotificationForTwilio(): ?string
+    {
+        return $this->phone;
+    }
+
+    /**
+     * Route for Vonage SMS notifications.
+     */
+    public function routeNotificationForVonage(): ?string
+    {
+        return $this->phone;
     }
 }
 ```

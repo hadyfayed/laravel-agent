@@ -2,17 +2,17 @@
 
 > AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.
 
-A Claude Code plugin with **22 specialized agents** and **32 commands** covering the entire Laravel development lifecycle.
+A Claude Code plugin with **23 specialized agents** and **42 commands** covering the entire Laravel development lifecycle.
 
 ## Features
 
 - **Single Plugin Install** - One command installs everything
-- **22 Specialized Agents** - Architecture, features, APIs, testing, security, deployment, and more
-- **32 Commands** - Direct access to all capabilities
+- **23 Specialized Agents** - Architecture, features, APIs, testing, security, deployment, performance, packages, and more
+- **42 Commands** - Direct access to all capabilities
 - **SOLID/DRY Enforcement** - Every generated code follows best practices
 - **Pattern Limit** - Max 5 design patterns per project to prevent complexity
 - **Multi-Tenancy Support** - Optional tenant isolation (opt-in, not forced)
-- **50+ Package Integrations** - Detects and adapts to installed packages
+- **85+ Package Integrations** - Detects and adapts to installed packages
 
 ## Installation
 
@@ -24,7 +24,7 @@ A Claude Code plugin with **22 specialized agents** and **32 commands** covering
 /plugin install laravel-agent@hadyfayed-laravel-agent
 ```
 
-That's it! All 22 agents and 32 commands are now available.
+That's it! All 23 agents and 42 commands are now available.
 
 ## Available Commands
 
@@ -71,20 +71,24 @@ That's it! All 22 agents and 32 commands are now available.
 | `/laravel-agent:auth:setup` | Setup authentication |
 | `/laravel-agent:security:audit` | Run OWASP security audit |
 
-### Async
+### Async & Notifications
 | Command | Description |
 |---------|-------------|
 | `/laravel-agent:job:make` | Create queued job |
 | `/laravel-agent:broadcast:make` | Create broadcast event |
+| `/laravel-agent:notification:make` | Create multi-channel notification (55+ channels) or setup channel |
 
-### AI
+### AI & Content
 | Command | Description |
 |---------|-------------|
 | `/laravel-agent:ai:make` | Create AI-powered feature (Prism PHP) |
 | `/laravel-agent:bug:fix` | AI-assisted bug fixing |
 | `/laravel-agent:docs:generate` | Generate documentation |
+| `/laravel-agent:pdf:make` | Generate PDF templates (invoices, reports) |
+| `/laravel-agent:seo:setup` | Setup SEO infrastructure (sitemaps, meta tags, Open Graph) |
+| `/laravel-agent:geo:make` | Create geolocation features |
 
-### DevOps
+### DevOps & Infrastructure
 | Command | Description |
 |---------|-------------|
 | `/laravel-agent:deploy:setup` | Setup deployment (Forge, Vapor, Docker) |
@@ -92,6 +96,16 @@ That's it! All 22 agents and 32 commands are now available.
 | `/laravel-agent:reverb:setup` | Setup Laravel Reverb WebSockets |
 | `/laravel-agent:feature-flag:make` | Create feature flag (Pennant) |
 | `/laravel-agent:migrate:from-legacy` | Migrate from legacy codebase |
+| `/laravel-agent:backup:setup` | Configure automated backups (spatie/laravel-backup) |
+| `/laravel-agent:health:setup` | Setup health monitoring (spatie/laravel-health) |
+| `/laravel-agent:search:setup` | Configure Scout + Meilisearch/Algolia/Typesense |
+
+### Data & Integration
+| Command | Description |
+|---------|-------------|
+| `/laravel-agent:dto:make` | Create Data Transfer Objects (spatie/laravel-data) |
+| `/laravel-agent:webhook:make` | Create webhook handlers (Stripe, GitHub, etc.) |
+| `/laravel-agent:import:make` | Create CSV/Excel importers |
 
 ### Code Review & Git
 | Command | Description |
@@ -168,13 +182,14 @@ The architect will:
 | `laravel-ai` | AI features with Prism PHP |
 | `laravel-deploy` | Forge, Vapor, Docker, Bref deployment |
 | `laravel-cicd` | GitHub Actions, GitLab CI pipelines |
-| `laravel-security` | OWASP audits, security headers |
+| `laravel-security` | OWASP audits, security headers, false positive filtering |
 | `laravel-reverb` | WebSockets with Laravel Reverb |
 | `laravel-pennant` | Feature flags and A/B testing |
 | `laravel-migration` | Laravel/PHP version upgrades |
 | `laravel-review` | Code review orchestrator |
-| `laravel-validator` | Review validation and false positive filtering |
 | `laravel-git` | Git workflow automation |
+| `laravel-package` | Laravel package development |
+| `laravel-performance` | Performance optimization specialist |
 
 ## Architecture Decision Matrix
 
@@ -187,21 +202,34 @@ The architect will:
 
 ## Package Integrations
 
-The agents detect and adapt to 50+ packages including:
+The agents detect and adapt to 70+ packages including:
 
 - **Architecture**: nwidart/laravel-modules, lorisleiva/laravel-actions
 - **AI/LLM**: prism-php/prism, laravel/mcp
-- **API**: nuwave/lighthouse, laravel/passport, laravel/sanctum
+- **API**: nuwave/lighthouse, laravel/passport, laravel/sanctum, spatie/laravel-fractal
 - **Auth**: spatie/laravel-permission, santigarcor/laratrust
 - **Billing**: laravel/cashier
 - **Admin**: filament/filament, bezhansalleh/filament-shield
 - **Testing**: pestphp/pest, laravel/dusk
-- **Database**: spatie/laravel-medialibrary, spatie/laravel-activitylog
-- **Performance**: laravel/octane, laravel/horizon
+- **Database**: spatie/laravel-medialibrary, spatie/laravel-activitylog, venturecraft/revisionable
+- **Performance**: laravel/octane, laravel/horizon, beyondcode/laravel-query-detector
 - **WebSockets**: laravel/reverb
 - **Feature Flags**: laravel/pennant
 - **Multi-Tenancy**: stancl/tenancy
-- **Deployment**: bref/laravel-bridge, laravel/vapor-core
+- **Deployment**: bref/laravel-bridge, laravel/vapor-core, laravel/envoy
+- **Notifications**: 55+ channels via laravel-notification-channels (Telegram, Discord, Twilio, etc.)
+- **PDF**: spatie/laravel-pdf, barryvdh/laravel-dompdf
+- **SEO**: spatie/laravel-sitemap, artesaos/seotools, ralphjsmit/laravel-seo
+- **Settings**: spatie/laravel-settings
+- **DTOs**: spatie/laravel-data
+- **Search**: laravel/scout, meilisearch/meilisearch-php
+- **Geolocation**: spatie/geocoder
+- **Backups**: spatie/laravel-backup
+- **Health**: spatie/laravel-health
+- **Import/Export**: maatwebsite/excel, spatie/simple-excel
+- **Model Features**: spatie/eloquent-sortable, spatie/laravel-schemaless-attributes
+- **Security**: spatie/crypto
+- **Dev Tools**: grazulex/laravel-devtoolbox
 
 ## Requirements
 

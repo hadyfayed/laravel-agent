@@ -1012,6 +1012,391 @@ Bugsnag::registerCallback(function ($report) {
 Bugsnag::notifyException($exception);
 ```
 
+# SPATIE/LARAVEL-SETTINGS (Type-safe Settings)
+
+If `spatie/laravel-settings` is installed or requested:
+
+## Install
+```bash
+composer require spatie/laravel-settings
+php artisan vendor:publish --provider="Spatie\LaravelSettings\LaravelSettingsServiceProvider" --tag="migrations"
+php artisan migrate
+```
+
+## Create Settings Class
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Settings;
+
+use Spatie\LaravelSettings\Settings;
+
+final class GeneralSettings extends Settings
+{
+    public string $site_name;
+    public string $site_description;
+    public bool $maintenance_mode;
+    public ?string $contact_email;
+    public array $social_links;
+
+    public static function group(): string
+    {
+        return 'general';
+    }
+}
+```
+
+## Migration
+```php
+<?php
+
+use Spatie\LaravelSettings\Migrations\SettingsMigration;
+
+return new class extends SettingsMigration
+{
+    public function up(): void
+    {
+        $this->migrator->add('general.site_name', 'My App');
+        $this->migrator->add('general.site_description', '');
+        $this->migrator->add('general.maintenance_mode', false);
+        $this->migrator->add('general.contact_email', null);
+        $this->migrator->add('general.social_links', []);
+    }
+};
+```
+
+## Usage
+```php
+// Get settings
+$settings = app(GeneralSettings::class);
+$siteName = $settings->site_name;
+
+// Update settings
+$settings->site_name = 'New Name';
+$settings->save();
+
+// In Blade
+{{ app(App\Settings\GeneralSettings::class)->site_name }}
+```
+
+## Settings Controller
+```php
+public function edit(GeneralSettings $settings)
+{
+    return view('settings.general', compact('settings'));
+}
+
+public function update(GeneralSettings $settings, Request $request)
+{
+    $settings->site_name = $request->input('site_name');
+    $settings->maintenance_mode = $request->boolean('maintenance_mode');
+    $settings->save();
+
+    return back()->with('success', 'Settings saved!');
+}
+```
+
+# SEO PACKAGES
+
+## artesaos/seotools
+
+If `artesaos/seotools` is installed:
+
+```bash
+composer require artesaos/seotools
+php artisan vendor:publish --provider="Artesaos\SEOTools\Providers\SEOToolsServiceProvider"
+```
+
+### In Controller
+```php
+use Artesaos\SEOTools\Facades\SEOTools;
+use Artesaos\SEOTools\Facades\SEOMeta;
+use Artesaos\SEOTools\Facades\OpenGraph;
+use Artesaos\SEOTools\Facades\JsonLd;
+
+public function show(Post $post)
+{
+    SEOTools::setTitle($post->title);
+    SEOTools::setDescription($post->excerpt);
+    SEOTools::opengraph()->setUrl(route('posts.show', $post));
+    SEOTools::opengraph()->addProperty('type', 'article');
+    SEOTools::jsonLd()->setType('Article');
+
+    // Or use fluent API
+    SEOMeta::setTitle($post->title)
+        ->setDescription($post->excerpt)
+        ->setCanonical(route('posts.show', $post));
+
+    OpenGraph::setTitle($post->title)
+        ->setDescription($post->excerpt)
+        ->setType('article')
+        ->setArticle([
+            'published_time' => $post->published_at,
+            'author' => $post->author->name,
+        ])
+        ->addImage($post->featured_image);
+
+    return view('posts.show', compact('post'));
+}
+```
+
+### In Blade Layout
+```blade
+<head>
+    {!! SEO::generate() !!}
+    {{-- Or individual --}}
+    {!! SEOMeta::generate() !!}
+    {!! OpenGraph::generate() !!}
+    {!! Twitter::generate() !!}
+    {!! JsonLd::generate() !!}
+</head>
+```
+
+### SEO Trait for Models
+```php
+trait HasSeo
+{
+    public function applySeo(): void
+    {
+        SEOTools::setTitle($this->seo_title ?? $this->title);
+        SEOTools::setDescription($this->seo_description ?? Str::limit($this->content, 160));
+        SEOTools::opengraph()->setUrl($this->url);
+
+        if ($this->featured_image) {
+            SEOTools::opengraph()->addImage($this->featured_image);
+        }
+    }
+}
+```
+
+## ralphjsmit/laravel-seo
+
+If `ralphjsmit/laravel-seo` is installed:
+
+```bash
+composer require ralphjsmit/laravel-seo
+php artisan vendor:publish --tag="seo-migrations"
+php artisan migrate
+```
+
+### Add to Model
+```php
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
+
+class Post extends Model
+{
+    use HasSEO;
+
+    public function getDynamicSEOData(): SEOData
+    {
+        return new SEOData(
+            title: $this->title,
+            description: $this->excerpt,
+            author: $this->author->name,
+            image: $this->featured_image,
+            published_time: $this->published_at,
+            type: 'article',
+        );
+    }
+}
+```
+
+### In Blade
+```blade
+<head>
+    {!! seo($post) !!}
+    {{-- Or for page without model --}}
+    {!! seo()->for(new SEOData(title: 'My Title', description: 'Description')) !!}
+</head>
+```
+
+### With Filament
+```php
+// In Filament Resource
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
+
+public static function form(Form $form): Form
+{
+    return $form->schema([
+        // ... other fields
+        SEO::make(),
+    ]);
+}
+```
+
+# VENTURECRAFT/REVISIONABLE (Audit Trails)
+
+If `venturecraft/revisionable` is installed or requested:
+
+## Enable on Models
+```php
+use Venturecraft\Revisionable\RevisionableTrait;
+
+class Order extends Model
+{
+    use RevisionableTrait;
+
+    protected $revisionEnabled = true;
+    protected $revisionCleanup = true;
+    protected $historyLimit = 100;
+
+    // Fields to track
+    protected $keepRevisionOf = ['status', 'total_cents', 'notes'];
+
+    // Or exclude specific fields
+    protected $dontKeepRevisionOf = ['updated_at'];
+
+    // Show meaningful names for foreign keys
+    public function identifiableName(): string
+    {
+        return $this->number ?? $this->id;
+    }
+}
+```
+
+## Migration for Revisions Table
+```bash
+php artisan migrate --path=vendor/venturecraft/revisionable/src/migrations
+```
+
+## View Revision History
+```php
+// Get revision history
+$order->revisionHistory;
+
+// Get user who made change
+$revision->userResponsible();
+
+// Get old/new values
+$revision->oldValue();
+$revision->newValue();
+$revision->fieldName();
+```
+
+## In Views
+```blade
+@foreach($order->revisionHistory as $revision)
+    <p>
+        {{ $revision->userResponsible()?->name ?? 'System' }}
+        changed {{ $revision->fieldName() }}
+        from "{{ $revision->oldValue() }}"
+        to "{{ $revision->newValue() }}"
+        on {{ $revision->created_at->diffForHumans() }}
+    </p>
+@endforeach
+```
+
+# SPATIE/ELOQUENT-SORTABLE (Drag-Drop Ordering)
+
+If `spatie/eloquent-sortable` is installed or requested:
+
+## Enable on Models
+```php
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
+
+class MenuItem extends Model implements Sortable
+{
+    use SortableTrait;
+
+    public $sortable = [
+        'order_column_name' => 'sort_order',
+        'sort_when_creating' => true,
+    ];
+
+    // For grouped sorting (e.g., per menu)
+    public function buildSortQuery()
+    {
+        return static::query()->where('menu_id', $this->menu_id);
+    }
+}
+```
+
+## Migration Addition
+```php
+$table->unsignedInteger('sort_order')->default(0);
+```
+
+## Usage
+```php
+// Move items
+$item->moveOrderUp();
+$item->moveOrderDown();
+$item->moveToStart();
+$item->moveToEnd();
+
+// Set new order (for drag-drop UI)
+MenuItem::setNewOrder([3, 1, 2]); // array of IDs
+
+// Get ordered
+MenuItem::ordered()->get();
+```
+
+## API Controller for Reordering
+```php
+public function reorder(Request $request)
+{
+    $request->validate(['ids' => 'required|array']);
+
+    MenuItem::setNewOrder($request->input('ids'));
+
+    return response()->json(['status' => 'success']);
+}
+```
+
+# SPATIE/LARAVEL-SCHEMALESS-ATTRIBUTES (Flexible Metadata)
+
+If `spatie/laravel-schemaless-attributes` is installed or requested:
+
+## Enable on Models
+```php
+use Spatie\SchemalessAttributes\Casts\SchemalessAttributes;
+
+class User extends Model
+{
+    protected $casts = [
+        'preferences' => SchemalessAttributes::class,
+    ];
+
+    // Scope for querying
+    public function scopeWithPreferences(): Builder
+    {
+        return $this->preferences->modelScope();
+    }
+}
+```
+
+## Migration Addition
+```php
+$table->json('preferences')->nullable();
+// OR
+$table->schemalessAttributes('preferences'); // If using helper
+```
+
+## Usage
+```php
+// Set values
+$user->preferences->theme = 'dark';
+$user->preferences->notifications = ['email' => true, 'sms' => false];
+$user->save();
+
+// Get values
+$theme = $user->preferences->theme;
+$emailEnabled = $user->preferences->get('notifications.email');
+
+// Query by schemaless attribute
+User::withPreferences()->where('preferences->theme', 'dark')->get();
+```
+
+## Common Use Cases
+- User preferences/settings
+- Product metadata/attributes
+- Flexible form data
+- Feature flags per user
+
 # GUARDRAILS
 
 - **NEVER** mass-assign `created_for_id` or `created_by_id`

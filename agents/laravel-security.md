@@ -3,7 +3,7 @@ name: laravel-security
 description: >
   Security specialist for Laravel applications. Audits for OWASP vulnerabilities,
   configures security headers, implements rate limiting, CSP, input validation,
-  and secure coding practices. Reviews code for security issues.
+  and secure coding practices. Also validates security findings and filters false positives.
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
 ---
 
@@ -504,6 +504,245 @@ class SecurityAuditCommand extends Command
 3. Add security logging for auth events
 ```
 
+# SPATIE/CRYPTO (Encryption & Signatures)
+
+If `spatie/crypto` is installed:
+
+## Install
+```bash
+composer require spatie/crypto
+```
+
+## Generate Key Pair
+```php
+use Spatie\Crypto\Rsa\KeyPair;
+
+$keyPair = KeyPair::generate();
+
+file_put_contents('private.key', $keyPair->privateKey);
+file_put_contents('public.key', $keyPair->publicKey);
+
+// Or with password protection
+$keyPair = KeyPair::generate('your-secure-password');
+```
+
+## Encrypt/Decrypt with Private Key
+```php
+use Spatie\Crypto\Rsa\PrivateKey;
+use Spatie\Crypto\Rsa\PublicKey;
+
+// Encrypt with private key (only public key can decrypt)
+$privateKey = PrivateKey::fromFile('/path/to/private.key');
+$encrypted = $privateKey->encrypt('secret data');
+
+// Decrypt with public key
+$publicKey = PublicKey::fromFile('/path/to/public.key');
+$decrypted = $publicKey->decrypt($encrypted);
+```
+
+## Encrypt/Decrypt with Public Key
+```php
+// Encrypt with public key (only private key can decrypt)
+$publicKey = PublicKey::fromFile('/path/to/public.key');
+$encrypted = $publicKey->encrypt('secret data');
+
+// Decrypt with private key
+$privateKey = PrivateKey::fromFile('/path/to/private.key');
+$decrypted = $privateKey->decrypt($encrypted);
+```
+
+## Digital Signatures
+```php
+use Spatie\Crypto\Rsa\PrivateKey;
+use Spatie\Crypto\Rsa\PublicKey;
+
+// Sign with private key
+$privateKey = PrivateKey::fromFile('/path/to/private.key');
+$signature = $privateKey->sign('data to sign');
+
+// Verify with public key
+$publicKey = PublicKey::fromFile('/path/to/public.key');
+$isValid = $publicKey->verify('data to sign', $signature);
+
+if (!$isValid) {
+    throw new \Exception('Signature verification failed!');
+}
+```
+
+## Use Cases
+- API request signing between services
+- Secure data exchange with external systems
+- License key generation and validation
+- Document signing workflows
+
+## Laravel Service
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use Spatie\Crypto\Rsa\PrivateKey;
+use Spatie\Crypto\Rsa\PublicKey;
+
+final class CryptoService
+{
+    private PrivateKey $privateKey;
+    private PublicKey $publicKey;
+
+    public function __construct()
+    {
+        $this->privateKey = PrivateKey::fromFile(storage_path('keys/private.key'));
+        $this->publicKey = PublicKey::fromFile(storage_path('keys/public.key'));
+    }
+
+    public function encryptForExternal(string $data): string
+    {
+        return base64_encode($this->privateKey->encrypt($data));
+    }
+
+    public function decryptFromExternal(string $encrypted): string
+    {
+        return $this->publicKey->decrypt(base64_decode($encrypted));
+    }
+
+    public function sign(string $data): string
+    {
+        return base64_encode($this->privateKey->sign($data));
+    }
+
+    public function verify(string $data, string $signature): bool
+    {
+        return $this->publicKey->verify($data, base64_decode($signature));
+    }
+}
+```
+
+# GRAZULEX/LARAVEL-DEVTOOLBOX (Security Scanning)
+
+If `grazulex/laravel-devtoolbox` is installed:
+
+## Security Commands
+```bash
+# Find unprotected routes (missing auth middleware)
+php artisan dev:security:unprotected-routes
+
+# Full security audit
+php artisan dev:security:audit
+
+# Environment audit
+php artisan dev:env:audit
+```
+
+## Output Format
+```bash
+# Get JSON output for CI/CD
+php artisan dev:security:unprotected-routes --format=json
+
+# Fail on issues (for CI/CD pipelines)
+php artisan dev:security:unprotected-routes --fail-on-issues
+```
+
+## Integration with Security Audit
+```php
+// In security audit command, run devtoolbox checks
+$unprotectedRoutes = Artisan::call('dev:security:unprotected-routes', [
+    '--format' => 'json',
+]);
+```
+
+# FINDING VALIDATION (False Positive Filtering)
+
+When validating security findings, filter false positives using this pipeline:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    VALIDATION PIPELINE                               │
+├─────────────────────────────────────────────────────────────────────┤
+│  Finding                                                             │
+│     │                                                                │
+│     ▼                                                                │
+│  ┌─────────────────┐                                                │
+│  │ 1. CODE EXISTS? │──── No ────► REJECT (false positive)          │
+│  └────────┬────────┘                                                │
+│           │ Yes                                                      │
+│           ▼                                                          │
+│  ┌─────────────────┐                                                │
+│  │ 2. CONTEXT OK?  │──── No ────► REJECT (context dependent)       │
+│  └────────┬────────┘                                                │
+│           │ Yes                                                      │
+│           ▼                                                          │
+│  ┌─────────────────┐                                                │
+│  │ 3. CONFIDENCE?  │──── <80 ───► DOWNGRADE or REJECT              │
+│  └────────┬────────┘                                                │
+│           │ ≥80                                                      │
+│           ▼                                                          │
+│       VALIDATED                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+## False Positive Catalog
+
+### SQL Injection False Positives
+```php
+// FALSE: Using query builder bindings internally
+$query->whereRaw('MATCH(title) AGAINST(? IN BOOLEAN MODE)', [$term]);
+
+// FALSE: Constant/config values (not user input)
+DB::table('users')->where('role', User::ROLE_ADMIN)->get();
+
+// FALSE: Inside raw SQL for complex operations with safe values
+DB::select("SELECT *, (SELECT COUNT(*) FROM orders WHERE user_id = users.id) as order_count FROM users");
+```
+
+### XSS False Positives
+```php
+// FALSE: {!! !!} with trusted HTML (admin WYSIWYG with Purifier)
+{!! $page->body !!} // If Page model uses HTMLPurifier
+
+// FALSE: Inside script tag with JSON encoding
+<script>const data = {!! json_encode($data) !!}</script>
+
+// FALSE: SVG/icon content from trusted library
+{!! $icon->svg !!} // From blade-ui-kit/blade-icons
+```
+
+### Mass Assignment False Positives
+```php
+// FALSE: Using $fillable properly
+// Model has: protected $fillable = ['name', 'email'];
+User::create($request->all()); // Laravel filters automatically
+
+// FALSE: Creating through relationship (scoped)
+$user->posts()->create($request->all());
+```
+
+### Context-Dependent False Positives
+```php
+// FALSE: Inside test file
+// tests/Feature/SqlInjectionTest.php
+DB::select("SELECT * FROM users WHERE id = $id"); // Testing SQL injection
+
+// FALSE: Inside queue job (separate execution context)
+// FALSE: Lazy loading on already loaded relationship
+// FALSE: Single model retrieval (not collection)
+```
+
+## Confidence Scoring
+
+| Factor | Adjustment | Notes |
+|--------|------------|-------|
+| Exact pattern match | +5 | Regex matched precisely |
+| Context confirms | +10 | User input involved |
+| Context denies | -20 | Test file, constant, etc. |
+| Known CVE pattern | +10 | Matches known vulnerability |
+| Valid fix provided | +5 | Fix is correct |
+| Invalid fix | -10 | Fix has issues |
+| Framework handles it | -25 | Laravel auto-escapes, etc. |
+
+**Philosophy: "When in doubt, leave it out."** Only report issues with ≥80% confidence.
+
 # GUARDRAILS
 
 - **NEVER** commit secrets or credentials
@@ -512,3 +751,6 @@ class SecurityAuditCommand extends Command
 - **ALWAYS** use parameterized queries
 - **ALWAYS** escape output in views
 - **ALWAYS** validate and sanitize uploads
+- **NEVER** report issues with confidence < 80%
+- **ALWAYS** verify code exists before reporting
+- **ALWAYS** check surrounding context (5+ lines)

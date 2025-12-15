@@ -643,6 +643,146 @@ echo "Deployment complete!"
 2. ...
 ```
 
+# LARAVEL/ENVOY (Task Runner)
+
+If `laravel/envoy` is installed:
+
+## Install
+```bash
+composer require laravel/envoy --dev
+```
+
+## Envoy.blade.php
+```blade
+@servers(['web' => 'user@yourserver.com', 'staging' => 'user@staging.yourserver.com'])
+
+@setup
+    $repository = 'git@github.com:your/repo.git';
+    $releases_dir = '/var/www/yoursite.com/releases';
+    $app_dir = '/var/www/yoursite.com';
+    $release = date('YmdHis');
+    $new_release_dir = $releases_dir .'/'. $release;
+@endsetup
+
+@story('deploy')
+    clone_repository
+    run_composer
+    update_symlinks
+    run_migrations
+    cache_config
+    restart_services
+    cleanup_old
+@endstory
+
+@task('clone_repository', ['on' => 'web'])
+    echo 'Cloning repository...'
+    [ -d {{ $releases_dir }} ] || mkdir -p {{ $releases_dir }}
+    git clone --depth 1 {{ $repository }} {{ $new_release_dir }}
+    cd {{ $new_release_dir }}
+    git checkout {{ $branch ?? 'main' }}
+@endtask
+
+@task('run_composer', ['on' => 'web'])
+    echo "Starting deployment ({{ $release }})"
+    cd {{ $new_release_dir }}
+    composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+@endtask
+
+@task('update_symlinks', ['on' => 'web'])
+    echo "Linking storage directory..."
+    rm -rf {{ $new_release_dir }}/storage
+    ln -nfs {{ $app_dir }}/storage {{ $new_release_dir }}/storage
+
+    echo 'Linking .env file...'
+    ln -nfs {{ $app_dir }}/.env {{ $new_release_dir }}/.env
+
+    echo 'Linking current release...'
+    ln -nfs {{ $new_release_dir }} {{ $app_dir }}/current
+@endtask
+
+@task('run_migrations', ['on' => 'web'])
+    echo "Running migrations..."
+    cd {{ $new_release_dir }}
+    php artisan migrate --force
+@endtask
+
+@task('cache_config', ['on' => 'web'])
+    echo "Caching configuration..."
+    cd {{ $new_release_dir }}
+    php artisan config:cache
+    php artisan route:cache
+    php artisan view:cache
+    php artisan event:cache
+@endtask
+
+@task('restart_services', ['on' => 'web'])
+    echo "Restarting services..."
+    cd {{ $new_release_dir }}
+    php artisan queue:restart
+    php artisan octane:reload 2>/dev/null || true
+    sudo supervisorctl restart horizon 2>/dev/null || true
+@endtask
+
+@task('cleanup_old', ['on' => 'web'])
+    echo "Cleaning up old releases..."
+    cd {{ $releases_dir }}
+    ls -dt */ | tail -n +6 | xargs -d "\n" rm -rf 2>/dev/null || true
+@endtask
+
+@task('rollback', ['on' => 'web'])
+    echo "Rolling back to previous release..."
+    cd {{ $releases_dir }}
+    ln -nfs {{ $releases_dir }}/$(ls -t {{ $releases_dir }} | head -2 | tail -1) {{ $app_dir }}/current
+    php artisan cache:clear
+@endtask
+
+@task('health_check', ['on' => 'web'])
+    curl -sf {{ $app_url ?? 'https://yoursite.com' }}/api/health || exit 1
+@endtask
+
+@finished
+    @slack('webhook-url', '#deployments', "Deployed {$release} to production!")
+@endfinished
+
+@error
+    @slack('webhook-url', '#deployments', "Deployment failed!")
+@enderror
+```
+
+## Run Commands
+```bash
+# Deploy to production
+envoy run deploy
+
+# Deploy with branch
+envoy run deploy --branch=feature/new-feature
+
+# Deploy to staging
+envoy run deploy --on=staging
+
+# Rollback
+envoy run rollback
+
+# Check health
+envoy run health_check
+```
+
+## Parallel Tasks
+```blade
+@task('build_assets', ['on' => 'web', 'parallel' => true])
+    cd {{ $new_release_dir }}
+    npm ci && npm run build
+@endtask
+```
+
+## Confirmations
+```blade
+@task('migrate', ['on' => 'web', 'confirm' => true])
+    cd {{ $new_release_dir }}
+    php artisan migrate --force
+@endtask
+```
+
 # GUARDRAILS
 
 - **NEVER** commit secrets or credentials
