@@ -158,6 +158,133 @@ public function updated($property): void
 </div>
 ```
 
+## Loading States
+
+```blade
+<div>
+    <button wire:click="save" wire:loading.attr="disabled">
+        <span wire:loading.remove>Save</span>
+        <span wire:loading>Saving...</span>
+    </button>
+
+    {{-- Target specific actions --}}
+    <div wire:loading wire:target="save">
+        Processing...
+    </div>
+</div>
+```
+
+## Computed Properties
+
+```php
+use Livewire\Attributes\Computed;
+
+#[Computed]
+public function total(): float
+{
+    return $this->items->sum('price');
+}
+
+// Access in blade: $this->total
+```
+
+## Events & Communication
+
+```php
+// Dispatch from component
+$this->dispatch('order-created', orderId: $order->id);
+
+// Listen in another component
+#[On('order-created')]
+public function handleOrderCreated(int $orderId): void
+{
+    $this->orders = Order::latest()->get();
+}
+
+// Dispatch to parent
+$this->dispatch('itemAdded')->to(Cart::class);
+
+// Browser events
+$this->dispatch('notify', message: 'Saved!');
+```
+
+## Polling & Auto-refresh
+
+```blade
+{{-- Poll every 2 seconds --}}
+<div wire:poll.2s>
+    {{ $notifications->count() }} new notifications
+</div>
+
+{{-- Keep alive visible only --}}
+<div wire:poll.visible.5s>
+    Current time: {{ now() }}
+</div>
+```
+
+## Common Pitfalls
+
+1. **Missing wire:key** - Always use `wire:key` in loops to prevent DOM issues
+   ```blade
+   @foreach($items as $item)
+       <div wire:key="item-{{ $item->id }}">...</div>
+   @endforeach
+   ```
+
+2. **N+1 Queries in render()** - Eager load relationships
+   ```php
+   // Bad
+   public function render()
+   {
+       return view('livewire.posts', [
+           'posts' => Post::all(), // N+1 when accessing $post->author
+       ]);
+   }
+
+   // Good
+   public function render()
+   {
+       return view('livewire.posts', [
+           'posts' => Post::with('author')->get(),
+       ]);
+   }
+   ```
+
+3. **Large Component State** - Keep public properties minimal
+   ```php
+   // Bad - storing entire collection
+   public Collection $products;
+
+   // Good - store IDs, query when needed
+   public array $productIds = [];
+   ```
+
+4. **Not Debouncing Search** - Causes excessive requests
+   ```blade
+   {{-- Bad --}}
+   <input wire:model.live="search">
+
+   {{-- Good --}}
+   <input wire:model.live.debounce.300ms="search">
+   ```
+
+5. **Forgetting to Reset Pagination** - When filters change
+   ```php
+   public function updatedSearch(): void
+   {
+       $this->resetPage(); // Reset to page 1
+   }
+   ```
+
+6. **Memory Leaks with File Uploads** - Clean up temporary files
+   ```php
+   public function save(): void
+   {
+       $path = $this->photo->store('photos');
+       $this->reset('photo'); // Clear temporary upload
+   }
+   ```
+
 ## Best Practices
 
 - Use `wire:key` for list items
@@ -165,3 +292,5 @@ public function updated($property): void
 - Use `#[Computed]` for derived data
 - Keep components focused (single responsibility)
 - Use events for cross-component communication
+- Prefer `wire:navigate` for SPA-like navigation
+- Use loading states for better UX

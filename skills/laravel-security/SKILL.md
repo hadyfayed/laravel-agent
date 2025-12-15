@@ -142,12 +142,211 @@ Route::middleware(['throttle:api'])->group(function () {
 | Components | Composer audit |
 | Logging | Laravel logging |
 
+## Password Rules
+
+```php
+use Illuminate\Validation\Rules\Password;
+
+// In Form Request
+public function rules(): array
+{
+    return [
+        'password' => [
+            'required',
+            'confirmed',
+            Password::min(8)
+                ->letters()
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->uncompromised(), // Check HaveIBeenPwned
+        ],
+    ];
+}
+
+// Set defaults in AppServiceProvider
+Password::defaults(function () {
+    return app()->isProduction()
+        ? Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised()
+        : Password::min(8);
+});
+```
+
+## Security Middleware
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+final class SecurityHeaders
+{
+    public function handle(Request $request, Closure $next)
+    {
+        $response = $next($request);
+
+        return $response->withHeaders([
+            'X-Content-Type-Options' => 'nosniff',
+            'X-Frame-Options' => 'DENY',
+            'X-XSS-Protection' => '1; mode=block',
+            'Strict-Transport-Security' => 'max-age=31536000; includeSubDomains',
+            'Referrer-Policy' => 'strict-origin-when-cross-origin',
+            'Permissions-Policy' => 'camera=(), microphone=(), geolocation=()',
+            'Content-Security-Policy' => $this->buildCSP(),
+        ]);
+    }
+
+    private function buildCSP(): string
+    {
+        return implode('; ', [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline'",
+            "style-src 'self' 'unsafe-inline'",
+            "img-src 'self' data: https:",
+            "font-src 'self'",
+            "frame-ancestors 'none'",
+        ]);
+    }
+}
+```
+
+## Encrypted Model Attributes
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Crypt;
+
+final class User extends Model
+{
+    protected function ssn(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Crypt::decryptString($value) : null,
+            set: fn ($value) => $value ? Crypt::encryptString($value) : null,
+        );
+    }
+
+    // Or use built-in cast
+    protected function casts(): array
+    {
+        return [
+            'api_key' => 'encrypted',
+            'settings' => 'encrypted:array',
+        ];
+    }
+}
+```
+
+## Audit Logging
+
+```php
+// Log security events
+Log::channel('security')->info('User login', [
+    'user_id' => $user->id,
+    'ip' => $request->ip(),
+    'user_agent' => $request->userAgent(),
+]);
+
+// Log suspicious activity
+Log::channel('security')->warning('Failed login attempt', [
+    'email' => $request->email,
+    'ip' => $request->ip(),
+    'attempts' => RateLimiter::attempts($key),
+]);
+```
+
+## Common Pitfalls
+
+1. **Using `$guarded = []`** - Allows mass assignment attacks
+   ```php
+   // Bad
+   protected $guarded = [];
+
+   // Good - explicit fillable
+   protected $fillable = ['name', 'email'];
+   ```
+
+2. **Trusting User Input in Raw Queries**
+   ```php
+   // DANGEROUS
+   DB::statement("UPDATE users SET role = '{$request->role}'");
+
+   // Safe
+   DB::statement('UPDATE users SET role = ?', [$request->role]);
+   ```
+
+3. **Exposing Sensitive Data in Errors**
+   ```php
+   // config/app.php - in production
+   'debug' => false,
+
+   // Custom error messages
+   abort(404, 'Resource not found'); // Don't expose internals
+   ```
+
+4. **Missing Authorization Checks**
+   ```php
+   // Bad - no auth check
+   public function update(Request $request, Post $post)
+   {
+       $post->update($request->all());
+   }
+
+   // Good
+   public function update(Request $request, Post $post)
+   {
+       $this->authorize('update', $post);
+       $post->update($request->validated());
+   }
+   ```
+
+5. **Storing Tokens/Secrets in Logs**
+   ```php
+   // Bad
+   Log::info('Payment processed', $request->all());
+
+   // Good
+   Log::info('Payment processed', [
+       'amount' => $request->amount,
+       'card_last4' => substr($request->card_number, -4),
+   ]);
+   ```
+
+6. **Not Rate Limiting Sensitive Endpoints**
+   ```php
+   // routes/web.php
+   Route::post('/login', [AuthController::class, 'login'])
+       ->middleware('throttle:5,1'); // 5 attempts per minute
+   ```
+
+7. **Weak Session Configuration**
+   ```php
+   // config/session.php
+   'secure' => true,        // HTTPS only
+   'http_only' => true,     // No JS access
+   'same_site' => 'strict', // Strict CSRF protection
+   'expire_on_close' => true, // For sensitive apps
+   ```
+
 ## Package Integration
 
 - **spatie/laravel-permission** - Role-based access control
 - **spatie/crypto** - Encryption utilities
 - **laravel/sanctum** - API token authentication
 - **laravel/passport** - OAuth2 server
+- **paragonie/ciphersweet** - Searchable encryption
 
 ## Best Practices
 
@@ -158,3 +357,6 @@ Route::middleware(['throttle:api'])->group(function () {
 - Use prepared statements
 - Validate all input
 - Log security events
+- Use Content Security Policy
+- Implement proper session management
+- Regular security audits with `composer audit`

@@ -1,24 +1,25 @@
 ---
 name: laravel-database
 description: >
-  Database operations including migrations, Eloquent relationships, query optimization,
-  and schema design. Use when the user needs help with database, migrations, models,
-  relationships, queries, or performance. Triggers: "migration", "database", "schema",
-  "eloquent", "query", "relationship", "index", "N+1", "optimize query".
+  Optimize database operations, create migrations, fix N+1 queries, and design schemas.
+  Use when the user mentions database issues, needs migrations, or wants query optimization.
+  Triggers: "migration", "database", "query", "N+1", "index", "schema", "relationship",
+  "eloquent", "slow query", "optimize database".
 allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
 ---
 
 # Laravel Database Skill
 
-Expert database operations, schema design, and query optimization.
+Optimize database operations, design schemas, and fix performance issues.
 
 ## When to Use
 
-- Creating migrations or modifying schema
-- Designing Eloquent relationships
+- Creating or modifying migrations
+- Fixing N+1 query problems
 - Optimizing slow queries
-- Fixing N+1 problems
-- Adding indexes for performance
+- Designing database schemas
+- Adding indexes
+- Setting up relationships
 
 ## Quick Start
 
@@ -27,98 +28,198 @@ Expert database operations, schema design, and query optimization.
 /laravel-agent:db:diagram
 ```
 
-## Key Patterns
+## Complete Migration Example
 
-### Migrations
 ```php
-Schema::create('orders', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-    $table->string('status')->default('pending');
-    $table->decimal('total', 10, 2);
-    $table->timestamps();
+<?php
 
-    // Indexes for common queries
-    $table->index(['user_id', 'status']);
-    $table->index('created_at');
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('orders', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('shipping_address_id')->nullable()->constrained('addresses');
+            $table->string('order_number', 32)->unique();
+            $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])
+                  ->default('pending');
+            $table->decimal('subtotal', 10, 2);
+            $table->decimal('tax', 10, 2)->default(0);
+            $table->decimal('total', 10, 2);
+            $table->text('notes')->nullable();
+            $table->timestamp('shipped_at')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+
+            // Composite indexes for common queries
+            $table->index(['user_id', 'status']);
+            $table->index(['status', 'created_at']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('orders');
+    }
+};
+```
+
+## Fixing N+1 Queries
+
+### The Problem
+```php
+// BAD: N+1 query (1 + N queries)
+$posts = Post::all();
+foreach ($posts as $post) {
+    echo $post->author->name; // New query each time!
+}
+```
+
+### The Solution
+```php
+// GOOD: Eager loading (2 queries total)
+$posts = Post::with('author')->get();
+
+// Multiple relationships
+$posts = Post::with(['author', 'comments', 'tags'])->get();
+
+// Nested relationships
+$posts = Post::with(['author.profile', 'comments.user'])->get();
+
+// Conditional eager loading
+$posts = Post::with(['comments' => function ($query) {
+    $query->where('approved', true)->latest();
+}])->get();
+```
+
+### Prevent N+1 in Development
+```php
+// app/Providers/AppServiceProvider.php
+use Illuminate\Database\Eloquent\Model;
+
+public function boot(): void
+{
+    Model::preventLazyLoading(!app()->isProduction());
+}
+```
+
+## Query Optimization
+
+### Select Only Needed Columns
+```php
+// BAD
+$users = User::all();
+
+// GOOD
+$users = User::select(['id', 'name', 'email'])->get();
+```
+
+### Use Chunking for Large Datasets
+```php
+// Process in chunks (memory efficient)
+User::chunk(1000, function ($users) {
+    foreach ($users as $user) {
+        // Process
+    }
+});
+
+// ChunkById for updates
+User::where('active', false)
+    ->chunkById(1000, function ($users) {
+        foreach ($users as $user) {
+            $user->delete();
+        }
+    });
+```
+
+### Efficient Counting
+```php
+// BAD
+$count = User::all()->count();
+
+// GOOD
+$count = User::count();
+
+// With relationships
+$users = User::withCount('posts')->get();
+// Access: $user->posts_count
+```
+
+## Index Strategy
+
+```php
+Schema::table('orders', function (Blueprint $table) {
+    // Single column - for WHERE clauses
+    $table->index('status');
+
+    // Composite - for WHERE + ORDER BY
+    $table->index(['user_id', 'created_at']);
+
+    // Unique - for uniqueness + lookups
+    $table->unique('order_number');
 });
 ```
 
-### Relationships
+## Relationship Patterns
+
 ```php
-// One-to-Many
+// One to Many
 public function orders(): HasMany
 {
     return $this->hasMany(Order::class);
 }
 
-// Many-to-Many with pivot
+// Many to Many with Pivot
 public function roles(): BelongsToMany
 {
     return $this->belongsToMany(Role::class)
-        ->withPivot('expires_at')
+        ->withPivot(['expires_at'])
         ->withTimestamps();
 }
 
-// Has-Many-Through
+// Has Many Through
 public function orderItems(): HasManyThrough
 {
     return $this->hasManyThrough(OrderItem::class, Order::class);
 }
 ```
 
-### N+1 Prevention
+## Database Transactions
+
 ```php
-// BAD - N+1 queries
-$orders = Order::all();
-foreach ($orders as $order) {
-    echo $order->user->name; // N+1!
-}
+use Illuminate\Support\Facades\DB;
 
-// GOOD - Eager loading
-$orders = Order::with('user')->get();
-
-// Prevent in development
-Model::preventLazyLoading(!app()->isProduction());
-```
-
-### Query Optimization
-```php
-// Select only needed columns
-User::select('id', 'name', 'email')->get();
-
-// Use chunking for large datasets
-User::chunk(1000, function ($users) {
-    // Process chunk
-});
-
-// Use cursor for memory efficiency
-User::cursor()->each(function ($user) {
-    // Process one at a time
+DB::transaction(function () {
+    $order = Order::create([...]);
+    $order->items()->createMany([...]);
 });
 ```
 
-## Index Strategy
+## Common Pitfalls
 
-| Query Pattern | Index Type |
-|---------------|------------|
-| `WHERE column = ?` | Single column |
-| `WHERE a = ? AND b = ?` | Composite (a, b) |
-| `ORDER BY column` | Single column |
-| `WHERE a = ? ORDER BY b` | Composite (a, b) |
-| Full-text search | FULLTEXT |
+1. **N+1 Queries** - Always eager load relationships
+2. **Missing Indexes** - Add indexes for WHERE and ORDER BY
+3. **SELECT *** - Only select needed columns
+4. **No Chunking** - Use chunk() for large datasets
+5. **No Foreign Keys** - Always use constraints
+6. **No Transactions** - Wrap related operations
 
-## Tools Integration
+## Package Integration
 
 - **beyondcode/laravel-query-detector** - N+1 detection
-- **grazulex/laravel-devtoolbox** - Query analysis
-- **Laravel Telescope** - Query monitoring
+- **barryvdh/laravel-debugbar** - Query profiling
+- **spatie/laravel-query-builder** - API query building
 
 ## Best Practices
 
-- Add indexes for WHERE and ORDER BY columns
+- Design indexes based on actual queries
 - Use foreign key constraints
-- Eager load relationships
-- Chunk large operations
-- Use database transactions
-- Monitor slow queries
+- Monitor slow queries in production
+- Use database transactions for related operations

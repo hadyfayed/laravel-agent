@@ -1,10 +1,9 @@
 ---
 name: laravel-testing
 description: >
-  Write comprehensive Pest tests for Laravel applications including unit, feature,
-  API, and browser tests. Use when the user wants to write tests, improve coverage,
-  or test specific functionality. Triggers: "test", "pest", "phpunit", "coverage",
-  "unit test", "feature test", "api test", "testing".
+  Write comprehensive tests using Pest PHP for Laravel applications. Use when the user
+  wants to write tests, improve coverage, or implement TDD. Triggers: "test", "testing",
+  "pest", "phpunit", "coverage", "tdd", "unit test", "feature test", "integration test".
 allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
 ---
 
@@ -14,10 +13,11 @@ Write comprehensive tests using Pest PHP for Laravel applications.
 
 ## When to Use
 
-- User wants to "write tests" or "add test coverage"
-- Testing specific features or classes
-- API endpoint testing
-- Browser/Dusk testing
+- Writing unit or feature tests
+- Implementing TDD workflow
+- Improving test coverage
+- Testing APIs
+- Browser testing with Dusk
 
 ## Quick Start
 
@@ -26,117 +26,199 @@ Write comprehensive tests using Pest PHP for Laravel applications.
 /laravel-agent:test:coverage
 ```
 
-## Test Types
+## Complete Feature Test
 
-### Feature Tests
 ```php
-describe('Order Management', function () {
-    it('creates an order', function () {
-        $user = User::factory()->create();
+<?php
 
-        $response = $this->actingAs($user)
-            ->post('/orders', [
-                'product_id' => Product::factory()->create()->id,
-                'quantity' => 2,
+declare(strict_types=1);
+
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->product = Product::factory()->create(['price' => 99.99]);
+});
+
+describe('Order Creation', function () {
+    it('allows authenticated users to create orders', function () {
+        $response = $this->actingAs($this->user)
+            ->postJson('/api/orders', [
+                'items' => [
+                    ['product_id' => $this->product->id, 'quantity' => 2],
+                ],
             ]);
 
-        $response->assertRedirect('/orders');
+        $response->assertCreated()
+            ->assertJsonStructure([
+                'data' => ['id', 'order_number', 'total'],
+            ]);
+
         $this->assertDatabaseHas('orders', [
-            'user_id' => $user->id,
-            'quantity' => 2,
+            'user_id' => $this->user->id,
         ]);
     });
 
-    it('requires authentication', function () {
-        $this->post('/orders')->assertRedirect('/login');
+    it('rejects unauthenticated requests', function () {
+        $this->postJson('/api/orders', [])->assertUnauthorized();
+    });
+
+    it('validates required fields', function () {
+        $this->actingAs($this->user)
+            ->postJson('/api/orders', [])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['items']);
     });
 });
 ```
 
-### API Tests
+## Unit Test Example
+
 ```php
-describe('Products API', function () {
-    it('lists products', function () {
-        Product::factory()->count(3)->create();
+<?php
 
-        $this->getJson('/api/v1/products')
-            ->assertOk()
-            ->assertJsonCount(3, 'data')
-            ->assertJsonStructure([
-                'data' => [['id', 'name', 'price']],
-                'meta' => ['total'],
-            ]);
-    });
+declare(strict_types=1);
 
-    it('requires api token', function () {
-        $this->getJson('/api/v1/products')
-            ->assertUnauthorized();
-    });
-});
-```
+use App\Services\PriceCalculator;
 
-### Unit Tests
-```php
 describe('PriceCalculator', function () {
-    it('calculates discount', function () {
-        $calculator = new PriceCalculator();
-
-        expect($calculator->withDiscount(100, 10))
-            ->toBe(90.0);
+    beforeEach(function () {
+        $this->calculator = new PriceCalculator();
     });
 
-    it('throws on negative price', function () {
-        $calculator = new PriceCalculator();
+    it('calculates subtotal', function () {
+        $items = [
+            ['price' => 10.00, 'quantity' => 2],
+            ['price' => 25.00, 'quantity' => 1],
+        ];
 
-        expect(fn() => $calculator->withDiscount(-100, 10))
-            ->toThrow(InvalidArgumentException::class);
+        expect($this->calculator->subtotal($items))->toBe(45.00);
+    });
+
+    it('applies percentage discount', function () {
+        expect($this->calculator->applyDiscount(100.00, 20))->toBe(80.00);
+    });
+
+    it('does not allow negative totals', function () {
+        expect($this->calculator->applyDiscount(10.00, 50.00))->toBe(0.00);
     });
 });
 ```
 
-## Key Patterns
+## Testing Patterns
 
-### Factories
+### Testing Events
 ```php
-User::factory()
-    ->has(Order::factory()->count(3))
-    ->create();
+use Illuminate\Support\Facades\Event;
+
+it('dispatches OrderCreated event', function () {
+    Event::fake();
+
+    Order::factory()->create();
+
+    Event::assertDispatched(OrderCreated::class);
+});
 ```
 
-### Database Refresh
+### Testing Jobs
 ```php
-uses(RefreshDatabase::class);
+use Illuminate\Support\Facades\Queue;
+
+it('queues SendOrderConfirmation job', function () {
+    Queue::fake();
+
+    $order = Order::factory()->create();
+    $order->confirm();
+
+    Queue::assertPushed(SendOrderConfirmation::class);
+});
 ```
 
-### Mocking
+### Testing Notifications
 ```php
-$this->mock(PaymentGateway::class)
-    ->shouldReceive('charge')
-    ->once()
-    ->andReturn(true);
+use Illuminate\Support\Facades\Notification;
+
+it('sends confirmation notification', function () {
+    Notification::fake();
+
+    $user = User::factory()->create();
+    $order = Order::factory()->for($user)->create();
+    $order->sendConfirmation();
+
+    Notification::assertSentTo($user, OrderConfirmation::class);
+});
 ```
 
-### Assertions
+### Testing Exceptions
 ```php
-expect($user)
-    ->name->toBe('John')
-    ->email->toEndWith('@example.com')
-    ->orders->toHaveCount(3);
+it('throws exception for invalid state', function () {
+    $order = Order::factory()->delivered()->create();
+
+    expect(fn () => $order->cancel())
+        ->toThrow(InvalidStateException::class);
+});
 ```
 
-## Coverage Requirements
+## Factory Example
 
-| Type | Target |
-|------|--------|
-| Unit | 90%+ |
-| Feature | 80%+ |
-| Critical paths | 100% |
+```php
+<?php
+
+namespace Database\Factories;
+
+use App\Enums\OrderStatus;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+final class OrderFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'user_id' => User::factory(),
+            'order_number' => $this->faker->unique()->numerify('ORD-######'),
+            'status' => OrderStatus::Pending,
+            'total' => $this->faker->randomFloat(2, 10, 500),
+        ];
+    }
+
+    public function pending(): static
+    {
+        return $this->state(['status' => OrderStatus::Pending]);
+    }
+
+    public function delivered(): static
+    {
+        return $this->state(['status' => OrderStatus::Delivered]);
+    }
+}
+```
+
+## Common Pitfalls
+
+1. **Not Using RefreshDatabase** - Always reset database state
+2. **Testing Implementation** - Test behavior, not implementation
+3. **Slow Tests** - Mock external services
+4. **Missing Edge Cases** - Test boundaries and errors
+5. **No Assertions** - Every test needs clear assertions
+6. **Shared State** - Use beforeEach for isolation
+
+## Package Integration
+
+- **pestphp/pest** - Testing framework
+- **pestphp/pest-plugin-laravel** - Laravel helpers
+- **mockery/mockery** - Mocking library
+- **laravel/dusk** - Browser testing
 
 ## Best Practices
 
-- Use `describe()` and `it()` for readability
 - One assertion concept per test
-- Use factories for test data
-- Isolate tests (RefreshDatabase)
+- Use descriptive test names
 - Test edge cases and errors
-- Mock external services
+- Keep tests fast (mock slow operations)
+- Use factories for test data
+- Follow Arrange-Act-Assert pattern

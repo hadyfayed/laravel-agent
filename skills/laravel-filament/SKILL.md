@@ -157,11 +157,199 @@ final class StatsOverview extends BaseWidget
 }
 ```
 
+## Relation Managers
+
+```php
+<?php
+
+namespace App\Filament\Resources\ProductResource\RelationManagers;
+
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+final class ReviewsRelationManager extends RelationManager
+{
+    protected static string $relationship = 'reviews';
+
+    public function form(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\Textarea::make('content')
+                ->required()
+                ->maxLength(1000),
+
+            Forms\Components\Select::make('rating')
+                ->options([1 => '1 Star', 2 => '2 Stars', 3 => '3 Stars', 4 => '4 Stars', 5 => '5 Stars'])
+                ->required(),
+        ]);
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('user.name'),
+                Tables\Columns\TextColumn::make('rating'),
+                Tables\Columns\TextColumn::make('created_at')->dateTime(),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ]);
+    }
+}
+```
+
+## Custom Actions
+
+```php
+use Filament\Tables\Actions\Action;
+
+Tables\Actions\Action::make('approve')
+    ->icon('heroicon-o-check')
+    ->color('success')
+    ->requiresConfirmation()
+    ->action(fn (Product $record) => $record->approve())
+    ->visible(fn (Product $record) => $record->isPending()),
+
+Tables\Actions\Action::make('export')
+    ->icon('heroicon-o-arrow-down-tray')
+    ->action(function () {
+        return response()->download(
+            (new ProductExport)->store('exports/products.xlsx')
+        );
+    }),
+```
+
+## Custom Pages
+
+```php
+<?php
+
+namespace App\Filament\Pages;
+
+use Filament\Pages\Page;
+
+final class Dashboard extends Page
+{
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+    protected static string $view = 'filament.pages.dashboard';
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            StatsOverview::class,
+            OrdersChart::class,
+        ];
+    }
+}
+```
+
+## Form Dependencies
+
+```php
+Forms\Components\Select::make('country_id')
+    ->relationship('country', 'name')
+    ->live()
+    ->afterStateUpdated(fn (Set $set) => $set('city_id', null)),
+
+Forms\Components\Select::make('city_id')
+    ->options(fn (Get $get) => City::where('country_id', $get('country_id'))->pluck('name', 'id'))
+    ->disabled(fn (Get $get) => !$get('country_id')),
+```
+
+## Authorization
+
+```php
+// In Resource
+public static function canViewAny(): bool
+{
+    return auth()->user()->can('view_products');
+}
+
+public static function canCreate(): bool
+{
+    return auth()->user()->can('create_products');
+}
+
+public static function canEdit(Model $record): bool
+{
+    return auth()->user()->can('edit_products');
+}
+
+public static function canDelete(Model $record): bool
+{
+    return auth()->user()->can('delete_products');
+}
+```
+
+## Common Pitfalls
+
+1. **Missing Navigation Icon** - Filament requires icons
+   ```php
+   protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+   ```
+
+2. **Not Registering Resources** - Add to Panel Provider
+   ```php
+   ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+   ```
+
+3. **Form Field Name Mismatch** - Field names must match model attributes
+   ```php
+   // Bad - if column is 'product_name'
+   Forms\Components\TextInput::make('name'),
+
+   // Good
+   Forms\Components\TextInput::make('product_name'),
+   ```
+
+4. **Missing Relationship Method** - Ensure model has the relationship
+   ```php
+   // Model must have:
+   public function category(): BelongsTo
+   {
+       return $this->belongsTo(Category::class);
+   }
+   ```
+
+5. **Select Without Searchable** - Large lists need search
+   ```php
+   Forms\Components\Select::make('category_id')
+       ->relationship('category', 'name')
+       ->searchable()  // Add this!
+       ->preload(),
+   ```
+
+6. **Not Using Soft Deletes** - Add restore action
+   ```php
+   Tables\Actions\RestoreAction::make(),
+   Tables\Actions\ForceDeleteAction::make(),
+
+   // And in filters
+   Tables\Filters\TrashedFilter::make(),
+   ```
+
+7. **Heavy Queries in Table** - Use column relationships
+   ```php
+   // Bad
+   Tables\Columns\TextColumn::make('total')
+       ->getStateUsing(fn ($record) => $record->items->sum('price')),
+
+   // Good - add accessor or use withSum
+   Tables\Columns\TextColumn::make('items_sum_price')
+       ->label('Total'),
+   ```
+
 ## Package Integration
 
 - **bezhansalleh/filament-shield** - Roles and permissions
 - **ralphjsmit/laravel-seo** - SEO fields
 - **filament/spatie-laravel-media-library-plugin** - Media management
+- **filament/spatie-laravel-settings-plugin** - Settings management
 
 ## Best Practices
 
@@ -170,3 +358,6 @@ final class StatsOverview extends BaseWidget
 - Use soft deletes with restore action
 - Implement proper authorization
 - Add global search
+- Use relation managers for related data
+- Keep forms under 15 fields per section
+- Use tabs for complex resources

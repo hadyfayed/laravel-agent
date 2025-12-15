@@ -107,6 +107,110 @@ php artisan octane:start --workers=4
 | PHP | OPcache, JIT (PHP 8.1+) |
 | Server | Nginx tuning, HTTP/2, gzip |
 
+## Laravel Pulse Setup
+
+```bash
+composer require laravel/pulse
+php artisan vendor:publish --provider="Laravel\Pulse\PulseServiceProvider"
+php artisan migrate
+```
+
+```php
+// config/pulse.php
+'ingest' => [
+    'trim_lottery' => [1, 1000], // Run trim 1 in 1000 requests
+],
+
+'recorders' => [
+    Recorders\SlowQueries::class => [
+        'threshold' => 100, // Log queries > 100ms
+    ],
+    Recorders\SlowJobs::class => [
+        'threshold' => 1000, // Log jobs > 1s
+    ],
+],
+```
+
+## Database Optimization
+
+```php
+// Prevent lazy loading in development
+Model::preventLazyLoading(!app()->isProduction());
+
+// Use cursor for memory efficiency
+User::cursor()->each(function (User $user) {
+    // Process one at a time, low memory
+});
+
+// Use lazy collections
+User::lazy()->each(function (User $user) {
+    // Memory efficient iteration
+});
+
+// Batch operations
+User::where('active', false)
+    ->chunkById(1000, function ($users) {
+        $users->each->delete();
+    });
+```
+
+## Memory Optimization
+
+```php
+// Clear query log in long processes
+DB::disableQueryLog();
+
+// Unset large variables
+unset($largeDataset);
+
+// Use generators for large data
+function processLargeFile($path): Generator
+{
+    $handle = fopen($path, 'r');
+    while (($line = fgets($handle)) !== false) {
+        yield $line;
+    }
+    fclose($handle);
+}
+```
+
+## View Optimization
+
+```php
+// Fragment caching
+@cache('sidebar-' . auth()->id(), 3600)
+    <div class="sidebar">
+        {{ $heavyComputation }}
+    </div>
+@endcache
+
+// Or use blade cache
+@cache('key')
+    Expensive content
+@endcache
+```
+
+## API Response Optimization
+
+```php
+// Use API Resources with conditional attributes
+final class ProductResource extends JsonResource
+{
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            // Only include when needed
+            'reviews' => $this->when(
+                $request->include === 'reviews',
+                ReviewResource::collection($this->reviews)
+            ),
+        ];
+    }
+}
+```
+
 ## Monitoring
 
 - **Laravel Telescope** - Development profiling
@@ -122,6 +226,64 @@ php artisan octane:start --workers=4
 | Memory usage | < 128MB |
 | Cache hit ratio | > 90% |
 
+## Common Pitfalls
+
+1. **Caching Without Invalidation** - Stale data issues
+   ```php
+   // Bad - no way to invalidate
+   Cache::forever('products', $products);
+
+   // Good - use tags or short TTL
+   Cache::tags(['products'])->put('all', $products, 3600);
+   Cache::tags(['products'])->flush(); // Invalidate
+   ```
+
+2. **Eager Loading Too Much** - Loading unused relations
+   ```php
+   // Bad - loading everything
+   Post::with('author', 'comments', 'tags', 'category')->get();
+
+   // Good - load only what's needed
+   Post::with('author')->get();
+   ```
+
+3. **Not Using Database Indexes** - Slow queries
+   ```php
+   // Add indexes for where/orderBy columns
+   Schema::table('orders', function (Blueprint $table) {
+       $table->index(['user_id', 'created_at']);
+       $table->index('status');
+   });
+   ```
+
+4. **Heavy Operations in Requests** - Slow response
+   ```php
+   // Bad - sync in request
+   foreach ($users as $user) {
+       Mail::send(new WelcomeEmail($user));
+   }
+
+   // Good - queue it
+   foreach ($users as $user) {
+       Mail::queue(new WelcomeEmail($user));
+   }
+   ```
+
+5. **Not Using Query Builder Methods**
+   ```php
+   // Bad - fetches all columns
+   User::where('active', true)->get()->pluck('id');
+
+   // Good - only fetches id
+   User::where('active', true)->pluck('id');
+   ```
+
+6. **Forgetting Route Caching** - Slow route resolution
+   ```bash
+   # Always run in production
+   php artisan route:cache
+   ```
+
 ## Best Practices
 
 - Profile before optimizing
@@ -129,3 +291,6 @@ php artisan octane:start --workers=4
 - Cache at appropriate levels
 - Use queues for slow operations
 - Monitor production performance
+- Use database indexes strategically
+- Prevent lazy loading in development
+- Use Pulse for production insights
