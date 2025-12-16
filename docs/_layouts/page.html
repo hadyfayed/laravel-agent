@@ -5,6 +5,7 @@
 </head>
 <body class="bg-background text-foreground antialiased min-h-screen">
     {% include sidebar.html %}
+    {% include search-modal.html %}
 
     <!-- Main Content -->
     <main class="lg:ml-72 min-h-screen">
@@ -12,10 +13,16 @@
             <div class="px-6 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <div class="lg:hidden w-10"></div>
-                    <a href="{{ page.back_url | relative_url }}" class="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                        <span class="text-sm">{{ page.back_text }}</span>
-                    </a>
+                    <!-- Breadcrumb Navigation -->
+                    <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm">
+                        <a href="{{ '/' | relative_url }}" class="text-muted-foreground hover:text-foreground transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        </a>
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <a href="{{ page.back_url | relative_url }}" class="text-muted-foreground hover:text-foreground transition-colors">{{ page.back_text }}</a>
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <span class="text-foreground font-medium truncate max-w-[200px]">{{ page.title }}</span>
+                    </nav>
                 </div>
                 <div class="w-10"></div>
             </div>

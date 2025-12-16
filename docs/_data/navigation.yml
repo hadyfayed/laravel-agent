@@ -2,6 +2,9 @@ main:
   - title: Home
     url: /
     icon: home
+  - title: Getting Started
+    url: /getting-started.html
+    icon: book
   - title: Commands
     url: /commands.html
     icon: terminal

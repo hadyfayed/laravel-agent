@@ -1,0 +1,110 @@
+---
+layout: page
+title: Installation
+description: Complete installation guide for Laravel Agent
+nav_active: Getting Started
+back_url: /getting-started.html
+back_text: Getting Started
+---
+
+<div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2">Installation</h1>
+    <p class="text-xl text-muted-foreground">Complete guide to installing and configuring Laravel Agent</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Requirements</h2>
+    <ul>
+        <li><strong>Claude Code</strong> with Plugin support</li>
+        <li><strong>Laravel 10+</strong> project</li>
+        <li>PHP 8.1 or higher</li>
+    </ul>
+
+    <h2>Quick Install</h2>
+    <pre><code class="language-bash"># Add the marketplace
+/plugin marketplace add hadyfayed/laravel-agent
+
+# Install the plugin
+/plugin install laravel-agent@hadyfayed-laravel-agent</code></pre>
+
+    <h2>Verify Installation</h2>
+    <p>After installation, verify by running:</p>
+    <pre><code class="language-bash">/laravel-agent:patterns</code></pre>
+    <p>You should see the current pattern usage for your project.</p>
+
+    <h2>Optional Dependencies</h2>
+    <p>For the best experience, install these packages in your Laravel project:</p>
+
+    <h3>Code Quality</h3>
+    <pre><code class="language-bash"># Code formatting
+composer require laravel/pint --dev
+
+# Static analysis
+composer require phpstan/phpstan --dev
+composer require larastan/larastan --dev
+
+# IDE support
+composer require barryvdh/laravel-ide-helper --dev</code></pre>
+
+    <h3>Testing</h3>
+    <pre><code class="language-bash"># Pest testing framework
+composer require pestphp/pest --dev
+composer require pestphp/pest-plugin-laravel --dev</code></pre>
+
+    <h3>Development Tools</h3>
+    <pre><code class="language-bash"># Debug bar
+composer require barryvdh/laravel-debugbar --dev
+
+# Query detector (N+1)
+composer require beyondcode/laravel-query-detector --dev</code></pre>
+
+    <h2>Configuration</h2>
+
+    <h3>Hooks Setup</h3>
+    <p>To enable pre-commit hooks and auto-formatting, add to <code>.claude/settings.json</code>:</p>
+    <pre><code class="language-json">{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "git commit",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/pre-commit.sh"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/post-edit.sh \"$TOOL_INPUT_FILE_PATH\""
+      }
+    ]
+  }
+}</code></pre>
+    <p>See <a href="{{ '/hooks.html' | relative_url }}" class="text-primary hover:underline">Hooks Documentation</a> for full configuration.</p>
+
+    <h2>Updating</h2>
+    <p>To update to the latest version:</p>
+    <pre><code class="language-bash">/plugin update laravel-agent@hadyfayed-laravel-agent</code></pre>
+
+    <h2>Uninstalling</h2>
+    <p>To remove the plugin:</p>
+    <pre><code class="language-bash">/plugin uninstall laravel-agent@hadyfayed-laravel-agent</code></pre>
+
+    <h2>Troubleshooting</h2>
+
+    <h3>Plugin not found</h3>
+    <p>Make sure you've added the marketplace first:</p>
+    <pre><code class="language-bash">/plugin marketplace add hadyfayed/laravel-agent</code></pre>
+
+    <h3>Commands not working</h3>
+    <ol>
+        <li>Check that you're in a Laravel project directory</li>
+        <li>Verify plugin is installed: <code>/plugin list</code></li>
+        <li>Try reinstalling the plugin</li>
+    </ol>
+
+    <h3>Hooks not running</h3>
+    <ol>
+        <li>Check <code>.claude/settings.json</code> exists</li>
+        <li>Verify hook paths are correct</li>
+        <li>Make sure scripts are executable: <code>chmod +x hooks/scripts/*.sh</code></li>
+    </ol>
+</div>

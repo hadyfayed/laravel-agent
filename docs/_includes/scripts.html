@@ -1,18 +1,33 @@
+<!-- Lunr.js Search -->
+<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+
+<!-- Prism.js Syntax Highlighting -->
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-php.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
 <script>
     const html = document.documentElement;
     const themeToggle = document.getElementById('theme-toggle');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const searchBtn = document.getElementById('search-btn');
 
-    // Theme toggle
+    // Theme toggle with smooth transition
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         html.classList.add('dark');
     }
-    themeToggle.addEventListener('click', () => {
-        html.classList.toggle('dark');
-        localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
-    });
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+        });
+    }
 
     // Mobile menu toggle
     if (mobileMenuBtn) {
@@ -25,6 +40,38 @@
         sidebarOverlay.addEventListener('click', () => {
             sidebar.classList.add('-translate-x-full');
             sidebarOverlay.classList.add('hidden');
+        });
+    }
+
+    // Keyboard shortcut for search (Cmd/Ctrl + K)
+    document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            const searchModal = document.getElementById('search-modal');
+            if (searchModal) {
+                searchModal.classList.toggle('hidden');
+                const searchInput = searchModal.querySelector('input');
+                if (searchInput) searchInput.focus();
+            }
+        }
+        // Close search with Escape
+        if (e.key === 'Escape') {
+            const searchModal = document.getElementById('search-modal');
+            if (searchModal && !searchModal.classList.contains('hidden')) {
+                searchModal.classList.add('hidden');
+            }
+        }
+    });
+
+    // Search button click
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            const searchModal = document.getElementById('search-modal');
+            if (searchModal) {
+                searchModal.classList.remove('hidden');
+                const searchInput = searchModal.querySelector('input');
+                if (searchInput) searchInput.focus();
+            }
         });
     }
 </script>

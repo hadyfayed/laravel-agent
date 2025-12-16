@@ -1,0 +1,154 @@
+---
+layout: page
+title: Quick Start
+description: Get productive with Laravel Agent in 5 minutes
+nav_active: Getting Started
+back_url: /getting-started.html
+back_text: Getting Started
+---
+
+<div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2">Quick Start Guide</h1>
+    <p class="text-xl text-muted-foreground">Get productive with Laravel Agent in 5 minutes</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Your First Feature</h2>
+    <p>Let the architect decide the best approach:</p>
+    <pre><code class="language-bash">/laravel-agent:build user management with roles and permissions</code></pre>
+
+    <p>The architect will:</p>
+    <ol>
+        <li>Analyze your request</li>
+        <li>Scan your codebase for existing patterns</li>
+        <li>Decide implementation type (Feature/Module/Service)</li>
+        <li>Generate code with tests</li>
+        <li>Verify everything works</li>
+    </ol>
+
+    <h2>Direct Commands</h2>
+    <p>For specific tasks, use direct commands:</p>
+
+    <h3>Create a Feature</h3>
+    <pre><code class="language-bash">/laravel-agent:feature:make Products with categories and inventory</code></pre>
+
+    <h3>Create an API</h3>
+    <pre><code class="language-bash">/laravel-agent:api:make Products v1</code></pre>
+
+    <h3>Generate Tests</h3>
+    <pre><code class="language-bash">/laravel-agent:test:make ProductService</code></pre>
+
+    <h3>Security Audit</h3>
+    <pre><code class="language-bash">/laravel-agent:security:audit</code></pre>
+
+    <h2>Using Skills (Automatic)</h2>
+    <p>Skills activate automatically based on context. Just describe what you need:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Say This</th>
+                    <th class="text-left py-3 px-4 font-medium">Skill Activated</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">"Build a feature for..."</td>
+                    <td class="py-3 px-4"><code>laravel-feature</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">"Create an API endpoint for..."</td>
+                    <td class="py-3 px-4"><code>laravel-api</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">"Write tests for..."</td>
+                    <td class="py-3 px-4"><code>laravel-testing</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">"The app is slow, help me..."</td>
+                    <td class="py-3 px-4"><code>laravel-performance</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">"Add authentication..."</td>
+                    <td class="py-3 px-4"><code>laravel-auth</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Common Workflows</h2>
+
+    <h3>Building a CRUD Feature</h3>
+    <pre><code class="language-bash"># Option 1: Let architect decide
+/laravel-agent:build invoice management with PDF export
+
+# Option 2: Direct feature command
+/laravel-agent:feature:make Invoices with line items and PDF generation</code></pre>
+
+    <h3>Creating an API</h3>
+    <pre><code class="language-bash"># Create versioned API
+/laravel-agent:api:make Orders v1
+
+# Generate documentation
+/laravel-agent:api:docs</code></pre>
+
+    <h3>Adding Authentication</h3>
+    <pre><code class="language-bash"># Setup auth with roles
+/laravel-agent:auth:setup
+
+# Or just describe it
+"Add role-based authentication with admin and user roles"</code></pre>
+
+    <h3>Database Operations</h3>
+    <pre><code class="language-bash"># Optimize queries
+/laravel-agent:db:optimize
+
+# Generate diagram
+/laravel-agent:db:diagram</code></pre>
+
+    <h3>Deployment</h3>
+    <pre><code class="language-bash"># Setup deployment
+/laravel-agent:deploy:setup vapor
+
+# Setup CI/CD
+/laravel-agent:cicd:setup github</code></pre>
+
+    <h2>Code Review</h2>
+    <p>Before committing:</p>
+    <pre><code class="language-bash"># Review staged changes
+/laravel-agent:review:staged
+
+# Create smart commit
+/laravel-agent:git:commit</code></pre>
+
+    <h2>Best Practices</h2>
+
+    <h3>1. Start with <code>/laravel-agent:build</code></h3>
+    <p>Let the architect analyze your request and decide the best approach.</p>
+
+    <h3>2. Use Natural Language</h3>
+    <p>Skills respond to natural language. Just describe what you need:</p>
+    <blockquote>
+        <p>"I need to add a notification system that sends emails and Slack messages when orders are placed"</p>
+    </blockquote>
+
+    <h3>3. Review Generated Code</h3>
+    <p>Always review generated code before committing. Use:</p>
+    <pre><code class="language-bash">/laravel-agent:review:staged</code></pre>
+
+    <h3>4. Run Tests</h3>
+    <p>After generating features, run tests:</p>
+    <pre><code class="language-bash">php artisan test</code></pre>
+
+    <h3>5. Check Patterns</h3>
+    <p>Keep patterns under control:</p>
+    <pre><code class="language-bash">/laravel-agent:patterns</code></pre>
+
+    <h2>Next Steps</h2>
+    <ul>
+        <li><a href="{{ '/commands.html' | relative_url }}" class="text-primary hover:underline">Command Reference</a> - All available commands</li>
+        <li><a href="{{ '/skills.html' | relative_url }}" class="text-primary hover:underline">Skills Overview</a> - How skills work</li>
+        <li><a href="{{ '/agents.html' | relative_url }}" class="text-primary hover:underline">Agents</a> - Specialized agents</li>
+    </ul>
+</div>
