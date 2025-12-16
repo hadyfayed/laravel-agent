@@ -75,7 +75,7 @@ back_text: All Agents
     </ul>
 
     <h2>Generated Resource Example</h2>
-    <pre><code class="language-php">&lt;?php
+    <pre class="language-php"><code class="language-php">&lt;?php
 
 namespace App\Http\Resources\V1;
 
@@ -124,7 +124,7 @@ class ProductResource extends JsonResource
 
     <h2>Rate Limiting</h2>
     <p>Generated APIs include rate limiting middleware:</p>
-    <pre><code class="language-php">// In RouteServiceProvider
+    <pre class="language-php"><code class="language-php">// In RouteServiceProvider
 RateLimiter::for('api', function (Request $request) {
     return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
 });

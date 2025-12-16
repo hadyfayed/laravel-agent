@@ -15,7 +15,7 @@ back_text: Getting Started
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Your First Feature</h2>
     <p>Let the architect decide the best approach:</p>
-    <pre><code class="language-bash">/laravel-agent:build user management with roles and permissions</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:build user management with roles and permissions</code></pre>
 
     <p>The architect will:</p>
     <ol>
@@ -30,16 +30,16 @@ back_text: Getting Started
     <p>For specific tasks, use direct commands:</p>
 
     <h3>Create a Feature</h3>
-    <pre><code class="language-bash">/laravel-agent:feature:make Products with categories and inventory</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:feature:make Products with categories and inventory</code></pre>
 
     <h3>Create an API</h3>
-    <pre><code class="language-bash">/laravel-agent:api:make Products v1</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:api:make Products v1</code></pre>
 
     <h3>Generate Tests</h3>
-    <pre><code class="language-bash">/laravel-agent:test:make ProductService</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:test:make ProductService</code></pre>
 
     <h3>Security Audit</h3>
-    <pre><code class="language-bash">/laravel-agent:security:audit</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:security:audit</code></pre>
 
     <h2>Using Skills (Automatic)</h2>
     <p>Skills activate automatically based on context. Just describe what you need:</p>
@@ -80,35 +80,35 @@ back_text: Getting Started
     <h2>Common Workflows</h2>
 
     <h3>Building a CRUD Feature</h3>
-    <pre><code class="language-bash"># Option 1: Let architect decide
+    <pre class="language-bash"><code class="language-bash"># Option 1: Let architect decide
 /laravel-agent:build invoice management with PDF export
 
 # Option 2: Direct feature command
 /laravel-agent:feature:make Invoices with line items and PDF generation</code></pre>
 
     <h3>Creating an API</h3>
-    <pre><code class="language-bash"># Create versioned API
+    <pre class="language-bash"><code class="language-bash"># Create versioned API
 /laravel-agent:api:make Orders v1
 
 # Generate documentation
 /laravel-agent:api:docs</code></pre>
 
     <h3>Adding Authentication</h3>
-    <pre><code class="language-bash"># Setup auth with roles
+    <pre class="language-bash"><code class="language-bash"># Setup auth with roles
 /laravel-agent:auth:setup
 
 # Or just describe it
 "Add role-based authentication with admin and user roles"</code></pre>
 
     <h3>Database Operations</h3>
-    <pre><code class="language-bash"># Optimize queries
+    <pre class="language-bash"><code class="language-bash"># Optimize queries
 /laravel-agent:db:optimize
 
 # Generate diagram
 /laravel-agent:db:diagram</code></pre>
 
     <h3>Deployment</h3>
-    <pre><code class="language-bash"># Setup deployment
+    <pre class="language-bash"><code class="language-bash"># Setup deployment
 /laravel-agent:deploy:setup vapor
 
 # Setup CI/CD
@@ -116,7 +116,7 @@ back_text: Getting Started
 
     <h2>Code Review</h2>
     <p>Before committing:</p>
-    <pre><code class="language-bash"># Review staged changes
+    <pre class="language-bash"><code class="language-bash"># Review staged changes
 /laravel-agent:review:staged
 
 # Create smart commit
@@ -135,15 +135,15 @@ back_text: Getting Started
 
     <h3>3. Review Generated Code</h3>
     <p>Always review generated code before committing. Use:</p>
-    <pre><code class="language-bash">/laravel-agent:review:staged</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:review:staged</code></pre>
 
     <h3>4. Run Tests</h3>
     <p>After generating features, run tests:</p>
-    <pre><code class="language-bash">php artisan test</code></pre>
+    <pre class="language-bash"><code class="language-bash">php artisan test</code></pre>
 
     <h3>5. Check Patterns</h3>
     <p>Keep patterns under control:</p>
-    <pre><code class="language-bash">/laravel-agent:patterns</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:patterns</code></pre>
 
     <h2>Next Steps</h2>
     <ul>

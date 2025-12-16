@@ -100,7 +100,7 @@ back_text: All Agents
 
     <h2>Example Output</h2>
     <p>For a request like "Invoice management with line items and PDF export":</p>
-    <pre><code class="language-bash">app/
+    <pre class="language-bash"><code class="language-bash">app/
 ├── Models/
 │   ├── Invoice.php           # With hasMany(InvoiceLineItem::class)
 │   └── InvoiceLineItem.php   # With belongsTo(Invoice::class)
@@ -127,7 +127,7 @@ tests/Feature/
 └── InvoiceTest.php</code></pre>
 
     <h2>Generated Model Example</h2>
-    <pre><code class="language-php">&lt;?php
+    <pre class="language-php"><code class="language-php">&lt;?php
 
 namespace App\Models;
 
@@ -186,7 +186,7 @@ class Invoice extends Model
 }</code></pre>
 
     <h2>Generated Controller Example</h2>
-    <pre><code class="language-php">&lt;?php
+    <pre class="language-php"><code class="language-php">&lt;?php
 
 namespace App\Http\Controllers;
 

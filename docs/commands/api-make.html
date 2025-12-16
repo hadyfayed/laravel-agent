@@ -20,10 +20,10 @@ back_text: All Commands
     <p>The <code>/api:make</code> command creates a complete, versioned REST API resource following best practices. It generates controllers, resources, requests, and routes with proper versioning, authentication, and OpenAPI documentation.</p>
 
     <h2>Usage</h2>
-    <pre><code class="language-bash">/laravel-agent:api:make [resource name] [description]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:api:make [resource name] [description]</code></pre>
 
     <h2>Examples</h2>
-    <pre><code class="language-bash"># Create a products API
+    <pre class="language-bash"><code class="language-bash"># Create a products API
 /laravel-agent:api:make Products with filtering, sorting, and pagination
 
 # Create an orders API with nested resources
@@ -91,7 +91,7 @@ back_text: All Commands
 
     <h2>API Versioning Strategy</h2>
     <p>The command implements URL-based versioning by default:</p>
-    <pre><code class="language-bash"># Version 1 endpoints
+    <pre class="language-bash"><code class="language-bash"># Version 1 endpoints
 GET    /api/v1/products
 GET    /api/v1/products/{id}
 POST   /api/v1/products
@@ -114,7 +114,7 @@ GET    /api/v2/products  # When breaking changes needed</code></pre>
 
     <h2>Example Output Structure</h2>
     <p>For <code>/laravel-agent:api:make Products with filtering and pagination</code>:</p>
-    <pre><code class="language-bash">app/
+    <pre class="language-bash"><code class="language-bash">app/
 ├── Http/
 │   ├── Controllers/Api/V1/
 │   │   └── ProductController.php
@@ -136,7 +136,7 @@ tests/Feature/Api/V1/
 └── ProductTest.php</code></pre>
 
     <h2>Generated Controller Example</h2>
-    <pre><code class="language-php">&lt;?php
+    <pre class="language-php"><code class="language-php">&lt;?php
 
 namespace App\Http\Controllers\Api\V1;
 

@@ -61,7 +61,7 @@ back_text: All Agents
 
     <h2>Pest PHP Features Used</h2>
     <p>Generated tests leverage modern Pest PHP syntax:</p>
-    <pre><code class="language-php">&lt;?php
+    <pre class="language-php"><code class="language-php">&lt;?php
 
 use App\Models\User;
 use App\Models\Order;
@@ -135,7 +135,7 @@ describe('Order Management', function () {
 
     <h2>Factory Integration</h2>
     <p>Tests use model factories for realistic data:</p>
-    <pre><code class="language-php">// Generated factory usage
+    <pre class="language-php"><code class="language-php">// Generated factory usage
 it('lists orders with pagination', function () {
     Order::factory()
         ->count(25)
@@ -163,7 +163,7 @@ it('shows only pending orders', function () {
 
     <h2>Mocking External Services</h2>
     <p>The agent generates mocks for external dependencies:</p>
-    <pre><code class="language-php">use App\Services\PaymentGateway;
+    <pre class="language-php"><code class="language-php">use App\Services\PaymentGateway;
 
 it('processes payment successfully', function () {
     $mock = Mockery::mock(PaymentGateway::class);

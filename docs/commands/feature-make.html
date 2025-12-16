@@ -20,10 +20,10 @@ back_text: All Commands
     <p>The <code>/feature:make</code> command creates a complete, production-ready feature in your Laravel application. Unlike <code>/build</code> which delegates to the architect, this command directly invokes the <strong>laravel-feature-builder</strong> agent to generate all necessary components.</p>
 
     <h2>Usage</h2>
-    <pre><code class="language-bash">/laravel-agent:feature:make [feature name] [description]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:feature:make [feature name] [description]</code></pre>
 
     <h2>Examples</h2>
-    <pre><code class="language-bash"># Create an invoice management feature
+    <pre class="language-bash"><code class="language-bash"># Create an invoice management feature
 /laravel-agent:feature:make Invoices with line items, PDF export, and payment tracking
 
 # Create a product catalog
@@ -106,7 +106,7 @@ back_text: All Commands
 
     <h2>Example Output Structure</h2>
     <p>For <code>/laravel-agent:feature:make Invoices with line items and PDF export</code>:</p>
-    <pre><code class="language-bash">app/
+    <pre class="language-bash"><code class="language-bash">app/
 ├── Models/
 │   ├── Invoice.php
 │   └── InvoiceLineItem.php
