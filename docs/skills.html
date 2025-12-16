@@ -28,7 +28,16 @@ nav_active: Skills
         <p class="text-muted-foreground text-sm">Skills are automatically activated when Claude detects relevant keywords in your conversation. Simply describe what you need, and the appropriate skill will engage to provide specialized Laravel expertise.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="skills-grid">
+        <!-- Empty State -->
+    <div id="empty-state" class="hidden empty-state col-span-full">
+        <svg class="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="font-medium text-foreground mb-1">No skills found</p>
+        <p class="text-sm text-muted-foreground">Try a different search term or filter</p>
+    </div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="skills-grid">
         <a href="{{ 'skills/laravel-feature.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
             <div class="flex items-start gap-4">
                 <div class="skill-icon bg-gradient-to-br from-blue-500 to-blue-600">
@@ -248,14 +257,32 @@ nav_active: Skills
 </div>
 
 <script>
-    // Search functionality
+    // Elements
+    const emptyState = document.getElementById('empty-state');
     const searchInput = document.getElementById('search');
     const skillCards = document.querySelectorAll('.skill-card');
+
+    // Empty state helper
+    function updateEmptyState() {
+        const visibleCards = document.querySelectorAll('.skill-card:not([style*="display: none"])');
+        if (visibleCards.length === 0) {
+            emptyState.classList.remove('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+        }
+    }
+
+    // Search functionality with debounce
+    let searchTimeout;
     searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        skillCards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(query) ? 'block' : 'none';
-        });
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const query = e.target.value.toLowerCase();
+            skillCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? 'block' : 'none';
+            });
+            updateEmptyState();
+        }, 150);
     });
 </script>

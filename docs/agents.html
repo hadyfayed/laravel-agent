@@ -30,7 +30,16 @@ nav_active: Agents
         <button data-filter="quality" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Quality (4)</button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="agents-grid">
+        <!-- Empty State -->
+    <div id="empty-state" class="hidden empty-state col-span-full">
+        <svg class="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="font-medium text-foreground mb-1">No agents found</p>
+        <p class="text-sm text-muted-foreground">Try a different search term or filter</p>
+    </div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="agents-grid">
         <!-- Core -->
         <a href="{{ 'agents/laravel-architect.html' | relative_url }}" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="core" data-name="laravel-architect">
             <div class="flex items-start justify-between mb-3">
@@ -247,10 +256,23 @@ nav_active: Agents
 </div>
 
 <script>
-    // Filter functionality
+    // Elements
     const filterBtns = document.querySelectorAll('.filter-btn');
     const agentCards = document.querySelectorAll('.agent-card');
+    const emptyState = document.getElementById('empty-state');
+    const searchInput = document.getElementById('search');
 
+    // Empty state helper
+    function updateEmptyState() {
+        const visibleCards = document.querySelectorAll('.agent-card:not([style*="display: none"])');
+        if (visibleCards.length === 0) {
+            emptyState.classList.remove('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+        }
+    }
+
+    // Filter functionality
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             filterBtns.forEach(b => {
@@ -261,28 +283,41 @@ nav_active: Agents
             btn.classList.add('bg-primary', 'text-primary-foreground');
 
             const filter = btn.dataset.filter;
+            const query = searchInput.value.toLowerCase();
+
             agentCards.forEach(card => {
-                if (filter === 'all' || card.dataset.category === filter) {
+                const matchesFilter = filter === 'all' || card.dataset.category === filter;
+                const matchesSearch = !query || card.dataset.name.toLowerCase().includes(query) || card.textContent.toLowerCase().includes(query);
+
+                if (matchesFilter && matchesSearch) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
                 }
             });
+            updateEmptyState();
         });
     });
 
-    // Search functionality
-    const searchInput = document.getElementById('search');
+    // Search functionality with debounce
+    let searchTimeout;
     searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        agentCards.forEach(card => {
-            const name = card.dataset.name.toLowerCase();
-            const text = card.textContent.toLowerCase();
-            if (name.includes(query) || text.includes(query)) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const query = e.target.value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.bg-primary')?.dataset.filter || 'all';
+
+            agentCards.forEach(card => {
+                const matchesFilter = activeFilter === 'all' || card.dataset.category === activeFilter;
+                const matchesSearch = !query || card.dataset.name.toLowerCase().includes(query) || card.textContent.toLowerCase().includes(query);
+
+                if (matchesFilter && matchesSearch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            updateEmptyState();
+        }, 150);
     });
 </script>

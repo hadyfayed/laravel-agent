@@ -35,6 +35,15 @@ nav_active: Commands
         <button data-filter="review" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Review (7)</button>
     </div>
 
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden empty-state col-span-full">
+        <svg class="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="font-medium text-foreground mb-1">No commands found</p>
+        <p class="text-sm text-muted-foreground">Try a different search term or filter</p>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="commands-grid">
         <!-- Core -->
         <a href="{{ 'commands/build.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="core" data-name="build">
@@ -355,9 +364,20 @@ nav_active: Commands
 </div>
 
 <script>
-    // Filter functionality
+    // Filter and search functionality
     const filterBtns = document.querySelectorAll('.filter-btn');
     const commandCards = document.querySelectorAll('.command-card');
+    const emptyState = document.getElementById('empty-state');
+    const searchInput = document.getElementById('search');
+
+    function updateEmptyState() {
+        const visibleCards = document.querySelectorAll('.command-card:not([style*="display: none"])');
+        if (visibleCards.length === 0) {
+            emptyState.classList.remove('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+        }
+    }
 
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -369,28 +389,41 @@ nav_active: Commands
             btn.classList.add('bg-primary', 'text-primary-foreground');
 
             const filter = btn.dataset.filter;
+            const query = searchInput.value.toLowerCase();
+
             commandCards.forEach(card => {
-                if (filter === 'all' || card.dataset.category === filter) {
+                const matchesFilter = filter === 'all' || card.dataset.category === filter;
+                const matchesSearch = !query || card.dataset.name.toLowerCase().includes(query) || card.textContent.toLowerCase().includes(query);
+
+                if (matchesFilter && matchesSearch) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
                 }
             });
+            updateEmptyState();
         });
     });
 
-    // Search functionality
-    const searchInput = document.getElementById('search');
+    // Search functionality with debounce
+    let searchTimeout;
     searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        commandCards.forEach(card => {
-            const name = card.dataset.name.toLowerCase();
-            const text = card.textContent.toLowerCase();
-            if (name.includes(query) || text.includes(query)) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const query = e.target.value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.bg-primary')?.dataset.filter || 'all';
+
+            commandCards.forEach(card => {
+                const matchesFilter = activeFilter === 'all' || card.dataset.category === activeFilter;
+                const matchesSearch = !query || card.dataset.name.toLowerCase().includes(query) || card.textContent.toLowerCase().includes(query);
+
+                if (matchesFilter && matchesSearch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            updateEmptyState();
+        }, 150);
     });
 </script>
