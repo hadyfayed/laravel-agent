@@ -10,7 +10,7 @@ back_text: All Skills
 <div class="mb-8">
     <div class="flex items-center gap-4 mb-4">
         <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
         </div>
         <div>
             <h1 class="text-3xl font-bold">laravel-filament</h1>
@@ -22,22 +22,192 @@ back_text: All Skills
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Trigger Keywords</h2>
-    <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
         <span class="trigger-tag">filament</span>
         <span class="trigger-tag">admin panel</span>
-        <span class="trigger-tag">widget</span>
         <span class="trigger-tag">dashboard</span>
+        <span class="trigger-tag">widget</span>
+        <span class="trigger-tag">resource</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Build admin panels with resources, pages, widgets. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-filament</strong> skill provides expertise for building admin panels with <a href="https://filamentphp.com/" target="_blank" rel="noopener">Filament</a>. It covers resources, forms, tables, widgets, and custom pages.</p>
 
-    <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Resources</strong> - CRUD interfaces for models</li>
+        <li><strong>Form Builder</strong> - Fields, layouts, validation</li>
+        <li><strong>Table Builder</strong> - Columns, filters, actions</li>
+        <li><strong>Widgets</strong> - Stats, charts, custom dashboards</li>
+        <li><strong>Custom Pages</strong> - Beyond CRUD functionality</li>
+        <li><strong>Relation Managers</strong> - Nested resource management</li>
+    </ul>
 
-    <h2>Example Prompts</h2>
-    <pre class="language-bash"><code class="language-bash">"Help me filament"
-"I need to admin panel"
-"Can you help with widget?"</code></pre>
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Creating a resource
+"Create a Filament resource for managing products with categories"
+
+# Custom forms
+"Add a rich text editor and image upload to my post form"
+
+# Table filters
+"Add date range and status filters to my orders table"
+
+# Dashboard widgets
+"Create a stats widget showing today's sales and orders"</code></pre>
+
+    <h2>Filament Resource Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Filament\Resources;
+
+use App\Models\Product;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class ProductResource extends Resource
+{
+    protected static ?string $model = Product::class;
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+
+    public static function form(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\TextInput::make('name')
+                ->required()
+                ->maxLength(255),
+
+            Forms\Components\RichEditor::make('description')
+                ->columnSpanFull(),
+
+            Forms\Components\TextInput::make('price')
+                ->required()
+                ->numeric()
+                ->prefix('$'),
+
+            Forms\Components\Select::make('category_id')
+                ->relationship('category', 'name')
+                ->searchable()
+                ->preload(),
+
+            Forms\Components\FileUpload::make('image')
+                ->image()
+                ->directory('products'),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\ImageColumn::make('image'),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('category.name'),
+                Tables\Columns\TextColumn::make('price')
+                    ->money()
+                    ->sortable(),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('category')
+                    ->relationship('category', 'name'),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ]);
+    }
+}</code></pre>
+
+    <h2>Common Form Fields</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Case</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>TextInput</code></td>
+                    <td class="py-3 px-4">Single line text, numbers, emails</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>Select</code></td>
+                    <td class="py-3 px-4">Dropdowns, relationships</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>RichEditor</code></td>
+                    <td class="py-3 px-4">WYSIWYG content</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>FileUpload</code></td>
+                    <td class="py-3 px-4">Images, documents</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>Repeater</code></td>
+                    <td class="py-3 px-4">Dynamic lists of fields</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Relation Manager</h2>
+    <pre class="language-php"><code class="language-php">// In ProductResource
+public static function getRelations(): array
+{
+    return [
+        RelationManagers\ReviewsRelationManager::class,
+    ];
+}
+
+// ReviewsRelationManager.php
+class ReviewsRelationManager extends RelationManager
+{
+    protected static string $relationship = 'reviews';
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('user.name'),
+                Tables\Columns\TextColumn::make('rating'),
+                Tables\Columns\TextColumn::make('comment')->limit(50),
+            ]);
+    }
+}</code></pre>
+
+    <h2>Custom Actions</h2>
+    <pre class="language-php"><code class="language-php">Tables\Actions\Action::make('approve')
+    ->action(fn (Product $record) => $record->approve())
+    ->requiresConfirmation()
+    ->color('success')
+    ->icon('heroicon-o-check'),
+
+Tables\Actions\BulkAction::make('export')
+    ->action(fn (Collection $records) => Excel::download($records))</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Missing relationship</strong> - Define <code>relationship()</code> on Select for models</li>
+        <li><strong>Slow tables</strong> - Add <code>->searchable()</code> sparingly, index columns</li>
+        <li><strong>Large forms</strong> - Use <code>Section</code> and <code>Tabs</code> components</li>
+        <li><strong>Authorization</strong> - Implement policies, use <code>can()</code> methods</li>
+    </ul>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/filament-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:filament:make</a> - Create Filament resources</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-filament.html' | relative_url }}" class="text-primary hover:underline">laravel-filament</a> - Filament admin specialist</li>
+    </ul>
 </div>

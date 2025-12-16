@@ -22,22 +22,236 @@ back_text: All Skills
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Trigger Keywords</h2>
-    <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
         <span class="trigger-tag">websocket</span>
         <span class="trigger-tag">real-time</span>
         <span class="trigger-tag">Reverb</span>
         <span class="trigger-tag">broadcast</span>
+        <span class="trigger-tag">Echo</span>
+        <span class="trigger-tag">pusher</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Build real-time features with Laravel Reverb. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-websocket</strong> skill provides expertise for building real-time features with <a href="https://reverb.laravel.com/" target="_blank" rel="noopener">Laravel Reverb</a>. It covers WebSocket setup, broadcasting events, presence channels, and client-side integration with Laravel Echo.</p>
 
-    <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Reverb Setup</strong> - First-party WebSocket server configuration</li>
+        <li><strong>Broadcasting</strong> - Event broadcasting to channels</li>
+        <li><strong>Channel Types</strong> - Public, private, and presence channels</li>
+        <li><strong>Laravel Echo</strong> - Client-side WebSocket integration</li>
+        <li><strong>Scaling</strong> - Redis pub/sub for horizontal scaling</li>
+        <li><strong>Authentication</strong> - Private channel authorization</li>
+    </ul>
 
-    <h2>Example Prompts</h2>
-    <pre class="language-bash"><code class="language-bash">"Help me websocket"
-"I need to real-time"
-"Can you help with Reverb?"</code></pre>
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Setting up Reverb
+"Set up Laravel Reverb for real-time notifications"
+
+# Broadcasting events
+"Create a broadcast event when a new message is sent"
+
+# Presence channels
+"Show who's online in a chat room using presence channels"
+
+# Client integration
+"How do I listen for events with Laravel Echo?"</code></pre>
+
+    <h2>Broadcast Event Example</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Events;
+
+use App\Models\Message;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class MessageSent implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public function __construct(
+        public Message $message
+    ) {}
+
+    public function broadcastOn(): array
+    {
+        return [
+            new PrivateChannel('chat.' . $this->message->conversation_id),
+        ];
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'id' => $this->message->id,
+            'body' => $this->message->body,
+            'user' => $this->message->user->only('id', 'name', 'avatar'),
+            'created_at' => $this->message->created_at->toISOString(),
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'message.sent';
+    }
+}</code></pre>
+
+    <h2>Channel Authorization</h2>
+    <pre class="language-php"><code class="language-php">// routes/channels.php
+
+// Private channel - user can only access their own
+Broadcast::channel('orders.{orderId}', function ($user, $orderId) {
+    return $user->id === Order::find($orderId)?->user_id;
+});
+
+// Presence channel - returns user data for "who's here"
+Broadcast::channel('chat.{conversationId}', function ($user, $conversationId) {
+    if ($user->canAccessConversation($conversationId)) {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'avatar' => $user->avatar_url,
+        ];
+    }
+});</code></pre>
+
+    <h2>Laravel Echo Client</h2>
+    <pre class="language-php"><code class="language-php">// resources/js/bootstrap.js
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+window.Pusher = Pusher;
+window.Echo = new Echo({
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: import.meta.env.VITE_REVERB_PORT,
+    wssPort: import.meta.env.VITE_REVERB_PORT,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
+});
+
+// Listening to events
+Echo.private(`chat.${conversationId}`)
+    .listen('.message.sent', (event) => {
+        console.log('New message:', event);
+        messages.push(event);
+    });
+
+// Presence channel - track who's online
+Echo.join(`chat.${conversationId}`)
+    .here((users) => {
+        onlineUsers = users;
+    })
+    .joining((user) => {
+        onlineUsers.push(user);
+    })
+    .leaving((user) => {
+        onlineUsers = onlineUsers.filter(u => u.id !== user.id);
+    });</code></pre>
+
+    <h2>Channel Types</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Case</th>
+                    <th class="text-left py-3 px-4 font-medium">Auth Required</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>Channel</code></td>
+                    <td class="py-3 px-4">Public data (scores, prices)</td>
+                    <td class="py-3 px-4">No</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>PrivateChannel</code></td>
+                    <td class="py-3 px-4">User-specific data (notifications)</td>
+                    <td class="py-3 px-4">Yes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>PresenceChannel</code></td>
+                    <td class="py-3 px-4">Who's online (chat rooms)</td>
+                    <td class="py-3 px-4">Yes + user data</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Missing queue worker</strong> - Broadcasts require <code>php artisan queue:work</code></li>
+        <li><strong>CORS issues</strong> - Configure <code>config/cors.php</code> for WebSocket connections</li>
+        <li><strong>Auth endpoint</strong> - Ensure <code>/broadcasting/auth</code> route exists</li>
+        <li><strong>Event naming</strong> - Use <code>broadcastAs()</code> for consistent event names</li>
+    </ul>
+
+    <h2>Scaling with Redis</h2>
+    <pre class="language-php"><code class="language-php">// config/broadcasting.php
+'reverb' => [
+    'driver' => 'reverb',
+    'key' => env('REVERB_APP_KEY'),
+    'secret' => env('REVERB_APP_SECRET'),
+    'app_id' => env('REVERB_APP_ID'),
+    'options' => [
+        'host' => env('REVERB_HOST'),
+        'port' => env('REVERB_PORT', 443),
+        'scheme' => env('REVERB_SCHEME', 'https'),
+        'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
+    ],
+    'client_options' => [],
+],
+
+// For horizontal scaling, use Redis
+// .env
+BROADCAST_DRIVER=reverb
+REVERB_SCALING_ENABLED=true</code></pre>
+
+    <h2>Testing WebSockets</h2>
+    <pre class="language-php"><code class="language-php">use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Broadcast;
+
+it('broadcasts message sent event', function () {
+    Event::fake();
+
+    $message = Message::factory()->create();
+
+    event(new MessageSent($message));
+
+    Event::assertDispatched(MessageSent::class, function ($event) use ($message) {
+        return $event->message->id === $message->id;
+    });
+});
+
+it('authorizes private channel access', function () {
+    $user = User::factory()->create();
+    $conversation = Conversation::factory()->create();
+    $conversation->users()->attach($user);
+
+    $this->actingAs($user)
+        ->post('/broadcasting/auth', [
+            'channel_name' => "private-chat.{$conversation->id}",
+        ])
+        ->assertOk();
+});</code></pre>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/reverb-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:reverb:setup</a> - Setup Laravel Reverb</li>
+        <li><a href="{{ '/commands/broadcast-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:broadcast:make</a> - Create broadcast events</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-reverb.html' | relative_url }}" class="text-primary hover:underline">laravel-reverb</a> - WebSocket specialist</li>
+    </ul>
 </div>

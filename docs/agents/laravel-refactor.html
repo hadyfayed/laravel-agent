@@ -13,20 +13,191 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-refactor</h1>
     <p class="text-xl text-muted-foreground">Refactors code for SOLID/DRY compliance</p>
-    <p class="text-sm text-muted-foreground mt-2">Uses: Pint, PHPStan</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Refactors code for SOLID/DRY compliance. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-refactor</strong> agent improves code quality by applying SOLID principles, eliminating duplication (DRY), extracting services, and following Laravel best practices. It uses Pint for styling and PHPStan for static analysis.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of quality-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>SOLID Compliance</strong> - Single responsibility, dependency inversion, etc.</li>
+        <li><strong>DRY Extraction</strong> - Extract duplicated code into reusable components</li>
+        <li><strong>Service Extraction</strong> - Move business logic from controllers to services</li>
+        <li><strong>Code Style</strong> - Apply Laravel Pint formatting</li>
+        <li><strong>Static Analysis</strong> - Fix PHPStan issues</li>
+        <li><strong>Simplification</strong> - Reduce complexity, improve readability</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>Uses: Pint, PHPStan</strong></p>
+    <h2>SOLID Principles Applied</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Principle</th>
+                    <th class="text-left py-3 px-4 font-medium">What Agent Does</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">S - Single Responsibility</td>
+                    <td class="py-3 px-4">Extracts classes doing too much into focused services</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">O - Open/Closed</td>
+                    <td class="py-3 px-4">Uses interfaces and strategy patterns</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">L - Liskov Substitution</td>
+                    <td class="py-3 px-4">Ensures proper inheritance hierarchies</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">I - Interface Segregation</td>
+                    <td class="py-3 px-4">Splits fat interfaces into focused ones</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">D - Dependency Inversion</td>
+                    <td class="py-3 px-4">Injects dependencies via constructor</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Refactoring Examples</h2>
+    <pre class="language-php"><code class="language-php">// BEFORE: Fat controller with business logic
+class OrderController extends Controller
+{
+    public function store(Request $request)
+    {
+        $validated = $request->validate([...]);
+
+        // Business logic in controller (bad!)
+        $order = new Order($validated);
+        foreach ($request->items as $item) {
+            $product = Product::find($item['id']);
+            if ($product->stock < $item['quantity']) {
+                return back()->withErrors(['Insufficient stock']);
+            }
+            $product->decrement('stock', $item['quantity']);
+            $order->items()->create([...]);
+        }
+        $order->save();
+
+        // More business logic...
+        Mail::send(new OrderConfirmation($order));
+
+        return redirect()->route('orders.show', $order);
+    }
+}
+
+// AFTER: Thin controller with service
+class OrderController extends Controller
+{
+    public function __construct(
+        private OrderService $orderService
+    ) {}
+
+    public function store(StoreOrderRequest $request)
+    {
+        try {
+            $order = $this->orderService->create(
+                auth()->user(),
+                $request->validated()
+            );
+
+            return redirect()
+                ->route('orders.show', $order)
+                ->with('success', 'Order placed!');
+
+        } catch (InsufficientStockException $e) {
+            return back()->withErrors(['stock' => $e->getMessage()]);
+        }
+    }
+}</code></pre>
+
+    <h2>DRY Extraction Example</h2>
+    <pre class="language-php"><code class="language-php">// BEFORE: Duplicated query logic
+class UserController
+{
+    public function index()
+    {
+        $users = User::where('active', true)
+            ->where('role', 'admin')
+            ->orderBy('name')
+            ->get();
+    }
+}
+
+class ReportController
+{
+    public function admins()
+    {
+        $users = User::where('active', true)
+            ->where('role', 'admin')
+            ->orderBy('name')
+            ->get(); // Same query!
+    }
+}
+
+// AFTER: Query scope in model
+class User extends Model
+{
+    public function scopeActiveAdmins($query)
+    {
+        return $query->where('active', true)
+            ->where('role', 'admin')
+            ->orderBy('name');
+    }
+}
+
+// Usage
+$users = User::activeAdmins()->get();</code></pre>
+
+    <h2>Laravel Pint Configuration</h2>
+    <pre class="language-json"><code class="language-json">{
+    "preset": "laravel",
+    "rules": {
+        "simplified_null_return": true,
+        "blank_line_before_statement": {
+            "statements": ["return", "throw", "try"]
+        },
+        "concat_space": {
+            "spacing": "one"
+        },
+        "method_argument_space": {
+            "on_multiline": "ensure_fully_multiline"
+        }
+    }
+}</code></pre>
+
+    <h2>PHPStan Configuration</h2>
+    <pre class="language-bash"><code class="language-bash"># phpstan.neon
+parameters:
+    level: 8
+    paths:
+        - app
+    ignoreErrors:
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder#'
+    checkMissingIterableValueType: false</code></pre>
+
+    <h2>Common Refactoring Patterns</h2>
+    <ul>
+        <li><strong>Extract Service</strong> - Move business logic from controllers</li>
+        <li><strong>Extract Action</strong> - Create single-purpose classes</li>
+        <li><strong>Extract Query Scope</strong> - Reusable query logic in models</li>
+        <li><strong>Extract Trait</strong> - Share behavior across models</li>
+        <li><strong>Extract Interface</strong> - Define contracts for swappable implementations</li>
+        <li><strong>Extract Value Object</strong> - Encapsulate related data</li>
+    </ul>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/refactor.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:refactor</a> - Analyze and refactor code</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-review.html' | relative_url }}" class="text-primary hover:underline">laravel-review</a> - Code review agent</li>
+        <li><a href="{{ '/agents/laravel-service-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-service-builder</a> - Creates extracted services</li>
+    </ul>
 </div>

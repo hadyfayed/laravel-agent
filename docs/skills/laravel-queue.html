@@ -10,7 +10,7 @@ back_text: All Skills
 <div class="mb-8">
     <div class="flex items-center gap-4 mb-4">
         <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
         </div>
         <div>
             <h1 class="text-3xl font-bold">laravel-queue</h1>
@@ -22,22 +22,172 @@ back_text: All Skills
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Trigger Keywords</h2>
-    <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
         <span class="trigger-tag">queue</span>
         <span class="trigger-tag">job</span>
         <span class="trigger-tag">event</span>
+        <span class="trigger-tag">listener</span>
         <span class="trigger-tag">horizon</span>
+        <span class="trigger-tag">dispatch</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Create jobs, events, listeners with rate limiting. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-queue</strong> skill provides expertise for background job processing. It covers job creation, event-driven architecture, rate limiting, retries, and monitoring with Horizon.</p>
 
-    <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Job Creation</strong> - Queueable jobs with proper patterns</li>
+        <li><strong>Event/Listener</strong> - Event-driven architecture</li>
+        <li><strong>Rate Limiting</strong> - Throttle job processing</li>
+        <li><strong>Retry Logic</strong> - Backoff, max attempts, failure handling</li>
+        <li><strong>Batching</strong> - Process related jobs together</li>
+        <li><strong>Horizon</strong> - Queue monitoring and configuration</li>
+    </ul>
 
-    <h2>Example Prompts</h2>
-    <pre class="language-bash"><code class="language-bash">"Help me queue"
-"I need to job"
-"Can you help with event?"</code></pre>
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Creating a job
+"Create a job to process large CSV imports in chunks"
+
+# Event-driven
+"Set up events for when a user places an order"
+
+# Rate limiting
+"Limit my email sending job to 100 per minute"
+
+# Failure handling
+"What happens when a job fails? How do I handle it?"</code></pre>
+
+    <h2>Job Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Jobs;
+
+use App\Models\Order;
+use App\Services\PaymentGateway;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\Middleware\RateLimited;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
+
+class ProcessPayment implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 3;
+    public int $backoff = 60; // seconds
+    public int $timeout = 120;
+
+    public function __construct(
+        public Order $order
+    ) {}
+
+    public function middleware(): array
+    {
+        return [
+            new RateLimited('payments'),
+            new WithoutOverlapping($this->order->id),
+        ];
+    }
+
+    public function handle(PaymentGateway $gateway): void
+    {
+        $result = $gateway->charge($this->order);
+
+        if ($result->failed()) {
+            $this->fail($result->error());
+        }
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        // Notify admin, log, etc.
+    }
+}</code></pre>
+
+    <h2>Dispatching Jobs</h2>
+    <pre class="language-php"><code class="language-php">// Dispatch immediately to queue
+ProcessPayment::dispatch($order);
+
+// Dispatch with delay
+ProcessPayment::dispatch($order)->delay(now()->addMinutes(10));
+
+// Dispatch to specific queue
+ProcessPayment::dispatch($order)->onQueue('payments');
+
+// Dispatch after response sent
+ProcessPayment::dispatchAfterResponse($order);
+
+// Conditional dispatch
+ProcessPayment::dispatchIf($order->isPending(), $order);
+
+// Chain jobs
+Bus::chain([
+    new ProcessPayment($order),
+    new SendReceipt($order),
+    new UpdateInventory($order),
+])->dispatch();</code></pre>
+
+    <h2>Rate Limiting</h2>
+    <pre class="language-php"><code class="language-php">// In AppServiceProvider
+RateLimiter::for('payments', function (object $job) {
+    return Limit::perMinute(100);
+});
+
+// Per-user rate limiting
+RateLimiter::for('emails', function (object $job) {
+    return Limit::perMinute(10)->by($job->user->id);
+});</code></pre>
+
+    <h2>Unique Jobs</h2>
+    <pre class="language-php"><code class="language-php">use Illuminate\Contracts\Queue\ShouldBeUnique;
+
+class ProcessWebhook implements ShouldQueue, ShouldBeUnique
+{
+    public int $uniqueFor = 3600; // seconds
+
+    public function uniqueId(): string
+    {
+        return $this->webhook->id;
+    }
+}</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Serializing large data</strong> - Pass IDs, not entire models with relationships</li>
+        <li><strong>Missing <code>implements ShouldQueue</code></strong> - Job runs synchronously without it</li>
+        <li><strong>Ignoring failures</strong> - Always implement <code>failed()</code> method</li>
+        <li><strong>Not setting timeouts</strong> - Jobs can hang indefinitely</li>
+    </ul>
+
+    <h2>Testing Jobs</h2>
+    <pre class="language-php"><code class="language-php">use Illuminate\Support\Facades\Queue;
+
+it('dispatches payment job on order', function () {
+    Queue::fake();
+
+    $order = Order::factory()->create();
+    $order->process();
+
+    Queue::assertPushed(ProcessPayment::class, function ($job) use ($order) {
+        return $job->order->id === $order->id;
+    });
+});
+
+// Test job execution
+it('charges the order', function () {
+    $order = Order::factory()->create();
+
+    (new ProcessPayment($order))->handle(app(PaymentGateway::class));
+
+    expect($order->fresh()->status)->toBe('paid');
+});</code></pre>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/job-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:job:make</a> - Create queued jobs</li>
+    </ul>
 </div>

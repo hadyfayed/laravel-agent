@@ -13,20 +13,212 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-livewire</h1>
     <p class="text-xl text-muted-foreground">Creates Livewire 3 reactive components with forms, tables, modals</p>
-    <p class="text-sm text-muted-foreground mt-2">app/Livewire/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Creates Livewire 3 reactive components with forms, tables, modals. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-livewire</strong> agent creates reactive components using <a href="https://livewire.laravel.com/" target="_blank" rel="noopener">Livewire 3</a>. It generates forms with real-time validation, data tables with sorting/filtering, modals, wizards, and handles component communication.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of frontend-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Form Components</strong> - Create/edit forms with real-time validation</li>
+        <li><strong>Data Tables</strong> - Searchable, sortable, paginated tables</li>
+        <li><strong>Modal Components</strong> - Confirmation and form modals</li>
+        <li><strong>Multi-step Wizards</strong> - Form wizards with step validation</li>
+        <li><strong>Component Events</strong> - Inter-component communication</li>
+        <li><strong>File Uploads</strong> - WithFileUploads integration</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>app/Livewire/</strong></p>
+    <h2>What It Creates</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">PHP Class</td>
+                    <td class="py-3 px-4"><code>app/Livewire/</code></td>
+                    <td class="py-3 px-4">Component logic and state</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Blade View</td>
+                    <td class="py-3 px-4"><code>resources/views/livewire/</code></td>
+                    <td class="py-3 px-4">Component template</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/Livewire/</code></td>
+                    <td class="py-3 px-4">Component tests</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated Form Component</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Livewire;
+
+use App\Models\Post;
+use Livewire\Attributes\Rule;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+
+#[Title('Create Post')]
+class CreatePost extends Component
+{
+    #[Rule('required|min:3|max:255')]
+    public string $title = '';
+
+    #[Rule('required|min:10')]
+    public string $content = '';
+
+    #[Rule('nullable|exists:categories,id')]
+    public ?int $category_id = null;
+
+    public function save()
+    {
+        $validated = $this->validate();
+
+        $post = Post::create([
+            ...$validated,
+            'user_id' => auth()->id(),
+        ]);
+
+        session()->flash('success', 'Post created successfully!');
+
+        $this->redirect(route('posts.show', $post));
+    }
+
+    public function render()
+    {
+        return view('livewire.create-post', [
+            'categories' => \App\Models\Category::all(),
+        ]);
+    }
+}</code></pre>
+
+    <h2>Generated Data Table</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Livewire;
+
+use App\Models\User;
+use Livewire\Attributes\Url;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+class UserTable extends Component
+{
+    use WithPagination;
+
+    #[Url]
+    public string $search = '';
+
+    #[Url]
+    public string $sortBy = 'created_at';
+
+    #[Url]
+    public string $sortDirection = 'desc';
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function sort(string $column)
+    {
+        if ($this->sortBy === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $column;
+            $this->sortDirection = 'asc';
+        }
+    }
+
+    public function render()
+    {
+        $users = User::query()
+            ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%")
+                ->orWhere('email', 'like', "%{$this->search}%"))
+            ->orderBy($this->sortBy, $this->sortDirection)
+            ->paginate(15);
+
+        return view('livewire.user-table', compact('users'));
+    }
+}</code></pre>
+
+    <h2>Component Communication</h2>
+    <pre class="language-php"><code class="language-php">// Dispatching events
+$this->dispatch('post-created', id: $post->id);
+
+// Listening in another component
+use Livewire\Attributes\On;
+
+#[On('post-created')]
+public function handlePostCreated(int $id): void
+{
+    $this->posts = Post::latest()->get();
+}
+
+// From JavaScript
+Livewire.dispatch('post-created', { id: 1 });</code></pre>
+
+    <h2>Modal Example</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Livewire;
+
+use App\Models\Post;
+use Livewire\Component;
+
+class DeletePostModal extends Component
+{
+    public bool $show = false;
+    public ?Post $post = null;
+
+    public function open(Post $post)
+    {
+        $this->post = $post;
+        $this->show = true;
+    }
+
+    public function delete()
+    {
+        $this->authorize('delete', $this->post);
+
+        $this->post->delete();
+
+        $this->dispatch('post-deleted');
+        $this->show = false;
+
+        session()->flash('success', 'Post deleted.');
+    }
+
+    public function render()
+    {
+        return view('livewire.delete-post-modal');
+    }
+}</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/livewire-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:livewire:make</a> - Create Livewire components</li>
+    </ul>
+
+    <h2>Called By</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building reactive features</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-livewire.html' | relative_url }}" class="text-primary hover:underline">laravel-livewire skill</a> - Auto-invoked Livewire expertise</li>
+        <li><a href="{{ '/agents/laravel-filament.html' | relative_url }}" class="text-primary hover:underline">laravel-filament</a> - Admin panel components</li>
+    </ul>
 </div>

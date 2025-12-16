@@ -10,7 +10,7 @@ back_text: All Skills
 <div class="mb-8">
     <div class="flex items-center gap-4 mb-4">
         <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <div>
             <h1 class="text-3xl font-bold">laravel-testing</h1>
@@ -22,22 +22,152 @@ back_text: All Skills
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Trigger Keywords</h2>
-    <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
         <span class="trigger-tag">test</span>
         <span class="trigger-tag">pest</span>
         <span class="trigger-tag">coverage</span>
         <span class="trigger-tag">tdd</span>
+        <span class="trigger-tag">assert</span>
+        <span class="trigger-tag">mock</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Comprehensive testing with Pest PHP - unit, feature, API, browser. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-testing</strong> skill provides expertise for writing comprehensive tests using <a href="https://pestphp.com/" target="_blank" rel="noopener">Pest PHP</a>. It covers unit tests, feature tests, API tests, and browser tests with Laravel Dusk.</p>
 
-    <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Pest PHP syntax</strong> - Modern, expressive test syntax with <code>describe()</code>, <code>it()</code>, <code>expect()</code></li>
+        <li><strong>Factory patterns</strong> - Model factories with states and relationships</li>
+        <li><strong>Database testing</strong> - RefreshDatabase, transactions, assertions</li>
+        <li><strong>HTTP testing</strong> - Request/response testing with JSON assertions</li>
+        <li><strong>Mocking</strong> - Mockery, fakes, and dependency injection</li>
+        <li><strong>Coverage</strong> - Code coverage configuration and reporting</li>
+    </ul>
 
-    <h2>Example Prompts</h2>
-    <pre class="language-bash"><code class="language-bash">"Help me test"
-"I need to pest"
-"Can you help with coverage?"</code></pre>
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Writing tests for a feature
+"Write tests for my OrderService that handles checkout and payment"
+
+# Testing API endpoints
+"Help me test my products API with authentication and validation"
+
+# Mocking external services
+"How do I mock the Stripe payment gateway in my tests?"
+
+# Database assertions
+"Test that deleting a user cascades to their posts"</code></pre>
+
+    <h2>Pest PHP Patterns</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+uses(RefreshDatabase::class);
+
+describe('OrderService', function () {
+    beforeEach(function () {
+        $this->user = User::factory()->create();
+        $this->service = app(OrderService::class);
+    });
+
+    it('creates an order with valid items', function () {
+        $items = [
+            ['product_id' => 1, 'quantity' => 2],
+        ];
+
+        $order = $this->service->create($this->user, $items);
+
+        expect($order)
+            ->toBeInstanceOf(Order::class)
+            ->user_id->toBe($this->user->id)
+            ->items->toHaveCount(1);
+    });
+
+    it('throws exception for empty cart', function () {
+        $this->service->create($this->user, []);
+    })->throws(EmptyCartException::class);
+
+    it('calculates total correctly', function () {
+        $order = Order::factory()
+            ->has(OrderItem::factory()->count(3)->state(['price' => 10.00]))
+            ->create();
+
+        expect($order->total)->toBe(30.00);
+    });
+});</code></pre>
+
+    <h2>Test Types</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Case</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Unit</td>
+                    <td class="py-3 px-4"><code>tests/Unit/</code></td>
+                    <td class="py-3 px-4">Isolated class testing without framework</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Feature</td>
+                    <td class="py-3 px-4"><code>tests/Feature/</code></td>
+                    <td class="py-3 px-4">HTTP requests, full application stack</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">API</td>
+                    <td class="py-3 px-4"><code>tests/Feature/Api/</code></td>
+                    <td class="py-3 px-4">JSON API endpoints with auth</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Browser</td>
+                    <td class="py-3 px-4"><code>tests/Browser/</code></td>
+                    <td class="py-3 px-4">Laravel Dusk end-to-end</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Testing implementation</strong> - Test behavior, not internal methods</li>
+        <li><strong>Slow tests</strong> - Use <code>RefreshDatabase</code> not <code>DatabaseMigrations</code></li>
+        <li><strong>Brittle assertions</strong> - Use <code>assertJsonStructure()</code> over exact matching</li>
+        <li><strong>Missing factories</strong> - Always use factories, never raw inserts</li>
+    </ul>
+
+    <h2>Testing HTTP Responses</h2>
+    <pre class="language-php"><code class="language-php">it('returns products with pagination', function () {
+    Product::factory()->count(25)->create();
+
+    $response = $this->getJson('/api/products');
+
+    $response
+        ->assertOk()
+        ->assertJsonCount(15, 'data')
+        ->assertJsonStructure([
+            'data' => [['id', 'name', 'price']],
+            'meta' => ['total', 'per_page'],
+        ]);
+});
+
+it('validates required fields', function () {
+    $this->actingAs(User::factory()->create())
+        ->postJson('/api/products', [])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['name', 'price']);
+});</code></pre>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests for a class</li>
+        <li><a href="{{ '/commands/test-coverage.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:coverage</a> - Run tests with coverage</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-testing.html' | relative_url }}" class="text-primary hover:underline">laravel-testing</a> - Generates comprehensive test suites</li>
+    </ul>
 </div>

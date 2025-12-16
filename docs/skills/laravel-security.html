@@ -10,7 +10,7 @@ back_text: All Skills
 <div class="mb-8">
     <div class="flex items-center gap-4 mb-4">
         <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
         </div>
         <div>
             <h1 class="text-3xl font-bold">laravel-security</h1>
@@ -22,22 +22,147 @@ back_text: All Skills
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Trigger Keywords</h2>
-    <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
         <span class="trigger-tag">security</span>
         <span class="trigger-tag">XSS</span>
         <span class="trigger-tag">SQL injection</span>
+        <span class="trigger-tag">CSRF</span>
         <span class="trigger-tag">OWASP</span>
+        <span class="trigger-tag">vulnerability</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Security audits for OWASP vulnerabilities and fixes. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-security</strong> skill provides expertise for identifying and fixing security vulnerabilities. It covers OWASP Top 10 issues, Laravel-specific security patterns, and best practices for hardening applications.</p>
 
-    <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>OWASP Top 10</strong> - Detection and fixes for common vulnerabilities</li>
+        <li><strong>Input Validation</strong> - Proper sanitization and escaping</li>
+        <li><strong>Authentication Security</strong> - Password policies, brute force protection</li>
+        <li><strong>CSRF/XSS Prevention</strong> - Token verification, output encoding</li>
+        <li><strong>SQL Injection</strong> - Parameterized queries, Eloquent safety</li>
+        <li><strong>Security Headers</strong> - CSP, HSTS, X-Frame-Options</li>
+    </ul>
 
-    <h2>Example Prompts</h2>
-    <pre class="language-bash"><code class="language-bash">"Help me security"
-"I need to XSS"
-"Can you help with SQL injection?"</code></pre>
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Finding vulnerabilities
+"Audit my authentication system for security issues"
+
+# Fixing XSS
+"My blade templates might be vulnerable to XSS attacks"
+
+# SQL injection concerns
+"Is this raw query safe from SQL injection?"
+
+# Security headers
+"Help me configure security headers for production"</code></pre>
+
+    <h2>Common Vulnerabilities & Fixes</h2>
+    <pre class="language-php"><code class="language-php">// BAD: SQL Injection
+$users = DB::select("SELECT * FROM users WHERE name = '$name'");
+
+// GOOD: Parameterized query
+$users = DB::select("SELECT * FROM users WHERE name = ?", [$name]);
+
+// BETTER: Use Eloquent
+$users = User::where('name', $name)->get();
+
+// BAD: XSS vulnerability
+{!! $userInput !!}
+
+// GOOD: Escaped output
+{{ $userInput }}
+
+// BAD: Mass assignment vulnerability
+$user = User::create($request->all());
+
+// GOOD: Explicit fields
+$user = User::create($request->only(['name', 'email']));
+
+// Or use $fillable in model</code></pre>
+
+    <h2>Security Middleware</h2>
+    <pre class="language-php"><code class="language-php">// Add security headers
+class SecurityHeaders
+{
+    public function handle($request, Closure $next)
+    {
+        $response = $next($request);
+
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        $response->headers->set('X-XSS-Protection', '1; mode=block');
+        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+        return $response;
+    }
+}</code></pre>
+
+    <h2>OWASP Top 10 Checklist</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Vulnerability</th>
+                    <th class="text-left py-3 px-4 font-medium">Laravel Protection</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Injection</td>
+                    <td class="py-3 px-4">Eloquent, prepared statements</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Broken Authentication</td>
+                    <td class="py-3 px-4">Built-in auth, throttling</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">XSS</td>
+                    <td class="py-3 px-4">Blade auto-escaping</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">CSRF</td>
+                    <td class="py-3 px-4">@csrf directive, VerifyCsrfToken middleware</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Mass Assignment</td>
+                    <td class="py-3 px-4">$fillable / $guarded properties</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Using <code>{!! !!}</code></strong> - Only for trusted HTML, never user input</li>
+        <li><strong>Storing secrets in code</strong> - Use <code>.env</code> and config</li>
+        <li><strong>Exposing debug info</strong> - Never <code>APP_DEBUG=true</code> in production</li>
+        <li><strong>Weak password rules</strong> - Use <code>Password::min(8)->mixedCase()->numbers()</code></li>
+    </ul>
+
+    <h2>Password Validation</h2>
+    <pre class="language-php"><code class="language-php">use Illuminate\Validation\Rules\Password;
+
+$request->validate([
+    'password' => [
+        'required',
+        'confirmed',
+        Password::min(8)
+            ->mixedCase()
+            ->numbers()
+            ->symbols()
+            ->uncompromised(), // Check against data breaches
+    ],
+]);</code></pre>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/security-audit.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:security:audit</a> - Run security audit</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-security.html' | relative_url }}" class="text-primary hover:underline">laravel-security</a> - Security audit specialist</li>
+    </ul>
 </div>

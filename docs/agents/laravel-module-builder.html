@@ -13,20 +13,221 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-module-builder</h1>
     <p class="text-xl text-muted-foreground">Builds reusable domain modules - pure business logic without routes/views</p>
-    <p class="text-sm text-muted-foreground mt-2">app/Modules/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Builds reusable domain modules - pure business logic without routes/views. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-module-builder</strong> agent creates self-contained domain modules. Unlike features (which include routes, views, and controllers), modules are pure business logic packages with contracts, services, DTOs, and tests that can be shared across applications or extracted into packages.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of builder-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Contract Definition</strong> - Interfaces for dependency inversion</li>
+        <li><strong>Service Classes</strong> - Business logic implementation</li>
+        <li><strong>DTOs</strong> - Data transfer objects for type safety</li>
+        <li><strong>Value Objects</strong> - Immutable domain objects</li>
+        <li><strong>Events</strong> - Domain events for decoupling</li>
+        <li><strong>Tests</strong> - Unit tests for the module</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>app/Modules/</strong></p>
+    <h2>What It Creates</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Contracts</td>
+                    <td class="py-3 px-4"><code>app/Modules/{Name}/Contracts/</code></td>
+                    <td class="py-3 px-4">Interface definitions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Services</td>
+                    <td class="py-3 px-4"><code>app/Modules/{Name}/Services/</code></td>
+                    <td class="py-3 px-4">Business logic</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">DTOs</td>
+                    <td class="py-3 px-4"><code>app/Modules/{Name}/DTOs/</code></td>
+                    <td class="py-3 px-4">Data transfer objects</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Events</td>
+                    <td class="py-3 px-4"><code>app/Modules/{Name}/Events/</code></td>
+                    <td class="py-3 px-4">Domain events</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Tests</td>
+                    <td class="py-3 px-4"><code>tests/Unit/Modules/{Name}/</code></td>
+                    <td class="py-3 px-4">Unit tests</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Module Structure Example</h2>
+    <pre class="language-bash"><code class="language-bash">app/Modules/Payment/
+├── Contracts/
+│   ├── PaymentGatewayInterface.php
+│   └── PaymentResultInterface.php
+├── Services/
+│   └── PaymentService.php
+├── DTOs/
+│   ├── ChargeRequest.php
+│   └── PaymentResult.php
+├── Exceptions/
+│   ├── PaymentFailedException.php
+│   └── InvalidCardException.php
+├── Events/
+│   ├── PaymentSucceeded.php
+│   └── PaymentFailed.php
+└── PaymentServiceProvider.php
+
+tests/Unit/Modules/Payment/
+├── PaymentServiceTest.php
+└── ChargeRequestTest.php</code></pre>
+
+    <h2>Generated Contract Example</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Modules\Payment\Contracts;
+
+use App\Modules\Payment\DTOs\ChargeRequest;
+use App\Modules\Payment\DTOs\PaymentResult;
+
+interface PaymentGatewayInterface
+{
+    /**
+     * Charge a payment method.
+     *
+     * @throws \App\Modules\Payment\Exceptions\PaymentFailedException
+     */
+    public function charge(ChargeRequest $request): PaymentResult;
+
+    /**
+     * Refund a previous charge.
+     */
+    public function refund(string $transactionId, int $amountInCents): PaymentResult;
+
+    /**
+     * Check if the gateway is available.
+     */
+    public function isAvailable(): bool;
+}</code></pre>
+
+    <h2>Generated DTO Example</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Modules\Payment\DTOs;
+
+use Illuminate\Contracts\Support\Arrayable;
+
+readonly class ChargeRequest implements Arrayable
+{
+    public function __construct(
+        public int $amountInCents,
+        public string $currency,
+        public string $paymentMethodId,
+        public ?string $description = null,
+        public array $metadata = [],
+    ) {}
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            amountInCents: $data['amount_in_cents'],
+            currency: $data['currency'] ?? 'USD',
+            paymentMethodId: $data['payment_method_id'],
+            description: $data['description'] ?? null,
+            metadata: $data['metadata'] ?? [],
+        );
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'amount_in_cents' => $this->amountInCents,
+            'currency' => $this->currency,
+            'payment_method_id' => $this->paymentMethodId,
+            'description' => $this->description,
+            'metadata' => $this->metadata,
+        ];
+    }
+}</code></pre>
+
+    <h2>Service Provider</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Modules\Payment;
+
+use Illuminate\Support\ServiceProvider;
+use App\Modules\Payment\Contracts\PaymentGatewayInterface;
+use App\Modules\Payment\Services\StripeGateway;
+
+class PaymentServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this->app->bind(
+            PaymentGatewayInterface::class,
+            StripeGateway::class
+        );
+    }
+
+    public function boot(): void
+    {
+        // Publish config if needed
+        // $this->publishes([...]);
+    }
+}</code></pre>
+
+    <h2>When to Use Modules vs Features</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Use Module When</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Feature When</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Business logic is reusable</td>
+                    <td class="py-3 px-4">Need CRUD with UI</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">May extract to package later</td>
+                    <td class="py-3 px-4">App-specific feature</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">No routes/views needed</td>
+                    <td class="py-3 px-4">Need controllers and views</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Integration with external APIs</td>
+                    <td class="py-3 px-4">User-facing functionality</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/module-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:module:make</a> - Create domain modules</li>
+    </ul>
+
+    <h2>Called By</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building reusable domain logic</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - For full-stack features</li>
+        <li><a href="{{ '/agents/laravel-service-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-service-builder</a> - For single services</li>
+    </ul>
 </div>

@@ -13,20 +13,222 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-deploy</h1>
     <p class="text-xl text-muted-foreground">Configures deployment for Forge, Vapor, Docker, Bref</p>
-    <p class="text-sm text-muted-foreground mt-2">Dockerfile, serverless.yml</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Configures deployment for Forge, Vapor, Docker, Bref. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-deploy</strong> agent configures production deployment. It sets up zero-downtime deployments, creates Docker configurations, generates deployment scripts for various platforms, and configures health checks and monitoring.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of devops-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Zero-Downtime Deployment</strong> - Atomic deployments with symlinks</li>
+        <li><strong>Platform Configuration</strong> - Forge, Vapor, Ploi, custom VPS</li>
+        <li><strong>Docker Setup</strong> - Production-ready Dockerfiles</li>
+        <li><strong>Health Checks</strong> - Endpoint monitoring for load balancers</li>
+        <li><strong>Environment Config</strong> - Production-ready settings</li>
+        <li><strong>SSL/HTTPS</strong> - Certificate configuration</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>Dockerfile, serverless.yml</strong></p>
+    <h2>What It Creates</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">File</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Dockerfile</td>
+                    <td class="py-3 px-4"><code>Dockerfile</code></td>
+                    <td class="py-3 px-4">Container image definition</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Docker Compose</td>
+                    <td class="py-3 px-4"><code>docker-compose.yml</code></td>
+                    <td class="py-3 px-4">Multi-container orchestration</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Deploy Script</td>
+                    <td class="py-3 px-4"><code>deploy.sh</code></td>
+                    <td class="py-3 px-4">Deployment automation</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Health Check</td>
+                    <td class="py-3 px-4"><code>app/Http/Controllers/HealthController.php</code></td>
+                    <td class="py-3 px-4">Load balancer health endpoint</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated Dockerfile</h2>
+    <pre class="language-bash"><code class="language-bash"># Production Dockerfile
+FROM php:8.3-fpm-alpine
+
+# Install dependencies
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    libpng-dev \
+    libzip-dev \
+    && docker-php-ext-install pdo_mysql gd zip opcache
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Configure PHP
+COPY docker/php.ini /usr/local/etc/php/conf.d/custom.ini
+
+# Configure Nginx
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+
+# Configure Supervisor
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy application
+COPY --chown=www-data:www-data . .
+
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader
+
+# Cache config
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
+
+EXPOSE 80
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]</code></pre>
+
+    <h2>Zero-Downtime Deploy Script</h2>
+    <pre class="language-bash"><code class="language-bash">#!/bin/bash
+set -e
+
+DEPLOY_DIR="/var/www/app"
+RELEASES_DIR="$DEPLOY_DIR/releases"
+SHARED_DIR="$DEPLOY_DIR/shared"
+CURRENT="$DEPLOY_DIR/current"
+RELEASE=$(date +%Y%m%d%H%M%S)
+
+echo "Starting deployment: $RELEASE"
+
+# Clone fresh release
+git clone --depth 1 git@github.com:user/repo.git "$RELEASES_DIR/$RELEASE"
+cd "$RELEASES_DIR/$RELEASE"
+
+# Link shared resources
+ln -nfs "$SHARED_DIR/.env" .env
+ln -nfs "$SHARED_DIR/storage" storage
+
+# Install dependencies
+composer install --no-dev --optimize-autoloader
+
+# Build assets
+npm ci && npm run build
+
+# Cache everything
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+
+# Run migrations
+php artisan migrate --force
+
+# Health check before switching
+if ! curl -sf http://localhost:8080/health > /dev/null; then
+    echo "Health check failed, aborting deployment"
+    rm -rf "$RELEASES_DIR/$RELEASE"
+    exit 1
+fi
+
+# Atomic switch
+ln -nfs "$RELEASES_DIR/$RELEASE" "$CURRENT"
+
+# Restart services
+php artisan queue:restart
+sudo systemctl reload php-fpm
+
+# Cleanup old releases (keep 5)
+ls -dt "$RELEASES_DIR"/* | tail -n +6 | xargs rm -rf
+
+echo "Deployment complete: $RELEASE"</code></pre>
+
+    <h2>Laravel Forge Configuration</h2>
+    <pre class="language-bash"><code class="language-bash"># Forge deployment script
+cd /home/forge/example.com
+
+git pull origin $FORGE_SITE_BRANCH
+
+$FORGE_COMPOSER install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+( flock -w 10 9 || exit 1
+    echo 'Restarting FPM...'; sudo -S service $FORGE_PHP_FPM reload ) 9>/tmp/fpmlock
+
+if [ -f artisan ]; then
+    $FORGE_PHP artisan migrate --force
+    $FORGE_PHP artisan config:cache
+    $FORGE_PHP artisan route:cache
+    $FORGE_PHP artisan view:cache
+    $FORGE_PHP artisan queue:restart
+fi
+
+npm ci && npm run build</code></pre>
+
+    <h2>Health Check Endpoint</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
+
+class HealthController extends Controller
+{
+    public function __invoke()
+    {
+        $checks = [
+            'status' => 'ok',
+            'timestamp' => now()->toIso8601String(),
+            'checks' => [
+                'database' => $this->checkDatabase(),
+                'cache' => $this->checkCache(),
+                'redis' => $this->checkRedis(),
+            ],
+        ];
+
+        $healthy = collect($checks['checks'])
+            ->every(fn ($check) => $check['status'] === 'ok');
+
+        return response()->json($checks, $healthy ? 200 : 503);
+    }
+
+    private function checkDatabase(): array
+    {
+        try {
+            DB::select('SELECT 1');
+            return ['status' => 'ok'];
+        } catch (\Exception $e) {
+            return ['status' => 'fail', 'error' => $e->getMessage()];
+        }
+    }
+}</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/deploy-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:deploy:setup</a> - Configure deployment</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-deploy.html' | relative_url }}" class="text-primary hover:underline">laravel-deploy skill</a> - Auto-invoked deployment expertise</li>
+        <li><a href="{{ '/agents/laravel-cicd.html' | relative_url }}" class="text-primary hover:underline">laravel-cicd</a> - CI/CD pipeline setup</li>
+    </ul>
 </div>

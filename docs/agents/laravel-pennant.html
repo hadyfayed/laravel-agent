@@ -13,20 +13,295 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-pennant</h1>
     <p class="text-xl text-muted-foreground">Creates feature flags using Laravel Pennant</p>
-    <p class="text-sm text-muted-foreground mt-2">app/Features/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Creates feature flags using Laravel Pennant. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-pennant</strong> agent creates feature flags using <a href="https://laravel.com/docs/pennant" target="_blank" rel="noopener">Laravel Pennant</a>. It generates feature classes with resolution logic, sets up A/B testing, configures gradual rollouts, and integrates feature flags into Blade, Middleware, and API responses.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of backend-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Feature Classes</strong> - Create typed feature flag definitions</li>
+        <li><strong>Resolution Logic</strong> - User/team-based feature targeting</li>
+        <li><strong>Gradual Rollouts</strong> - Percentage-based feature activation</li>
+        <li><strong>A/B Testing</strong> - Multi-variant feature experiments</li>
+        <li><strong>Blade Integration</strong> - Feature directives in templates</li>
+        <li><strong>Middleware</strong> - Gate access based on features</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>app/Features/</strong></p>
+    <h2>What It Creates</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Feature Classes</td>
+                    <td class="py-3 px-4"><code>app/Features/</code></td>
+                    <td class="py-3 px-4">Feature flag definitions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Middleware</td>
+                    <td class="py-3 px-4"><code>app/Http/Middleware/</code></td>
+                    <td class="py-3 px-4">Feature-gated routes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/</code></td>
+                    <td class="py-3 px-4">Feature flag tests</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated Feature Class</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Features;
+
+use Illuminate\Support\Lottery;
+use Laravel\Pennant\Feature;
+
+class NewDashboard
+{
+    /**
+     * Resolve the feature's initial value.
+     */
+    public function resolve(mixed $scope): bool
+    {
+        // Enable for specific users
+        if ($scope instanceof \App\Models\User) {
+            // Beta testers always get new features
+            if ($scope->is_beta_tester) {
+                return true;
+            }
+
+            // Gradual rollout to 20% of users
+            return Lottery::odds(1, 5)-&gt;choose();
+        }
+
+        return false;
+    }
+}
+
+// Usage in controller
+public function index()
+{
+    if (Feature::active(NewDashboard::class)) {
+        return view('dashboard.new');
+    }
+
+    return view('dashboard.classic');
+}</code></pre>
+
+    <h2>A/B Testing with Variants</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Features;
+
+use App\Models\User;
+use Illuminate\Support\Arr;
+
+class CheckoutFlow
+{
+    /**
+     * Return a variant for A/B testing.
+     */
+    public function resolve(User $user): string
+    {
+        // Consistent variant per user based on ID
+        return match ($user-&gt;id % 3) {
+            0 =&gt; 'control',      // Original flow
+            1 =&gt; 'simplified',   // Fewer steps
+            2 =&gt; 'one-page',     // Single page checkout
+        };
+    }
+}
+
+// Usage
+$variant = Feature::value(CheckoutFlow::class);
+
+return match ($variant) {
+    'simplified' =&gt; view('checkout.simplified'),
+    'one-page' =&gt; view('checkout.one-page'),
+    default =&gt; view('checkout.control'),
+};</code></pre>
+
+    <h2>Team-Based Features</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Features;
+
+use App\Models\Team;
+
+class AdvancedAnalytics
+{
+    public function resolve(Team $team): bool
+    {
+        // Only for Pro and Enterprise plans
+        return in_array($team-&gt;plan, ['pro', 'enterprise']);
+    }
+}
+
+// Scoped feature check
+Feature::for($user-&gt;currentTeam)-&gt;active(AdvancedAnalytics::class);
+
+// In service provider - set default scope
+Feature::resolveScopeUsing(fn () =&gt; auth()-&gt;user()?-&gt;currentTeam);</code></pre>
+
+    <h2>Blade Directives</h2>
+    <pre class="language-php"><code class="language-php">{{-- Check if feature is active --}}
+@feature('new-dashboard')
+    &lt;x-new-dashboard-widget /&gt;
+@else
+    &lt;x-classic-dashboard-widget /&gt;
+@endfeature
+
+{{-- Using class-based features --}}
+@feature(App\Features\NewDashboard::class)
+    &lt;div class="new-design"&gt;
+        {{ $content }}
+    &lt;/div&gt;
+@endfeature
+
+{{-- A/B variant checking --}}
+@featureValue(App\Features\CheckoutFlow::class, 'one-page')
+    &lt;x-one-page-checkout /&gt;
+@endfeatureValue</code></pre>
+
+    <h2>Feature Middleware</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Laravel\Pennant\Feature;
+
+class EnsureFeatureActive
+{
+    public function handle($request, Closure $next, string $feature)
+    {
+        if (!Feature::active($feature)) {
+            abort(404);
+        }
+
+        return $next($request);
+    }
+}
+
+// routes/web.php
+Route::middleware(['feature:new-dashboard'])-&gt;group(function () {
+    Route::get('/dashboard/v2', [DashboardController::class, 'v2']);
+});
+
+// Or with class-based features
+Route::get('/checkout/express', [CheckoutController::class, 'express'])
+    -&gt;middleware('feature:' . \App\Features\ExpressCheckout::class);</code></pre>
+
+    <h2>Gradual Rollout Configuration</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Features;
+
+use Illuminate\Support\Lottery;
+
+class NewPaymentFlow
+{
+    /**
+     * Rollout schedule:
+     * Week 1: 10% of users
+     * Week 2: 25% of users
+     * Week 3: 50% of users
+     * Week 4: 100% of users
+     */
+    public function resolve($user): bool
+    {
+        $rolloutPercentage = match (true) {
+            now()-&gt;lt(carbon('2024-02-01')) =&gt; 10,
+            now()-&gt;lt(carbon('2024-02-08')) =&gt; 25,
+            now()-&gt;lt(carbon('2024-02-15')) =&gt; 50,
+            default =&gt; 100,
+        };
+
+        return Lottery::odds($rolloutPercentage, 100)-&gt;choose();
+    }
+}
+
+// Force enable/disable for testing
+Feature::activate(NewPaymentFlow::class);      // Enable for current scope
+Feature::deactivate(NewPaymentFlow::class);    // Disable for current scope
+Feature::forget(NewPaymentFlow::class);        // Reset to default resolution</code></pre>
+
+    <h2>API Response Integration</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+use Laravel\Pennant\Feature;
+
+class UserResource extends JsonResource
+{
+    public function toArray($request): array
+    {
+        return [
+            'id' =&gt; $this-&gt;id,
+            'name' =&gt; $this-&gt;name,
+            'email' =&gt; $this-&gt;email,
+
+            // Include feature flags for frontend
+            'features' =&gt; [
+                'new_dashboard' =&gt; Feature::for($this-&gt;resource)-&gt;active('new-dashboard'),
+                'dark_mode' =&gt; Feature::for($this-&gt;resource)-&gt;active('dark-mode'),
+                'checkout_variant' =&gt; Feature::for($this-&gt;resource)-&gt;value('checkout-flow'),
+            ],
+        ];
+    }
+}</code></pre>
+
+    <h2>Testing Feature Flags</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Laravel\Pennant\Feature;
+use App\Features\NewDashboard;
+
+it('shows new dashboard for beta testers', function () {
+    Feature::activate(NewDashboard::class);
+
+    $response = $this-&gt;actingAs($user)-&gt;get('/dashboard');
+
+    $response-&gt;assertViewIs('dashboard.new');
+});
+
+it('shows classic dashboard when feature is disabled', function () {
+    Feature::deactivate(NewDashboard::class);
+
+    $response = $this-&gt;actingAs($user)-&gt;get('/dashboard');
+
+    $response-&gt;assertViewIs('dashboard.classic');
+});
+
+it('returns 404 when feature-gated route is disabled', function () {
+    Feature::deactivate('express-checkout');
+
+    $response = $this-&gt;actingAs($user)-&gt;get('/checkout/express');
+
+    $response-&gt;assertNotFound();
+});</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/feature-flag-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:feature-flag:make</a> - Create feature flags</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - Full-stack feature building</li>
+        <li><a href="{{ '/agents/laravel-testing.html' | relative_url }}" class="text-primary hover:underline">laravel-testing</a> - Test generation</li>
+    </ul>
 </div>

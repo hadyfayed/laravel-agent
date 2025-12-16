@@ -10,7 +10,7 @@ back_text: All Skills
 <div class="mb-8">
     <div class="flex items-center gap-4 mb-4">
         <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         </div>
         <div>
             <h1 class="text-3xl font-bold">laravel-api</h1>
@@ -22,22 +22,123 @@ back_text: All Skills
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Trigger Keywords</h2>
-    <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
-        <span class="trigger-tag">build api</span>
-        <span class="trigger-tag">rest api</span>
+        <span class="trigger-tag">api</span>
+        <span class="trigger-tag">rest</span>
         <span class="trigger-tag">endpoint</span>
         <span class="trigger-tag">openapi</span>
+        <span class="trigger-tag">json</span>
+        <span class="trigger-tag">resource</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Build REST APIs with versioning and OpenAPI documentation. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-api</strong> skill provides expertise for building production-ready REST APIs. When activated, Claude understands API versioning strategies, JSON resource transformations, rate limiting, authentication, and OpenAPI documentation.</p>
 
-    <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>API Versioning</strong> - URL-based (/api/v1/) or header-based versioning</li>
+        <li><strong>JSON Resources</strong> - Proper response transformation with relationships</li>
+        <li><strong>Request Validation</strong> - Form requests with API-specific error formatting</li>
+        <li><strong>Rate Limiting</strong> - Per-user and per-endpoint throttling</li>
+        <li><strong>Authentication</strong> - Sanctum, Passport, or API key strategies</li>
+        <li><strong>Documentation</strong> - OpenAPI/Swagger spec generation</li>
+    </ul>
 
-    <h2>Example Prompts</h2>
-    <pre class="language-bash"><code class="language-bash">"Help me build api"
-"I need to rest api"
-"Can you help with endpoint?"</code></pre>
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Building a new API
+"I need to create a REST API for managing products with filtering and pagination"
+
+# Adding versioning
+"Help me version my API - I need to support v1 and v2 simultaneously"
+
+# Response formatting
+"How should I structure my API responses for a collection with pagination?"
+
+# Authentication
+"Set up Sanctum authentication for my API with token abilities"</code></pre>
+
+    <h2>API Response Patterns</h2>
+    <p>The skill ensures consistent response structures:</p>
+    <pre class="language-php"><code class="language-php">// Collection response with pagination
+{
+    "data": [...],
+    "meta": {
+        "current_page": 1,
+        "per_page": 15,
+        "total": 100
+    },
+    "links": {
+        "first": "...",
+        "last": "...",
+        "next": "..."
+    }
+}
+
+// Single resource response
+{
+    "data": {
+        "id": 1,
+        "type": "products",
+        "attributes": {...},
+        "relationships": {...}
+    }
+}
+
+// Error response
+{
+    "message": "Validation failed",
+    "errors": {
+        "email": ["The email field is required."]
+    }
+}</code></pre>
+
+    <h2>Common Patterns</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Pattern</th>
+                    <th class="text-left py-3 px-4 font-medium">When to Use</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>JsonResource</code></td>
+                    <td class="py-3 px-4">Single model transformation</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>ResourceCollection</code></td>
+                    <td class="py-3 px-4">Collections with custom pagination</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>whenLoaded()</code></td>
+                    <td class="py-3 px-4">Conditional relationship inclusion</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>QueryBuilder</code></td>
+                    <td class="py-3 px-4">Filtering, sorting, including via query params</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>N+1 in resources</strong> - Always eager load relationships before transforming</li>
+        <li><strong>Exposing sensitive data</strong> - Explicitly define what to include, don't use <code>toArray()</code></li>
+        <li><strong>Inconsistent errors</strong> - Use exception handlers for uniform error responses</li>
+        <li><strong>Missing rate limits</strong> - Always protect public endpoints</li>
+    </ul>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/api-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:make</a> - Create API resources</li>
+        <li><a href="{{ '/commands/api-docs.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:docs</a> - Generate OpenAPI documentation</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-api-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-api-builder</a> - Builds complete API resources</li>
+    </ul>
 </div>

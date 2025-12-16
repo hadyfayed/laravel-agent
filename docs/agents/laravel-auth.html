@@ -13,20 +13,187 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-auth</h1>
     <p class="text-xl text-muted-foreground">Sets up authentication with policies, gates, roles/permissions</p>
-    <p class="text-sm text-muted-foreground mt-2">app/Policies/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Sets up authentication with policies, gates, roles/permissions. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-auth</strong> agent specializes in authentication and authorization setup. It configures Laravel's built-in auth, Sanctum for APIs, creates policies for model authorization, and implements role-based access control systems.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of backend-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Authentication Setup</strong> - Session-based, token-based, or social login</li>
+        <li><strong>Policy Creation</strong> - Model-specific authorization policies</li>
+        <li><strong>Gate Definition</strong> - Application-wide ability checks</li>
+        <li><strong>Sanctum Configuration</strong> - SPA authentication and API tokens</li>
+        <li><strong>Role/Permission System</strong> - With Spatie or custom implementation</li>
+        <li><strong>Multi-tenancy</strong> - Tenant isolation and scoping</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>app/Policies/</strong></p>
+    <h2>What It Creates</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Policies</td>
+                    <td class="py-3 px-4"><code>app/Policies/</code></td>
+                    <td class="py-3 px-4">Model authorization rules</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Gates</td>
+                    <td class="py-3 px-4"><code>AuthServiceProvider</code></td>
+                    <td class="py-3 px-4">Application-wide abilities</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Middleware</td>
+                    <td class="py-3 px-4"><code>app/Http/Middleware/</code></td>
+                    <td class="py-3 px-4">Role/permission checks</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Migrations</td>
+                    <td class="py-3 px-4"><code>database/migrations/</code></td>
+                    <td class="py-3 px-4">Roles/permissions tables</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated Policy Example</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Policies;
+
+use App\Models\Post;
+use App\Models\User;
+
+class PostPolicy
+{
+    /**
+     * Runs before all other checks.
+     */
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->hasRole('admin')) {
+            return true; // Admins bypass all checks
+        }
+
+        return null; // Continue to specific check
+    }
+
+    public function viewAny(User $user): bool
+    {
+        return true; // Anyone can list posts
+    }
+
+    public function view(User $user, Post $post): bool
+    {
+        return $post->published_at !== null
+            || $user->id === $post->user_id;
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->hasPermission('posts.create');
+    }
+
+    public function update(User $user, Post $post): bool
+    {
+        return $user->id === $post->user_id
+            || $user->hasPermission('posts.edit-any');
+    }
+
+    public function delete(User $user, Post $post): bool
+    {
+        return $user->id === $post->user_id
+            && $post->comments()->count() === 0;
+    }
+}</code></pre>
+
+    <h2>Sanctum API Setup</h2>
+    <pre class="language-php"><code class="language-php">// Creating tokens with abilities
+$token = $user->createToken('api-token', [
+    'posts:read',
+    'posts:write',
+    'comments:read',
+]);
+
+// Protecting routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', fn () => auth()->user());
+
+    Route::apiResource('posts', PostController::class)
+        ->middleware('abilities:posts:read,posts:write');
+});
+
+// Checking token abilities in controller
+public function store(Request $request)
+{
+    if (!$request->user()->tokenCan('posts:write')) {
+        abort(403, 'Token missing posts:write ability');
+    }
+
+    return Post::create($request->validated());
+}</code></pre>
+
+    <h2>Role-Based Middleware</h2>
+    <pre class="language-php"><code class="language-php">// app/Http/Middleware/EnsureUserHasRole.php
+class EnsureUserHasRole
+{
+    public function handle(Request $request, Closure $next, string ...$roles)
+    {
+        if (!$request->user()?->hasAnyRole($roles)) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return $next($request);
+    }
+}
+
+// Usage in routes
+Route::middleware(['auth', 'role:admin,editor'])->group(function () {
+    Route::resource('posts', PostController::class);
+});
+
+// Usage in controller constructor
+public function __construct()
+{
+    $this->middleware('permission:posts.create')->only(['create', 'store']);
+    $this->middleware('permission:posts.delete')->only('destroy');
+}</code></pre>
+
+    <h2>Gate Registration</h2>
+    <pre class="language-php"><code class="language-php">// In AuthServiceProvider boot()
+Gate::define('access-admin', function (User $user) {
+    return $user->hasRole(['admin', 'super-admin']);
+});
+
+Gate::define('moderate-content', function (User $user) {
+    return $user->hasAnyPermission(['moderate', 'admin']);
+});
+
+// Usage
+if (Gate::allows('access-admin')) {
+    // Show admin link
+}
+
+@can('moderate-content')
+    <a href="/moderation">Moderate</a>
+@endcan</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/auth-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:auth:setup</a> - Setup authentication system</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-auth.html' | relative_url }}" class="text-primary hover:underline">laravel-auth skill</a> - Auto-invoked auth expertise</li>
+        <li><a href="{{ '/agents/laravel-security.html' | relative_url }}" class="text-primary hover:underline">laravel-security</a> - Security audits and fixes</li>
+    </ul>
 </div>

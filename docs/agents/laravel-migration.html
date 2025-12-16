@@ -13,20 +13,176 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-migration</h1>
     <p class="text-xl text-muted-foreground">Handles version upgrades and legacy migrations</p>
-    <p class="text-sm text-muted-foreground mt-2">Uses: rector, php-cs-fixer</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Handles version upgrades and legacy migrations. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-migration</strong> agent handles Laravel version upgrades and legacy code migrations. It uses tools like Rector for automated refactoring, updates deprecated syntax, migrates configuration files, and ensures compatibility with newer Laravel versions.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of backend-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Version Upgrades</strong> - Laravel 9→10, 10→11, etc.</li>
+        <li><strong>Syntax Updates</strong> - Replace deprecated patterns</li>
+        <li><strong>Configuration Migration</strong> - Update config files to new formats</li>
+        <li><strong>Service Provider Updates</strong> - Migrate boot/register methods</li>
+        <li><strong>Route Migration</strong> - Update route syntax and middleware</li>
+        <li><strong>Package Compatibility</strong> - Check and update dependencies</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>Uses: rector, php-cs-fixer</strong></p>
+    <h2>Tools Used</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Tool</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>rector</code></td>
+                    <td class="py-3 px-4">Automated PHP code refactoring</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>php-cs-fixer</code></td>
+                    <td class="py-3 px-4">Code style fixing</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>phpstan</code></td>
+                    <td class="py-3 px-4">Static analysis for issues</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>composer</code></td>
+                    <td class="py-3 px-4">Dependency updates</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Migration Process</h2>
+    <div class="not-prose">
+        <div class="bg-muted/50 rounded-lg p-6 border border-border">
+            <pre class="text-sm text-foreground">
+┌─────────────────────────────────────────────────────────────┐
+│               Laravel Version Migration Flow                 │
+├─────────────────────────────────────────────────────────────┤
+│  1. Analyze Current State                                    │
+│     → Check Laravel version                                  │
+│     → List installed packages                                │
+│     → Identify deprecated patterns                           │
+├─────────────────────────────────────────────────────────────┤
+│  2. Update Dependencies                                      │
+│     → Update composer.json                                   │
+│     → Run composer update                                    │
+│     → Resolve conflicts                                      │
+├─────────────────────────────────────────────────────────────┤
+│  3. Run Rector                                               │
+│     → Apply Laravel upgrade rules                            │
+│     → Fix deprecated syntax                                  │
+│     → Update type hints                                      │
+├─────────────────────────────────────────────────────────────┤
+│  4. Update Configuration                                     │
+│     → Merge new config options                               │
+│     → Update env variables                                   │
+│     → Fix middleware registration                            │
+├─────────────────────────────────────────────────────────────┤
+│  5. Verify & Test                                            │
+│     → Run PHPStan                                            │
+│     → Run test suite                                         │
+│     → Manual verification                                    │
+└─────────────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+    </div>
+
+    <h2>Common Migration Examples</h2>
+    <pre class="language-php"><code class="language-php">// Laravel 10→11: Route model binding syntax
+// BEFORE (L10)
+Route::get('/users/{user}', [UserController::class, 'show']);
+
+// AFTER (L11) - No change needed, but explicit binding:
+Route::get('/users/{user}', [UserController::class, 'show'])
+    ->whereNumber('user');
+
+// Service Provider: boot() with type hints
+// BEFORE
+public function boot()
+{
+    //
+}
+
+// AFTER
+public function boot(): void
+{
+    //
+}
+
+// Middleware registration (L11)
+// BEFORE (kernel.php)
+protected $middlewareGroups = ['web' => [...]];
+
+// AFTER (bootstrap/app.php)
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->web(append: [
+        MyMiddleware::class,
+    ]);
+})</code></pre>
+
+    <h2>Rector Configuration</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+// rector.php
+use Rector\Config\RectorConfig;
+use Rector\Set\ValueObject\LevelSetList;
+use RectorLaravel\Set\LaravelSetList;
+
+return RectorConfig::configure()
+    ->withPaths([
+        __DIR__ . '/app',
+        __DIR__ . '/config',
+        __DIR__ . '/routes',
+        __DIR__ . '/tests',
+    ])
+    ->withSets([
+        LevelSetList::UP_TO_PHP_83,
+        LaravelSetList::LARAVEL_110,
+    ])
+    ->withSkip([
+        __DIR__ . '/bootstrap/cache',
+    ]);</code></pre>
+
+    <h2>Package Compatibility Check</h2>
+    <pre class="language-bash"><code class="language-bash"># Check for outdated packages
+composer outdated
+
+# Check Laravel compatibility
+composer why-not laravel/framework:^11.0
+
+# Update with dry-run
+composer update --dry-run
+
+# Update specific package
+composer require laravel/framework:^11.0 -W</code></pre>
+
+    <h2>Post-Migration Checklist</h2>
+    <ul>
+        <li>Run <code>php artisan optimize:clear</code></li>
+        <li>Run full test suite</li>
+        <li>Check error logs</li>
+        <li>Verify queue workers restart</li>
+        <li>Test scheduled commands</li>
+        <li>Verify API endpoints</li>
+        <li>Check for deprecation warnings</li>
+    </ul>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/migrate-from-legacy.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:migrate:from-legacy</a> - Migrate from legacy systems</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-refactor.html' | relative_url }}" class="text-primary hover:underline">laravel-refactor</a> - Code quality refactoring</li>
+        <li><a href="{{ '/agents/laravel-database.html' | relative_url }}" class="text-primary hover:underline">laravel-database</a> - Database schema migrations</li>
+    </ul>
 </div>

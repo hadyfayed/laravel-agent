@@ -1,7 +1,7 @@
 ---
 layout: page
 title: laravel-review
-description: Orchestrates code reviews with parallel reviewers
+description: Reviews code for quality, security, and Laravel best practices
 nav_active: Agents
 back_url: /agents.html
 back_text: All Agents
@@ -12,21 +12,206 @@ back_text: All Agents
         <span class="category-badge badge-quality">Quality</span>
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-review</h1>
-    <p class="text-xl text-muted-foreground">Orchestrates code reviews with parallel reviewers</p>
-    <p class="text-sm text-muted-foreground mt-2">Delegates to: laravel-validator</p>
+    <p class="text-xl text-muted-foreground">Reviews code for quality, security, and Laravel best practices</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Orchestrates code reviews with parallel reviewers. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-review</strong> agent performs comprehensive code reviews focusing on Laravel best practices, security vulnerabilities, performance issues, and code quality. It can review staged changes, pull requests, or run full codebase audits.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of quality-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>PR Reviews</strong> - Review pull requests with parallel specialized reviewers</li>
+        <li><strong>Staged Review</strong> - Review staged changes before commit</li>
+        <li><strong>Full Audit</strong> - Complete codebase security and quality audit</li>
+        <li><strong>Laravel Patterns</strong> - Check adherence to Laravel conventions</li>
+        <li><strong>Security Analysis</strong> - OWASP Top 10 vulnerability detection</li>
+        <li><strong>Performance Review</strong> - N+1 queries, caching opportunities</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>Delegates to: laravel-validator</strong></p>
+    <h2>Review Categories</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Category</th>
+                    <th class="text-left py-3 px-4 font-medium">What It Checks</th>
+                    <th class="text-left py-3 px-4 font-medium">Severity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Security</td>
+                    <td class="py-3 px-4">SQL injection, XSS, CSRF, mass assignment</td>
+                    <td class="py-3 px-4"><span class="text-red-500">Critical</span></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Performance</td>
+                    <td class="py-3 px-4">N+1 queries, missing indexes, inefficient loops</td>
+                    <td class="py-3 px-4"><span class="text-yellow-500">Warning</span></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Architecture</td>
+                    <td class="py-3 px-4">Fat controllers, missing service layer, coupling</td>
+                    <td class="py-3 px-4"><span class="text-blue-500">Info</span></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Laravel Patterns</td>
+                    <td class="py-3 px-4">Incorrect facades, missing policies, validation</td>
+                    <td class="py-3 px-4"><span class="text-blue-500">Info</span></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Testing</td>
+                    <td class="py-3 px-4">Missing tests, low coverage, brittle tests</td>
+                    <td class="py-3 px-4"><span class="text-yellow-500">Warning</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Review Process Flow</h2>
+    <div class="not-prose">
+        <div class="bg-muted/50 rounded-lg p-6 border border-border">
+            <pre class="text-sm text-foreground">
+┌─────────────────────────────────────────────────────────────┐
+│                   Parallel Code Review                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
+│  │  Security   │  │ Performance │  │  Laravel    │          │
+│  │  Reviewer   │  │  Reviewer   │  │  Patterns   │          │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘          │
+│         │                │                │                  │
+│         └────────────────┼────────────────┘                  │
+│                          ▼                                   │
+│              ┌─────────────────────┐                         │
+│              │   Aggregate Issues  │                         │
+│              │   by Severity       │                         │
+│              └──────────┬──────────┘                         │
+│                         ▼                                    │
+│              ┌─────────────────────┐                         │
+│              │  Generate Report    │                         │
+│              │  with Suggestions   │                         │
+│              └─────────────────────┘                         │
+└─────────────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+    </div>
+
+    <h2>Example Review Output</h2>
+    <pre class="language-bash"><code class="language-bash"># Review Summary for PR #142
+
+## Critical Issues (2)
+
+### 1. SQL Injection Vulnerability
+File: app/Http/Controllers/SearchController.php:45
+
+// VULNERABLE
+$results = DB::select("SELECT * FROM users WHERE name LIKE '%{$request->q}%'");
+
+// FIXED
+$results = DB::select("SELECT * FROM users WHERE name LIKE ?", ["%{$request->q}%"]);
+
+### 2. Mass Assignment Vulnerability
+File: app/Http/Controllers/UserController.php:23
+
+// VULNERABLE - Accepts all input
+$user->update($request->all());
+
+// FIXED - Only validated fields
+$user->update($request->validated());
+
+## Warnings (3)
+
+### 1. N+1 Query Detected
+File: app/Http/Controllers/OrderController.php:15
+
+// N+1 - Each order triggers a user query
+$orders = Order::all();
+foreach ($orders as $order) {
+    echo $order->user->name; // N+1!
+}
+
+// FIXED - Eager load
+$orders = Order::with('user')->get();
+
+### 2. Missing Index
+File: database/migrations/create_orders_table.php
+The 'status' column is frequently filtered but has no index.
+
+### 3. Missing Test Coverage
+File: app/Services/PaymentService.php
+New service class has no corresponding tests.</code></pre>
+
+    <h2>Security Checks</h2>
+    <pre class="language-php"><code class="language-php">// Patterns the reviewer detects:
+
+// 1. SQL Injection
+DB::raw("WHERE id = " . $id); // BAD
+DB::raw("WHERE id = ?", [$id]); // GOOD
+
+// 2. XSS Vulnerabilities
+{!! $userInput !!} // BAD - Unescaped
+{{ $userInput }} // GOOD - Escaped
+
+// 3. Mass Assignment
+User::create($request->all()); // BAD
+User::create($request->validated()); // GOOD
+User::create($request->only(['name', 'email'])); // GOOD
+
+// 4. Path Traversal
+file_get_contents($request->file); // BAD
+Storage::get($validatedPath); // GOOD
+
+// 5. Open Redirect
+return redirect($request->url); // BAD
+return redirect()->intended(); // GOOD
+
+// 6. CSRF Missing
+// &lt;form method="POST"&gt; // BAD
+// &lt;form method="POST"&gt;@csrf // GOOD
+
+// 7. Insecure Deserialization
+unserialize($request->data); // BAD
+json_decode($request->data); // GOOD</code></pre>
+
+    <h2>Laravel Pattern Checks</h2>
+    <pre class="language-php"><code class="language-php">// Patterns enforced:
+
+// 1. Use Eloquent over raw queries
+DB::table('users')->where(...); // Consider User::where(...)
+
+// 2. Use policies for authorization
+if ($user->id === $post->user_id) // BAD
+$this->authorize('update', $post); // GOOD
+
+// 3. Use config() over env()
+env('APP_DEBUG'); // BAD (except in config files)
+config('app.debug'); // GOOD
+
+// 4. Use route names
+redirect('/dashboard'); // Avoid
+redirect()->route('dashboard'); // GOOD
+
+// 5. Use Form Requests for validation
+$request->validate([...]); // For complex validation
+StoreUserRequest $request // GOOD
+
+// 6. Avoid logic in Blade
+@php $total = $items->sum('price'); @endphp // BAD
+{{ $total }} // GOOD (computed in controller/view model)</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/review-pr.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:pr</a> - Review a pull request</li>
+        <li><a href="{{ '/commands/review-staged.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:staged</a> - Review staged changes</li>
+        <li><a href="{{ '/commands/review-audit.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:audit</a> - Full codebase audit</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-security.html' | relative_url }}" class="text-primary hover:underline">laravel-security</a> - Security-focused agent</li>
+        <li><a href="{{ '/agents/laravel-refactor.html' | relative_url }}" class="text-primary hover:underline">laravel-refactor</a> - Code refactoring</li>
+        <li><a href="{{ '/agents/laravel-testing.html' | relative_url }}" class="text-primary hover:underline">laravel-testing</a> - Test generation</li>
+    </ul>
 </div>

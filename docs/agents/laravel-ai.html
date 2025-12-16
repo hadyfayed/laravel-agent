@@ -9,24 +9,308 @@ back_text: All Agents
 
 <div class="mb-8">
     <div class="flex items-center gap-3 mb-4">
-        <span class="category-badge badge-backend">Backend</span>
+        <span class="category-badge badge-builder">Builder</span>
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-ai</h1>
     <p class="text-xl text-muted-foreground">Creates AI-powered features using Prism PHP</p>
-    <p class="text-sm text-muted-foreground mt-2">app/Services/AI/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Creates AI-powered features using Prism PHP. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-ai</strong> agent creates AI-powered features using <a href="https://github.com/echolabsdev/prism" target="_blank" rel="noopener">Prism PHP</a>. It generates AI services, implements tool use (function calling), creates embeddings for semantic search, sets up RAG (Retrieval-Augmented Generation) pipelines, and builds conversational chatbots.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of backend-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>AI Service Classes</strong> - Structured classes for AI operations</li>
+        <li><strong>Tool Use / Function Calling</strong> - Let AI call your application functions</li>
+        <li><strong>Embeddings</strong> - Vector representations for semantic search</li>
+        <li><strong>RAG Pipelines</strong> - Retrieval-augmented generation setup</li>
+        <li><strong>Chatbot Features</strong> - Conversational AI with memory</li>
+        <li><strong>Provider Abstraction</strong> - Switch between OpenAI, Anthropic, etc.</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>app/Services/AI/</strong></p>
+    <h2>Supported Providers</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Provider</th>
+                    <th class="text-left py-3 px-4 font-medium">Models</th>
+                    <th class="text-left py-3 px-4 font-medium">Features</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">OpenAI</td>
+                    <td class="py-3 px-4">GPT-4o, GPT-4, GPT-3.5</td>
+                    <td class="py-3 px-4">Chat, Tools, Embeddings, Vision</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Anthropic</td>
+                    <td class="py-3 px-4">Claude 3.5, Claude 3</td>
+                    <td class="py-3 px-4">Chat, Tools, Vision</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Ollama</td>
+                    <td class="py-3 px-4">Llama 3, Mistral, etc.</td>
+                    <td class="py-3 px-4">Chat, Embeddings (local)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Groq</td>
+                    <td class="py-3 px-4">Llama, Mixtral</td>
+                    <td class="py-3 px-4">Fast inference</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated AI Service</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Services\AI;
+
+use EchoLabs\Prism\Prism;
+use EchoLabs\Prism\Enums\Provider;
+use EchoLabs\Prism\ValueObjects\Messages\UserMessage;
+use EchoLabs\Prism\ValueObjects\Messages\AssistantMessage;
+
+class ContentAssistant
+{
+    private array $conversationHistory = [];
+
+    public function __construct(
+        private string $systemPrompt = 'You are a helpful content assistant.'
+    ) {}
+
+    /**
+     * Generate content based on a prompt.
+     */
+    public function generate(string $prompt): string
+    {
+        $response = Prism::text()
+            -&gt;using(Provider::OpenAI, 'gpt-4o')
+            -&gt;withSystemPrompt($this-&gt;systemPrompt)
+            -&gt;withPrompt($prompt)
+            -&gt;generate();
+
+        return $response-&gt;text;
+    }
+
+    /**
+     * Continue a conversation with context.
+     */
+    public function chat(string $message): string
+    {
+        $this-&gt;conversationHistory[] = new UserMessage($message);
+
+        $response = Prism::text()
+            -&gt;using(Provider::OpenAI, 'gpt-4o')
+            -&gt;withSystemPrompt($this-&gt;systemPrompt)
+            -&gt;withMessages($this-&gt;conversationHistory)
+            -&gt;generate();
+
+        $this-&gt;conversationHistory[] = new AssistantMessage($response-&gt;text);
+
+        return $response-&gt;text;
+    }
+
+    /**
+     * Summarize long content.
+     */
+    public function summarize(string $content, int $maxWords = 100): string
+    {
+        return Prism::text()
+            -&gt;using(Provider::OpenAI, 'gpt-4o-mini')
+            -&gt;withPrompt("Summarize the following in {$maxWords} words or less:\n\n{$content}")
+            -&gt;generate()
+            -&gt;text;
+    }
+
+    public function resetConversation(): void
+    {
+        $this-&gt;conversationHistory = [];
+    }
+}</code></pre>
+
+    <h2>Tool Use (Function Calling)</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Services\AI;
+
+use EchoLabs\Prism\Prism;
+use EchoLabs\Prism\Enums\Provider;
+use EchoLabs\Prism\Tool;
+use App\Models\Product;
+use App\Models\Order;
+
+class ShoppingAssistant
+{
+    public function process(string $userMessage): string
+    {
+        $response = Prism::text()
+            -&gt;using(Provider::Anthropic, 'claude-3-5-sonnet-20241022')
+            -&gt;withSystemPrompt('You are a shopping assistant. Use the available tools to help customers.')
+            -&gt;withPrompt($userMessage)
+            -&gt;withTools($this-&gt;getTools())
+            -&gt;generate();
+
+        return $response-&gt;text;
+    }
+
+    private function getTools(): array
+    {
+        return [
+            Tool::as('search_products')
+                -&gt;for('Search for products by name or category')
+                -&gt;withStringParameter('query', 'Search query')
+                -&gt;withStringParameter('category', 'Product category', nullable: true)
+                -&gt;using(function (string $query, ?string $category = null): string {
+                    $products = Product::query()
+                        -&gt;where('name', 'like', "%{$query}%")
+                        -&gt;when($category, fn ($q) =&gt; $q-&gt;where('category', $category))
+                        -&gt;limit(5)
+                        -&gt;get(['id', 'name', 'price', 'in_stock']);
+
+                    return $products-&gt;toJson();
+                }),
+
+            Tool::as('get_order_status')
+                -&gt;for('Get the status of an order by order number')
+                -&gt;withStringParameter('order_number', 'The order number')
+                -&gt;using(function (string $orderNumber): string {
+                    $order = Order::where('number', $orderNumber)-&gt;first();
+
+                    if (!$order) {
+                        return json_encode(['error' =&gt; 'Order not found']);
+                    }
+
+                    return json_encode([
+                        'status' =&gt; $order-&gt;status,
+                        'shipped_at' =&gt; $order-&gt;shipped_at?-&gt;toDateString(),
+                        'estimated_delivery' =&gt; $order-&gt;estimated_delivery?-&gt;toDateString(),
+                    ]);
+                }),
+        ];
+    }
+}</code></pre>
+
+    <h2>RAG Pipeline with Embeddings</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Services\AI;
+
+use EchoLabs\Prism\Prism;
+use EchoLabs\Prism\Enums\Provider;
+use App\Models\Document;
+use Illuminate\Support\Collection;
+
+class DocumentRAG
+{
+    /**
+     * Index a document by generating embeddings.
+     */
+    public function indexDocument(Document $document): void
+    {
+        // Split into chunks
+        $chunks = $this-&gt;splitIntoChunks($document-&gt;content, 500);
+
+        foreach ($chunks as $index =&gt; $chunk) {
+            $embedding = Prism::embeddings()
+                -&gt;using(Provider::OpenAI, 'text-embedding-3-small')
+                -&gt;fromInput($chunk)
+                -&gt;generate();
+
+            $document-&gt;chunks()-&gt;create([
+                'content' =&gt; $chunk,
+                'embedding' =&gt; $embedding-&gt;embeddings[0],
+                'chunk_index' =&gt; $index,
+            ]);
+        }
+    }
+
+    /**
+     * Query documents using semantic search.
+     */
+    public function query(string $question, int $topK = 5): string
+    {
+        // Generate embedding for the question
+        $questionEmbedding = Prism::embeddings()
+            -&gt;using(Provider::OpenAI, 'text-embedding-3-small')
+            -&gt;fromInput($question)
+            -&gt;generate()
+            -&gt;embeddings[0];
+
+        // Find similar chunks (using pgvector or similar)
+        $relevantChunks = $this-&gt;findSimilarChunks($questionEmbedding, $topK);
+
+        // Build context from relevant chunks
+        $context = $relevantChunks
+            -&gt;pluck('content')
+            -&gt;implode("\n\n---\n\n");
+
+        // Generate answer using context
+        return Prism::text()
+            -&gt;using(Provider::OpenAI, 'gpt-4o')
+            -&gt;withSystemPrompt("Answer questions based on the provided context. If the answer isn't in the context, say so.")
+            -&gt;withPrompt("Context:\n{$context}\n\nQuestion: {$question}")
+            -&gt;generate()
+            -&gt;text;
+    }
+
+    private function splitIntoChunks(string $content, int $chunkSize): array
+    {
+        $words = explode(' ', $content);
+        return collect($words)
+            -&gt;chunk($chunkSize)
+            -&gt;map(fn ($chunk) =&gt; implode(' ', $chunk-&gt;toArray()))
+            -&gt;toArray();
+    }
+
+    private function findSimilarChunks(array $embedding, int $topK): Collection
+    {
+        // Using pgvector extension
+        return DocumentChunk::query()
+            -&gt;selectRaw('*, embedding &lt;=&gt; ? as distance', [json_encode($embedding)])
+            -&gt;orderBy('distance')
+            -&gt;limit($topK)
+            -&gt;get();
+    }
+}</code></pre>
+
+    <h2>Configuration</h2>
+    <pre class="language-php"><code class="language-php">// config/prism.php
+return [
+    'providers' =&gt; [
+        'openai' =&gt; [
+            'api_key' =&gt; env('OPENAI_API_KEY'),
+            'organization' =&gt; env('OPENAI_ORGANIZATION'),
+        ],
+        'anthropic' =&gt; [
+            'api_key' =&gt; env('ANTHROPIC_API_KEY'),
+        ],
+        'ollama' =&gt; [
+            'url' =&gt; env('OLLAMA_URL', 'http://localhost:11434'),
+        ],
+    ],
+];
+
+// .env
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/ai-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:ai:make</a> - Create AI-powered features</li>
+    </ul>
+
+    <h2>Called By</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building AI features</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-service-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-service-builder</a> - Service class patterns</li>
+        <li><a href="{{ '/agents/laravel-queue.html' | relative_url }}" class="text-primary hover:underline">laravel-queue</a> - Background AI processing</li>
+    </ul>
 </div>

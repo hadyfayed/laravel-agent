@@ -13,20 +13,244 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-service-builder</h1>
     <p class="text-xl text-muted-foreground">Creates services for orchestrating operations and actions</p>
-    <p class="text-sm text-muted-foreground mt-2">app/Services/ or app/Actions/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Creates services for orchestrating operations and actions. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-service-builder</strong> agent creates service classes and actions that encapsulate business logic. It follows the single responsibility principle, creating focused classes that handle one specific operation or orchestrate multiple steps.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of builder-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Service Classes</strong> - Multi-method services for related operations</li>
+        <li><strong>Action Classes</strong> - Single-purpose invokable classes</li>
+        <li><strong>Dependency Injection</strong> - Proper constructor injection</li>
+        <li><strong>Interface Binding</strong> - Contract-based service registration</li>
+        <li><strong>Error Handling</strong> - Custom exceptions and error states</li>
+        <li><strong>Unit Tests</strong> - Tests with mocked dependencies</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>app/Services/ or app/Actions/</strong></p>
+    <h2>What It Creates</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Services</td>
+                    <td class="py-3 px-4"><code>app/Services/</code></td>
+                    <td class="py-3 px-4">Multi-method service classes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Actions</td>
+                    <td class="py-3 px-4"><code>app/Actions/</code></td>
+                    <td class="py-3 px-4">Single-purpose invokable classes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Contracts</td>
+                    <td class="py-3 px-4"><code>app/Contracts/</code></td>
+                    <td class="py-3 px-4">Service interfaces</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Tests</td>
+                    <td class="py-3 px-4"><code>tests/Unit/</code></td>
+                    <td class="py-3 px-4">Service/action tests</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated Service Example</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Services;
+
+use App\Models\Order;
+use App\Models\User;
+use App\Contracts\PaymentGatewayInterface;
+use App\Contracts\InventoryServiceInterface;
+use App\Events\OrderPlaced;
+use App\Exceptions\InsufficientStockException;
+use Illuminate\Support\Facades\DB;
+
+class OrderService
+{
+    public function __construct(
+        private PaymentGatewayInterface $paymentGateway,
+        private InventoryServiceInterface $inventory,
+    ) {}
+
+    /**
+     * Create a new order and process payment.
+     *
+     * @throws InsufficientStockException
+     * @throws PaymentFailedException
+     */
+    public function createOrder(User $user, array $items, string $paymentMethodId): Order
+    {
+        // Validate stock
+        foreach ($items as $item) {
+            if (!$this->inventory->hasStock($item['product_id'], $item['quantity'])) {
+                throw new InsufficientStockException($item['product_id']);
+            }
+        }
+
+        return DB::transaction(function () use ($user, $items, $paymentMethodId) {
+            // Create order
+            $order = Order::create([
+                'user_id' => $user->id,
+                'status' => 'pending',
+                'total' => $this->calculateTotal($items),
+            ]);
+
+            // Add line items
+            foreach ($items as $item) {
+                $order->items()->create($item);
+            }
+
+            // Process payment
+            $this->paymentGateway->charge(
+                amount: $order->total,
+                paymentMethodId: $paymentMethodId,
+                metadata: ['order_id' => $order->id],
+            );
+
+            // Reserve inventory
+            $this->inventory->reserve($items);
+
+            $order->update(['status' => 'paid']);
+
+            event(new OrderPlaced($order));
+
+            return $order;
+        });
+    }
+
+    private function calculateTotal(array $items): int
+    {
+        return collect($items)->sum(fn ($item) =>
+            $item['unit_price'] * $item['quantity']
+        );
+    }
+}</code></pre>
+
+    <h2>Generated Action Example</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Actions;
+
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+
+class CreateUserAction
+{
+    /**
+     * Create a new user with profile.
+     */
+    public function __invoke(array $data): User
+    {
+        return DB::transaction(function () use ($data) {
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+            ]);
+
+            if (isset($data['profile'])) {
+                $user->profile()->create($data['profile']);
+            }
+
+            if (isset($data['roles'])) {
+                $user->roles()->attach($data['roles']);
+            }
+
+            return $user->load(['profile', 'roles']);
+        });
+    }
+}
+
+// Usage in controller
+public function store(Request $request, CreateUserAction $createUser)
+{
+    $user = $createUser($request->validated());
+
+    return redirect()->route('users.show', $user);
+}</code></pre>
+
+    <h2>Service vs Action Pattern</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Use Service When</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Action When</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Related operations grouped together</td>
+                    <td class="py-3 px-4">Single operation with clear purpose</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">e.g., OrderService (create, cancel, refund)</td>
+                    <td class="py-3 px-4">e.g., CreateOrderAction</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Shared state/dependencies</td>
+                    <td class="py-3 px-4">Stateless, composable</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Complex domain with many operations</td>
+                    <td class="py-3 px-4">Simple, focused operations</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Testing Services</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+use App\Services\OrderService;
+use App\Contracts\PaymentGatewayInterface;
+use App\Contracts\InventoryServiceInterface;
+
+it('creates an order with payment', function () {
+    $paymentGateway = Mockery::mock(PaymentGatewayInterface::class);
+    $paymentGateway->shouldReceive('charge')->once()->andReturn(true);
+
+    $inventory = Mockery::mock(InventoryServiceInterface::class);
+    $inventory->shouldReceive('hasStock')->andReturn(true);
+    $inventory->shouldReceive('reserve')->once();
+
+    $service = new OrderService($paymentGateway, $inventory);
+
+    $user = User::factory()->create();
+    $items = [['product_id' => 1, 'quantity' => 2, 'unit_price' => 1000]];
+
+    $order = $service->createOrder($user, $items, 'pm_test');
+
+    expect($order->status)->toBe('paid');
+    expect($order->total)->toBe(2000);
+});</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/service-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:service:make</a> - Create services/actions</li>
+    </ul>
+
+    <h2>Called By</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building business logic</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-module-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-module-builder</a> - For complete domain modules</li>
+        <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - For full-stack features</li>
+    </ul>
 </div>

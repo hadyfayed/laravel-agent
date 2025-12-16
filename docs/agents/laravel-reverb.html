@@ -13,20 +13,197 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-reverb</h1>
     <p class="text-xl text-muted-foreground">Sets up Laravel Reverb WebSocket server for real-time features</p>
-    <p class="text-sm text-muted-foreground mt-2">config/broadcasting.php</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Sets up Laravel Reverb WebSocket server for real-time features. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-reverb</strong> agent sets up <a href="https://reverb.laravel.com/" target="_blank" rel="noopener">Laravel Reverb</a> for real-time WebSocket communication. It configures broadcasting, creates events, sets up channel authorization, and integrates Laravel Echo on the client side.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of backend-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Reverb Installation</strong> - Install and configure the WebSocket server</li>
+        <li><strong>Broadcast Events</strong> - Create events that broadcast to channels</li>
+        <li><strong>Channel Authorization</strong> - Private and presence channel auth</li>
+        <li><strong>Echo Integration</strong> - Client-side WebSocket setup</li>
+        <li><strong>Scaling Configuration</strong> - Redis pub/sub for horizontal scaling</li>
+        <li><strong>SSL/TLS Setup</strong> - Secure WebSocket connections</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>config/broadcasting.php</strong></p>
+    <h2>What It Creates</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Broadcast Config</td>
+                    <td class="py-3 px-4"><code>config/broadcasting.php</code></td>
+                    <td class="py-3 px-4">Reverb connection settings</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Channel Routes</td>
+                    <td class="py-3 px-4"><code>routes/channels.php</code></td>
+                    <td class="py-3 px-4">Channel authorization</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Broadcast Events</td>
+                    <td class="py-3 px-4"><code>app/Events/</code></td>
+                    <td class="py-3 px-4">Real-time event classes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Echo Bootstrap</td>
+                    <td class="py-3 px-4"><code>resources/js/bootstrap.js</code></td>
+                    <td class="py-3 px-4">Client-side Echo setup</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated Broadcast Event</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Events;
+
+use App\Models\Message;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class MessageSent implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public function __construct(
+        public Message $message
+    ) {}
+
+    public function broadcastOn(): array
+    {
+        return [
+            new PrivateChannel('chat.' . $this->message->conversation_id),
+        ];
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'id' => $this->message->id,
+            'body' => $this->message->body,
+            'user' => [
+                'id' => $this->message->user->id,
+                'name' => $this->message->user->name,
+                'avatar' => $this->message->user->avatar_url,
+            ],
+            'created_at' => $this->message->created_at->toIso8601String(),
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'message.sent';
+    }
+}</code></pre>
+
+    <h2>Channel Authorization</h2>
+    <pre class="language-php"><code class="language-php">// routes/channels.php
+
+// Private channel
+Broadcast::channel('orders.{orderId}', function ($user, $orderId) {
+    return $user->id === Order::find($orderId)?->user_id;
+});
+
+// Presence channel with user data
+Broadcast::channel('chat.{conversationId}', function ($user, $conversationId) {
+    if ($user->canAccessConversation($conversationId)) {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'avatar' => $user->avatar_url,
+        ];
+    }
+});
+
+// Public channel (no auth needed)
+Broadcast::channel('notifications', function () {
+    return true;
+});</code></pre>
+
+    <h2>Laravel Echo Setup</h2>
+    <pre class="language-php"><code class="language-php">// resources/js/bootstrap.js
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+window.Pusher = Pusher;
+window.Echo = new Echo({
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
+});
+
+// Listen to private channel
+Echo.private(`chat.${conversationId}`)
+    .listen('.message.sent', (event) => {
+        messages.value.push(event);
+    });
+
+// Presence channel
+Echo.join(`chat.${conversationId}`)
+    .here((users) => {
+        onlineUsers.value = users;
+    })
+    .joining((user) => {
+        onlineUsers.value.push(user);
+    })
+    .leaving((user) => {
+        onlineUsers.value = onlineUsers.value.filter(u => u.id !== user.id);
+    });</code></pre>
+
+    <h2>Reverb Configuration</h2>
+    <pre class="language-php"><code class="language-php">// config/broadcasting.php
+'reverb' => [
+    'driver' => 'reverb',
+    'key' => env('REVERB_APP_KEY'),
+    'secret' => env('REVERB_APP_SECRET'),
+    'app_id' => env('REVERB_APP_ID'),
+    'options' => [
+        'host' => env('REVERB_HOST'),
+        'port' => env('REVERB_PORT', 443),
+        'scheme' => env('REVERB_SCHEME', 'https'),
+        'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
+    ],
+],
+
+// .env
+BROADCAST_DRIVER=reverb
+REVERB_APP_ID=app-id
+REVERB_APP_KEY=app-key
+REVERB_APP_SECRET=app-secret
+REVERB_HOST="localhost"
+REVERB_PORT=8080
+REVERB_SCHEME=http</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/reverb-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:reverb:setup</a> - Setup Reverb server</li>
+        <li><a href="{{ '/commands/broadcast-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:broadcast:make</a> - Create broadcast events</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-websocket.html' | relative_url }}" class="text-primary hover:underline">laravel-websocket skill</a> - Auto-invoked WebSocket expertise</li>
+        <li><a href="{{ '/agents/laravel-queue.html' | relative_url }}" class="text-primary hover:underline">laravel-queue</a> - Background jobs for broadcasts</li>
+    </ul>
 </div>

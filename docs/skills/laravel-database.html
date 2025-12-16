@@ -10,7 +10,7 @@ back_text: All Skills
 <div class="mb-8">
     <div class="flex items-center gap-4 mb-4">
         <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
         </div>
         <div>
             <h1 class="text-3xl font-bold">laravel-database</h1>
@@ -22,22 +22,146 @@ back_text: All Skills
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Trigger Keywords</h2>
-    <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
         <span class="trigger-tag">migration</span>
-        <span class="trigger-tag">N+1</span>
         <span class="trigger-tag">query</span>
+        <span class="trigger-tag">N+1</span>
         <span class="trigger-tag">eloquent</span>
+        <span class="trigger-tag">index</span>
+        <span class="trigger-tag">database</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Optimize queries, fix N+1 issues, design schemas with indexes. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-database</strong> skill provides expertise for database design, query optimization, and Eloquent best practices. It helps identify and fix N+1 problems, design efficient schemas, and write performant queries.</p>
 
-    <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Schema Design</strong> - Proper column types, indexes, foreign keys</li>
+        <li><strong>N+1 Detection</strong> - Identify and fix eager loading issues</li>
+        <li><strong>Query Optimization</strong> - Efficient queries with proper indexing</li>
+        <li><strong>Migrations</strong> - Safe, reversible database changes</li>
+        <li><strong>Eloquent Patterns</strong> - Scopes, accessors, relationships</li>
+        <li><strong>Raw Queries</strong> - When and how to use raw SQL safely</li>
+    </ul>
 
-    <h2>Example Prompts</h2>
-    <pre class="language-bash"><code class="language-bash">"Help me migration"
-"I need to N+1"
-"Can you help with query?"</code></pre>
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Fixing N+1 issues
+"My page is making 100 queries to load 10 posts with their authors"
+
+# Schema design
+"Design a database schema for a multi-tenant e-commerce platform"
+
+# Query optimization
+"This query is slow - how can I optimize it?"
+
+# Migration safety
+"How do I add a column to a table with millions of rows without downtime?"</code></pre>
+
+    <h2>N+1 Problem & Solution</h2>
+    <pre class="language-php"><code class="language-php">// BAD: N+1 queries (1 + N queries)
+$posts = Post::all();
+foreach ($posts as $post) {
+    echo $post->author->name; // Query for each post!
+}
+
+// GOOD: Eager loading (2 queries total)
+$posts = Post::with('author')->get();
+foreach ($posts as $post) {
+    echo $post->author->name; // No additional query
+}
+
+// BETTER: Eager load nested relationships
+$posts = Post::with(['author', 'comments.user'])->get();
+
+// BEST: Constrain eager loads
+$posts = Post::with(['comments' => function ($query) {
+    $query->where('approved', true)->latest()->limit(5);
+}])->get();</code></pre>
+
+    <h2>Index Strategies</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Index Type</th>
+                    <th class="text-left py-3 px-4 font-medium">When to Use</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>$table->index('column')</code></td>
+                    <td class="py-3 px-4">Columns in WHERE, ORDER BY, JOIN</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>$table->unique('email')</code></td>
+                    <td class="py-3 px-4">Columns that must be unique</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>$table->index(['a', 'b'])</code></td>
+                    <td class="py-3 px-4">Columns frequently queried together</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>$table->fullText('content')</code></td>
+                    <td class="py-3 px-4">Text search columns</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Migration Best Practices</h2>
+    <pre class="language-php"><code class="language-php">// Safe column addition (nullable first, then backfill)
+public function up()
+{
+    Schema::table('users', function (Blueprint $table) {
+        $table->string('timezone')->nullable()->after('email');
+    });
+
+    // Backfill in chunks to avoid memory issues
+    User::query()->chunk(1000, function ($users) {
+        foreach ($users as $user) {
+            $user->update(['timezone' => 'UTC']);
+        }
+    });
+}
+
+// Safe column removal (make nullable first in separate deploy)
+public function up()
+{
+    Schema::table('users', function (Blueprint $table) {
+        $table->dropColumn('legacy_field');
+    });
+}</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Missing indexes on foreign keys</strong> - Always index foreign key columns</li>
+        <li><strong>Using <code>get()</code> when you need <code>first()</code></strong> - Fetch only what you need</li>
+        <li><strong>Not using <code>select()</code></strong> - Don't fetch columns you don't use</li>
+        <li><strong>Destructive migrations</strong> - Always make migrations reversible</li>
+        <li><strong>Large table alterations</strong> - Use <code>pt-online-schema-change</code> for production</li>
+    </ul>
+
+    <h2>Query Debugging</h2>
+    <pre class="language-php"><code class="language-php">// Enable query log
+DB::enableQueryLog();
+
+// Run your code
+$posts = Post::with('author')->get();
+
+// Dump queries
+dd(DB::getQueryLog());
+
+// Or use Laravel Debugbar / Telescope in development</code></pre>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/db-optimize.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:optimize</a> - Analyze and optimize queries</li>
+        <li><a href="{{ '/commands/db-diagram.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:diagram</a> - Generate schema diagrams</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-database.html' | relative_url }}" class="text-primary hover:underline">laravel-database</a> - Database optimization specialist</li>
+    </ul>
 </div>

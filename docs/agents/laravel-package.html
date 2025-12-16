@@ -13,20 +13,332 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-package</h1>
     <p class="text-xl text-muted-foreground">Creates distributable Laravel packages for Packagist</p>
-    <p class="text-sm text-muted-foreground mt-2">packages/vendor/name/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Creates distributable Laravel packages for Packagist. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-package</strong> agent creates distributable Laravel packages ready for Packagist publication. It scaffolds the package structure, configures autoloading, creates service providers, sets up testing, and generates documentation following community standards.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of builder-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Package Scaffolding</strong> - Complete package directory structure</li>
+        <li><strong>Service Provider</strong> - Auto-discovery and configuration publishing</li>
+        <li><strong>Composer Setup</strong> - Autoloading, dependencies, scripts</li>
+        <li><strong>Testing Setup</strong> - Orchestra Testbench configuration</li>
+        <li><strong>Documentation</strong> - README, changelog, contributing guide</li>
+        <li><strong>CI/CD</strong> - GitHub Actions for testing and publishing</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>packages/vendor/name/</strong></p>
+    <h2>Package Structure</h2>
+    <pre class="language-bash"><code class="language-bash">packages/vendor-name/package-name/
+├── .github/
+│   └── workflows/
+│       ├── tests.yml
+│       └── release.yml
+├── config/
+│   └── package-name.php
+├── database/
+│   └── migrations/
+├── resources/
+│   └── views/
+├── src/
+│   ├── Commands/
+│   ├── Facades/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   └── Middleware/
+│   ├── Models/
+│   ├── PackageNameServiceProvider.php
+│   └── PackageName.php
+├── tests/
+│   ├── Feature/
+│   ├── Unit/
+│   └── TestCase.php
+├── .gitignore
+├── CHANGELOG.md
+├── composer.json
+├── LICENSE.md
+├── phpunit.xml
+└── README.md</code></pre>
+
+    <h2>Generated Service Provider</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace VendorName\PackageName;
+
+use Illuminate\Support\ServiceProvider;
+
+class PackageNameServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this-&gt;mergeConfigFrom(
+            __DIR__ . '/../config/package-name.php',
+            'package-name'
+        );
+
+        $this-&gt;app-&gt;singleton('package-name', function ($app) {
+            return new PackageName($app['config']['package-name']);
+        });
+    }
+
+    public function boot(): void
+    {
+        // Publish config
+        $this-&gt;publishes([
+            __DIR__ . '/../config/package-name.php' =&gt; config_path('package-name.php'),
+        ], 'package-name-config');
+
+        // Publish migrations
+        $this-&gt;publishes([
+            __DIR__ . '/../database/migrations/' =&gt; database_path('migrations'),
+        ], 'package-name-migrations');
+
+        // Load migrations
+        $this-&gt;loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+        // Publish views
+        $this-&gt;loadViewsFrom(__DIR__ . '/../resources/views', 'package-name');
+        $this-&gt;publishes([
+            __DIR__ . '/../resources/views' =&gt; resource_path('views/vendor/package-name'),
+        ], 'package-name-views');
+
+        // Register commands
+        if ($this-&gt;app-&gt;runningInConsole()) {
+            $this-&gt;commands([
+                Commands\InstallCommand::class,
+                Commands\PublishCommand::class,
+            ]);
+        }
+
+        // Register routes
+        $this-&gt;loadRoutesFrom(__DIR__ . '/../routes/web.php');
+    }
+}</code></pre>
+
+    <h2>Generated Facade</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace VendorName\PackageName\Facades;
+
+use Illuminate\Support\Facades\Facade;
+
+/**
+ * @method static mixed doSomething(string $param)
+ * @method static self configure(array $options)
+ *
+ * @see \VendorName\PackageName\PackageName
+ */
+class PackageName extends Facade
+{
+    protected static function getFacadeAccessor(): string
+    {
+        return 'package-name';
+    }
+}</code></pre>
+
+    <h2>Composer Configuration</h2>
+    <pre class="language-json"><code class="language-json">{
+    "name": "vendor-name/package-name",
+    "description": "A Laravel package that does something awesome",
+    "keywords": ["laravel", "package"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Your Name",
+            "email": "you@example.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0",
+        "pestphp/pest": "^2.0",
+        "laravel/pint": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "VendorName\\PackageName\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "VendorName\\PackageName\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "format": "vendor/bin/pint"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "VendorName\\PackageName\\PackageNameServiceProvider"
+            ],
+            "aliases": {
+                "PackageName": "VendorName\\PackageName\\Facades\\PackageName"
+            }
+        }
+    },
+    "minimum-stability": "stable"
+}</code></pre>
+
+    <h2>Test Setup with Orchestra Testbench</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace VendorName\PackageName\Tests;
+
+use Orchestra\Testbench\TestCase as Orchestra;
+use VendorName\PackageName\PackageNameServiceProvider;
+
+class TestCase extends Orchestra
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Run package migrations
+        $this-&gt;loadMigrationsFrom(__DIR__ . '/../database/migrations');
+    }
+
+    protected function getPackageProviders($app): array
+    {
+        return [
+            PackageNameServiceProvider::class,
+        ];
+    }
+
+    protected function getPackageAliases($app): array
+    {
+        return [
+            'PackageName' =&gt; \VendorName\PackageName\Facades\PackageName::class,
+        ];
+    }
+
+    protected function defineEnvironment($app): void
+    {
+        $app['config']-&gt;set('database.default', 'testing');
+        $app['config']-&gt;set('database.connections.testing', [
+            'driver' =&gt; 'sqlite',
+            'database' =&gt; ':memory:',
+        ]);
+    }
+}
+
+// tests/Feature/ExampleTest.php
+use VendorName\PackageName\Facades\PackageName;
+
+it('can do something', function () {
+    $result = PackageName::doSomething('test');
+
+    expect($result)-&gt;toBe('expected');
+});</code></pre>
+
+    <h2>GitHub Actions CI</h2>
+    <pre class="language-bash"><code class="language-bash"># .github/workflows/tests.yml
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [8.2, 8.3]
+        laravel: [11.*]
+        dependency-version: [prefer-lowest, prefer-stable]
+
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - ${{ matrix.dependency-version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+
+      - name: Run tests
+        run: vendor/bin/pest</code></pre>
+
+    <h2>Install Command</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace VendorName\PackageName\Commands;
+
+use Illuminate\Console\Command;
+
+class InstallCommand extends Command
+{
+    protected $signature = 'package-name:install';
+    protected $description = 'Install the PackageName package';
+
+    public function handle(): int
+    {
+        $this-&gt;info('Installing PackageName...');
+
+        // Publish config
+        $this-&gt;call('vendor:publish', [
+            '--tag' =&gt; 'package-name-config',
+        ]);
+
+        // Publish migrations
+        if ($this-&gt;confirm('Would you like to publish migrations?', true)) {
+            $this-&gt;call('vendor:publish', [
+                '--tag' =&gt; 'package-name-migrations',
+            ]);
+
+            if ($this-&gt;confirm('Run migrations now?', true)) {
+                $this-&gt;call('migrate');
+            }
+        }
+
+        $this-&gt;info('PackageName installed successfully!');
+
+        return self::SUCCESS;
+    }
+}</code></pre>
+
+    <h2>Local Development Setup</h2>
+    <pre class="language-json"><code class="language-json">// In your Laravel app's composer.json
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./packages/vendor-name/package-name"
+        }
+    ],
+    "require": {
+        "vendor-name/package-name": "*"
+    }
+}
+
+// Then run:
+// composer update vendor-name/package-name</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When extracting to package</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-module-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-module-builder</a> - Internal modules</li>
+        <li><a href="{{ '/agents/laravel-cicd.html' | relative_url }}" class="text-primary hover:underline">laravel-cicd</a> - CI/CD setup</li>
+        <li><a href="{{ '/agents/laravel-testing.html' | relative_url }}" class="text-primary hover:underline">laravel-testing</a> - Test generation</li>
+    </ul>
 </div>

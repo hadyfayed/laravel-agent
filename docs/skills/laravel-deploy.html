@@ -10,7 +10,7 @@ back_text: All Skills
 <div class="mb-8">
     <div class="flex items-center gap-4 mb-4">
         <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
         </div>
         <div>
             <h1 class="text-3xl font-bold">laravel-deploy</h1>
@@ -22,22 +22,270 @@ back_text: All Skills
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Trigger Keywords</h2>
-    <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
         <span class="trigger-tag">deploy</span>
         <span class="trigger-tag">production</span>
         <span class="trigger-tag">forge</span>
         <span class="trigger-tag">vapor</span>
+        <span class="trigger-tag">envoy</span>
+        <span class="trigger-tag">zero-downtime</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Configure deployment with zero-downtime, health checks. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-deploy</strong> skill provides expertise for deploying Laravel applications to production. It covers zero-downtime deployments, health checks, environment configuration, and platform-specific setups for Forge, Vapor, and custom servers.</p>
 
-    <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Zero-Downtime</strong> - Atomic deployments with symlinks</li>
+        <li><strong>Health Checks</strong> - Endpoint monitoring and rollback triggers</li>
+        <li><strong>Platform Setup</strong> - Forge, Vapor, Ploi, custom VPS</li>
+        <li><strong>Environment Config</strong> - Production-ready settings</li>
+        <li><strong>Caching</strong> - Config, route, view, and event caching</li>
+        <li><strong>Queue Management</strong> - Horizon/worker restart strategies</li>
+    </ul>
 
-    <h2>Example Prompts</h2>
-    <pre class="language-bash"><code class="language-bash">"Help me deploy"
-"I need to production"
-"Can you help with forge?"</code></pre>
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Zero-downtime setup
+"Set up zero-downtime deployment with Envoy"
+
+# Health checks
+"Add a health check endpoint for my load balancer"
+
+# Production optimization
+"What caching commands should I run after deployment?"
+
+# Platform-specific
+"Configure my Laravel Forge deployment script"</code></pre>
+
+    <h2>Health Check Endpoint</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
+
+class HealthController extends Controller
+{
+    public function __invoke()
+    {
+        $checks = [
+            'status' => 'ok',
+            'timestamp' => now()->toISOString(),
+            'checks' => [
+                'database' => $this->checkDatabase(),
+                'cache' => $this->checkCache(),
+                'redis' => $this->checkRedis(),
+            ],
+        ];
+
+        $allPassing = collect($checks['checks'])
+            ->every(fn ($check) => $check['status'] === 'ok');
+
+        return response()->json($checks, $allPassing ? 200 : 503);
+    }
+
+    private function checkDatabase(): array
+    {
+        try {
+            DB::select('SELECT 1');
+            return ['status' => 'ok'];
+        } catch (\Exception $e) {
+            return ['status' => 'fail', 'error' => $e->getMessage()];
+        }
+    }
+
+    private function checkCache(): array
+    {
+        try {
+            Cache::put('health-check', true, 10);
+            Cache::forget('health-check');
+            return ['status' => 'ok'];
+        } catch (\Exception $e) {
+            return ['status' => 'fail', 'error' => $e->getMessage()];
+        }
+    }
+
+    private function checkRedis(): array
+    {
+        try {
+            Redis::ping();
+            return ['status' => 'ok'];
+        } catch (\Exception $e) {
+            return ['status' => 'fail', 'error' => $e->getMessage()];
+        }
+    }
+}
+
+// routes/web.php
+Route::get('/health', HealthController::class);</code></pre>
+
+    <h2>Zero-Downtime Deploy Script</h2>
+    <pre class="language-bash"><code class="language-bash">#!/bin/bash
+# deploy.sh - Zero-downtime deployment
+
+set -e
+
+REPO="git@github.com:user/repo.git"
+RELEASES_DIR="/var/www/app/releases"
+SHARED_DIR="/var/www/app/shared"
+CURRENT_LINK="/var/www/app/current"
+RELEASE=$(date +%Y%m%d%H%M%S)
+
+# Clone fresh release
+git clone --depth 1 $REPO "$RELEASES_DIR/$RELEASE"
+cd "$RELEASES_DIR/$RELEASE"
+
+# Link shared files
+ln -nfs "$SHARED_DIR/.env" .env
+ln -nfs "$SHARED_DIR/storage" storage
+
+# Install dependencies
+composer install --no-dev --optimize-autoloader
+
+# Build assets
+npm ci && npm run build
+
+# Cache everything
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+
+# Run migrations
+php artisan migrate --force
+
+# Atomic switch (zero-downtime moment)
+ln -nfs "$RELEASES_DIR/$RELEASE" "$CURRENT_LINK"
+
+# Restart workers
+php artisan queue:restart
+php artisan horizon:terminate 2>/dev/null || true
+
+# Cleanup old releases (keep last 5)
+ls -dt "$RELEASES_DIR"/* | tail -n +6 | xargs rm -rf
+
+echo "Deployed release: $RELEASE"</code></pre>
+
+    <h2>Laravel Forge Deploy Script</h2>
+    <pre class="language-bash"><code class="language-bash"># Forge deployment script
+cd /home/forge/example.com
+
+git pull origin $FORGE_SITE_BRANCH
+
+$FORGE_COMPOSER install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+( flock -w 10 9 || exit 1
+    echo 'Restarting FPM...'; sudo -S service $FORGE_PHP_FPM reload ) 9>/tmp/fpmlock
+
+if [ -f artisan ]; then
+    $FORGE_PHP artisan migrate --force
+    $FORGE_PHP artisan config:cache
+    $FORGE_PHP artisan route:cache
+    $FORGE_PHP artisan view:cache
+    $FORGE_PHP artisan queue:restart
+fi
+
+npm ci
+npm run build</code></pre>
+
+    <h2>Production Environment</h2>
+    <pre class="language-bash"><code class="language-bash"># .env.production essentials
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://example.com
+
+# Performance
+CACHE_DRIVER=redis
+SESSION_DRIVER=redis
+QUEUE_CONNECTION=redis
+
+# Security
+SESSION_SECURE_COOKIE=true
+SESSION_SAME_SITE_COOKIE=strict
+
+# Logging
+LOG_CHANNEL=stack
+LOG_LEVEL=error
+
+# Database pooling
+DB_POOL_MIN=2
+DB_POOL_MAX=10</code></pre>
+
+    <h2>Optimization Commands</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Command</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>config:cache</code></td>
+                    <td class="py-3 px-4">Cache all config files into one</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>route:cache</code></td>
+                    <td class="py-3 px-4">Cache route registrations</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>view:cache</code></td>
+                    <td class="py-3 px-4">Pre-compile all Blade templates</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>event:cache</code></td>
+                    <td class="py-3 px-4">Cache event-listener mappings</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>optimize</code></td>
+                    <td class="py-3 px-4">Run all cache commands at once</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Forgetting <code>queue:restart</code></strong> - Workers cache old code</li>
+        <li><strong>Missing <code>--force</code></strong> - Migrations won't run in production without it</li>
+        <li><strong>APP_DEBUG=true</strong> - Exposes sensitive error details</li>
+        <li><strong>No health checks</strong> - Load balancers need endpoints to verify health</li>
+    </ul>
+
+    <h2>Rollback Strategy</h2>
+    <pre class="language-bash"><code class="language-bash">#!/bin/bash
+# rollback.sh - Quick rollback to previous release
+
+RELEASES_DIR="/var/www/app/releases"
+CURRENT_LINK="/var/www/app/current"
+
+# Get previous release
+PREVIOUS=$(ls -t "$RELEASES_DIR" | sed -n '2p')
+
+if [ -z "$PREVIOUS" ]; then
+    echo "No previous release found"
+    exit 1
+fi
+
+# Atomic switch back
+ln -nfs "$RELEASES_DIR/$PREVIOUS" "$CURRENT_LINK"
+
+php artisan queue:restart
+
+echo "Rolled back to: $PREVIOUS"</code></pre>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/deploy-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:deploy:setup</a> - Configure deployment</li>
+        <li><a href="{{ '/commands/cicd-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:cicd:setup</a> - Setup CI/CD pipeline</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-deploy.html' | relative_url }}" class="text-primary hover:underline">laravel-deploy</a> - Deployment specialist</li>
+    </ul>
 </div>

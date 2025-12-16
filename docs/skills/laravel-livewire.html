@@ -22,22 +22,171 @@ back_text: All Skills
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Trigger Keywords</h2>
-    <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
         <span class="trigger-tag">livewire</span>
+        <span class="trigger-tag">wire:model</span>
         <span class="trigger-tag">reactive</span>
         <span class="trigger-tag">component</span>
         <span class="trigger-tag">alpine</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Create Livewire 3 components with forms, tables, modals. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-livewire</strong> skill provides expertise for building reactive components with <a href="https://livewire.laravel.com/" target="_blank" rel="noopener">Livewire 3</a>. It covers component lifecycle, forms, validation, real-time updates, and Alpine.js integration.</p>
 
-    <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Component Patterns</strong> - Forms, tables, modals, wizards</li>
+        <li><strong>Two-way Binding</strong> - wire:model, wire:model.live, wire:model.blur</li>
+        <li><strong>Actions</strong> - wire:click, wire:submit, events</li>
+        <li><strong>Lifecycle Hooks</strong> - mount, hydrate, updated, etc.</li>
+        <li><strong>File Uploads</strong> - WithFileUploads trait</li>
+        <li><strong>Pagination</strong> - WithPagination trait</li>
+    </ul>
 
-    <h2>Example Prompts</h2>
-    <pre class="language-bash"><code class="language-bash">"Help me livewire"
-"I need to reactive"
-"Can you help with component?"</code></pre>
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Building a form
+"Create a Livewire form for user registration with real-time validation"
+
+# Data tables
+"Build a searchable, sortable data table with pagination"
+
+# Modals
+"How do I create a confirmation modal in Livewire 3?"
+
+# Events
+"Communicate between two Livewire components"</code></pre>
+
+    <h2>Livewire 3 Component Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Livewire;
+
+use App\Models\Post;
+use Livewire\Attributes\Rule;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+
+#[Title('Create Post')]
+class CreatePost extends Component
+{
+    #[Rule('required|min:3')]
+    public string $title = '';
+
+    #[Rule('required|min:10')]
+    public string $content = '';
+
+    public function save()
+    {
+        $validated = $this->validate();
+
+        Post::create($validated);
+
+        session()->flash('success', 'Post created!');
+
+        $this->redirect(route('posts.index'));
+    }
+
+    public function render()
+    {
+        return view('livewire.create-post');
+    }
+}</code></pre>
+
+    <h2>Blade Template</h2>
+    <pre class="language-php"><code class="language-php">&lt;form wire:submit="save"&gt;
+    &lt;div&gt;
+        &lt;input wire:model.blur="title" type="text"&gt;
+        @error('title')
+            &lt;span class="error"&gt;{{ $message }}&lt;/span&gt;
+        @enderror
+    &lt;/div&gt;
+
+    &lt;div&gt;
+        &lt;textarea wire:model.blur="content"&gt;&lt;/textarea&gt;
+        @error('content')
+            &lt;span class="error"&gt;{{ $message }}&lt;/span&gt;
+        @enderror
+    &lt;/div&gt;
+
+    &lt;button type="submit"&gt;
+        &lt;span wire:loading.remove&gt;Save&lt;/span&gt;
+        &lt;span wire:loading&gt;Saving...&lt;/span&gt;
+    &lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+    <h2>Wire:model Modifiers</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Modifier</th>
+                    <th class="text-left py-3 px-4 font-medium">Behavior</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>wire:model</code></td>
+                    <td class="py-3 px-4">Deferred (on form submit)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>wire:model.live</code></td>
+                    <td class="py-3 px-4">Updates on every keystroke</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>wire:model.blur</code></td>
+                    <td class="py-3 px-4">Updates when field loses focus</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>wire:model.live.debounce.500ms</code></td>
+                    <td class="py-3 px-4">Debounced live updates</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Events Between Components</h2>
+    <pre class="language-php"><code class="language-php">// Dispatching an event
+$this->dispatch('post-created', id: $post->id);
+
+// Listening in another component
+#[On('post-created')]
+public function handlePostCreated(int $id): void
+{
+    $this->posts = Post::latest()->get();
+}
+
+// From JavaScript
+Livewire.dispatch('post-created', { id: 1 })</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Too many requests</strong> - Use <code>.blur</code> or <code>.debounce</code> instead of <code>.live</code></li>
+        <li><strong>Large payloads</strong> - Keep component state minimal</li>
+        <li><strong>Missing wire:key</strong> - Always add keys in loops</li>
+        <li><strong>Forgetting @entangle</strong> - Use for Alpine.js integration</li>
+    </ul>
+
+    <h2>Loading States</h2>
+    <pre class="language-php"><code class="language-php">&lt;!-- Show while any action runs --&gt;
+&lt;div wire:loading&gt;Loading...&lt;/div&gt;
+
+&lt;!-- Show for specific action --&gt;
+&lt;div wire:loading wire:target="save"&gt;Saving...&lt;/div&gt;
+
+&lt;!-- Disable button while loading --&gt;
+&lt;button wire:loading.attr="disabled"&gt;Submit&lt;/button&gt;
+
+&lt;!-- Add class while loading --&gt;
+&lt;div wire:loading.class="opacity-50"&gt;Content&lt;/div&gt;</code></pre>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/livewire-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:livewire:make</a> - Create Livewire components</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-livewire.html' | relative_url }}" class="text-primary hover:underline">laravel-livewire</a> - Livewire component specialist</li>
+    </ul>
 </div>

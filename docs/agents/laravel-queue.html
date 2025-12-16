@@ -13,20 +13,206 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-queue</h1>
     <p class="text-xl text-muted-foreground">Creates queued jobs, events, listeners, notifications</p>
-    <p class="text-sm text-muted-foreground mt-2">app/Jobs/, app/Events/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Creates queued jobs, events, listeners, notifications. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-queue</strong> agent creates background job infrastructure. It generates queued jobs with proper retry logic, event-driven architectures with listeners, rate-limited processing, and batch job handling.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of backend-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Job Creation</strong> - Queued jobs with middleware, retries, and timeouts</li>
+        <li><strong>Event/Listener</strong> - Event-driven architecture with proper decoupling</li>
+        <li><strong>Notifications</strong> - Multi-channel notifications (mail, SMS, Slack)</li>
+        <li><strong>Rate Limiting</strong> - Job throttling with Redis locks</li>
+        <li><strong>Job Batching</strong> - Process related jobs together</li>
+        <li><strong>Failure Handling</strong> - Retry logic and dead letter queues</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>app/Jobs/, app/Events/</strong></p>
+    <h2>What It Creates</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Jobs</td>
+                    <td class="py-3 px-4"><code>app/Jobs/</code></td>
+                    <td class="py-3 px-4">Background task processing</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Events</td>
+                    <td class="py-3 px-4"><code>app/Events/</code></td>
+                    <td class="py-3 px-4">Domain events</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Listeners</td>
+                    <td class="py-3 px-4"><code>app/Listeners/</code></td>
+                    <td class="py-3 px-4">Event handlers</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Notifications</td>
+                    <td class="py-3 px-4"><code>app/Notifications/</code></td>
+                    <td class="py-3 px-4">User notifications</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated Job Example</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Jobs;
+
+use App\Models\Order;
+use App\Services\PaymentGateway;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\Middleware\RateLimited;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
+
+class ProcessPayment implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 3;
+    public array $backoff = [60, 300, 900]; // 1min, 5min, 15min
+    public int $timeout = 120;
+    public int $maxExceptions = 3;
+
+    public function __construct(
+        public Order $order
+    ) {}
+
+    public function middleware(): array
+    {
+        return [
+            new RateLimited('payments'),
+            new WithoutOverlapping($this->order->id),
+        ];
+    }
+
+    public function handle(PaymentGateway $gateway): void
+    {
+        $result = $gateway->charge($this->order);
+
+        if ($result->failed()) {
+            $this->fail($result->error());
+        }
+
+        $this->order->update(['status' => 'paid']);
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        $this->order->update(['status' => 'payment_failed']);
+
+        // Notify admin
+        \Notification::route('slack', config('services.slack.webhook'))
+            ->notify(new PaymentFailedNotification($this->order, $exception));
+    }
+}</code></pre>
+
+    <h2>Event/Listener Pattern</h2>
+    <pre class="language-php"><code class="language-php">// app/Events/OrderPlaced.php
+class OrderPlaced
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public function __construct(
+        public Order $order
+    ) {}
+}
+
+// app/Listeners/SendOrderConfirmation.php
+class SendOrderConfirmation implements ShouldQueue
+{
+    public function handle(OrderPlaced $event): void
+    {
+        $event->order->user->notify(
+            new OrderConfirmationNotification($event->order)
+        );
+    }
+}
+
+// app/Listeners/UpdateInventory.php
+class UpdateInventory implements ShouldQueue
+{
+    public function handle(OrderPlaced $event): void
+    {
+        foreach ($event->order->items as $item) {
+            $item->product->decrement('stock', $item->quantity);
+        }
+    }
+}
+
+// EventServiceProvider
+protected $listen = [
+    OrderPlaced::class => [
+        SendOrderConfirmation::class,
+        UpdateInventory::class,
+        NotifyWarehouse::class,
+    ],
+];</code></pre>
+
+    <h2>Job Batching</h2>
+    <pre class="language-php"><code class="language-php">use Illuminate\Bus\Batch;
+use Illuminate\Support\Facades\Bus;
+
+$batch = Bus::batch([
+    new ProcessOrder($order1),
+    new ProcessOrder($order2),
+    new ProcessOrder($order3),
+])
+->then(function (Batch $batch) {
+    // All jobs completed successfully
+    Log::info('Batch completed: ' . $batch->id);
+})
+->catch(function (Batch $batch, \Throwable $e) {
+    // First batch job failure
+    Log::error('Batch failed: ' . $e->getMessage());
+})
+->finally(function (Batch $batch) {
+    // Batch finished (success or failure)
+})
+->allowFailures()
+->dispatch();</code></pre>
+
+    <h2>Rate Limiting Configuration</h2>
+    <pre class="language-php"><code class="language-php">// In AppServiceProvider
+RateLimiter::for('payments', function (object $job) {
+    return Limit::perMinute(100);
+});
+
+// Per-user rate limiting
+RateLimiter::for('emails', function (object $job) {
+    return Limit::perMinute(10)->by($job->user->id);
+});
+
+// With backoff
+RateLimiter::for('api-calls', function (object $job) {
+    return Limit::perMinute(60)
+        ->by($job->apiKey)
+        ->response(fn ($job, $headers) =>
+            $job->release($headers['Retry-After'] ?? 60));
+});</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/job-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:job:make</a> - Create jobs, events, listeners</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-queue.html' | relative_url }}" class="text-primary hover:underline">laravel-queue skill</a> - Auto-invoked queue expertise</li>
+        <li><a href="{{ '/agents/laravel-reverb.html' | relative_url }}" class="text-primary hover:underline">laravel-reverb</a> - Real-time event broadcasting</li>
+    </ul>
 </div>

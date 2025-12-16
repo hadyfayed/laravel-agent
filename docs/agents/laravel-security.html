@@ -13,20 +13,169 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-security</h1>
     <p class="text-xl text-muted-foreground">Runs OWASP security audits and fixes vulnerabilities</p>
-    <p class="text-sm text-muted-foreground mt-2">Checks: SQL injection, XSS, CSRF</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Runs OWASP security audits and fixes vulnerabilities. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-security</strong> agent performs comprehensive security audits based on OWASP guidelines. It identifies vulnerabilities like SQL injection, XSS, CSRF issues, and provides fixes following Laravel security best practices.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of quality-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>OWASP Audit</strong> - Check against OWASP Top 10 vulnerabilities</li>
+        <li><strong>SQL Injection Detection</strong> - Find raw queries and unsafe bindings</li>
+        <li><strong>XSS Prevention</strong> - Identify unescaped output in Blade templates</li>
+        <li><strong>CSRF Verification</strong> - Ensure proper token usage</li>
+        <li><strong>Mass Assignment</strong> - Check for unprotected fillable properties</li>
+        <li><strong>Security Headers</strong> - Configure proper HTTP security headers</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>Checks: SQL injection, XSS, CSRF</strong></p>
+    <h2>Security Audit Process</h2>
+    <div class="not-prose">
+        <div class="bg-muted/50 rounded-lg p-6 border border-border">
+            <pre class="text-sm text-foreground">
+┌─────────────────────────────────────────────────────────────┐
+│                    Security Audit Flow                       │
+├─────────────────────────────────────────────────────────────┤
+│  1. Scan Controllers                                        │
+│     → Check for raw queries                                 │
+│     → Verify authorization calls                            │
+│     → Validate input handling                               │
+├─────────────────────────────────────────────────────────────┤
+│  2. Scan Blade Templates                                    │
+│     → Find {!! !!} usage (unescaped output)                │
+│     → Check @csrf in forms                                  │
+│     → Verify @method for non-GET forms                      │
+├─────────────────────────────────────────────────────────────┤
+│  3. Scan Models                                             │
+│     → Check $fillable vs $guarded                          │
+│     → Review relationship security                          │
+├─────────────────────────────────────────────────────────────┤
+│  4. Check Configuration                                     │
+│     → APP_DEBUG setting                                     │
+│     → Session security options                              │
+│     → CORS configuration                                    │
+└─────────────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+    </div>
+
+    <h2>Vulnerability Detection Examples</h2>
+    <pre class="language-php"><code class="language-php">// VULNERABILITY: SQL Injection
+$users = DB::select("SELECT * FROM users WHERE name = '$name'");
+
+// FIX: Parameterized query
+$users = DB::select("SELECT * FROM users WHERE name = ?", [$name]);
+
+// VULNERABILITY: XSS (unescaped output)
+{!! $userInput !!}
+
+// FIX: Escaped output
+{{ $userInput }}
+
+// VULNERABILITY: Mass Assignment
+$user = User::create($request->all());
+
+// FIX: Explicit fields
+$user = User::create($request->only(['name', 'email']));</code></pre>
+
+    <h2>Security Headers Middleware</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class SecurityHeaders
+{
+    public function handle(Request $request, Closure $next)
+    {
+        $response = $next($request);
+
+        // Prevent MIME type sniffing
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+
+        // Prevent clickjacking
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+
+        // Enable XSS filter
+        $response->headers->set('X-XSS-Protection', '1; mode=block');
+
+        // Control referrer information
+        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+        // Content Security Policy
+        $response->headers->set('Content-Security-Policy', "default-src 'self'");
+
+        return $response;
+    }
+}</code></pre>
+
+    <h2>Audit Report Format</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Severity</th>
+                    <th class="text-left py-3 px-4 font-medium">Issue</th>
+                    <th class="text-left py-3 px-4 font-medium">File</th>
+                    <th class="text-left py-3 px-4 font-medium">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><span class="text-red-500 font-bold">CRITICAL</span></td>
+                    <td class="py-3 px-4">SQL Injection</td>
+                    <td class="py-3 px-4"><code>UserController.php:45</code></td>
+                    <td class="py-3 px-4">Use parameterized query</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><span class="text-orange-500 font-bold">HIGH</span></td>
+                    <td class="py-3 px-4">XSS Vulnerability</td>
+                    <td class="py-3 px-4"><code>show.blade.php:23</code></td>
+                    <td class="py-3 px-4">Use {{ }} not {!! !!}</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><span class="text-yellow-500 font-bold">MEDIUM</span></td>
+                    <td class="py-3 px-4">Missing CSRF</td>
+                    <td class="py-3 px-4"><code>create.blade.php:12</code></td>
+                    <td class="py-3 px-4">Add @csrf directive</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><span class="text-blue-500 font-bold">LOW</span></td>
+                    <td class="py-3 px-4">Debug Mode On</td>
+                    <td class="py-3 px-4"><code>.env</code></td>
+                    <td class="py-3 px-4">Set APP_DEBUG=false</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Password Validation Setup</h2>
+    <pre class="language-php"><code class="language-php">use Illuminate\Validation\Rules\Password;
+
+// In a Form Request or controller
+$request->validate([
+    'password' => [
+        'required',
+        'confirmed',
+        Password::min(8)
+            ->mixedCase()
+            ->numbers()
+            ->symbols()
+            ->uncompromised(), // Check against breach databases
+    ],
+]);</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/security-audit.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:security:audit</a> - Run security audit</li>
+        <li><a href="{{ '/commands/review-audit.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:audit</a> - Full codebase audit</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-security.html' | relative_url }}" class="text-primary hover:underline">laravel-security skill</a> - Auto-invoked security expertise</li>
+        <li><a href="{{ '/agents/laravel-auth.html' | relative_url }}" class="text-primary hover:underline">laravel-auth</a> - Authentication setup</li>
+    </ul>
 </div>

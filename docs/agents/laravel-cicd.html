@@ -1,7 +1,7 @@
 ---
 layout: page
 title: laravel-cicd
-description: Sets up CI/CD pipelines for GitHub Actions and GitLab CI
+description: Configures CI/CD pipelines for Laravel applications
 nav_active: Agents
 back_url: /agents.html
 back_text: All Agents
@@ -12,21 +12,295 @@ back_text: All Agents
         <span class="category-badge badge-devops">DevOps</span>
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-cicd</h1>
-    <p class="text-xl text-muted-foreground">Sets up CI/CD pipelines for GitHub Actions and GitLab CI</p>
-    <p class="text-sm text-muted-foreground mt-2">.github/workflows/</p>
+    <p class="text-xl text-muted-foreground">Configures CI/CD pipelines for Laravel applications</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Sets up CI/CD pipelines for GitHub Actions and GitLab CI. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-cicd</strong> agent sets up continuous integration and deployment pipelines for Laravel applications. It supports GitHub Actions, GitLab CI, and Bitbucket Pipelines with Laravel-optimized workflows including testing, code quality checks, and automated deployments.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of devops-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>GitHub Actions</strong> - Create Laravel-optimized workflows</li>
+        <li><strong>GitLab CI</strong> - Configure .gitlab-ci.yml pipelines</li>
+        <li><strong>Testing Pipeline</strong> - PHPUnit/Pest with coverage reports</li>
+        <li><strong>Code Quality</strong> - PHPStan, Pint, security checks</li>
+        <li><strong>Auto-Deploy</strong> - Deploy on merge to main/production</li>
+        <li><strong>Environment Setup</strong> - Database, cache, queue services</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>.github/workflows/</strong></p>
+    <h2>Supported Platforms</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Platform</th>
+                    <th class="text-left py-3 px-4 font-medium">Config File</th>
+                    <th class="text-left py-3 px-4 font-medium">Features</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">GitHub Actions</td>
+                    <td class="py-3 px-4"><code>.github/workflows/</code></td>
+                    <td class="py-3 px-4">Matrix testing, caching, environments</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">GitLab CI</td>
+                    <td class="py-3 px-4"><code>.gitlab-ci.yml</code></td>
+                    <td class="py-3 px-4">Stages, artifacts, environments</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Bitbucket</td>
+                    <td class="py-3 px-4"><code>bitbucket-pipelines.yml</code></td>
+                    <td class="py-3 px-4">Parallel steps, deployments</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated GitHub Actions Workflow</h2>
+    <pre class="language-bash"><code class="language-bash"># .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    strategy:
+      matrix:
+        php: [8.2, 8.3]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, pdo_mysql, redis
+          coverage: xdebug
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Copy Environment
+        run: cp .env.ci .env
+
+      - name: Generate Key
+        run: php artisan key:generate
+
+      - name: Run Migrations
+        run: php artisan migrate --force
+
+      - name: Run Tests
+        run: php artisan test --coverage-clover=coverage.xml
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+
+      - name: Install Dependencies
+        run: composer install --no-interaction
+
+      - name: Run Pint
+        run: ./vendor/bin/pint --test
+
+      - name: Run PHPStan
+        run: ./vendor/bin/phpstan analyse
+
+      - name: Security Check
+        run: composer audit
+
+  deploy:
+    needs: [tests, code-quality]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Production
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            cd /var/www/app
+            php artisan down
+            git pull origin main
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan queue:restart
+            php artisan up</code></pre>
+
+    <h2>GitLab CI Configuration</h2>
+    <pre class="language-bash"><code class="language-bash"># .gitlab-ci.yml
+stages:
+  - test
+  - quality
+  - deploy
+
+variables:
+  MYSQL_ROOT_PASSWORD: password
+  MYSQL_DATABASE: testing
+  DB_HOST: mysql
+  DB_DATABASE: testing
+  DB_USERNAME: root
+  DB_PASSWORD: password
+
+.php-base:
+  image: php:8.3-cli
+  before_script:
+    - apt-get update && apt-get install -y git unzip
+    - curl -sS https://getcomposer.org/installer | php
+    - php composer.phar install
+
+test:
+  extends: .php-base
+  stage: test
+  services:
+    - mysql:8.0
+    - redis:7
+  script:
+    - cp .env.ci .env
+    - php artisan key:generate
+    - php artisan migrate --force
+    - php artisan test --coverage-text
+  coverage: '/Lines:\s*(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      junit: report.xml
+
+phpstan:
+  extends: .php-base
+  stage: quality
+  script:
+    - ./vendor/bin/phpstan analyse --error-format=gitlab > report.json
+  artifacts:
+    reports:
+      codequality: report.json
+
+pint:
+  extends: .php-base
+  stage: quality
+  script:
+    - ./vendor/bin/pint --test
+
+deploy-production:
+  stage: deploy
+  only:
+    - main
+  environment:
+    name: production
+    url: https://app.example.com
+  script:
+    - 'which ssh-agent || apt-get install openssh-client'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | ssh-add -
+    - ssh $DEPLOY_USER@$DEPLOY_HOST "cd /var/www/app && ./deploy.sh"</code></pre>
+
+    <h2>Environment Configuration</h2>
+    <pre class="language-bash"><code class="language-bash"># .env.ci - CI environment settings
+APP_ENV=testing
+APP_DEBUG=true
+APP_KEY=
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=testing
+DB_USERNAME=root
+DB_PASSWORD=password
+
+CACHE_DRIVER=redis
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=array
+
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379</code></pre>
+
+    <h2>CI Pipeline Flow</h2>
+    <div class="not-prose">
+        <div class="bg-muted/50 rounded-lg p-6 border border-border">
+            <pre class="text-sm text-foreground">
+┌────────────────┐     ┌────────────────┐     ┌────────────────┐
+│   Push/PR      │────▶│     Tests      │────▶│  Code Quality  │
+│   Triggered    │     │   (parallel)   │     │   (parallel)   │
+└────────────────┘     └────────────────┘     └────────────────┘
+                              │                       │
+                              ▼                       ▼
+                       ┌────────────────────────────────────┐
+                       │         All Checks Pass?           │
+                       └────────────────────────────────────┘
+                                       │
+                    ┌──────────────────┴──────────────────┐
+                    │                                      │
+                    ▼                                      ▼
+             ┌────────────┐                        ┌────────────┐
+             │  main only │                        │  PR/branch │
+             │   Deploy   │                        │   Done     │
+             └────────────┘                        └────────────┘
+            </pre>
+        </div>
+    </div>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/cicd-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:cicd:setup</a> - Configure CI/CD pipeline</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-deploy.html' | relative_url }}" class="text-primary hover:underline">laravel-deploy</a> - Deployment configuration</li>
+        <li><a href="{{ '/agents/laravel-testing.html' | relative_url }}" class="text-primary hover:underline">laravel-testing</a> - Test generation</li>
+        <li><a href="{{ '/agents/laravel-git.html' | relative_url }}" class="text-primary hover:underline">laravel-git</a> - Git operations</li>
+    </ul>
 </div>

@@ -13,20 +13,147 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-database</h1>
     <p class="text-xl text-muted-foreground">Creates migrations, optimizes queries, fixes N+1 problems</p>
-    <p class="text-sm text-muted-foreground mt-2">database/migrations/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Creates migrations, optimizes queries, fixes N+1 problems. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-database</strong> agent specializes in database operations including migration creation, schema design, query optimization, index analysis, and N+1 problem detection and resolution.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of backend-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Migration Creation</strong> - Generate migrations with proper column types, indexes, and foreign keys</li>
+        <li><strong>Schema Design</strong> - Design normalized database schemas following best practices</li>
+        <li><strong>Query Optimization</strong> - Analyze and optimize slow database queries</li>
+        <li><strong>N+1 Detection</strong> - Identify and fix N+1 query problems with eager loading</li>
+        <li><strong>Index Strategy</strong> - Recommend and implement database indexes</li>
+        <li><strong>Relationship Setup</strong> - Configure Eloquent relationships correctly</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>database/migrations/</strong></p>
+    <h2>What It Creates</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Migrations</td>
+                    <td class="py-3 px-4"><code>database/migrations/</code></td>
+                    <td class="py-3 px-4">Schema changes with up/down methods</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Index Migrations</td>
+                    <td class="py-3 px-4"><code>database/migrations/</code></td>
+                    <td class="py-3 px-4">Performance-focused index additions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Model Scopes</td>
+                    <td class="py-3 px-4"><code>app/Models/</code></td>
+                    <td class="py-3 px-4">Optimized query scopes</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Migration Generation Example</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('orders', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained();
+            $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])
+                  ->default('pending');
+            $table->decimal('total', 10, 2);
+            $table->text('notes')->nullable();
+            $table->timestamp('shipped_at')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+
+            // Composite indexes for common queries
+            $table->index(['user_id', 'status']);
+            $table->index(['status', 'created_at']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('orders');
+    }
+};</code></pre>
+
+    <h2>N+1 Problem Detection</h2>
+    <p>The agent identifies N+1 queries and provides fixes:</p>
+    <pre class="language-php"><code class="language-php">// BEFORE: N+1 problem (1 + N queries)
+$posts = Post::all();
+foreach ($posts as $post) {
+    echo $post->author->name; // Queries for each post!
+}
+
+// AFTER: Eager loading (2 queries total)
+$posts = Post::with('author')->get();
+foreach ($posts as $post) {
+    echo $post->author->name; // No additional queries
+}
+
+// OPTIMIZED: Select only needed columns
+$posts = Post::select('id', 'title', 'user_id')
+    ->with('author:id,name')
+    ->get();</code></pre>
+
+    <h2>Index Recommendations</h2>
+    <p>The agent analyzes queries and recommends indexes:</p>
+    <pre class="language-php"><code class="language-php">// For this query pattern:
+Order::where('status', 'pending')
+    ->where('created_at', '>', now()->subDays(7))
+    ->orderBy('created_at', 'desc')
+    ->get();
+
+// Agent recommends this index migration:
+Schema::table('orders', function (Blueprint $table) {
+    $table->index(['status', 'created_at']); // Composite index
+});</code></pre>
+
+    <h2>Query Optimization Examples</h2>
+    <pre class="language-php"><code class="language-php">// SLOW: Loading unnecessary data
+$users = User::all();
+$activeCount = $users->where('active', true)->count();
+
+// FAST: Database-level counting
+$activeCount = User::where('active', true)->count();
+
+// SLOW: N+1 with aggregation
+foreach ($categories as $category) {
+    echo $category->products->count();
+}
+
+// FAST: WithCount
+$categories = Category::withCount('products')->get();
+foreach ($categories as $category) {
+    echo $category->products_count;
+}</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/db-optimize.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:optimize</a> - Analyze and optimize queries</li>
+        <li><a href="{{ '/commands/db-diagram.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:diagram</a> - Generate schema diagram</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-database.html' | relative_url }}" class="text-primary hover:underline">laravel-database skill</a> - Auto-invoked database expertise</li>
+        <li><a href="{{ '/agents/laravel-migration.html' | relative_url }}" class="text-primary hover:underline">laravel-migration</a> - Database schema migration specialist</li>
+    </ul>
 </div>

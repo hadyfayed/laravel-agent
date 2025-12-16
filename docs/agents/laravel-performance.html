@@ -13,20 +13,324 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-performance</h1>
     <p class="text-xl text-muted-foreground">Optimizes with caching and Pulse monitoring</p>
-    <p class="text-sm text-muted-foreground mt-2">config/cache.php, Pulse</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Optimizes with caching and Pulse monitoring. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-performance</strong> agent optimizes Laravel application performance through caching strategies, query optimization, memory-efficient processing, and <a href="https://pulse.laravel.com" target="_blank" rel="noopener">Laravel Pulse</a> monitoring setup. It identifies bottlenecks and implements best practices for high-performance applications.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of backend-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Caching Strategies</strong> - Response, query, and object caching</li>
+        <li><strong>Query Optimization</strong> - N+1 detection, index recommendations</li>
+        <li><strong>Memory Efficiency</strong> - Chunked processing, lazy collections</li>
+        <li><strong>Pulse Setup</strong> - Application performance monitoring</li>
+        <li><strong>Optimization Commands</strong> - Config, route, view caching</li>
+        <li><strong>Profiling</strong> - Identify slow queries and requests</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>config/cache.php, Pulse</strong></p>
+    <h2>Optimization Areas</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Area</th>
+                    <th class="text-left py-3 px-4 font-medium">Technique</th>
+                    <th class="text-left py-3 px-4 font-medium">Impact</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Database</td>
+                    <td class="py-3 px-4">Eager loading, indexes, query caching</td>
+                    <td class="py-3 px-4">High</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Response</td>
+                    <td class="py-3 px-4">HTTP caching, compression</td>
+                    <td class="py-3 px-4">High</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Memory</td>
+                    <td class="py-3 px-4">Chunking, lazy collections, generators</td>
+                    <td class="py-3 px-4">Medium</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Config</td>
+                    <td class="py-3 px-4">Config/route/view caching</td>
+                    <td class="py-3 px-4">Medium</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Queue</td>
+                    <td class="py-3 px-4">Async processing, job batching</td>
+                    <td class="py-3 px-4">High</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Caching Strategies</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// 1. Simple cache with TTL
+$users = Cache::remember('active-users', 3600, function () {
+    return User::where('active', true)-&gt;get();
+});
+
+// 2. Tagged cache for invalidation
+Cache::tags(['users', 'dashboard'])-&gt;remember('stats', 3600, fn () =&gt;
+    User::selectRaw('COUNT(*) as total, SUM(balance) as balance')-&gt;first()
+);
+
+// Invalidate by tag
+Cache::tags(['users'])-&gt;flush();
+
+// 3. Cache lock for race conditions
+$lock = Cache::lock('process-payment-' . $orderId, 10);
+
+if ($lock-&gt;get()) {
+    try {
+        // Process payment
+    } finally {
+        $lock-&gt;release();
+    }
+}
+
+// 4. Model caching with automatic invalidation
+class Product extends Model
+{
+    protected static function booted(): void
+    {
+        static::saved(fn () =&gt; Cache::tags(['products'])-&gt;flush());
+        static::deleted(fn () =&gt; Cache::tags(['products'])-&gt;flush());
+    }
+
+    public static function getCached(int $id): ?self
+    {
+        return Cache::tags(['products'])-&gt;remember(
+            "product.{$id}",
+            3600,
+            fn () =&gt; self::find($id)
+        );
+    }
+}</code></pre>
+
+    <h2>Query Optimization</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// BAD: N+1 query problem
+$orders = Order::all();
+foreach ($orders as $order) {
+    echo $order-&gt;user-&gt;name;     // N+1 queries!
+    echo $order-&gt;items-&gt;count(); // More N+1!
+}
+
+// GOOD: Eager loading
+$orders = Order::with(['user', 'items'])-&gt;get();
+
+// BETTER: Only load what you need
+$orders = Order::with([
+    'user:id,name',
+    'items' =&gt; fn ($q) =&gt; $q-&gt;select('id', 'order_id', 'total')
+])-&gt;get();
+
+// Select only needed columns
+$users = User::select('id', 'name', 'email')-&gt;get();
+
+// Use withCount instead of loading relationships
+$posts = Post::withCount('comments')-&gt;get();
+// Access via $post-&gt;comments_count
+
+// Subquery for aggregates
+$users = User::select('users.*')
+    -&gt;selectSub(
+        Order::selectRaw('SUM(total)')
+            -&gt;whereColumn('user_id', 'users.id'),
+        'total_spent'
+    )
+    -&gt;get();</code></pre>
+
+    <h2>Memory-Efficient Processing</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// BAD: Loads all records into memory
+User::all()-&gt;each(function ($user) {
+    // Process user
+});
+
+// GOOD: Process in chunks
+User::chunk(1000, function ($users) {
+    foreach ($users as $user) {
+        // Process user
+    }
+});
+
+// BETTER: Lazy collection (memory efficient)
+User::lazy()-&gt;each(function ($user) {
+    // Process user - only one record in memory at a time
+});
+
+// BEST: Cursor for read-only processing
+foreach (User::cursor() as $user) {
+    // Minimal memory, but no chunking overhead
+}
+
+// For updates: chunkById to avoid offset issues
+User::where('active', false)
+    -&gt;chunkById(1000, function ($users) {
+        $users-&gt;each-&gt;delete();
+    });
+
+// Generator for large exports
+function exportUsers(): Generator {
+    foreach (User::cursor() as $user) {
+        yield [
+            $user-&gt;id,
+            $user-&gt;name,
+            $user-&gt;email,
+        ];
+    }
+}</code></pre>
+
+    <h2>Laravel Pulse Setup</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Install Pulse
+// composer require laravel/pulse
+
+// config/pulse.php
+return [
+    'enabled' =&gt; env('PULSE_ENABLED', true),
+
+    'storage' =&gt; [
+        'driver' =&gt; env('PULSE_STORAGE_DRIVER', 'database'),
+    ],
+
+    'ingest' =&gt; [
+        'driver' =&gt; env('PULSE_INGEST_DRIVER', 'storage'),
+    ],
+
+    'recorders' =&gt; [
+        \Laravel\Pulse\Recorders\Requests::class =&gt; [
+            'sample_rate' =&gt; 1.0, // 100% sampling
+            'ignore' =&gt; [
+                '/pulse*',
+                '/health',
+            ],
+        ],
+        \Laravel\Pulse\Recorders\SlowQueries::class =&gt; [
+            'enabled' =&gt; true,
+            'threshold' =&gt; 100, // ms
+        ],
+        \Laravel\Pulse\Recorders\SlowJobs::class =&gt; [
+            'enabled' =&gt; true,
+            'threshold' =&gt; 1000, // ms
+        ],
+        \Laravel\Pulse\Recorders\Exceptions::class =&gt; [
+            'enabled' =&gt; true,
+        ],
+    ],
+];
+
+// Custom Pulse card
+use Laravel\Pulse\Facades\Pulse;
+
+Pulse::record('payment_processed', $amount)-&gt;count();
+Pulse::record('api_call', $provider)-&gt;avg($duration);</code></pre>
+
+    <h2>Response Caching</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Response caching middleware
+class CacheResponse
+{
+    public function handle($request, Closure $next, int $minutes = 60)
+    {
+        $key = 'response.' . sha1($request-&gt;fullUrl());
+
+        return Cache::remember($key, $minutes * 60, function () use ($next, $request) {
+            return $next($request);
+        });
+    }
+}
+
+// HTTP caching headers
+return response($content)
+    -&gt;header('Cache-Control', 'public, max-age=3600')
+    -&gt;header('ETag', md5($content));
+
+// Conditional response (304 Not Modified)
+public function show(Request $request, Post $post)
+{
+    $etag = md5($post-&gt;updated_at-&gt;timestamp);
+
+    if ($request-&gt;header('If-None-Match') === $etag) {
+        return response(null, 304);
+    }
+
+    return response()-&gt;json($post)-&gt;header('ETag', $etag);
+}</code></pre>
+
+    <h2>Production Optimization Commands</h2>
+    <pre class="language-bash"><code class="language-bash"># Cache configuration files
+php artisan config:cache
+
+# Cache routes
+php artisan route:cache
+
+# Cache views
+php artisan view:cache
+
+# Cache events
+php artisan event:cache
+
+# Optimize autoloader
+composer install --optimize-autoloader --no-dev
+
+# All in one
+php artisan optimize
+
+# Clear all caches (for development)
+php artisan optimize:clear</code></pre>
+
+    <h2>Database Indexing</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Migration with indexes
+Schema::create('orders', function (Blueprint $table) {
+    $table-&gt;id();
+    $table-&gt;foreignId('user_id')-&gt;constrained();
+    $table-&gt;string('status');
+    $table-&gt;timestamp('created_at');
+
+    // Index frequently filtered columns
+    $table-&gt;index('status');
+    $table-&gt;index('created_at');
+
+    // Composite index for common queries
+    $table-&gt;index(['user_id', 'status']);
+    $table-&gt;index(['status', 'created_at']);
+});
+
+// Find missing indexes
+DB::listen(function ($query) {
+    if ($query-&gt;time &gt; 100) {
+        Log::warning('Slow query', [
+            'sql' =&gt; $query-&gt;sql,
+            'time' =&gt; $query-&gt;time,
+        ]);
+    }
+});</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/db-optimize.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:optimize</a> - Database optimization</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-performance.html' | relative_url }}" class="text-primary hover:underline">laravel-performance skill</a> - Auto-invoked performance expertise</li>
+        <li><a href="{{ '/agents/laravel-database.html' | relative_url }}" class="text-primary hover:underline">laravel-database</a> - Database operations</li>
+        <li><a href="{{ '/agents/laravel-queue.html' | relative_url }}" class="text-primary hover:underline">laravel-queue</a> - Async processing</li>
+    </ul>
 </div>

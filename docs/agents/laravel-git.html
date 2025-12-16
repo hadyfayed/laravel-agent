@@ -13,20 +13,165 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-git</h1>
     <p class="text-xl text-muted-foreground">Handles git operations including smart commits and releases</p>
-    <p class="text-sm text-muted-foreground mt-2">Uses: git, gh CLI</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Handles git operations including smart commits and releases. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-git</strong> agent handles all Git-related operations with Laravel-aware intelligence. It generates meaningful commit messages, performs security reviews before commits, creates releases with auto-generated changelogs, and manages branching strategies.</p>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of devops-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Smart Commits</strong> - Analyze changes and generate descriptive messages</li>
+        <li><strong>Security Review</strong> - Scan staged changes for sensitive data</li>
+        <li><strong>Release Management</strong> - Create tags and generate changelogs</li>
+        <li><strong>PR Descriptions</strong> - Auto-generate pull request summaries</li>
+        <li><strong>Branch Management</strong> - Follow conventional branch naming</li>
+        <li><strong>Sensitive File Detection</strong> - Prevent committing secrets</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>Uses: git, gh CLI</strong></p>
+    <h2>Commit Message Generation</h2>
+    <p>The agent analyzes staged changes and generates conventional commit messages:</p>
+    <pre class="language-bash"><code class="language-bash"># Agent analyzes these patterns:
+# - New files → "feat: add X"
+# - Modified files → "update X" or "fix X" or "refactor X"
+# - Deleted files → "remove X"
+# - Test files → "test: add tests for X"
+# - Config files → "chore: update configuration"
+
+# Example generated commits:
+feat(auth): add two-factor authentication support
+
+- Add TwoFactorController for TOTP management
+- Create migration for two_factor_secrets table
+- Add TwoFactorAuthentication trait to User model
+- Include QR code generation for authenticator apps
+
+fix(orders): resolve race condition in stock reservation
+
+- Add database lock during stock check
+- Use transactions for atomic updates
+- Add retry logic for deadlock scenarios</code></pre>
+
+    <h2>Security Review Process</h2>
+    <div class="not-prose">
+        <div class="bg-muted/50 rounded-lg p-6 border border-border">
+            <pre class="text-sm text-foreground">
+┌─────────────────────────────────────────────────────────────┐
+│                  Pre-Commit Security Review                  │
+├─────────────────────────────────────────────────────────────┤
+│  1. Scan Staged Files                                        │
+│     → Check for .env files                                   │
+│     → Look for credentials.json, secrets.yaml                │
+│     → Detect hardcoded API keys/tokens                       │
+├─────────────────────────────────────────────────────────────┤
+│  2. Pattern Detection                                        │
+│     → AWS_SECRET_ACCESS_KEY patterns                         │
+│     → Database connection strings                            │
+│     → JWT secrets, encryption keys                           │
+│     → Private keys (RSA, SSH)                                │
+├─────────────────────────────────────────────────────────────┤
+│  3. Warning & Blocking                                       │
+│     → Warn on suspicious patterns                            │
+│     → Block commits with confirmed secrets                   │
+│     → Suggest .gitignore updates                             │
+└─────────────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+    </div>
+
+    <h2>Patterns Detected</h2>
+    <pre class="language-php"><code class="language-php">// Patterns the agent scans for:
+$sensitivePatterns = [
+    // API Keys
+    '/(?:api[_-]?key|apikey)\s*[=:]\s*["\']?[\w-]{20,}/i',
+
+    // AWS Credentials
+    '/AKIA[0-9A-Z]{16}/',
+    '/aws[_-]?secret[_-]?access[_-]?key/i',
+
+    // Database URLs
+    '/(?:mysql|postgres|mongodb):\/\/[^:]+:[^@]+@/',
+
+    // Private Keys
+    '/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/',
+
+    // Laravel Specific
+    '/APP_KEY=base64:[A-Za-z0-9+\/=]{43,}/',
+    '/MAIL_PASSWORD=["\']?[^"\'\s]+/',
+    '/DB_PASSWORD=["\']?[^"\'\s]+/',
+];
+
+// Files always blocked from commits
+$blockedFiles = [
+    '.env',
+    '.env.local',
+    '.env.production',
+    'credentials.json',
+    'service-account.json',
+    '*.pem',
+    '*.key',
+    'id_rsa',
+];</code></pre>
+
+    <h2>Release Management</h2>
+    <pre class="language-bash"><code class="language-bash"># Agent generates changelog from commits since last tag
+# Groups by type: Features, Fixes, Breaking Changes
+
+# Example generated release:
+git tag -a v2.1.0 -m "Release v2.1.0
+
+## What's New
+
+### Features
+- Add two-factor authentication (#142)
+- Implement webhook retry mechanism (#156)
+- Add bulk export functionality (#161)
+
+### Bug Fixes
+- Fix timezone handling in scheduled jobs (#158)
+- Resolve N+1 query in dashboard (#163)
+
+### Breaking Changes
+- Remove deprecated PaymentGateway class (#165)
+- Require PHP 8.2+ (#167)
+
+Full Changelog: https://github.com/org/repo/compare/v2.0.0...v2.1.0"</code></pre>
+
+    <h2>PR Description Generation</h2>
+    <pre class="language-bash"><code class="language-bash"># Agent analyzes commits in branch and generates:
+gh pr create --title "feat(auth): Add two-factor authentication" --body "
+## Summary
+Implements TOTP-based two-factor authentication for enhanced account security.
+
+## Changes
+- Add TwoFactorController with enable/disable/verify endpoints
+- Create two_factor_secrets migration
+- Add TwoFactorAuthentication trait to User model
+- Include QR code generation using BaconQrCode
+
+## Test Plan
+- [ ] Enable 2FA and scan QR code with authenticator app
+- [ ] Verify login requires 2FA code when enabled
+- [ ] Test recovery codes work correctly
+- [ ] Verify 2FA can be disabled
+
+## Screenshots
+[If applicable]
+
+---
+Generated with Laravel Agent
+"</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/git-commit.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:git:commit</a> - Smart commit with security review</li>
+        <li><a href="{{ '/commands/git-pr.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:git:pr</a> - Create pull request</li>
+        <li><a href="{{ '/commands/git-release.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:git:release</a> - Create release with changelog</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-cicd.html' | relative_url }}" class="text-primary hover:underline">laravel-cicd</a> - CI/CD pipeline setup</li>
+        <li><a href="{{ '/agents/laravel-review.html' | relative_url }}" class="text-primary hover:underline">laravel-review</a> - Code review agent</li>
+    </ul>
 </div>

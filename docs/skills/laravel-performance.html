@@ -22,22 +22,266 @@ back_text: All Skills
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Trigger Keywords</h2>
-    <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
         <span class="trigger-tag">slow</span>
         <span class="trigger-tag">optimize</span>
         <span class="trigger-tag">cache</span>
         <span class="trigger-tag">pulse</span>
+        <span class="trigger-tag">performance</span>
+        <span class="trigger-tag">memory</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Optimize with caching, Pulse monitoring, memory management. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-performance</strong> skill provides expertise for optimizing Laravel applications. It covers caching strategies, query optimization, memory management, and monitoring with <a href="https://pulse.laravel.com/" target="_blank" rel="noopener">Laravel Pulse</a>.</p>
 
-    <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Caching Strategies</strong> - Data, query, and full-page caching</li>
+        <li><strong>Query Optimization</strong> - N+1 fixes, indexing, eager loading</li>
+        <li><strong>Memory Management</strong> - Chunking, lazy collections, memory limits</li>
+        <li><strong>Laravel Pulse</strong> - Real-time performance monitoring</li>
+        <li><strong>Profiling</strong> - Identifying bottlenecks with tools</li>
+        <li><strong>Asset Optimization</strong> - Vite bundling, compression</li>
+    </ul>
 
-    <h2>Example Prompts</h2>
-    <pre class="language-bash"><code class="language-bash">"Help me slow"
-"I need to optimize"
-"Can you help with cache?"</code></pre>
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Diagnosing slowness
+"My dashboard page is loading slowly, how can I profile it?"
+
+# Caching
+"What's the best way to cache expensive database queries?"
+
+# Memory issues
+"My job runs out of memory processing large datasets"
+
+# Monitoring
+"Set up Laravel Pulse to monitor my application performance"</code></pre>
+
+    <h2>Caching Patterns</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+use Illuminate\Support\Facades\Cache;
+
+// Basic cache with TTL
+$users = Cache::remember('active-users', 3600, function () {
+    return User::where('active', true)->get();
+});
+
+// Cache tags for group invalidation
+$products = Cache::tags(['products', 'catalog'])->remember(
+    "category-{$categoryId}-products",
+    3600,
+    fn () => Product::where('category_id', $categoryId)->get()
+);
+
+// Invalidate all products cache
+Cache::tags('products')->flush();
+
+// Atomic locks for expensive operations
+$result = Cache::lock('report-generation', 120)->block(10, function () {
+    return $this->generateExpensiveReport();
+});
+
+// Cache model queries efficiently
+class Product extends Model
+{
+    public static function getCachedFeatured()
+    {
+        return Cache::remember('featured-products', 3600, function () {
+            return static::where('featured', true)
+                ->with('category')
+                ->limit(10)
+                ->get();
+        });
+    }
+
+    protected static function booted()
+    {
+        static::saved(fn () => Cache::forget('featured-products'));
+        static::deleted(fn () => Cache::forget('featured-products'));
+    }
+}</code></pre>
+
+    <h2>Memory-Efficient Processing</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+// BAD: Loads all records into memory
+$users = User::all();
+foreach ($users as $user) {
+    $user->sendNewsletter();
+}
+
+// GOOD: Process in chunks
+User::chunk(1000, function ($users) {
+    foreach ($users as $user) {
+        $user->sendNewsletter();
+    }
+});
+
+// BETTER: Lazy collection (one record at a time)
+User::lazy()->each(function ($user) {
+    $user->sendNewsletter();
+});
+
+// For cursor-based iteration (lowest memory)
+foreach (User::cursor() as $user) {
+    $user->sendNewsletter();
+}
+
+// Chunk by ID for stability during updates
+User::chunkById(1000, function ($users) {
+    foreach ($users as $user) {
+        $user->update(['processed_at' => now()]);
+    }
+});</code></pre>
+
+    <h2>Query Optimization</h2>
+    <pre class="language-php"><code class="language-php"><?php
+
+// BAD: N+1 queries
+$posts = Post::all();
+foreach ($posts as $post) {
+    echo $post->author->name; // Query for each post!
+}
+
+// GOOD: Eager loading
+$posts = Post::with('author')->get();
+
+// Select only needed columns
+$posts = Post::select('id', 'title', 'user_id')
+    ->with('author:id,name')
+    ->get();
+
+// Use query scopes for reusability
+class Post extends Model
+{
+    public function scopeWithAuthorName($query)
+    {
+        return $query->select('id', 'title', 'user_id')
+            ->with('author:id,name');
+    }
+}
+
+// Index frequently queried columns
+// In migration:
+$table->index(['status', 'created_at']); // Composite index
+$table->index('user_id');
+
+// Use explain to analyze queries
+DB::enableQueryLog();
+$posts = Post::where('status', 'published')->get();
+dd(DB::getQueryLog());</code></pre>
+
+    <h2>Laravel Pulse Setup</h2>
+    <pre class="language-bash"><code class="language-bash"># Install Pulse
+composer require laravel/pulse
+
+# Publish config and migrations
+php artisan vendor:publish --provider="Laravel\Pulse\PulseServiceProvider"
+php artisan migrate
+
+# Access at /pulse (protected by gate)</code></pre>
+
+    <pre class="language-php"><code class="language-php">// config/pulse.php - Configure recorders
+'recorders' => [
+    \Laravel\Pulse\Recorders\CacheInteractions::class => [
+        'enabled' => true,
+        'sample_rate' => 1,
+    ],
+    \Laravel\Pulse\Recorders\Exceptions::class => [
+        'enabled' => true,
+    ],
+    \Laravel\Pulse\Recorders\Queues::class => [
+        'enabled' => true,
+    ],
+    \Laravel\Pulse\Recorders\SlowQueries::class => [
+        'enabled' => true,
+        'threshold' => 100, // ms
+    ],
+    \Laravel\Pulse\Recorders\SlowRequests::class => [
+        'enabled' => true,
+        'threshold' => 1000, // ms
+    ],
+],
+
+// app/Providers/AppServiceProvider.php - Gate access
+use Laravel\Pulse\Facades\Pulse;
+
+public function boot()
+{
+    Pulse::authorize(function ($request) {
+        return $request->user()?->isAdmin();
+    });
+}</code></pre>
+
+    <h2>Performance Checklist</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Area</th>
+                    <th class="text-left py-3 px-4 font-medium">Optimization</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Config</td>
+                    <td class="py-3 px-4"><code>config:cache</code>, <code>route:cache</code>, <code>view:cache</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Queries</td>
+                    <td class="py-3 px-4">Eager load, indexes, select specific columns</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Caching</td>
+                    <td class="py-3 px-4">Redis for sessions, cache, and queues</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Assets</td>
+                    <td class="py-3 px-4">Vite minification, CDN, compression</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">PHP</td>
+                    <td class="py-3 px-4">OPcache enabled, JIT compilation</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Caching forever</strong> - Always set TTL, stale data causes bugs</li>
+        <li><strong>Cache stampede</strong> - Use atomic locks for expensive operations</li>
+        <li><strong>Over-eager loading</strong> - Only load relationships you need</li>
+        <li><strong>Missing indexes</strong> - Add indexes for WHERE, ORDER BY columns</li>
+    </ul>
+
+    <h2>Profiling Tools</h2>
+    <pre class="language-php"><code class="language-php">// Laravel Debugbar (development)
+composer require barryvdh/laravel-debugbar --dev
+
+// Clockwork (development)
+composer require itsgoingd/clockwork --dev
+
+// Custom timing
+$start = microtime(true);
+// ... operation
+$duration = microtime(true) - $start;
+Log::info("Operation took {$duration}s");
+
+// Memory usage
+$memory = memory_get_peak_usage(true) / 1024 / 1024;
+Log::info("Peak memory: {$memory}MB");</code></pre>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/db-optimize.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:optimize</a> - Database optimization</li>
+    </ul>
+
+    <h2>Related Skills</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-database.html' | relative_url }}" class="text-primary hover:underline">laravel-database</a> - Query patterns and N+1 fixes</li>
+        <li><a href="{{ '/skills/laravel-queue.html' | relative_url }}" class="text-primary hover:underline">laravel-queue</a> - Offload work to background jobs</li>
+    </ul>
 </div>
