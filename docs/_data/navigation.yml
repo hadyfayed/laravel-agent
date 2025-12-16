@@ -1,0 +1,16 @@
+main:
+  - title: Home
+    url: /
+    icon: home
+  - title: Commands
+    url: /commands.html
+    icon: terminal
+  - title: Skills
+    url: /skills.html
+    icon: lightbulb
+  - title: Agents
+    url: /agents.html
+    icon: users
+  - title: Hooks
+    url: /hooks.html
+    icon: code

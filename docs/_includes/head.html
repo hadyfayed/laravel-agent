@@ -1,0 +1,84 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+<meta name="description" content="{{ page.description | default: site.description }}">
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    background: 'oklch(var(--background) / <alpha-value>)',
+                    foreground: 'oklch(var(--foreground) / <alpha-value>)',
+                    card: 'oklch(var(--card) / <alpha-value>)',
+                    'card-foreground': 'oklch(var(--card-foreground) / <alpha-value>)',
+                    primary: 'oklch(var(--primary) / <alpha-value>)',
+                    'primary-foreground': 'oklch(var(--primary-foreground) / <alpha-value>)',
+                    secondary: 'oklch(var(--secondary) / <alpha-value>)',
+                    'secondary-foreground': 'oklch(var(--secondary-foreground) / <alpha-value>)',
+                    muted: 'oklch(var(--muted) / <alpha-value>)',
+                    'muted-foreground': 'oklch(var(--muted-foreground) / <alpha-value>)',
+                    accent: 'oklch(var(--accent) / <alpha-value>)',
+                    'accent-foreground': 'oklch(var(--accent-foreground) / <alpha-value>)',
+                    border: 'oklch(var(--border) / <alpha-value>)',
+                    sidebar: 'oklch(var(--sidebar) / <alpha-value>)',
+                    'sidebar-foreground': 'oklch(var(--sidebar-foreground) / <alpha-value>)',
+                    'sidebar-primary': 'oklch(var(--sidebar-primary) / <alpha-value>)',
+                    'sidebar-accent': 'oklch(var(--sidebar-accent) / <alpha-value>)',
+                    'sidebar-border': 'oklch(var(--sidebar-border) / <alpha-value>)',
+                },
+                borderRadius: { DEFAULT: 'var(--radius)' }
+            }
+        }
+    }
+</script>
+<style>
+    :root {
+        --radius: 0.625rem;
+        --background: 1 0 0; --foreground: 0.145 0 0;
+        --card: 1 0 0; --card-foreground: 0.145 0 0;
+        --primary: 0.205 0 0; --primary-foreground: 0.985 0 0;
+        --secondary: 0.97 0 0; --secondary-foreground: 0.205 0 0;
+        --muted: 0.97 0 0; --muted-foreground: 0.556 0 0;
+        --accent: 0.97 0 0; --accent-foreground: 0.205 0 0;
+        --border: 0.922 0 0;
+        --sidebar: 0.985 0 0; --sidebar-foreground: 0.145 0 0;
+        --sidebar-primary: 0.205 0 0; --sidebar-accent: 0.97 0 0; --sidebar-border: 0.922 0 0;
+    }
+    .dark {
+        --background: 0.145 0 0; --foreground: 0.985 0 0;
+        --card: 0.205 0 0; --card-foreground: 0.985 0 0;
+        --primary: 0.922 0 0; --primary-foreground: 0.205 0 0;
+        --secondary: 0.269 0 0; --secondary-foreground: 0.985 0 0;
+        --muted: 0.269 0 0; --muted-foreground: 0.708 0 0;
+        --accent: 0.269 0 0; --accent-foreground: 0.985 0 0;
+        --border: 0.3 0 0;
+        --sidebar: 0.175 0 0; --sidebar-foreground: 0.985 0 0;
+        --sidebar-primary: 0.488 0.243 264.376; --sidebar-accent: 0.269 0 0; --sidebar-border: 0.3 0 0;
+    }
+    pre { background: oklch(0.205 0 0) !important; border-radius: var(--radius); overflow-x: auto; padding: 1rem; margin: 1rem 0; }
+    .dark pre { background: oklch(0.145 0 0) !important; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    code:not(pre code) { background: oklch(var(--muted)); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; }
+    .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-radius: var(--radius); color: oklch(var(--sidebar-foreground)); transition: all 0.15s; }
+    .sidebar-link:hover { background: oklch(var(--sidebar-accent)); }
+    .sidebar-link.active { background: oklch(var(--sidebar-accent)); font-weight: 500; }
+    .card-hover { transition: all 0.2s; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1); }
+    .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; }
+    .badge-core { background: oklch(0.488 0.243 264.376); color: white; }
+    .badge-builder { background: oklch(0.6 0.15 150); color: white; }
+    .badge-api { background: oklch(0.55 0.2 200); color: white; }
+    .badge-testing { background: oklch(0.65 0.15 300); color: white; }
+    .badge-devops { background: oklch(0.6 0.2 30); color: white; }
+    .badge-frontend { background: oklch(0.55 0.2 250); color: white; }
+    .badge-backend { background: oklch(0.5 0.15 150); color: white; }
+    .badge-quality { background: oklch(0.55 0.18 180); color: white; }
+    .trigger-tag { display: inline-flex; padding: 0.25rem 0.625rem; font-size: 0.75rem; border-radius: 0.25rem; background: oklch(var(--accent)); margin: 0.125rem; }
+    .event-badge { display: inline-flex; padding: 0.25rem 0.5rem; font-size: 0.7rem; font-weight: 600; border-radius: 0.25rem; }
+    .event-submit { background: oklch(0.55 0.2 200); color: white; }
+    .event-post { background: oklch(0.6 0.15 150); color: white; }
+    .check-item { display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.5rem 0; }
+    .check-icon { width: 1.25rem; height: 1.25rem; flex-shrink: 0; margin-top: 0.125rem; }
+</style>

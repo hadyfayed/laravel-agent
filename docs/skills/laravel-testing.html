@@ -22,6 +22,11 @@
                         'muted-foreground': 'oklch(var(--muted-foreground) / <alpha-value>)',
                         accent: 'oklch(var(--accent) / <alpha-value>)',
                         border: 'oklch(var(--border) / <alpha-value>)',
+                        sidebar: 'oklch(var(--sidebar) / <alpha-value>)',
+                        'sidebar-foreground': 'oklch(var(--sidebar-foreground) / <alpha-value>)',
+                        'sidebar-primary': 'oklch(var(--sidebar-primary) / <alpha-value>)',
+                        'sidebar-accent': 'oklch(var(--sidebar-accent) / <alpha-value>)',
+                        'sidebar-border': 'oklch(var(--sidebar-border) / <alpha-value>)',
                     },
                     borderRadius: { DEFAULT: 'var(--radius)' }
                 }
@@ -36,6 +41,8 @@
             --primary: 0.205 0 0; --primary-foreground: 0.985 0 0;
             --muted: 0.97 0 0; --muted-foreground: 0.556 0 0;
             --accent: 0.97 0 0; --border: 0.922 0 0;
+            --sidebar: 0.985 0 0; --sidebar-foreground: 0.145 0 0;
+            --sidebar-primary: 0.205 0 0; --sidebar-accent: 0.97 0 0; --sidebar-border: 0.922 0 0;
         }
         .dark {
             --background: 0.145 0 0; --foreground: 0.985 0 0;
@@ -43,63 +50,119 @@
             --primary: 0.922 0 0; --primary-foreground: 0.205 0 0;
             --muted: 0.269 0 0; --muted-foreground: 0.708 0 0;
             --accent: 0.269 0 0; --border: 0.3 0 0;
+            --sidebar: 0.175 0 0; --sidebar-foreground: 0.985 0 0;
+            --sidebar-primary: 0.488 0.243 264.376; --sidebar-accent: 0.269 0 0; --sidebar-border: 0.3 0 0;
         }
         pre { background: oklch(0.205 0 0) !important; border-radius: var(--radius); overflow-x: auto; padding: 1rem; margin: 1rem 0; }
         .dark pre { background: oklch(0.145 0 0) !important; }
         code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
         code:not(pre code) { background: oklch(var(--muted)); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; }
         .trigger-tag { display: inline-flex; padding: 0.25rem 0.625rem; font-size: 0.75rem; border-radius: 0.25rem; background: oklch(var(--accent)); margin: 0.125rem; }
+        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; border-radius: var(--radius); color: oklch(var(--sidebar-foreground)); transition: all 0.15s; }
+        .sidebar-link:hover { background: oklch(var(--sidebar-accent)); }
+        .sidebar-link.active { background: oklch(var(--sidebar-accent)); font-weight: 500; }
     </style>
 </head>
 <body class="bg-background text-foreground antialiased min-h-screen">
-    <header class="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-50">
-        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="../skills.html" class="flex items-center gap-3 text-foreground hover:text-primary transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                <span class="text-sm font-medium">All Skills</span>
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-[var(--radius)] bg-card border border-border">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-sidebar border-r border-sidebar-border transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto flex flex-col">
+        <div class="p-6 border-b border-sidebar-border">
+            <a href="../index.html" class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-[var(--radius)] bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <span class="font-semibold text-lg text-sidebar-foreground">Laravel Agent</span>
             </a>
-            <button id="theme-toggle" class="p-2 rounded-[var(--radius)] hover:bg-accent">
+        </div>
+        <nav class="flex-1 p-4 space-y-1">
+            <a href="../index.html" class="sidebar-link">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Home
+            </a>
+            <a href="../commands.html" class="sidebar-link">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Commands
+            </a>
+            <a href="../skills.html" class="sidebar-link active">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                Skills
+            </a>
+            <a href="../agents.html" class="sidebar-link">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                Agents
+            </a>
+            <a href="../hooks.html" class="sidebar-link">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                Hooks
+            </a>
+        </nav>
+        <div class="p-4 border-t border-sidebar-border">
+            <button id="theme-toggle" class="w-full flex items-center gap-3 px-3 py-2 rounded-[var(--radius)] hover:bg-sidebar-accent transition-colors text-sidebar-foreground">
                 <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>
                 <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+                <span class="text-sm">Toggle theme</span>
             </button>
         </div>
-    </header>
+    </aside>
 
-    <main class="max-w-4xl mx-auto px-6 py-8">
-        <div class="mb-8">
-            <div class="w-16 h-16 rounded-[var(--radius)] bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <!-- Overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 lg:hidden hidden"></div>
+
+    <!-- Main Content -->
+    <main class="lg:ml-72 min-h-screen">
+        <header class="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-20">
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="lg:hidden w-10"></div>
+                    <a href="../skills.html" class="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        <span class="text-sm">All Skills</span>
+                    </a>
+                </div>
+                <div class="w-10"></div>
             </div>
-            <h1 class="text-3xl font-bold mb-2">laravel-testing</h1>
-            <p class="text-xl text-muted-foreground mb-4">Write comprehensive tests using Pest PHP for Laravel applications</p>
-            <div class="flex flex-wrap gap-1">
-                <span class="trigger-tag">test</span>
-                <span class="trigger-tag">testing</span>
-                <span class="trigger-tag">pest</span>
-                <span class="trigger-tag">phpunit</span>
-                <span class="trigger-tag">coverage</span>
-                <span class="trigger-tag">tdd</span>
-                <span class="trigger-tag">unit test</span>
-                <span class="trigger-tag">feature test</span>
+        </header>
+
+        <div class="p-6 max-w-4xl mx-auto">
+            <div class="mb-8">
+                <div class="w-16 h-16 rounded-[var(--radius)] bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h1 class="text-3xl font-bold mb-2">laravel-testing</h1>
+                <p class="text-xl text-muted-foreground mb-4">Write comprehensive tests using Pest PHP for Laravel applications</p>
+                <div class="flex flex-wrap gap-1">
+                    <span class="trigger-tag">test</span>
+                    <span class="trigger-tag">testing</span>
+                    <span class="trigger-tag">pest</span>
+                    <span class="trigger-tag">phpunit</span>
+                    <span class="trigger-tag">coverage</span>
+                    <span class="trigger-tag">tdd</span>
+                    <span class="trigger-tag">unit test</span>
+                    <span class="trigger-tag">feature test</span>
+                </div>
             </div>
-        </div>
 
-        <div class="prose prose-neutral dark:prose-invert max-w-none">
-            <h2>When to Use</h2>
-            <ul>
-                <li>Writing unit or feature tests</li>
-                <li>Implementing TDD workflow</li>
-                <li>Improving test coverage</li>
-                <li>Testing APIs</li>
-                <li>Browser testing with Dusk</li>
-            </ul>
+            <div class="prose prose-neutral dark:prose-invert max-w-none">
+                <h2>When to Use</h2>
+                <ul>
+                    <li>Writing unit or feature tests</li>
+                    <li>Implementing TDD workflow</li>
+                    <li>Improving test coverage</li>
+                    <li>Testing APIs</li>
+                    <li>Browser testing with Dusk</li>
+                </ul>
 
-            <h2>Quick Start</h2>
-            <pre><code class="text-green-400">/laravel-agent:test:make &lt;ClassName&gt;
+                <h2>Quick Start</h2>
+                <pre><code class="text-green-400">/laravel-agent:test:make &lt;ClassName&gt;
 /laravel-agent:test:coverage</code></pre>
 
-            <h2>Complete Feature Test Example</h2>
-            <pre><code class="text-green-400">&lt;?php
+                <h2>Complete Feature Test Example</h2>
+                <pre><code class="text-green-400">&lt;?php
 
 declare(strict_types=1);
 
@@ -146,8 +209,8 @@ describe('Order Creation', function () {
     });
 });</code></pre>
 
-            <h2>Unit Test Example</h2>
-            <pre><code class="text-green-400">&lt;?php
+                <h2>Unit Test Example</h2>
+                <pre><code class="text-green-400">&lt;?php
 
 declare(strict_types=1);
 
@@ -172,10 +235,10 @@ describe('PriceCalculator', function () {
     });
 });</code></pre>
 
-            <h2>Testing Patterns</h2>
+                <h2>Testing Patterns</h2>
 
-            <h3>Testing Events</h3>
-            <pre><code class="text-green-400">use Illuminate\Support\Facades\Event;
+                <h3>Testing Events</h3>
+                <pre><code class="text-green-400">use Illuminate\Support\Facades\Event;
 
 it('dispatches OrderCreated event', function () {
     Event::fake();
@@ -185,8 +248,8 @@ it('dispatches OrderCreated event', function () {
     Event::assertDispatched(OrderCreated::class);
 });</code></pre>
 
-            <h3>Testing Jobs</h3>
-            <pre><code class="text-green-400">use Illuminate\Support\Facades\Queue;
+                <h3>Testing Jobs</h3>
+                <pre><code class="text-green-400">use Illuminate\Support\Facades\Queue;
 
 it('queues SendOrderConfirmation job', function () {
     Queue::fake();
@@ -197,8 +260,8 @@ it('queues SendOrderConfirmation job', function () {
     Queue::assertPushed(SendOrderConfirmation::class);
 });</code></pre>
 
-            <h3>Testing Notifications</h3>
-            <pre><code class="text-green-400">use Illuminate\Support\Facades\Notification;
+                <h3>Testing Notifications</h3>
+                <pre><code class="text-green-400">use Illuminate\Support\Facades\Notification;
 
 it('sends confirmation notification', function () {
     Notification::fake();
@@ -210,79 +273,95 @@ it('sends confirmation notification', function () {
     Notification::assertSentTo($user, OrderConfirmation::class);
 });</code></pre>
 
-            <h3>Testing Exceptions</h3>
-            <pre><code class="text-green-400">it('throws exception for invalid state', function () {
+                <h3>Testing Exceptions</h3>
+                <pre><code class="text-green-400">it('throws exception for invalid state', function () {
     $order = Order::factory()-&gt;delivered()-&gt;create();
 
     expect(fn () =&gt; $order-&gt;cancel())
         -&gt;toThrow(InvalidStateException::class);
 });</code></pre>
 
-            <h2>Common Pitfalls</h2>
-            <div class="bg-card border border-border rounded-[var(--radius)] p-4 not-prose">
-                <ul class="space-y-2 text-sm">
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-500 font-bold">1.</span>
-                        <div><strong>Not Using RefreshDatabase</strong> - Always reset database state between tests</div>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-500 font-bold">2.</span>
-                        <div><strong>Testing Implementation</strong> - Test behavior, not implementation details</div>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-500 font-bold">3.</span>
-                        <div><strong>Slow Tests</strong> - Mock external services to keep tests fast</div>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-500 font-bold">4.</span>
-                        <div><strong>Missing Edge Cases</strong> - Test boundaries and error conditions</div>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-500 font-bold">5.</span>
-                        <div><strong>No Assertions</strong> - Every test needs clear assertions</div>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-500 font-bold">6.</span>
-                        <div><strong>Shared State</strong> - Use beforeEach for test isolation</div>
-                    </li>
+                <h2>Common Pitfalls</h2>
+                <div class="bg-card border border-border rounded-[var(--radius)] p-4 not-prose">
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-500 font-bold">1.</span>
+                            <div><strong>Not Using RefreshDatabase</strong> - Always reset database state between tests</div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-500 font-bold">2.</span>
+                            <div><strong>Testing Implementation</strong> - Test behavior, not implementation details</div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-500 font-bold">3.</span>
+                            <div><strong>Slow Tests</strong> - Mock external services to keep tests fast</div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-500 font-bold">4.</span>
+                            <div><strong>Missing Edge Cases</strong> - Test boundaries and error conditions</div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-500 font-bold">5.</span>
+                            <div><strong>No Assertions</strong> - Every test needs clear assertions</div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-500 font-bold">6.</span>
+                            <div><strong>Shared State</strong> - Use beforeEach for test isolation</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <h2>Package Integration</h2>
+                <ul>
+                    <li><strong>pestphp/pest</strong> - Testing framework</li>
+                    <li><strong>pestphp/pest-plugin-laravel</strong> - Laravel helpers</li>
+                    <li><strong>mockery/mockery</strong> - Mocking library</li>
+                    <li><strong>laravel/dusk</strong> - Browser testing</li>
+                </ul>
+
+                <h2>Best Practices</h2>
+                <ul>
+                    <li>One assertion concept per test</li>
+                    <li>Use descriptive test names</li>
+                    <li>Test edge cases and errors</li>
+                    <li>Keep tests fast (mock slow operations)</li>
+                    <li>Use factories for test data</li>
+                    <li>Follow Arrange-Act-Assert pattern</li>
+                </ul>
+
+                <h2>Related Commands</h2>
+                <ul>
+                    <li><a href="../commands/test-make.html" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests</li>
+                    <li><a href="../commands/test-coverage.html" class="text-primary hover:underline">/laravel-agent:test:coverage</a> - Run coverage</li>
                 </ul>
             </div>
-
-            <h2>Package Integration</h2>
-            <ul>
-                <li><strong>pestphp/pest</strong> - Testing framework</li>
-                <li><strong>pestphp/pest-plugin-laravel</strong> - Laravel helpers</li>
-                <li><strong>mockery/mockery</strong> - Mocking library</li>
-                <li><strong>laravel/dusk</strong> - Browser testing</li>
-            </ul>
-
-            <h2>Best Practices</h2>
-            <ul>
-                <li>One assertion concept per test</li>
-                <li>Use descriptive test names</li>
-                <li>Test edge cases and errors</li>
-                <li>Keep tests fast (mock slow operations)</li>
-                <li>Use factories for test data</li>
-                <li>Follow Arrange-Act-Assert pattern</li>
-            </ul>
-
-            <h2>Related Commands</h2>
-            <ul>
-                <li><a href="../commands/test-make.html" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests</li>
-                <li><a href="../commands/test-coverage.html" class="text-primary hover:underline">/laravel-agent:test:coverage</a> - Run coverage</li>
-            </ul>
         </div>
     </main>
 
     <script>
         const html = document.documentElement;
         const themeToggle = document.getElementById('theme-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+
+        // Theme toggle
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             html.classList.add('dark');
         }
         themeToggle.addEventListener('click', () => {
             html.classList.toggle('dark');
             localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+        });
+
+        // Mobile menu toggle
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
+        });
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
         });
     </script>
 </body>

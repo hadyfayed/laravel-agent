@@ -1,1092 +1,314 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laravel Agent - AI-powered Laravel Development Assistant</title>
-    <meta name="description" content="AI-powered Laravel development assistant for Claude Code with 23 agents, 42 commands, 12 skills, and 7 hooks.">
-    <meta name="keywords" content="Laravel, Claude Code, AI, development, assistant, PHP">
-    <meta property="og:title" content="Laravel Agent">
-    <meta property="og:description" content="AI-powered Laravel development assistant for Claude Code">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://hadyfayed.github.io/laravel-agent/">
-    <link rel="canonical" href="https://hadyfayed.github.io/laravel-agent/">
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        background: 'oklch(var(--background) / <alpha-value>)',
-                        foreground: 'oklch(var(--foreground) / <alpha-value>)',
-                        card: 'oklch(var(--card) / <alpha-value>)',
-                        'card-foreground': 'oklch(var(--card-foreground) / <alpha-value>)',
-                        primary: 'oklch(var(--primary) / <alpha-value>)',
-                        'primary-foreground': 'oklch(var(--primary-foreground) / <alpha-value>)',
-                        secondary: 'oklch(var(--secondary) / <alpha-value>)',
-                        'secondary-foreground': 'oklch(var(--secondary-foreground) / <alpha-value>)',
-                        muted: 'oklch(var(--muted) / <alpha-value>)',
-                        'muted-foreground': 'oklch(var(--muted-foreground) / <alpha-value>)',
-                        accent: 'oklch(var(--accent) / <alpha-value>)',
-                        'accent-foreground': 'oklch(var(--accent-foreground) / <alpha-value>)',
-                        destructive: 'oklch(var(--destructive) / <alpha-value>)',
-                        border: 'oklch(var(--border) / <alpha-value>)',
-                        input: 'oklch(var(--input) / <alpha-value>)',
-                        ring: 'oklch(var(--ring) / <alpha-value>)',
-                        sidebar: 'oklch(var(--sidebar) / <alpha-value>)',
-                        'sidebar-foreground': 'oklch(var(--sidebar-foreground) / <alpha-value>)',
-                        'sidebar-primary': 'oklch(var(--sidebar-primary) / <alpha-value>)',
-                        'sidebar-accent': 'oklch(var(--sidebar-accent) / <alpha-value>)',
-                        'sidebar-border': 'oklch(var(--sidebar-border) / <alpha-value>)',
-                    },
-                    borderRadius: {
-                        DEFAULT: 'var(--radius)',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        :root {
-            --radius: 0.625rem;
-            --background: 1 0 0;
-            --foreground: 0.145 0 0;
-            --card: 1 0 0;
-            --card-foreground: 0.145 0 0;
-            --primary: 0.205 0 0;
-            --primary-foreground: 0.985 0 0;
-            --secondary: 0.97 0 0;
-            --secondary-foreground: 0.205 0 0;
-            --muted: 0.97 0 0;
-            --muted-foreground: 0.556 0 0;
-            --accent: 0.97 0 0;
-            --accent-foreground: 0.205 0 0;
-            --destructive: 0.577 0.245 27.325;
-            --border: 0.922 0 0;
-            --input: 0.922 0 0;
-            --ring: 0.708 0 0;
-            --sidebar: 0.985 0 0;
-            --sidebar-foreground: 0.145 0 0;
-            --sidebar-primary: 0.205 0 0;
-            --sidebar-accent: 0.97 0 0;
-            --sidebar-border: 0.922 0 0;
-        }
+---
+layout: default
+title: AI-powered Laravel Development
+description: AI-powered Laravel development assistant for Claude Code with 23 agents, 42 commands, 12 skills, and 7 hooks.
+nav_active: Home
+---
 
-        .dark {
-            --background: 0.145 0 0;
-            --foreground: 0.985 0 0;
-            --card: 0.205 0 0;
-            --card-foreground: 0.985 0 0;
-            --primary: 0.922 0 0;
-            --primary-foreground: 0.205 0 0;
-            --secondary: 0.269 0 0;
-            --secondary-foreground: 0.985 0 0;
-            --muted: 0.269 0 0;
-            --muted-foreground: 0.708 0 0;
-            --accent: 0.269 0 0;
-            --accent-foreground: 0.985 0 0;
-            --destructive: 0.704 0.191 22.216;
-            --border: 0.3 0 0;
-            --input: 0.3 0 0;
-            --ring: 0.556 0 0;
-            --sidebar: 0.175 0 0;
-            --sidebar-foreground: 0.985 0 0;
-            --sidebar-primary: 0.488 0.243 264.376;
-            --sidebar-accent: 0.269 0 0;
-            --sidebar-border: 0.3 0 0;
-        }
+<!-- Hero -->
+<section id="home" class="mb-16">
+    <div class="flex items-center gap-2 mb-6">
+        <span class="badge badge-core">v1.1.0</span>
+        <span class="badge badge-builder">Claude Code Plugin</span>
+    </div>
+    <h1 class="text-4xl lg:text-5xl font-bold mb-6 tracking-tight">Laravel Agent</h1>
+    <p class="text-xl text-muted-foreground mb-10 max-w-2xl leading-relaxed">AI-powered Laravel development assistant. Architecture decisions, code generation, testing, deployment, and more.</p>
 
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: oklch(var(--muted)); }
-        ::-webkit-scrollbar-thumb { background: oklch(var(--border)); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: oklch(var(--muted-foreground)); }
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <a href="{{ '/agents.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
+            <div class="text-3xl font-bold mb-1">23</div>
+            <div class="text-sm text-muted-foreground">Specialized Agents</div>
+        </a>
+        <a href="{{ '/commands.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
+            <div class="text-3xl font-bold mb-1">42</div>
+            <div class="text-sm text-muted-foreground">Commands</div>
+        </a>
+        <a href="{{ '/skills.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
+            <div class="text-3xl font-bold mb-1">12</div>
+            <div class="text-sm text-muted-foreground">Auto-Invoked Skills</div>
+        </a>
+        <a href="#packages" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
+            <div class="text-3xl font-bold mb-1">85+</div>
+            <div class="text-sm text-muted-foreground">Package Integrations</div>
+        </a>
+    </div>
 
-        pre { background: oklch(0.205 0 0) !important; border-radius: var(--radius); overflow-x: auto; }
-        .dark pre { background: oklch(0.145 0 0) !important; }
-        code:not(pre code) {
-            background: oklch(var(--muted));
-            color: oklch(var(--foreground));
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.25rem;
-            font-size: 0.875em;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        }
-
-        .nav-item.active { background: oklch(var(--sidebar-accent)); color: oklch(var(--sidebar-primary)); }
-        * { transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
-        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; }
-        .badge-primary { background: oklch(var(--primary)); color: oklch(var(--primary-foreground)); }
-        .badge-secondary { background: oklch(var(--secondary)); color: oklch(var(--secondary-foreground)); }
-        .badge-success { background: oklch(0.7 0.15 150); color: white; }
-    </style>
-</head>
-<body class="bg-background text-foreground antialiased">
-    <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 p-2.5 rounded-[var(--radius)] bg-card border border-border shadow-lg hover:bg-accent">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
-
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-sidebar border-r border-sidebar-border transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto flex flex-col">
-        <div class="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border">
-            <div class="w-10 h-10 rounded-[var(--radius)] bg-primary flex items-center justify-center">
-                <svg class="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            </div>
-            <div>
-                <h1 class="text-sidebar-foreground font-semibold text-lg">Laravel Agent</h1>
-                <p class="text-muted-foreground text-xs">v1.1.0</p>
-            </div>
+    <div class="bg-card rounded-[var(--radius)] border border-border overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 bg-muted border-b border-border">
+            <span class="text-sm font-medium">Quick Install</span>
         </div>
-
-        <nav class="flex-1 p-4 space-y-6">
-            <div>
-                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Getting Started</h2>
-                <ul class="space-y-1">
-                    <li><a href="#home" class="nav-item active flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        Home
-                    </a></li>
-                    <li><a href="#installation" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        Installation
-                    </a></li>
-                    <li><a href="#quickstart" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        Quick Start
-                    </a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Reference</h2>
-                <ul class="space-y-1">
-                    <li><a href="commands.html" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Commands <span class="ml-auto badge badge-secondary">42</span>
-                    </a></li>
-                    <li><a href="skills.html" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                        Skills <span class="ml-auto badge badge-secondary">12</span>
-                    </a></li>
-                    <li><a href="agents.html" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Agents <span class="ml-auto badge badge-secondary">23</span>
-                    </a></li>
-                    <li><a href="hooks.html" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Hooks <span class="ml-auto badge badge-secondary">7</span>
-                    </a></li>
-                    <li><a href="#packages" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                        Packages <span class="ml-auto badge badge-secondary">85+</span>
-                    </a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Architecture</h2>
-                <ul class="space-y-1">
-                    <li><a href="#architecture" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                        How It Works
-                    </a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Resources</h2>
-                <ul class="space-y-1">
-                    <li><a href="https://github.com/hadyfayed/laravel-agent" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                        GitHub
-                        <svg class="w-3 h-3 ml-auto text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    </a></li>
-                </ul>
-            </div>
-        </nav>
-
-        <div class="p-4 border-t border-sidebar-border">
-            <button id="theme-toggle" class="flex items-center gap-3 w-full px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                <svg id="theme-icon-light" class="w-4 h-4 text-muted-foreground hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                <svg id="theme-icon-dark" class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                <span id="theme-text">Dark mode</span>
-            </button>
-        </div>
-    </aside>
-
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 lg:hidden hidden"></div>
-
-    <main class="lg:ml-72 min-h-screen">
-        <header class="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b border-border">
-            <div class="max-w-5xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
-                <div class="lg:hidden w-10"></div>
-                <div class="flex-1 max-w-md">
-                    <div class="relative">
-                        <input type="text" id="search-input" placeholder="Search documentation..." class="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius)] border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        <kbd class="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 text-xs text-muted-foreground bg-muted rounded border border-border">/</kbd>
-                    </div>
-                </div>
-                <a href="https://github.com/hadyfayed/laravel-agent" target="_blank" class="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-[var(--radius)] hover:opacity-90">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                    Star
-                </a>
-            </div>
-        </header>
-
-        <div class="max-w-5xl mx-auto px-6 lg:px-8 py-12">
-            <!-- Hero -->
-            <section id="home" class="mb-20 scroll-mt-20">
-                <div class="flex items-center gap-2 mb-6">
-                    <span class="badge badge-primary">v1.1.0</span>
-                    <span class="badge badge-success">Claude Code Plugin</span>
-                </div>
-                <h1 class="text-4xl lg:text-5xl font-bold text-foreground mb-6 tracking-tight">Laravel Agent</h1>
-                <p class="text-xl text-muted-foreground mb-10 max-w-2xl leading-relaxed">AI-powered Laravel development assistant. Architecture decisions, code generation, testing, deployment, and more.</p>
-
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-                    <div class="bg-card rounded-[var(--radius)] p-5 border border-border">
-                        <div class="text-3xl font-bold text-foreground mb-1">23</div>
-                        <div class="text-sm text-muted-foreground">Specialized Agents</div>
-                    </div>
-                    <div class="bg-card rounded-[var(--radius)] p-5 border border-border">
-                        <div class="text-3xl font-bold text-foreground mb-1">42</div>
-                        <div class="text-sm text-muted-foreground">Commands</div>
-                    </div>
-                    <div class="bg-card rounded-[var(--radius)] p-5 border border-border">
-                        <div class="text-3xl font-bold text-foreground mb-1">12</div>
-                        <div class="text-sm text-muted-foreground">Auto-Invoked Skills</div>
-                    </div>
-                    <div class="bg-card rounded-[var(--radius)] p-5 border border-border">
-                        <div class="text-3xl font-bold text-foreground mb-1">85+</div>
-                        <div class="text-sm text-muted-foreground">Package Integrations</div>
-                    </div>
-                </div>
-
-                <div class="bg-card rounded-[var(--radius)] border border-border overflow-hidden">
-                    <div class="flex items-center justify-between px-4 py-3 bg-muted border-b border-border">
-                        <span class="text-sm font-medium text-foreground">Quick Install</span>
-                        <button onclick="copyCode(this, 'install-code')" class="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-accent">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                        </button>
-                    </div>
-                    <pre class="p-4 text-sm overflow-x-auto"><code id="install-code" class="text-gray-300"># Add the marketplace
+        <pre class="p-4 text-sm overflow-x-auto"><code class="text-green-400"># Add the marketplace
 /plugin marketplace add hadyfayed/laravel-agent
 
 # Install the plugin
 /plugin install laravel-agent@hadyfayed-laravel-agent</code></pre>
-                </div>
-            </section>
+    </div>
+</section>
 
-            <!-- Installation -->
-            <section id="installation" class="mb-20 scroll-mt-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-foreground">Installation</h2>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <h3 class="font-semibold text-foreground mb-3">Requirements</h3>
-                        <ul class="space-y-2 text-muted-foreground">
-                            <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Claude Code with Plugin support</li>
-                            <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Laravel 10+ project</li>
-                            <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> PHP 8.1 or higher</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <h3 class="font-semibold text-foreground mb-3">Verify Installation</h3>
-                        <p class="text-muted-foreground mb-4">After installation, verify by running:</p>
-                        <div class="bg-muted rounded-[var(--radius)] p-3">
-                            <code class="text-sm text-foreground">/laravel-agent:patterns</code>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Quick Start -->
-            <section id="quickstart" class="mb-20 scroll-mt-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-foreground">Quick Start</h2>
-                </div>
-
-                <div class="grid gap-4">
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-start gap-4">
-                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1"><span class="text-sm font-bold text-primary">1</span></div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-foreground mb-2">Intelligent Build (Recommended)</h3>
-                                <p class="text-muted-foreground text-sm mb-3">Let the architect analyze and decide the best approach:</p>
-                                <div class="bg-muted rounded-[var(--radius)] p-3"><code class="text-sm text-foreground">/laravel-agent:build invoice management system with PDF export</code></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-start gap-4">
-                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1"><span class="text-sm font-bold text-primary">2</span></div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-foreground mb-2">Create Features Directly</h3>
-                                <p class="text-muted-foreground text-sm mb-3">Build complete features with CRUD, views, API, and tests:</p>
-                                <div class="bg-muted rounded-[var(--radius)] p-3"><code class="text-sm text-foreground">/laravel-agent:feature:make Products with categories and variants</code></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-start gap-4">
-                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1"><span class="text-sm font-bold text-primary">3</span></div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-foreground mb-2">Generate Tests</h3>
-                                <p class="text-muted-foreground text-sm mb-3">Create comprehensive Pest tests for any class:</p>
-                                <div class="bg-muted rounded-[var(--radius)] p-3"><code class="text-sm text-foreground">/laravel-agent:test:make App/Services/PaymentService</code></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Commands -->
-            <section id="commands" class="mb-20 scroll-mt-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-foreground">Commands</h2>
-                    <span class="badge badge-secondary ml-2">42 total</span>
-                </div>
-
-                <div class="space-y-4">
-                    <!-- Core -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group" open>
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">Core</span><span class="badge badge-secondary">2</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/build</code><span class="text-sm text-muted-foreground">Intelligent build - architect analyzes request, decides implementation type (Feature/Module/Service/Action), and delegates to appropriate builder</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/patterns</code><span class="text-sm text-muted-foreground">View current design pattern usage and enforce max 5 patterns per project to prevent complexity</span></div>
-                        </div>
-                    </details>
-
-                    <!-- Builders -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">Builders</span><span class="badge badge-secondary">3</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/feature:make</code><span class="text-sm text-muted-foreground">Create complete feature with ServiceProvider, routes (web+api), controllers, requests, resources, views, models, factories, seeders, migrations, policies, and Pest tests</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/module:make</code><span class="text-sm text-muted-foreground">Create reusable domain module with contracts, services, DTOs, and tests - for shared logic without routes/views</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/service:make</code><span class="text-sm text-muted-foreground">Create service class or action with proper patterns - single execute() method for discrete operations</span></div>
-                        </div>
-                    </details>
-
-                    <!-- API -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">API</span><span class="badge badge-secondary">2</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/api:make</code><span class="text-sm text-muted-foreground">Create versioned API resource with controllers, resources, routes, filtering (Spatie Query Builder), pagination, rate limiting, and OpenAPI annotations</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/api:docs</code><span class="text-sm text-muted-foreground">Generate OpenAPI/Swagger documentation from annotations</span></div>
-                        </div>
-                    </details>
-
-                    <!-- Testing -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">Testing</span><span class="badge badge-secondary">2</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/test:make</code><span class="text-sm text-muted-foreground">Generate Pest tests (unit, feature, API, browser) with factories, mocking, and comprehensive coverage levels (basic/comprehensive/exhaustive)</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/test:coverage</code><span class="text-sm text-muted-foreground">Run tests with coverage analysis and generate reports</span></div>
-                        </div>
-                    </details>
-
-                    <!-- Database -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">Database</span><span class="badge badge-secondary">2</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/db:optimize</code><span class="text-sm text-muted-foreground">Analyze and optimize queries, fix N+1 problems, add indexes, improve schema design</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/db:diagram</code><span class="text-sm text-muted-foreground">Generate ER diagram from database schema</span></div>
-                        </div>
-                    </details>
-
-                    <!-- Frontend -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">Frontend</span><span class="badge badge-secondary">2</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/livewire:make</code><span class="text-sm text-muted-foreground">Create Livewire 3 component with form handling, table/modal patterns, events, polling, and loading states</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/filament:make</code><span class="text-sm text-muted-foreground">Create Filament resource, page, or widget with relation managers, custom actions, and Shield permissions</span></div>
-                        </div>
-                    </details>
-
-                    <!-- Auth & Security -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">Auth & Security</span><span class="badge badge-secondary">2</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/auth:setup</code><span class="text-sm text-muted-foreground">Setup authentication with policies, gates, Sanctum/Passport, social login, 2FA, and role-based permissions</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/security:audit</code><span class="text-sm text-muted-foreground">Run OWASP Top 10 security audit - SQL injection, XSS, mass assignment, with false positive filtering (80% confidence threshold)</span></div>
-                        </div>
-                    </details>
-
-                    <!-- Async & Notifications -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">Async & Notifications</span><span class="badge badge-secondary">3</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/job:make</code><span class="text-sm text-muted-foreground">Create queued job with unique jobs, rate limiting, batching, chaining, and Horizon integration</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/broadcast:make</code><span class="text-sm text-muted-foreground">Create broadcast event with channel configuration for Reverb/Pusher</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/notification:make</code><span class="text-sm text-muted-foreground">Create multi-channel notification (55+ channels: Telegram, Discord, Twilio, Slack, etc.)</span></div>
-                        </div>
-                    </details>
-
-                    <!-- AI & Content -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">AI & Content</span><span class="badge badge-secondary">6</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/ai:make</code><span class="text-sm text-muted-foreground">Create AI-powered feature using Prism PHP - chat, embeddings, image generation, function calling</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/bug:fix</code><span class="text-sm text-muted-foreground">AI-assisted bug analysis with root cause identification and fix suggestions</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/docs:generate</code><span class="text-sm text-muted-foreground">Generate documentation from code (API docs, README, PHPDoc)</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/pdf:make</code><span class="text-sm text-muted-foreground">Generate PDF templates (invoices, reports) using DomPDF or Spatie PDF</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/seo:setup</code><span class="text-sm text-muted-foreground">Setup SEO infrastructure (sitemaps, meta tags, Open Graph, JSON-LD)</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/geo:make</code><span class="text-sm text-muted-foreground">Create geolocation features with geocoding and distance calculations</span></div>
-                        </div>
-                    </details>
-
-                    <!-- DevOps & Infrastructure -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">DevOps & Infrastructure</span><span class="badge badge-secondary">8</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/deploy:setup</code><span class="text-sm text-muted-foreground">Setup deployment for Forge, Vapor, Docker, or Bref (serverless) with zero-downtime strategies</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/cicd:setup</code><span class="text-sm text-muted-foreground">Configure CI/CD pipeline (GitHub Actions, GitLab CI) with testing, linting, and deployment stages</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/reverb:setup</code><span class="text-sm text-muted-foreground">Setup Laravel Reverb WebSocket server with scaling and reconnection handling</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/feature-flag:make</code><span class="text-sm text-muted-foreground">Create feature flag with Laravel Pennant for A/B testing and gradual rollouts</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/migrate:from-legacy</code><span class="text-sm text-muted-foreground">Migrate from legacy systems or upgrade Laravel/PHP versions with Rector</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/backup:setup</code><span class="text-sm text-muted-foreground">Configure automated backups with spatie/laravel-backup (S3, local, notifications)</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/health:setup</code><span class="text-sm text-muted-foreground">Setup health monitoring with spatie/laravel-health (database, cache, queue, disk checks)</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/search:setup</code><span class="text-sm text-muted-foreground">Configure Laravel Scout with Meilisearch/Algolia/Typesense</span></div>
-                        </div>
-                    </details>
-
-                    <!-- Data & Integration -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">Data & Integration</span><span class="badge badge-secondary">3</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/dto:make</code><span class="text-sm text-muted-foreground">Create Data Transfer Objects with spatie/laravel-data - validation, casting, transformation</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/webhook:make</code><span class="text-sm text-muted-foreground">Create webhook handlers (Stripe, GitHub, etc.) with signature verification</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/import:make</code><span class="text-sm text-muted-foreground">Create CSV/Excel importers with validation, chunking, and queued processing</span></div>
-                        </div>
-                    </details>
-
-                    <!-- Code Review & Git -->
-                    <details class="bg-card rounded-[var(--radius)] border border-border group">
-                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
-                            <div class="flex items-center gap-3"><span class="font-semibold text-foreground">Code Review & Git</span><span class="badge badge-secondary">7</span></div>
-                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </summary>
-                        <div class="px-6 pb-4 space-y-2">
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/review:staged</code><span class="text-sm text-muted-foreground">Review staged changes with parallel reviewers (security, quality, Laravel best practices, tests)</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/review:pr</code><span class="text-sm text-muted-foreground">Review pull request with comprehensive analysis</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/review:audit</code><span class="text-sm text-muted-foreground">Full codebase security and quality audit</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/refactor</code><span class="text-sm text-muted-foreground">Analyze and refactor code for SOLID/DRY compliance</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/git:commit</code><span class="text-sm text-muted-foreground">Create conventional commit with security review and auto-generated message</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/git:pr</code><span class="text-sm text-muted-foreground">Create pull request with auto-generated description and review checklist</span></div>
-                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]"><code class="text-sm text-primary font-mono whitespace-nowrap">/git:release</code><span class="text-sm text-muted-foreground">Create release with changelog generation</span></div>
-                        </div>
-                    </details>
-                </div>
-            </section>
-
-            <!-- Skills -->
-            <section id="skills" class="mb-20 scroll-mt-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-foreground">Auto-Invoked Skills</h2>
-                    <span class="badge badge-secondary ml-2">12 total</span>
-                </div>
-
-                <p class="text-muted-foreground mb-6">Skills are automatically activated based on your conversation context. No commands needed - just describe what you need and Claude will apply the relevant expertise.</p>
-
-                <div class="space-y-4">
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-feature</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "build feature", "create feature", "make feature"</p>
-                        <p class="text-muted-foreground text-sm">Complete feature development with CRUD operations, views, API endpoints, and tests. Creates self-contained features under app/Features/ with ServiceProvider, routes, controllers, models, migrations, policies, and Pest tests.</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-api</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "build api", "create endpoint", "rest api"</p>
-                        <p class="text-muted-foreground text-sm">REST API development with versioning, OpenAPI documentation, filtering (Spatie Query Builder), pagination, rate limiting, and authentication (Sanctum/Passport).</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-database</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "migration", "database", "query", "N+1", "index", "schema", "eloquent", "slow query"</p>
-                        <p class="text-muted-foreground text-sm">Database operations and optimization. Creates migrations with proper indexes, fixes N+1 queries with eager loading, optimizes slow queries, designs schemas, and sets up relationships. Includes Model::preventLazyLoading() patterns.</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-testing</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "test", "testing", "pest", "phpunit", "coverage", "tdd"</p>
-                        <p class="text-muted-foreground text-sm">Comprehensive Pest PHP testing. Unit tests, feature tests, API tests, browser tests (Dusk). Includes factories, mocking (Event::fake, Queue::fake), database assertions, and TDD workflows.</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-auth</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "auth", "authentication", "permission", "role", "policy", "gate"</p>
-                        <p class="text-muted-foreground text-sm">Authentication and authorization. Policies, gates, Sanctum/Passport setup, role-based permissions (Spatie/Laratrust), social login, 2FA, and password rules.</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-livewire</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "livewire", "reactive", "component", "wire:model"</p>
-                        <p class="text-muted-foreground text-sm">Livewire 3 reactive components. Form handling, table patterns, modals, events, polling, loading states, file uploads, and real-time validation.</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-filament</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "filament", "admin panel", "admin dashboard"</p>
-                        <p class="text-muted-foreground text-sm">Filament admin panel development. Resources, pages, widgets, relation managers, custom actions, form components, table columns, and Shield permission integration.</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-performance</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "slow", "optimize", "cache", "performance", "speed"</p>
-                        <p class="text-muted-foreground text-sm">Performance optimization. Caching strategies, query optimization, Pulse setup, Octane configuration, memory optimization, and lazy loading prevention.</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-security</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "security", "vulnerability", "XSS", "SQL injection", "CSRF"</p>
-                        <p class="text-muted-foreground text-sm">Security audits and fixes. OWASP Top 10 checks, security middleware, password rules, input validation, mass assignment protection, and encryption.</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-deploy</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "deploy", "production", "server", "hosting"</p>
-                        <p class="text-muted-foreground text-sm">Deployment and hosting. Zero-downtime deployment, health checks, environment configuration, Forge/Vapor/Docker/Bref setup, and production optimization.</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-queue</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "queue", "job", "notification", "background"</p>
-                        <p class="text-muted-foreground text-sm">Background jobs and notifications. Unique jobs, rate limiting, job batching, chaining, Horizon configuration, and multi-channel notifications (55+ channels).</p>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                            <span class="font-semibold text-foreground">laravel-websocket</span>
-                        </div>
-                        <p class="text-muted-foreground text-sm mb-2"><strong>Triggers:</strong> "websocket", "real-time", "Reverb", "broadcasting"</p>
-                        <p class="text-muted-foreground text-sm">Real-time features with Laravel Reverb. Broadcasting events, presence channels, private channels, scaling, reconnection handling, and client-side integration.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Agents -->
-            <section id="agents" class="mb-20 scroll-mt-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-foreground">Specialized Agents</h2>
-                    <span class="badge badge-secondary ml-2">23 total</span>
-                </div>
-
-                <p class="text-muted-foreground mb-6">Each agent is a specialized AI with deep expertise in its domain. The architect automatically delegates to the appropriate agent based on your request.</p>
-
-                <div class="bg-card rounded-[var(--radius)] border border-border overflow-hidden">
-                    <table class="w-full">
-                        <thead class="bg-muted">
-                            <tr>
-                                <th class="text-left px-6 py-3 text-sm font-semibold text-foreground">Agent</th>
-                                <th class="text-left px-6 py-3 text-sm font-semibold text-foreground">Purpose</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-border">
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-architect</td><td class="px-6 py-3 text-sm text-muted-foreground">Decision maker - analyzes requests, scans codebase, checks pattern registry, decides implementation type, and delegates to builders</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-feature-builder</td><td class="px-6 py-3 text-sm text-muted-foreground">Builds complete features with CRUD, views, API, tests - creates self-contained modules under app/Features/</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-module-builder</td><td class="px-6 py-3 text-sm text-muted-foreground">Builds reusable domain modules without routes/views - contracts, services, DTOs for shared logic</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-service-builder</td><td class="px-6 py-3 text-sm text-muted-foreground">Builds services and single-purpose actions with proper patterns</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-api-builder</td><td class="px-6 py-3 text-sm text-muted-foreground">REST APIs with versioning, OpenAPI docs, filtering, GraphQL (Lighthouse) support</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-testing</td><td class="px-6 py-3 text-sm text-muted-foreground">Pest tests - unit, feature, API, browser with factories and mocking</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-database</td><td class="px-6 py-3 text-sm text-muted-foreground">Migrations, optimization, relationships, N+1 fixes, indexing strategies</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-migration</td><td class="px-6 py-3 text-sm text-muted-foreground">Laravel/PHP version upgrades with Rector, deprecation fixes</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-auth</td><td class="px-6 py-3 text-sm text-muted-foreground">Authentication, authorization, policies, gates, Sanctum/Passport</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-security</td><td class="px-6 py-3 text-sm text-muted-foreground">OWASP audits, security headers, false positive filtering (80% confidence)</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-livewire</td><td class="px-6 py-3 text-sm text-muted-foreground">Livewire 3 reactive components with forms, tables, modals</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-filament</td><td class="px-6 py-3 text-sm text-muted-foreground">Filament admin panels with resources, pages, widgets</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-queue</td><td class="px-6 py-3 text-sm text-muted-foreground">Jobs, events, notifications, Horizon, batching, rate limiting</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-ai</td><td class="px-6 py-3 text-sm text-muted-foreground">AI features with Prism PHP - chat, embeddings, function calling</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-deploy</td><td class="px-6 py-3 text-sm text-muted-foreground">Forge, Vapor, Docker, Bref deployment with zero-downtime</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-cicd</td><td class="px-6 py-3 text-sm text-muted-foreground">GitHub Actions, GitLab CI pipelines with testing stages</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-reverb</td><td class="px-6 py-3 text-sm text-muted-foreground">WebSockets with Laravel Reverb, broadcasting, scaling</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-pennant</td><td class="px-6 py-3 text-sm text-muted-foreground">Feature flags and A/B testing with Laravel Pennant</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-refactor</td><td class="px-6 py-3 text-sm text-muted-foreground">Code improvement for SOLID/DRY compliance</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-review</td><td class="px-6 py-3 text-sm text-muted-foreground">Code review orchestrator with parallel reviewers</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-git</td><td class="px-6 py-3 text-sm text-muted-foreground">Git workflow automation - commits, PRs, releases</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-package</td><td class="px-6 py-3 text-sm text-muted-foreground">Laravel package development with spatie/package-tools</td></tr>
-                            <tr><td class="px-6 py-3 text-sm font-mono text-primary">laravel-performance</td><td class="px-6 py-3 text-sm text-muted-foreground">Performance optimization - caching, Octane, Pulse</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Hooks -->
-            <section id="hooks" class="mb-20 scroll-mt-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-foreground">Quality Hooks</h2>
-                    <span class="badge badge-secondary ml-2">7 total</span>
-                </div>
-
-                <p class="text-muted-foreground mb-6">Pre-configured shell scripts that run automatically to ensure Laravel code quality. Install by copying to your project's hooks directory.</p>
-
-                <div class="bg-card rounded-[var(--radius)] border border-border overflow-hidden">
-                    <table class="w-full">
-                        <thead class="bg-muted">
-                            <tr>
-                                <th class="text-left px-6 py-3 text-sm font-semibold text-foreground">Hook</th>
-                                <th class="text-left px-6 py-3 text-sm font-semibold text-foreground">Purpose</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-border">
-                            <tr><td class="px-6 py-3"><code class="text-sm text-primary">pre-commit.sh</code></td><td class="px-6 py-3 text-sm text-muted-foreground">Comprehensive checks: PHP syntax, Laravel Pint formatting, PHPStan analysis, security scan, Blade validation, migration safety</td></tr>
-                            <tr><td class="px-6 py-3"><code class="text-sm text-primary">post-edit.sh</code></td><td class="px-6 py-3 text-sm text-muted-foreground">Auto-format PHP files with Pint, update IDE helper docblocks</td></tr>
-                            <tr><td class="px-6 py-3"><code class="text-sm text-primary">security-scan.sh</code></td><td class="px-6 py-3 text-sm text-muted-foreground">Detect secrets, API keys, passwords, debug functions (dd, dump, var_dump)</td></tr>
-                            <tr><td class="px-6 py-3"><code class="text-sm text-primary">migration-safety.sh</code></td><td class="px-6 py-3 text-sm text-muted-foreground">Warn about destructive migration operations (dropColumn, dropTable, dropIndex)</td></tr>
-                            <tr><td class="px-6 py-3"><code class="text-sm text-primary">blade-lint.sh</code></td><td class="px-6 py-3 text-sm text-muted-foreground">Validate Blade templates: CSRF tokens, XSS protection, directive syntax</td></tr>
-                            <tr><td class="px-6 py-3"><code class="text-sm text-primary">test-runner.sh</code></td><td class="px-6 py-3 text-sm text-muted-foreground">Run related Pest tests when files change</td></tr>
-                            <tr><td class="px-6 py-3"><code class="text-sm text-primary">env-check.sh</code></td><td class="px-6 py-3 text-sm text-muted-foreground">Block .env file commits, validate .env.example completeness</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Packages -->
-            <section id="packages" class="mb-20 scroll-mt-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-foreground">Package Integrations</h2>
-                    <span class="badge badge-secondary ml-2">85+ packages</span>
-                </div>
-
-                <p class="text-muted-foreground mb-6">The agents automatically detect installed packages and adapt their output accordingly. Here are the supported packages by category:</p>
-
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Architecture & Structure</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>nwidart/laravel-modules</li>
-                            <li>lorisleiva/laravel-actions</li>
-                            <li>spatie/laravel-package-tools</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">AI & LLM</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>prism-php/prism</li>
-                            <li>laravel/mcp</li>
-                            <li>openai-php/laravel</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">API & GraphQL</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>nuwave/lighthouse</li>
-                            <li>laravel/passport</li>
-                            <li>laravel/sanctum</li>
-                            <li>spatie/laravel-fractal</li>
-                            <li>spatie/laravel-query-builder</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Auth & Permissions</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>spatie/laravel-permission</li>
-                            <li>santigarcor/laratrust</li>
-                            <li>bezhansalleh/filament-shield</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Admin & UI</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>filament/filament</li>
-                            <li>livewire/livewire</li>
-                            <li>inertiajs/inertia-laravel</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Testing</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>pestphp/pest</li>
-                            <li>pestphp/pest-plugin-laravel</li>
-                            <li>laravel/dusk</li>
-                            <li>mockery/mockery</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Database & Models</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>spatie/laravel-medialibrary</li>
-                            <li>spatie/laravel-activitylog</li>
-                            <li>spatie/laravel-tags</li>
-                            <li>spatie/laravel-sluggable</li>
-                            <li>spatie/eloquent-sortable</li>
-                            <li>venturecraft/revisionable</li>
-                            <li>spatie/laravel-schemaless-attributes</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Performance</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>laravel/octane</li>
-                            <li>laravel/horizon</li>
-                            <li>laravel/pulse</li>
-                            <li>beyondcode/laravel-query-detector</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Real-time & Queues</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>laravel/reverb</li>
-                            <li>pusher/pusher-php-server</li>
-                            <li>beyondcode/laravel-websockets</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Billing & Payments</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>laravel/cashier</li>
-                            <li>laravel/cashier-paddle</li>
-                            <li>spatie/laravel-stripe-webhooks</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Notifications (55+ channels)</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>laravel-notification-channels/telegram</li>
-                            <li>laravel-notification-channels/discord</li>
-                            <li>laravel-notification-channels/twilio</li>
-                            <li>laravel-notification-channels/slack</li>
-                            <li>laravel-notification-channels/vonage</li>
-                            <li>...and 50+ more</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">PDF & Documents</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>spatie/laravel-pdf</li>
-                            <li>barryvdh/laravel-dompdf</li>
-                            <li>knplabs/knp-snappy</li>
-                            <li>maatwebsite/excel</li>
-                            <li>spatie/simple-excel</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">SEO & Marketing</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>spatie/laravel-sitemap</li>
-                            <li>artesaos/seotools</li>
-                            <li>ralphjsmit/laravel-seo</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Multi-Tenancy & Features</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>stancl/tenancy</li>
-                            <li>laravel/pennant</li>
-                            <li>spatie/laravel-translatable</li>
-                            <li>laravel-lang/lang</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">DevOps & Monitoring</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>bref/laravel-bridge</li>
-                            <li>laravel/vapor-core</li>
-                            <li>laravel/telescope</li>
-                            <li>spatie/laravel-health</li>
-                            <li>spatie/laravel-backup</li>
-                            <li>sentry/sentry-laravel</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-card rounded-[var(--radius)] border border-border p-5">
-                        <h4 class="font-semibold text-foreground mb-3">Search & Geolocation</h4>
-                        <ul class="space-y-1 text-sm text-muted-foreground">
-                            <li>laravel/scout</li>
-                            <li>meilisearch/meilisearch-php</li>
-                            <li>algolia/algoliasearch-client-php</li>
-                            <li>typesense/typesense-php</li>
-                            <li>spatie/geocoder</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Architecture -->
-            <section id="architecture" class="mb-20 scroll-mt-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                    </div>
-                    <h2 class="text-2xl font-bold text-foreground">How It Works</h2>
-                </div>
-
-                <div class="bg-card rounded-[var(--radius)] border border-border p-6 mb-6">
-                    <h3 class="font-semibold text-foreground mb-4">Request Flow</h3>
-                    <div class="font-mono text-sm text-muted-foreground whitespace-pre leading-relaxed overflow-x-auto">
-User Request: "/build invoice system"
-        |
-        v
-+------------------+
-|    Architect     |  Phase 1: Analyze request
-+------------------+  Phase 2: Scan codebase
-        |             Phase 3: Check pattern registry
-        |             Phase 4: Decide implementation type
-        v
-+------------------+
-| Feature Builder  |  Creates: Models, Controllers, Views
-+------------------+  Creates: Routes, Migrations, Policies
-        |             Creates: Pest Tests
-        |
-        +-----> Delegates API to: laravel-api-builder
-        |
-        v
-+------------------+
-|   Review Agent   |  Parallel reviewers:
-+------------------+  - Security (OWASP)
-        |             - Quality (SOLID/DRY)
-        |             - Laravel Best Practices
-        v             - Test Coverage
-+------------------+
-|    Complete!     |  Summary with next steps
-+------------------+</div>
-                </div>
-
-                <div class="bg-card rounded-[var(--radius)] border border-border overflow-hidden">
-                    <div class="px-6 py-3 bg-muted border-b border-border">
-                        <h3 class="font-semibold text-foreground text-sm">Architecture Decision Matrix</h3>
-                    </div>
-                    <table class="w-full">
-                        <thead class="bg-muted/50">
-                            <tr>
-                                <th class="text-left px-6 py-3 text-sm font-medium text-foreground">Request Type</th>
-                                <th class="text-left px-6 py-3 text-sm font-medium text-foreground">Implementation</th>
-                                <th class="text-left px-6 py-3 text-sm font-medium text-foreground">Location</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-border">
-                            <tr>
-                                <td class="px-6 py-3 text-sm text-muted-foreground">CRUD + UI + API (complete business capability)</td>
-                                <td class="px-6 py-3 text-sm text-foreground font-medium">Feature</td>
-                                <td class="px-6 py-3 text-sm text-muted-foreground font-mono">app/Features/&lt;Name&gt;/</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-3 text-sm text-muted-foreground">Reusable logic, no UI (shared across features)</td>
-                                <td class="px-6 py-3 text-sm text-foreground font-medium">Module</td>
-                                <td class="px-6 py-3 text-sm text-muted-foreground font-mono">app/Modules/&lt;Name&gt;/</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-3 text-sm text-muted-foreground">Orchestrates multiple operations</td>
-                                <td class="px-6 py-3 text-sm text-foreground font-medium">Service</td>
-                                <td class="px-6 py-3 text-sm text-muted-foreground font-mono">app/Services/</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-3 text-sm text-muted-foreground">Single discrete operation</td>
-                                <td class="px-6 py-3 text-sm text-foreground font-medium">Action</td>
-                                <td class="px-6 py-3 text-sm text-muted-foreground font-mono">app/Actions/&lt;Domain&gt;/</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Footer -->
-            <footer class="border-t border-border pt-8">
-                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <p class="text-sm text-muted-foreground">MIT License - Laravel Agent by <a href="https://github.com/hadyfayed" class="text-foreground hover:underline">hadyfayed</a></p>
-                    <a href="https://github.com/hadyfayed/laravel-agent" target="_blank" class="text-muted-foreground hover:text-foreground transition-colors">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                    </a>
-                </div>
-            </footer>
+<!-- Installation -->
+<section id="installation" class="mb-16">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
         </div>
-    </main>
+        <h2 class="text-2xl font-bold">Installation</h2>
+    </div>
 
-    <script>
-        const themeToggle = document.getElementById('theme-toggle');
-        const html = document.documentElement;
-        const themeText = document.getElementById('theme-text');
-        const themeIconLight = document.getElementById('theme-icon-light');
-        const themeIconDark = document.getElementById('theme-icon-dark');
+    <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+            <h3 class="font-semibold mb-3">Requirements</h3>
+            <ul class="space-y-2 text-muted-foreground">
+                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Claude Code with Plugin support</li>
+                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Laravel 10+ project</li>
+                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> PHP 8.1 or higher</li>
+            </ul>
+        </div>
+        <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+            <h3 class="font-semibold mb-3">Verify Installation</h3>
+            <p class="text-muted-foreground mb-4">After installation, verify by running:</p>
+            <div class="bg-muted rounded-[var(--radius)] p-3">
+                <code class="text-sm">/laravel-agent:patterns</code>
+            </div>
+        </div>
+    </div>
+</section>
 
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
-            updateThemeUI(true);
-        }
+<!-- Quick Start -->
+<section id="quickstart" class="mb-16">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h2 class="text-2xl font-bold">Quick Start</h2>
+    </div>
 
-        themeToggle.addEventListener('click', () => {
-            const isDark = html.classList.toggle('dark');
-            localStorage.theme = isDark ? 'dark' : 'light';
-            updateThemeUI(isDark);
-        });
+    <div class="grid gap-4">
+        <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+            <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="text-sm font-bold text-primary">1</span></div>
+                <div class="flex-1">
+                    <h3 class="font-semibold mb-2">Intelligent Build (Recommended)</h3>
+                    <p class="text-muted-foreground text-sm mb-3">Let the architect analyze and decide the best approach:</p>
+                    <div class="bg-muted rounded-[var(--radius)] p-3"><code class="text-sm">/laravel-agent:build invoice management system with PDF export</code></div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+            <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="text-sm font-bold text-primary">2</span></div>
+                <div class="flex-1">
+                    <h3 class="font-semibold mb-2">Create Features Directly</h3>
+                    <p class="text-muted-foreground text-sm mb-3">Build complete features with CRUD, views, API, and tests:</p>
+                    <div class="bg-muted rounded-[var(--radius)] p-3"><code class="text-sm">/laravel-agent:feature:make Products with categories</code></div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+            <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><span class="text-sm font-bold text-primary">3</span></div>
+                <div class="flex-1">
+                    <h3 class="font-semibold mb-2">Generate Tests</h3>
+                    <p class="text-muted-foreground text-sm mb-3">Create comprehensive Pest tests for any class:</p>
+                    <div class="bg-muted rounded-[var(--radius)] p-3"><code class="text-sm">/laravel-agent:test:make App/Services/PaymentService</code></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-        function updateThemeUI(isDark) {
-            themeText.textContent = isDark ? 'Light mode' : 'Dark mode';
-            themeIconLight.classList.toggle('hidden', !isDark);
-            themeIconDark.classList.toggle('hidden', isDark);
-        }
+<!-- Commands Preview -->
+<section id="commands-preview" class="mb-16">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold">Commands</h2>
+            <span class="badge badge-secondary">42</span>
+        </div>
+        <a href="{{ '/commands.html' | relative_url }}" class="flex items-center gap-2 text-sm text-primary hover:underline">
+            View all
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+    </div>
 
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
+    <div class="grid md:grid-cols-3 gap-4">
+        <a href="{{ '/commands/build.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/build</code>
+                <span class="badge badge-core">Core</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Intelligent build - architect analyzes and decides approach</p>
+        </a>
+        <a href="{{ '/commands/feature-make.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/feature:make</code>
+                <span class="badge badge-builder">Builder</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create complete feature with CRUD, views, API, tests</p>
+        </a>
+        <a href="{{ '/commands/test-make.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/test:make</code>
+                <span class="badge badge-testing">Testing</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Generate Pest tests for any class or feature</p>
+        </a>
+    </div>
+</section>
 
-        mobileMenuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        });
+<!-- Skills Preview -->
+<section id="skills-preview" class="mb-16">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold">Auto-Invoked Skills</h2>
+            <span class="badge badge-secondary">12</span>
+        </div>
+        <a href="{{ '/skills.html' | relative_url }}" class="flex items-center gap-2 text-sm text-primary hover:underline">
+            View all
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+    </div>
 
-        overlay.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
-        });
+    <p class="text-muted-foreground mb-6">Skills activate automatically based on conversation context.</p>
 
-        function copyCode(button, codeId) {
-            const code = document.getElementById(codeId).textContent;
-            navigator.clipboard.writeText(code).then(() => {
-                button.innerHTML = '<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
-                setTimeout(() => {
-                    button.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
-                }, 2000);
-            });
-        }
+    <div class="grid md:grid-cols-2 gap-4">
+        <a href="{{ '/skills/laravel-testing.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
+            <div class="flex items-center gap-3 mb-2">
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span class="font-semibold">laravel-testing</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Triggers: "test", "pest", "coverage" - Pest PHP testing</p>
+        </a>
+        <a href="{{ '/skills/laravel-database.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
+            <div class="flex items-center gap-3 mb-2">
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span class="font-semibold">laravel-database</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Triggers: "migration", "N+1", "query" - Database optimization</p>
+        </a>
+    </div>
+</section>
 
-        const sections = document.querySelectorAll('section[id]');
-        const navItems = document.querySelectorAll('.nav-item');
+<!-- Agents Preview -->
+<section id="agents-preview" class="mb-16">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold">Specialized Agents</h2>
+            <span class="badge badge-secondary">23</span>
+        </div>
+        <a href="{{ '/agents.html' | relative_url }}" class="flex items-center gap-2 text-sm text-primary hover:underline">
+            View all
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+    </div>
 
-        window.addEventListener('scroll', () => {
-            let current = 'home';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (scrollY >= sectionTop - 100) {
-                    current = section.getAttribute('id');
-                }
-            });
+    <div class="bg-card rounded-[var(--radius)] border border-border overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-muted">
+                <tr>
+                    <th class="text-left px-6 py-3 text-sm font-semibold">Agent</th>
+                    <th class="text-left px-6 py-3 text-sm font-semibold">Purpose</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border">
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-architect</td><td class="px-6 py-3 text-sm text-muted-foreground">Analyzes requests, decides approach, delegates to builders</td></tr>
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-feature-builder</td><td class="px-6 py-3 text-sm text-muted-foreground">Builds complete features with CRUD, views, API, tests</td></tr>
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-testing</td><td class="px-6 py-3 text-sm text-muted-foreground">Pest tests - unit, feature, API, browser</td></tr>
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-security</td><td class="px-6 py-3 text-sm text-muted-foreground">OWASP audits, security headers, vulnerability fixes</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
 
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                if (item.getAttribute('href') === '#' + current) {
-                    item.classList.add('active');
-                }
-            });
-        });
+<!-- Hooks Preview -->
+<section id="hooks-preview" class="mb-16">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold">Quality Hooks</h2>
+            <span class="badge badge-secondary">7</span>
+        </div>
+        <a href="{{ '/hooks.html' | relative_url }}" class="flex items-center gap-2 text-sm text-primary hover:underline">
+            View all
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+    </div>
 
-        const searchInput = document.getElementById('search-input');
-        document.addEventListener('keydown', (e) => {
-            if (e.key === '/' && document.activeElement !== searchInput) {
-                e.preventDefault();
-                searchInput.focus();
-            }
-            if (e.key === 'Escape') {
-                searchInput.blur();
-            }
-        });
+    <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-card rounded-[var(--radius)] border border-border p-5">
+            <code class="text-sm text-primary">pre-commit.sh</code>
+            <p class="text-sm text-muted-foreground mt-2">PHP syntax, Pint, PHPStan, security scan, Blade validation</p>
+        </div>
+        <div class="bg-card rounded-[var(--radius)] border border-border p-5">
+            <code class="text-sm text-primary">security-scan.sh</code>
+            <p class="text-sm text-muted-foreground mt-2">Detect secrets, API keys, passwords, debug functions</p>
+        </div>
+    </div>
+</section>
 
-        searchInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') {
-                const query = e.target.value.toLowerCase();
-                for (const section of sections) {
-                    if (section.textContent.toLowerCase().includes(query)) {
-                        section.scrollIntoView({ behavior: 'smooth' });
-                        break;
-                    }
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+<!-- Packages -->
+<section id="packages" class="mb-16">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        </div>
+        <h2 class="text-2xl font-bold">Package Integrations</h2>
+        <span class="badge badge-secondary">85+</span>
+    </div>
+
+    <p class="text-muted-foreground mb-6">Agents detect installed packages and adapt output automatically.</p>
+
+    <div class="grid md:grid-cols-4 gap-4">
+        <div class="bg-card rounded-[var(--radius)] border border-border p-4">
+            <h4 class="font-semibold text-sm mb-2">Admin & UI</h4>
+            <ul class="text-xs text-muted-foreground space-y-1">
+                <li>filament/filament</li>
+                <li>livewire/livewire</li>
+                <li>inertiajs/inertia-laravel</li>
+            </ul>
+        </div>
+        <div class="bg-card rounded-[var(--radius)] border border-border p-4">
+            <h4 class="font-semibold text-sm mb-2">Testing</h4>
+            <ul class="text-xs text-muted-foreground space-y-1">
+                <li>pestphp/pest</li>
+                <li>laravel/dusk</li>
+                <li>mockery/mockery</li>
+            </ul>
+        </div>
+        <div class="bg-card rounded-[var(--radius)] border border-border p-4">
+            <h4 class="font-semibold text-sm mb-2">API & Auth</h4>
+            <ul class="text-xs text-muted-foreground space-y-1">
+                <li>laravel/sanctum</li>
+                <li>spatie/laravel-permission</li>
+                <li>nuwave/lighthouse</li>
+            </ul>
+        </div>
+        <div class="bg-card rounded-[var(--radius)] border border-border p-4">
+            <h4 class="font-semibold text-sm mb-2">Performance</h4>
+            <ul class="text-xs text-muted-foreground space-y-1">
+                <li>laravel/octane</li>
+                <li>laravel/horizon</li>
+                <li>laravel/pulse</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t border-border pt-8">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-sm text-muted-foreground">MIT License - Laravel Agent by <a href="https://github.com/hadyfayed" class="hover:underline">hadyfayed</a></p>
+        <a href="https://github.com/hadyfayed/laravel-agent" target="_blank" class="text-muted-foreground hover:text-foreground">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+    </div>
+</footer>

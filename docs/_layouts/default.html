@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    {% include head.html %}
+</head>
+<body class="bg-background text-foreground antialiased min-h-screen">
+    {% include sidebar.html %}
+
+    <!-- Main Content -->
+    <main class="lg:ml-72 min-h-screen">
+        {% if page.header_title %}
+        <header class="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-20">
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="lg:hidden w-10"></div>
+                    {% if page.back_url %}
+                    <a href="{{ page.back_url | relative_url }}" class="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        <span class="text-sm">{{ page.back_text | default: "Back" }}</span>
+                    </a>
+                    {% else %}
+                    <h1 class="text-lg font-semibold">{{ page.header_title }}</h1>
+                    {% endif %}
+                </div>
+                <div class="w-10"></div>
+            </div>
+        </header>
+        {% endif %}
+
+        <div class="p-6 {% if page.max_width %}{{ page.max_width }}{% else %}max-w-6xl{% endif %} mx-auto">
+            {{ content }}
+        </div>
+    </main>
+
+    {% include scripts.html %}
+</body>
+</html>
