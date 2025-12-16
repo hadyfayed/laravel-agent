@@ -13,20 +13,269 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-feature-builder</h1>
     <p class="text-xl text-muted-foreground">Builds complete features with CRUD, views, API, migrations, and tests</p>
-    <p class="text-sm text-muted-foreground mt-2">app/Features/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Builds complete features with CRUD, views, API, migrations, and tests. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-feature-builder</strong> agent creates production-ready Laravel features. It generates all necessary components—models, controllers, views, migrations, tests—following Laravel conventions and best practices.</p>
 
-    <h2>Responsibilities</h2>
+    <h2>What It Creates</h2>
+    <p>A complete feature includes all of these components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">What's Included</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Model</td>
+                    <td class="py-3 px-4"><code>app/Models/</code></td>
+                    <td class="py-3 px-4">Fillable, casts, relationships, scopes, accessors</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Migration</td>
+                    <td class="py-3 px-4"><code>database/migrations/</code></td>
+                    <td class="py-3 px-4">Schema with indexes, foreign keys, proper types</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Controller</td>
+                    <td class="py-3 px-4"><code>app/Http/Controllers/</code></td>
+                    <td class="py-3 px-4">Resource methods, authorization, flash messages</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Form Requests</td>
+                    <td class="py-3 px-4"><code>app/Http/Requests/</code></td>
+                    <td class="py-3 px-4">Store/Update validation with authorization</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Views</td>
+                    <td class="py-3 px-4"><code>resources/views/</code></td>
+                    <td class="py-3 px-4">Index, create, edit, show Blade templates</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Routes</td>
+                    <td class="py-3 px-4"><code>routes/web.php</code></td>
+                    <td class="py-3 px-4">Resource routes with middleware</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Factory</td>
+                    <td class="py-3 px-4"><code>database/factories/</code></td>
+                    <td class="py-3 px-4">Model factory with realistic fake data</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Seeder</td>
+                    <td class="py-3 px-4"><code>database/seeders/</code></td>
+                    <td class="py-3 px-4">Database seeder using factory</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Policy</td>
+                    <td class="py-3 px-4"><code>app/Policies/</code></td>
+                    <td class="py-3 px-4">Authorization policy (if auth requested)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/</code></td>
+                    <td class="py-3 px-4">Pest PHP tests for all CRUD operations</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generation Process</h2>
+    <ol>
+        <li><strong>Analyze Requirements</strong> - Parse feature description and identify components</li>
+        <li><strong>Check Existing Code</strong> - Look for related models, avoid duplication</li>
+        <li><strong>Generate Schema</strong> - Create migration with appropriate columns and indexes</li>
+        <li><strong>Build Model</strong> - Add relationships based on schema analysis</li>
+        <li><strong>Create Controller</strong> - Generate CRUD methods with validation</li>
+        <li><strong>Generate Views</strong> - Create Blade templates matching your app's style</li>
+        <li><strong>Write Tests</strong> - Generate Pest tests covering all operations</li>
+        <li><strong>Register Routes</strong> - Add resource routes to web.php</li>
+    </ol>
+
+    <h2>Example Output</h2>
+    <p>For a request like "Invoice management with line items and PDF export":</p>
+    <pre><code class="language-bash">app/
+├── Models/
+│   ├── Invoice.php           # With hasMany(InvoiceLineItem::class)
+│   └── InvoiceLineItem.php   # With belongsTo(Invoice::class)
+├── Http/
+│   ├── Controllers/
+│   │   └── InvoiceController.php
+│   └── Requests/
+│       ├── StoreInvoiceRequest.php
+│       └── UpdateInvoiceRequest.php
+├── Services/
+│   └── InvoicePdfService.php
+database/
+├── migrations/
+│   ├── 2024_01_15_create_invoices_table.php
+│   └── 2024_01_15_create_invoice_line_items_table.php
+└── factories/
+    └── InvoiceFactory.php
+resources/views/invoices/
+├── index.blade.php
+├── create.blade.php
+├── edit.blade.php
+└── show.blade.php
+tests/Feature/
+└── InvoiceTest.php</code></pre>
+
+    <h2>Generated Model Example</h2>
+    <pre><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Invoice extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $fillable = [
+        'customer_id',
+        'invoice_number',
+        'issued_at',
+        'due_at',
+        'status',
+        'notes',
+    ];
+
+    protected $casts = [
+        'issued_at' => 'date',
+        'due_at' => 'date',
+    ];
+
+    // Relationships
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function lineItems(): HasMany
+    {
+        return $this->hasMany(InvoiceLineItem::class);
+    }
+
+    // Accessors
+    public function getTotalAttribute(): float
+    {
+        return $this->lineItems->sum(fn ($item) => $item->quantity * $item->unit_price);
+    }
+
+    // Scopes
+    public function scopeOverdue($query)
+    {
+        return $query->where('due_at', '<', now())
+                     ->where('status', '!=', 'paid');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+}</code></pre>
+
+    <h2>Generated Controller Example</h2>
+    <pre><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreInvoiceRequest;
+use App\Http\Requests\UpdateInvoiceRequest;
+use App\Models\Invoice;
+
+class InvoiceController extends Controller
+{
+    public function index()
+    {
+        $invoices = Invoice::with('customer')
+            ->latest()
+            ->paginate(15);
+
+        return view('invoices.index', compact('invoices'));
+    }
+
+    public function create()
+    {
+        return view('invoices.create');
+    }
+
+    public function store(StoreInvoiceRequest $request)
+    {
+        $invoice = Invoice::create($request->validated());
+
+        return redirect()
+            ->route('invoices.show', $invoice)
+            ->with('success', 'Invoice created successfully.');
+    }
+
+    public function show(Invoice $invoice)
+    {
+        $invoice->load('lineItems', 'customer');
+
+        return view('invoices.show', compact('invoice'));
+    }
+
+    public function edit(Invoice $invoice)
+    {
+        return view('invoices.edit', compact('invoice'));
+    }
+
+    public function update(UpdateInvoiceRequest $request, Invoice $invoice)
+    {
+        $invoice->update($request->validated());
+
+        return redirect()
+            ->route('invoices.show', $invoice)
+            ->with('success', 'Invoice updated successfully.');
+    }
+
+    public function destroy(Invoice $invoice)
+    {
+        $invoice->delete();
+
+        return redirect()
+            ->route('invoices.index')
+            ->with('success', 'Invoice deleted successfully.');
+    }
+}</code></pre>
+
+    <h2>Customization Options</h2>
+    <p>Include these in your request to customize output:</p>
     <ul>
-        <li>Specialized handling of builder-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>with soft deletes</strong> - Add SoftDeletes trait</li>
+        <li><strong>with API</strong> - Also generate API controller and routes</li>
+        <li><strong>with authorization</strong> - Generate policy and gates</li>
+        <li><strong>without views</strong> - Skip Blade template generation</li>
+        <li><strong>without tests</strong> - Skip test generation (not recommended)</li>
+        <li><strong>with Livewire</strong> - Use Livewire components instead of Blade</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>app/Features/</strong></p>
+    <h2>Called By</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building complete features</li>
+    </ul>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/feature-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:feature:make</a> - Direct invocation</li>
+        <li><a href="{{ '/commands/build.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:build</a> - Via architect delegation</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-module-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-module-builder</a> - For reusable domain modules</li>
+        <li><a href="{{ '/agents/laravel-service-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-service-builder</a> - For standalone services</li>
+        <li><a href="{{ '/skills/laravel-feature.html' | relative_url }}" class="text-primary hover:underline">laravel-feature skill</a> - Auto-invoked for feature building</li>
+    </ul>
 </div>

@@ -13,20 +13,142 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-api-builder</h1>
     <p class="text-xl text-muted-foreground">Builds REST APIs with versioning and OpenAPI documentation</p>
-    <p class="text-sm text-muted-foreground mt-2">routes/api.php, app/Http/Controllers/Api/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Builds REST APIs with versioning and OpenAPI documentation. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-api-builder</strong> agent specializes in creating production-ready REST APIs. It generates versioned endpoints, JSON resources, request validation, OpenAPI documentation, and comprehensive API tests.</p>
 
-    <h2>Responsibilities</h2>
+    <h2>What It Creates</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">API Controller</td>
+                    <td class="py-3 px-4"><code>app/Http/Controllers/Api/V1/</code></td>
+                    <td class="py-3 px-4">RESTful endpoints with proper HTTP methods</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">JSON Resource</td>
+                    <td class="py-3 px-4"><code>app/Http/Resources/V1/</code></td>
+                    <td class="py-3 px-4">Response transformation and formatting</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Form Requests</td>
+                    <td class="py-3 px-4"><code>app/Http/Requests/Api/V1/</code></td>
+                    <td class="py-3 px-4">Input validation and authorization</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">API Routes</td>
+                    <td class="py-3 px-4"><code>routes/api/v1.php</code></td>
+                    <td class="py-3 px-4">Versioned route definitions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">OpenAPI Spec</td>
+                    <td class="py-3 px-4"><code>docs/api/</code></td>
+                    <td class="py-3 px-4">Auto-generated API documentation</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">API Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/Api/V1/</code></td>
+                    <td class="py-3 px-4">Pest PHP endpoint tests</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>API Standards</h2>
+    <p>Generated APIs follow these standards:</p>
     <ul>
-        <li>Specialized handling of builder-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>JSON:API</strong> - Consistent response structure with data, meta, links</li>
+        <li><strong>RESTful conventions</strong> - Proper HTTP methods and status codes</li>
+        <li><strong>URL versioning</strong> - <code>/api/v1/</code> prefix for all endpoints</li>
+        <li><strong>HATEOAS links</strong> - Self-referential links in responses</li>
+        <li><strong>Pagination</strong> - Cursor or offset-based with meta information</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>routes/api.php, app/Http/Controllers/Api/</strong></p>
+    <h2>Generated Resource Example</h2>
+    <pre><code class="language-php">&lt;?php
+
+namespace App\Http\Resources\V1;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ProductResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'type' => 'products',
+            'attributes' => [
+                'name' => $this->name,
+                'slug' => $this->slug,
+                'description' => $this->description,
+                'price' => [
+                    'amount' => $this->price,
+                    'currency' => 'USD',
+                    'formatted' => '$' . number_format($this->price, 2),
+                ],
+                'in_stock' => $this->stock_quantity > 0,
+                'created_at' => $this->created_at->toIso8601String(),
+                'updated_at' => $this->updated_at->toIso8601String(),
+            ],
+            'relationships' => [
+                'category' => new CategoryResource($this->whenLoaded('category')),
+                'images' => ImageResource::collection($this->whenLoaded('images')),
+            ],
+            'links' => [
+                'self' => route('api.v1.products.show', $this->id),
+            ],
+        ];
+    }
+}</code></pre>
+
+    <h2>Authentication Support</h2>
+    <p>The agent can configure various authentication methods:</p>
+    <ul>
+        <li><strong>Laravel Sanctum</strong> - Token-based API authentication</li>
+        <li><strong>Passport</strong> - OAuth2 implementation</li>
+        <li><strong>API Keys</strong> - Simple key-based access</li>
+        <li><strong>JWT</strong> - JSON Web Token authentication</li>
+    </ul>
+
+    <h2>Rate Limiting</h2>
+    <p>Generated APIs include rate limiting middleware:</p>
+    <pre><code class="language-php">// In RouteServiceProvider
+RateLimiter::for('api', function (Request $request) {
+    return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+});
+
+// High-throughput endpoint
+RateLimiter::for('uploads', function (Request $request) {
+    return Limit::perMinute(10)->by($request->user()->id);
+});</code></pre>
+
+    <h2>Called By</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building APIs</li>
+    </ul>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/api-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:make</a> - Create API resources</li>
+        <li><a href="{{ '/commands/api-docs.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:docs</a> - Generate documentation</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - For full-stack features with views</li>
+        <li><a href="{{ '/skills/laravel-api.html' | relative_url }}" class="text-primary hover:underline">laravel-api skill</a> - Auto-invoked API expertise</li>
+        <li><a href="{{ '/commands/auth-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:auth:setup</a> - Configure API authentication</li>
+    </ul>
 </div>

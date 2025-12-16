@@ -24,20 +24,106 @@ back_text: All Skills
     <h2>Trigger Keywords</h2>
     <p>This skill automatically activates when Claude detects these keywords in your conversation:</p>
     <div class="flex flex-wrap gap-2 not-prose mb-6">
-        <span class="trigger-tag">build feature</span>
-        <span class="trigger-tag">create feature</span>
-        <span class="trigger-tag">implement</span>
+        <span class="trigger-tag">build</span>
+        <span class="trigger-tag">feature</span>
+        <span class="trigger-tag">create</span>
         <span class="trigger-tag">crud</span>
+        <span class="trigger-tag">implement</span>
     </div>
 
     <h2>Overview</h2>
-    <p>Build complete Laravel features with CRUD, views, API, and tests. This skill is automatically activated based on context - no commands needed.</p>
+    <p>The <strong>laravel-feature</strong> skill provides specialized knowledge for building complete Laravel features. When activated, Claude gains enhanced understanding of Laravel conventions, CRUD patterns, and full-stack feature development.</p>
 
     <h2>How It Works</h2>
-    <p>Simply describe what you need using natural language. When Claude detects relevant keywords, this skill will engage to provide specialized Laravel expertise.</p>
+    <p>Unlike commands that you invoke explicitly, skills activate automatically based on context. When you ask Claude to build something, this skill engages to provide Laravel-specific expertise.</p>
 
-    <h2>Example Prompts</h2>
-    <pre><code class="text-green-400">"Help me build feature"
-"I need to create feature"
-"Can you help with implement?"</code></pre>
+    <div class="not-prose">
+        <div class="bg-muted/50 rounded-lg p-6 border border-border my-6">
+            <pre class="text-sm text-foreground">
+User: "Help me build an invoice management system"
+                    ↓
+         Claude detects "build" keyword
+                    ↓
+         laravel-feature skill activates
+                    ↓
+         Claude uses Laravel conventions and patterns
+                    ↓
+         May delegate to /build command or feature-builder agent
+            </pre>
+        </div>
+    </div>
+
+    <h2>Example Conversations</h2>
+    <pre><code class="language-bash"># Building a complete feature
+User: "I need to build a product catalog with categories and search"
+Claude: [skill activates] "I'll help you build a product catalog..."
+→ Generates Model, Migration, Controller, Views, Tests
+
+# Creating CRUD functionality
+User: "Create CRUD for managing blog posts"
+Claude: [skill activates] "Let me create a complete CRUD system..."
+→ Uses resource controller pattern, form requests, validation
+
+# Implementing a feature
+User: "Implement user notifications with email and database"
+Claude: [skill activates] "I'll implement notifications using..."
+→ Uses Laravel notification system, creates channels</code></pre>
+
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Laravel conventions</strong> - Proper naming, directory structure, PSR-4</li>
+        <li><strong>CRUD patterns</strong> - Resource controllers, form requests, validation</li>
+        <li><strong>Eloquent expertise</strong> - Relationships, scopes, accessors, casts</li>
+        <li><strong>View patterns</strong> - Blade components, layouts, partials</li>
+        <li><strong>Testing knowledge</strong> - Pest PHP, factories, database testing</li>
+    </ul>
+
+    <h2>When Skill Activates vs Commands</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Scenario</th>
+                    <th class="text-left py-3 px-4 font-medium">Behavior</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">"Build an invoice system"</td>
+                    <td class="py-3 px-4">Skill activates, may suggest <code>/build</code> command</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>/laravel-agent:build invoices</code></td>
+                    <td class="py-3 px-4">Command executes directly, skill provides context</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">"How do I create a model?"</td>
+                    <td class="py-3 px-4">Skill activates for Laravel guidance</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">"What's the weather today?"</td>
+                    <td class="py-3 px-4">Skill does not activate (no trigger keywords)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Be specific</strong> - "Build invoice management with line items" triggers better than "make invoices"</li>
+        <li><strong>Mention requirements</strong> - Include relationships, validations, special features</li>
+        <li><strong>Use commands for precision</strong> - When you know exactly what you want, use <code>/build</code> directly</li>
+    </ol>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/build.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:build</a> - Explicit feature building</li>
+        <li><a href="{{ '/commands/feature-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:feature:make</a> - Direct feature creation</li>
+    </ul>
+
+    <h2>Related Agents</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - Analyzes and delegates builds</li>
+        <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - Creates feature components</li>
+    </ul>
 </div>

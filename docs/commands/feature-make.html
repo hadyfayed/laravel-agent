@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:feature:make
-description: Create complete feature (CRUD, views, API, tests)
+description: Create a complete Laravel feature with CRUD, views, API, migrations, and tests
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,144 @@ back_text: All Commands
         <span class="badge badge-builder">Builder</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:feature:make</h1>
-    <p class="text-xl text-muted-foreground">Create complete feature (CRUD, views, API, tests)</p>
+    <p class="text-xl text-muted-foreground">Create a complete Laravel feature with CRUD, views, API, migrations, and tests</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create complete feature (CRUD, views, API, tests). This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/feature:make</code> command creates a complete, production-ready feature in your Laravel application. Unlike <code>/build</code> which delegates to the architect, this command directly invokes the <strong>laravel-feature-builder</strong> agent to generate all necessary components.</p>
 
     <h2>Usage</h2>
-    <pre><code class="text-green-400">/laravel-agent:feature:make [options]</code></pre>
+    <pre><code class="language-bash">/laravel-agent:feature:make [feature name] [description]</code></pre>
 
     <h2>Examples</h2>
-    <pre><code class="text-green-400">/laravel-agent:feature:make</code></pre>
+    <pre><code class="language-bash"># Create an invoice management feature
+/laravel-agent:feature:make Invoices with line items, PDF export, and payment tracking
+
+# Create a product catalog
+/laravel-agent:feature:make Products with categories, variants, and inventory management
+
+# Create user notifications
+/laravel-agent:feature:make Notifications with email and in-app delivery</code></pre>
+
+    <h2>What Gets Created</h2>
+    <p>A complete feature includes the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Model</td>
+                    <td class="py-3 px-4"><code>app/Models/</code></td>
+                    <td class="py-3 px-4">Eloquent model with relationships and scopes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Migration</td>
+                    <td class="py-3 px-4"><code>database/migrations/</code></td>
+                    <td class="py-3 px-4">Database schema with indexes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Controller</td>
+                    <td class="py-3 px-4"><code>app/Http/Controllers/</code></td>
+                    <td class="py-3 px-4">CRUD operations with validation</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Form Request</td>
+                    <td class="py-3 px-4"><code>app/Http/Requests/</code></td>
+                    <td class="py-3 px-4">Validation rules for create/update</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Resource</td>
+                    <td class="py-3 px-4"><code>app/Http/Resources/</code></td>
+                    <td class="py-3 px-4">API resource transformers</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Views</td>
+                    <td class="py-3 px-4"><code>resources/views/</code></td>
+                    <td class="py-3 px-4">Blade templates (index, create, edit, show)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Routes</td>
+                    <td class="py-3 px-4"><code>routes/web.php</code></td>
+                    <td class="py-3 px-4">Resource routes with middleware</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Factory</td>
+                    <td class="py-3 px-4"><code>database/factories/</code></td>
+                    <td class="py-3 px-4">Model factory for testing</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/</code></td>
+                    <td class="py-3 px-4">Pest PHP feature tests</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Options</h2>
+    <p>You can customize what gets generated by including these in your description:</p>
+    <ul>
+        <li><strong>with API</strong> - Include API endpoints in <code>routes/api.php</code></li>
+        <li><strong>with soft deletes</strong> - Add soft delete support</li>
+        <li><strong>with tenancy</strong> - Add tenant isolation for multi-tenant apps</li>
+        <li><strong>without views</strong> - Skip Blade template generation</li>
+        <li><strong>without tests</strong> - Skip test generation (not recommended)</li>
+    </ul>
+
+    <h2>Example Output Structure</h2>
+    <p>For <code>/laravel-agent:feature:make Invoices with line items and PDF export</code>:</p>
+    <pre><code class="language-bash">app/
+├── Models/
+│   ├── Invoice.php
+│   └── InvoiceLineItem.php
+├── Http/
+│   ├── Controllers/
+│   │   └── InvoiceController.php
+│   ├── Requests/
+│   │   ├── StoreInvoiceRequest.php
+│   │   └── UpdateInvoiceRequest.php
+│   └── Resources/
+│       └── InvoiceResource.php
+├── Services/
+│   └── InvoicePdfService.php
+database/
+├── migrations/
+│   ├── create_invoices_table.php
+│   └── create_invoice_line_items_table.php
+└── factories/
+    └── InvoiceFactory.php
+resources/views/invoices/
+├── index.blade.php
+├── create.blade.php
+├── edit.blade.php
+└── show.blade.php
+tests/Feature/
+└── InvoiceTest.php</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Be specific</strong> - Describe relationships and special behaviors in detail</li>
+        <li><strong>Mention integrations</strong> - If you need PDF, email, or external API integration, include it</li>
+        <li><strong>Consider authorization</strong> - Specify who should access what (e.g., "only admins can delete")</li>
+        <li><strong>Review before running migrations</strong> - Always check generated migrations before running them</li>
+    </ol>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> agent.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/build.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:build</a> - Let the architect decide the best approach</li>
+        <li><a href="{{ '/commands/module-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:module:make</a> - Create reusable domain modules</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate additional tests</li>
+        <li><a href="{{ '/skills/laravel-feature.html' | relative_url }}" class="text-primary hover:underline">laravel-feature skill</a> - Auto-invoked for feature building</li>
+    </ul>
 </div>

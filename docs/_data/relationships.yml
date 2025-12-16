@@ -1,0 +1,201 @@
+# Relationships between commands, agents, skills, and hooks
+# Used to generate "Related" sections in detail pages
+
+commands:
+  build:
+    agent: laravel-architect
+    related_commands: [feature-make, module-make, service-make]
+    skills: [laravel-feature]
+    description: "The main entry point that delegates to the architect"
+
+  feature-make:
+    agent: laravel-feature-builder
+    related_commands: [build, module-make, test-make]
+    skills: [laravel-feature]
+    description: "Creates complete features with CRUD, views, API"
+
+  module-make:
+    agent: laravel-module-builder
+    related_commands: [build, feature-make, service-make]
+    skills: [laravel-feature]
+    description: "Creates reusable domain modules"
+
+  service-make:
+    agent: laravel-service-builder
+    related_commands: [build, module-make, feature-make]
+    skills: []
+    description: "Creates services and actions"
+
+  api-make:
+    agent: laravel-api-builder
+    related_commands: [api-docs, auth-setup]
+    skills: [laravel-api]
+    description: "Creates versioned REST APIs"
+
+  api-docs:
+    agent: laravel-api-builder
+    related_commands: [api-make]
+    skills: [laravel-api]
+    description: "Generates OpenAPI documentation"
+
+  test-make:
+    agent: laravel-testing
+    related_commands: [test-coverage, feature-make]
+    skills: [laravel-testing]
+    description: "Generates Pest PHP tests"
+
+  test-coverage:
+    agent: laravel-testing
+    related_commands: [test-make]
+    skills: [laravel-testing]
+    description: "Runs tests with coverage"
+
+  security-audit:
+    agent: laravel-security
+    related_commands: [review-staged, review-audit]
+    skills: [laravel-security]
+    hooks: [security-scan]
+    description: "OWASP security audit"
+
+  auth-setup:
+    agent: laravel-auth
+    related_commands: [api-make]
+    skills: [laravel-auth]
+    description: "Setup authentication and authorization"
+
+  livewire-make:
+    agent: laravel-livewire
+    related_commands: [filament-make]
+    skills: [laravel-livewire]
+    description: "Create Livewire components"
+
+  filament-make:
+    agent: laravel-filament
+    related_commands: [livewire-make]
+    skills: [laravel-filament]
+    description: "Create Filament admin resources"
+
+  db-optimize:
+    agent: laravel-database
+    related_commands: [db-diagram]
+    skills: [laravel-database]
+    description: "Optimize database queries"
+
+  db-diagram:
+    agent: laravel-database
+    related_commands: [db-optimize]
+    skills: [laravel-database]
+    description: "Generate database diagrams"
+
+  deploy-setup:
+    agent: laravel-deploy
+    related_commands: [cicd-setup]
+    skills: [laravel-deploy]
+    description: "Configure deployment"
+
+  cicd-setup:
+    agent: laravel-cicd
+    related_commands: [deploy-setup]
+    skills: []
+    description: "Setup CI/CD pipelines"
+
+  git-commit:
+    agent: laravel-git
+    related_commands: [review-staged, git-pr]
+    hooks: [pre-commit]
+    description: "Smart commit with message generation"
+
+  git-pr:
+    agent: laravel-git
+    related_commands: [git-commit, git-release]
+    description: "Create pull requests"
+
+  review-staged:
+    agent: laravel-review
+    related_commands: [git-commit, security-audit]
+    description: "Review staged changes"
+
+  reverb-setup:
+    agent: laravel-reverb
+    related_commands: [broadcast-make]
+    skills: [laravel-websocket]
+    description: "Setup WebSocket server"
+
+agents:
+  laravel-architect:
+    commands: [build]
+    delegates_to: [laravel-feature-builder, laravel-module-builder, laravel-service-builder, laravel-api-builder]
+    description: "Central decision maker"
+
+  laravel-feature-builder:
+    commands: [feature-make]
+    called_by: [laravel-architect]
+    description: "Builds complete features"
+
+  laravel-api-builder:
+    commands: [api-make, api-docs]
+    called_by: [laravel-architect]
+    description: "Builds REST APIs"
+
+  laravel-testing:
+    commands: [test-make, test-coverage]
+    description: "Generates tests"
+
+  laravel-security:
+    commands: [security-audit]
+    hooks: [security-scan]
+    description: "Security auditing"
+
+skills:
+  laravel-feature:
+    triggers: [build, feature, create, crud, implement]
+    commands: [build, feature-make]
+    agents: [laravel-architect, laravel-feature-builder]
+
+  laravel-api:
+    triggers: [api, rest, endpoint, openapi]
+    commands: [api-make, api-docs]
+    agents: [laravel-api-builder]
+
+  laravel-testing:
+    triggers: [test, pest, coverage, tdd]
+    commands: [test-make, test-coverage]
+    agents: [laravel-testing]
+
+  laravel-database:
+    triggers: [migration, query, eloquent, n+1]
+    commands: [db-optimize, db-diagram]
+    agents: [laravel-database]
+
+  laravel-auth:
+    triggers: [auth, permission, policy, sanctum]
+    commands: [auth-setup]
+    agents: [laravel-auth]
+
+  laravel-security:
+    triggers: [security, xss, sql injection, owasp]
+    commands: [security-audit]
+    agents: [laravel-security]
+    hooks: [security-scan]
+
+hooks:
+  pre-commit:
+    event: UserPromptSubmit
+    triggers: [git commit]
+    related_commands: [git-commit]
+
+  security-scan:
+    event: PostToolUse
+    triggers: [Edit]
+    related_commands: [security-audit]
+    related_skills: [laravel-security]
+
+  blade-lint:
+    event: PostToolUse
+    triggers: [Edit]
+    description: "Validates Blade templates"
+
+  migration-safety:
+    event: PostToolUse
+    triggers: [Edit]
+    description: "Warns about destructive migrations"

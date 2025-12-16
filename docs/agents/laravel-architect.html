@@ -13,20 +13,153 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-architect</h1>
     <p class="text-xl text-muted-foreground">Senior architect that analyzes requests, decides implementation approach, enforces SOLID/DRY, and delegates to builders</p>
-    <p class="text-sm text-muted-foreground mt-2">Delegates to: All builder agents</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Senior architect that analyzes requests, decides implementation approach, enforces SOLID/DRY, and delegates to builders. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-architect</strong> is the central decision-making agent in Laravel Agent. When you use <code>/build</code>, this agent analyzes your request, determines the optimal implementation strategy, enforces architectural constraints, and delegates work to specialized builder agents.</p>
+
+    <h2>How It Works</h2>
+    <div class="not-prose">
+        <div class="bg-muted/50 rounded-lg p-6 border border-border">
+            <pre class="text-sm text-foreground">
+┌─────────────────────────────────────────────────────────────┐
+│                     User Request                            │
+│              "/build Invoice management"                    │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   laravel-architect                         │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ 1. Analyze request scope and complexity             │   │
+│  │ 2. Check existing codebase patterns                 │   │
+│  │ 3. Decide implementation approach                   │   │
+│  │ 4. Enforce 5-pattern limit per request              │   │
+│  │ 5. Delegate to appropriate builder(s)              │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+           ┌──────────────────┼──────────────────┐
+           ▼                  ▼                  ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │  feature-   │    │   module-   │    │  service-   │
+    │  builder    │    │   builder   │    │  builder    │
+    └─────────────┘    └─────────────┘    └─────────────┘
+            </pre>
+        </div>
+    </div>
 
     <h2>Responsibilities</h2>
     <ul>
-        <li>Specialized handling of core-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Request Analysis</strong> - Understands what you're trying to build</li>
+        <li><strong>Pattern Selection</strong> - Chooses appropriate design patterns (max 5)</li>
+        <li><strong>Codebase Awareness</strong> - Checks existing code to avoid duplication</li>
+        <li><strong>SOLID Enforcement</strong> - Ensures code follows SOLID principles</li>
+        <li><strong>DRY Compliance</strong> - Prevents code duplication across the project</li>
+        <li><strong>Delegation</strong> - Routes work to the right specialized builder</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>Delegates to: All builder agents</strong></p>
+    <h2>Decision Process</h2>
+    <p>When the architect receives a request, it follows this decision tree:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Request Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Delegates To</th>
+                    <th class="text-left py-3 px-4 font-medium">Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Complete feature (CRUD, views, etc.)</td>
+                    <td class="py-3 px-4"><code>laravel-feature-builder</code></td>
+                    <td class="py-3 px-4">"Build invoice management"</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Reusable domain module</td>
+                    <td class="py-3 px-4"><code>laravel-module-builder</code></td>
+                    <td class="py-3 px-4">"Create a payment gateway module"</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Service or action class</td>
+                    <td class="py-3 px-4"><code>laravel-service-builder</code></td>
+                    <td class="py-3 px-4">"Create PDF generation service"</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">REST API endpoint</td>
+                    <td class="py-3 px-4"><code>laravel-api-builder</code></td>
+                    <td class="py-3 px-4">"Build products API v1"</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Database optimization</td>
+                    <td class="py-3 px-4"><code>laravel-database</code></td>
+                    <td class="py-3 px-4">"Optimize slow queries"</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Livewire component</td>
+                    <td class="py-3 px-4"><code>laravel-livewire</code></td>
+                    <td class="py-3 px-4">"Build data table component"</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Filament admin resource</td>
+                    <td class="py-3 px-4"><code>laravel-filament</code></td>
+                    <td class="py-3 px-4">"Create user management panel"</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Pattern Limit</h2>
+    <p>To prevent over-engineering, the architect enforces a <strong>5-pattern limit</strong> per request. This means:</p>
+    <ul>
+        <li>Maximum 5 design patterns in a single implementation</li>
+        <li>Simpler solutions are preferred over complex ones</li>
+        <li>Each pattern must justify its inclusion</li>
+    </ul>
+    <p>Use <code>/laravel-agent:patterns</code> to see current pattern usage.</p>
+
+    <h2>Codebase Analysis</h2>
+    <p>Before delegating, the architect scans your codebase for:</p>
+    <ul>
+        <li><strong>Existing services</strong> - Reuse instead of duplicate</li>
+        <li><strong>Naming conventions</strong> - Match your project's style</li>
+        <li><strong>Directory structure</strong> - Follow established patterns</li>
+        <li><strong>Related code</strong> - Identify integration points</li>
+    </ul>
+
+    <h2>Example Decision</h2>
+    <pre><code class="language-bash"># User request
+/build Invoice management with PDF export and email notifications
+
+# Architect analysis
+→ Request type: Complete feature
+→ Components needed: Model, Controller, Views, Service, Notification
+→ Patterns selected: Repository (data access), Service (business logic),
+                      Observer (events), Factory (test data)
+→ Pattern count: 4/5 ✓
+→ Delegating to: laravel-feature-builder</code></pre>
+
+    <h2>Builder Agents</h2>
+    <p>The architect delegates to these specialized builders:</p>
+    <ul>
+        <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - Complete features with CRUD</li>
+        <li><a href="{{ '/agents/laravel-module-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-module-builder</a> - Reusable domain modules</li>
+        <li><a href="{{ '/agents/laravel-service-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-service-builder</a> - Services and actions</li>
+        <li><a href="{{ '/agents/laravel-api-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-api-builder</a> - REST API resources</li>
+    </ul>
+
+    <h2>Invoked By</h2>
+    <ul>
+        <li><a href="{{ '/commands/build.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:build</a> - Main entry point</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/feature-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:feature:make</a> - Bypass architect, direct to builder</li>
+        <li><a href="{{ '/commands/patterns.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:patterns</a> - View pattern usage</li>
+        <li><a href="{{ '/skills/laravel-feature.html' | relative_url }}" class="text-primary hover:underline">laravel-feature skill</a> - Auto-invoked feature building</li>
+    </ul>
 </div>

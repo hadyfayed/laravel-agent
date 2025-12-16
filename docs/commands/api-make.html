@@ -17,11 +17,193 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create a versioned API resource with documentation. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/api:make</code> command creates a complete, versioned REST API resource following best practices. It generates controllers, resources, requests, and routes with proper versioning, authentication, and OpenAPI documentation.</p>
 
     <h2>Usage</h2>
-    <pre><code class="text-green-400">/laravel-agent:api:make [options]</code></pre>
+    <pre><code class="language-bash">/laravel-agent:api:make [resource name] [description]</code></pre>
 
     <h2>Examples</h2>
-    <pre><code class="text-green-400">/laravel-agent:api:make</code></pre>
+    <pre><code class="language-bash"># Create a products API
+/laravel-agent:api:make Products with filtering, sorting, and pagination
+
+# Create an orders API with nested resources
+/laravel-agent:api:make Orders with line items, status transitions, and webhook events
+
+# Create a users API with authentication
+/laravel-agent:api:make Users with registration, profile updates, and avatar upload</code></pre>
+
+    <h2>What Gets Created</h2>
+    <p>A complete API resource includes the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">API Controller</td>
+                    <td class="py-3 px-4"><code>app/Http/Controllers/Api/V1/</code></td>
+                    <td class="py-3 px-4">RESTful controller with index, show, store, update, destroy</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">API Resource</td>
+                    <td class="py-3 px-4"><code>app/Http/Resources/V1/</code></td>
+                    <td class="py-3 px-4">JSON resource transformer with conditional attributes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Resource Collection</td>
+                    <td class="py-3 px-4"><code>app/Http/Resources/V1/</code></td>
+                    <td class="py-3 px-4">Collection wrapper with pagination meta</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Form Requests</td>
+                    <td class="py-3 px-4"><code>app/Http/Requests/Api/V1/</code></td>
+                    <td class="py-3 px-4">Store and Update request validation</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Query Filters</td>
+                    <td class="py-3 px-4"><code>app/Http/Filters/</code></td>
+                    <td class="py-3 px-4">Spatie Query Builder filters for searching/sorting</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">API Routes</td>
+                    <td class="py-3 px-4"><code>routes/api/v1.php</code></td>
+                    <td class="py-3 px-4">Versioned routes with middleware</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">OpenAPI Spec</td>
+                    <td class="py-3 px-4"><code>docs/api/</code></td>
+                    <td class="py-3 px-4">OpenAPI 3.0 documentation</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">API Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/Api/V1/</code></td>
+                    <td class="py-3 px-4">Pest PHP API tests with assertions</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>API Versioning Strategy</h2>
+    <p>The command implements URL-based versioning by default:</p>
+    <pre><code class="language-bash"># Version 1 endpoints
+GET    /api/v1/products
+GET    /api/v1/products/{id}
+POST   /api/v1/products
+PUT    /api/v1/products/{id}
+DELETE /api/v1/products/{id}
+
+# Future versions
+GET    /api/v2/products  # When breaking changes needed</code></pre>
+
+    <h2>Options</h2>
+    <p>Customize generation by including these in your description:</p>
+    <ul>
+        <li><strong>with Sanctum</strong> - Add Laravel Sanctum token authentication</li>
+        <li><strong>with rate limiting</strong> - Add per-user rate limiting middleware</li>
+        <li><strong>with pagination</strong> - Include cursor or offset pagination</li>
+        <li><strong>with filtering</strong> - Add Spatie Query Builder for advanced filtering</li>
+        <li><strong>with webhooks</strong> - Generate webhook event dispatching</li>
+        <li><strong>without docs</strong> - Skip OpenAPI documentation generation</li>
+    </ul>
+
+    <h2>Example Output Structure</h2>
+    <p>For <code>/laravel-agent:api:make Products with filtering and pagination</code>:</p>
+    <pre><code class="language-bash">app/
+├── Http/
+│   ├── Controllers/Api/V1/
+│   │   └── ProductController.php
+│   ├── Requests/Api/V1/
+│   │   ├── StoreProductRequest.php
+│   │   └── UpdateProductRequest.php
+│   ├── Resources/V1/
+│   │   ├── ProductResource.php
+│   │   └── ProductCollection.php
+│   └── Filters/
+│       └── ProductFilter.php
+routes/
+├── api.php
+└── api/
+    └── v1.php
+docs/api/
+└── products.yaml
+tests/Feature/Api/V1/
+└── ProductTest.php</code></pre>
+
+    <h2>Generated Controller Example</h2>
+    <pre><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreProductRequest;
+use App\Http\Requests\Api\V1\UpdateProductRequest;
+use App\Http\Resources\V1\ProductCollection;
+use App\Http\Resources\V1\ProductResource;
+use App\Models\Product;
+use Spatie\QueryBuilder\QueryBuilder;
+
+class ProductController extends Controller
+{
+    public function index()
+    {
+        $products = QueryBuilder::for(Product::class)
+            ->allowedFilters(['name', 'category', 'price'])
+            ->allowedSorts(['name', 'price', 'created_at'])
+            ->paginate();
+
+        return new ProductCollection($products);
+    }
+
+    public function store(StoreProductRequest $request)
+    {
+        $product = Product::create($request->validated());
+
+        return new ProductResource($product);
+    }
+
+    public function show(Product $product)
+    {
+        return new ProductResource($product->load('category'));
+    }
+
+    public function update(UpdateProductRequest $request, Product $product)
+    {
+        $product->update($request->validated());
+
+        return new ProductResource($product);
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+
+        return response()->noContent();
+    }
+}</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Use consistent naming</strong> - Plural resource names (products, not product)</li>
+        <li><strong>Version from the start</strong> - Always use v1, even for initial release</li>
+        <li><strong>Include rate limiting</strong> - Protect your API from abuse</li>
+        <li><strong>Document everything</strong> - OpenAPI docs enable client generation</li>
+        <li><strong>Test thoroughly</strong> - Generated tests cover happy paths; add edge cases</li>
+    </ol>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <a href="{{ '/agents/laravel-api-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-api-builder</a> agent.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/api-docs.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:docs</a> - Generate API documentation</li>
+        <li><a href="{{ '/commands/auth-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:auth:setup</a> - Setup API authentication</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate additional API tests</li>
+        <li><a href="{{ '/skills/laravel-api.html' | relative_url }}" class="text-primary hover:underline">laravel-api skill</a> - Auto-invoked for API building</li>
+    </ul>
 </div>

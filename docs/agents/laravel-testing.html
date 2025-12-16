@@ -13,20 +13,183 @@ back_text: All Agents
     </div>
     <h1 class="text-3xl font-bold mb-2">laravel-testing</h1>
     <p class="text-xl text-muted-foreground">Generates Pest PHP tests - unit, feature, API, browser</p>
-    <p class="text-sm text-muted-foreground mt-2">tests/Unit/, tests/Feature/</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Generates Pest PHP tests - unit, feature, API, browser. This agent is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <strong>laravel-testing</strong> agent generates comprehensive test suites using <a href="https://pestphp.com/" target="_blank" rel="noopener">Pest PHP</a>. It analyzes your code and creates tests covering happy paths, edge cases, validation, authorization, and database interactions.</p>
 
-    <h2>Responsibilities</h2>
+    <h2>Test Types Generated</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Case</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Unit Tests</td>
+                    <td class="py-3 px-4"><code>tests/Unit/</code></td>
+                    <td class="py-3 px-4">Isolated class testing, services, helpers</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Feature Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/</code></td>
+                    <td class="py-3 px-4">HTTP endpoints, middleware, full request cycle</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">API Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/Api/</code></td>
+                    <td class="py-3 px-4">JSON API assertions, authentication flows</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Livewire Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/Livewire/</code></td>
+                    <td class="py-3 px-4">Component interactions, wire:model, events</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4 font-medium">Browser Tests</td>
+                    <td class="py-3 px-4"><code>tests/Browser/</code></td>
+                    <td class="py-3 px-4">Laravel Dusk end-to-end testing</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Pest PHP Features Used</h2>
+    <p>Generated tests leverage modern Pest PHP syntax:</p>
+    <pre><code class="language-php">&lt;?php
+
+use App\Models\User;
+use App\Models\Order;
+
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
+describe('Order Management', function () {
+
+    beforeEach(function () {
+        $this->user = User::factory()->create();
+    });
+
+    describe('creating orders', function () {
+
+        it('creates an order with valid data', function () {
+            $response = $this->actingAs($this->user)
+                ->postJson('/api/orders', [
+                    'product_id' => 1,
+                    'quantity' => 2,
+                ]);
+
+            $response->assertCreated();
+
+            expect(Order::count())->toBe(1);
+        });
+
+        it('validates required fields', function () {
+            $response = $this->actingAs($this->user)
+                ->postJson('/api/orders', []);
+
+            $response->assertUnprocessable()
+                ->assertJsonValidationErrors(['product_id', 'quantity']);
+        });
+
+    });
+
+    describe('authorization', function () {
+
+        it('prevents guests from creating orders', function () {
+            $response = $this->postJson('/api/orders', [
+                'product_id' => 1,
+            ]);
+
+            $response->assertUnauthorized();
+        });
+
+        it('prevents users from viewing others orders', function () {
+            $otherUser = User::factory()->create();
+            $order = Order::factory()->for($otherUser)->create();
+
+            $response = $this->actingAs($this->user)
+                ->getJson("/api/orders/{$order->id}");
+
+            $response->assertForbidden();
+        });
+
+    });
+
+});</code></pre>
+
+    <h2>Test Coverage Areas</h2>
+    <p>The agent automatically generates tests for:</p>
     <ul>
-        <li>Specialized handling of quality-related tasks</li>
-        <li>Integration with Laravel best practices</li>
-        <li>Code generation following SOLID principles</li>
+        <li><strong>Happy paths</strong> - Standard successful operations</li>
+        <li><strong>Validation</strong> - Required fields, formats, uniqueness</li>
+        <li><strong>Authorization</strong> - Policies, gates, role checks</li>
+        <li><strong>Database state</strong> - assertDatabaseHas/Missing</li>
+        <li><strong>Edge cases</strong> - Null values, boundaries, empty inputs</li>
+        <li><strong>Relationships</strong> - Cascade deletes, constraints</li>
     </ul>
 
-    <h2>Output</h2>
-    <p><strong>tests/Unit/, tests/Feature/</strong></p>
+    <h2>Factory Integration</h2>
+    <p>Tests use model factories for realistic data:</p>
+    <pre><code class="language-php">// Generated factory usage
+it('lists orders with pagination', function () {
+    Order::factory()
+        ->count(25)
+        ->for($this->user)
+        ->create();
+
+    $response = $this->actingAs($this->user)
+        ->getJson('/api/orders');
+
+    $response->assertOk()
+        ->assertJsonCount(15, 'data')
+        ->assertJsonPath('meta.total', 25);
+});
+
+// With specific states
+it('shows only pending orders', function () {
+    Order::factory()->pending()->count(3)->for($this->user)->create();
+    Order::factory()->completed()->count(2)->for($this->user)->create();
+
+    $response = $this->actingAs($this->user)
+        ->getJson('/api/orders?status=pending');
+
+    $response->assertJsonCount(3, 'data');
+});</code></pre>
+
+    <h2>Mocking External Services</h2>
+    <p>The agent generates mocks for external dependencies:</p>
+    <pre><code class="language-php">use App\Services\PaymentGateway;
+
+it('processes payment successfully', function () {
+    $mock = Mockery::mock(PaymentGateway::class);
+    $mock->shouldReceive('charge')
+        ->once()
+        ->with(100.00, Mockery::any())
+        ->andReturn(['status' => 'success', 'transaction_id' => 'txn_123']);
+
+    $this->app->instance(PaymentGateway::class, $mock);
+
+    $response = $this->actingAs($this->user)
+        ->postJson('/api/checkout', ['amount' => 100.00]);
+
+    $response->assertOk()
+        ->assertJsonPath('transaction_id', 'txn_123');
+});</code></pre>
+
+    <h2>Invoked By Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests for a class/feature</li>
+        <li><a href="{{ '/commands/test-coverage.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:coverage</a> - Run tests with coverage report</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - Creates features with tests included</li>
+        <li><a href="{{ '/skills/laravel-testing.html' | relative_url }}" class="text-primary hover:underline">laravel-testing skill</a> - Auto-invoked testing expertise</li>
+    </ul>
 </div>

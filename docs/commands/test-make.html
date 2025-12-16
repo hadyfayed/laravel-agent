@@ -17,11 +17,209 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Generate comprehensive Pest tests for a class or feature. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/test:make</code> command generates comprehensive <a href="https://pestphp.com/" target="_blank" rel="noopener">Pest PHP</a> tests for your Laravel classes and features. It analyzes existing code and creates tests covering happy paths, edge cases, validation, authorization, and database interactions.</p>
 
     <h2>Usage</h2>
-    <pre><code class="text-green-400">/laravel-agent:test:make [options]</code></pre>
+    <pre><code class="language-bash">/laravel-agent:test:make [target] [options]</code></pre>
 
     <h2>Examples</h2>
-    <pre><code class="text-green-400">/laravel-agent:test:make</code></pre>
+    <pre><code class="language-bash"># Generate tests for a controller
+/laravel-agent:test:make ProductController
+
+# Generate tests for a service class
+/laravel-agent:test:make OrderService with mocking
+
+# Generate tests for an entire feature
+/laravel-agent:test:make Invoice feature with database assertions
+
+# Generate API tests
+/laravel-agent:test:make Api/V1/UserController</code></pre>
+
+    <h2>What Gets Created</h2>
+    <p>Depending on the target, the following test types may be generated:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Test Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Feature Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/</code></td>
+                    <td class="py-3 px-4">HTTP tests for controllers and routes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Unit Tests</td>
+                    <td class="py-3 px-4"><code>tests/Unit/</code></td>
+                    <td class="py-3 px-4">Isolated tests for services and helpers</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">API Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/Api/</code></td>
+                    <td class="py-3 px-4">JSON API endpoint tests with assertions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Livewire Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/Livewire/</code></td>
+                    <td class="py-3 px-4">Component tests using Livewire testing utilities</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Test Coverage Areas</h2>
+    <p>Generated tests automatically cover:</p>
+    <ul>
+        <li><strong>Happy paths</strong> - Standard successful operations</li>
+        <li><strong>Validation</strong> - Required fields, format validation, unique constraints</li>
+        <li><strong>Authorization</strong> - Policy checks, gate permissions, role-based access</li>
+        <li><strong>Database state</strong> - assertDatabaseHas, assertDatabaseMissing</li>
+        <li><strong>Relationships</strong> - Cascade deletes, foreign key constraints</li>
+        <li><strong>Edge cases</strong> - Empty inputs, boundary values, null handling</li>
+    </ul>
+
+    <h2>Options</h2>
+    <p>Customize test generation by including these in your description:</p>
+    <ul>
+        <li><strong>with mocking</strong> - Generate mocks for external dependencies</li>
+        <li><strong>with factories</strong> - Use model factories for test data</li>
+        <li><strong>with database</strong> - Include RefreshDatabase trait and DB assertions</li>
+        <li><strong>with coverage</strong> - Add @covers annotations for coverage tracking</li>
+        <li><strong>unit only</strong> - Generate only unit tests (no HTTP tests)</li>
+        <li><strong>feature only</strong> - Generate only feature tests (no unit tests)</li>
+    </ul>
+
+    <h2>Example Generated Tests</h2>
+    <p>For <code>/laravel-agent:test:make ProductController</code>:</p>
+    <pre><code class="language-php">&lt;?php
+
+use App\Models\Product;
+use App\Models\User;
+
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
+describe('ProductController', function () {
+
+    describe('index', function () {
+        it('returns paginated products', function () {
+            Product::factory()->count(15)->create();
+
+            $response = $this->getJson('/api/v1/products');
+
+            $response->assertOk()
+                ->assertJsonCount(10, 'data')
+                ->assertJsonStructure([
+                    'data' => [['id', 'name', 'price']],
+                    'meta' => ['current_page', 'total'],
+                ]);
+        });
+
+        it('filters products by category', function () {
+            Product::factory()->create(['category' => 'electronics']);
+            Product::factory()->create(['category' => 'clothing']);
+
+            $response = $this->getJson('/api/v1/products?filter[category]=electronics');
+
+            $response->assertOk()
+                ->assertJsonCount(1, 'data');
+        });
+    });
+
+    describe('store', function () {
+        it('creates a product with valid data', function () {
+            $user = User::factory()->create();
+
+            $response = $this->actingAs($user)
+                ->postJson('/api/v1/products', [
+                    'name' => 'Test Product',
+                    'price' => 99.99,
+                ]);
+
+            $response->assertCreated()
+                ->assertJsonPath('data.name', 'Test Product');
+
+            $this->assertDatabaseHas('products', [
+                'name' => 'Test Product',
+            ]);
+        });
+
+        it('validates required fields', function () {
+            $user = User::factory()->create();
+
+            $response = $this->actingAs($user)
+                ->postJson('/api/v1/products', []);
+
+            $response->assertUnprocessable()
+                ->assertJsonValidationErrors(['name', 'price']);
+        });
+
+        it('requires authentication', function () {
+            $response = $this->postJson('/api/v1/products', [
+                'name' => 'Test',
+            ]);
+
+            $response->assertUnauthorized();
+        });
+    });
+
+    describe('destroy', function () {
+        it('deletes a product', function () {
+            $user = User::factory()->create();
+            $product = Product::factory()->create();
+
+            $response = $this->actingAs($user)
+                ->deleteJson("/api/v1/products/{$product->id}");
+
+            $response->assertNoContent();
+
+            $this->assertDatabaseMissing('products', [
+                'id' => $product->id,
+            ]);
+        });
+
+        it('returns 404 for non-existent product', function () {
+            $user = User::factory()->create();
+
+            $response = $this->actingAs($user)
+                ->deleteJson('/api/v1/products/99999');
+
+            $response->assertNotFound();
+        });
+    });
+});</code></pre>
+
+    <h2>Pest PHP Features Used</h2>
+    <p>Generated tests leverage modern Pest PHP features:</p>
+    <ul>
+        <li><code>describe()</code> - Group related tests by method or feature</li>
+        <li><code>it()</code> - Expressive test naming</li>
+        <li><code>beforeEach()</code> - Shared setup for test groups</li>
+        <li><code>uses()</code> - Trait application (RefreshDatabase, etc.)</li>
+        <li><code>expect()</code> - Expectation API for fluent assertions</li>
+        <li>Datasets - Parameterized testing for multiple inputs</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Use factories</strong> - Let factories handle test data creation</li>
+        <li><strong>Test behavior, not implementation</strong> - Focus on what, not how</li>
+        <li><strong>One assertion concept per test</strong> - Keep tests focused</li>
+        <li><strong>Add edge cases</strong> - Generated tests cover basics; add your domain-specific cases</li>
+        <li><strong>Run frequently</strong> - Use <code>/laravel-agent:test:coverage</code> to track progress</li>
+    </ol>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <a href="{{ '/agents/laravel-testing.html' | relative_url }}" class="text-primary hover:underline">laravel-testing</a> agent.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/test-coverage.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:coverage</a> - Run tests with coverage report</li>
+        <li><a href="{{ '/commands/feature-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:feature:make</a> - Create features with tests included</li>
+        <li><a href="{{ '/skills/laravel-testing.html' | relative_url }}" class="text-primary hover:underline">laravel-testing skill</a> - Auto-invoked for test generation</li>
+    </ul>
 </div>
