@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agents - Laravel Agent</title>
+    <meta name="description" content="23 specialized agents for Laravel development with Claude Code">
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: 'oklch(var(--background) / <alpha-value>)',
+                        foreground: 'oklch(var(--foreground) / <alpha-value>)',
+                        card: 'oklch(var(--card) / <alpha-value>)',
+                        'card-foreground': 'oklch(var(--card-foreground) / <alpha-value>)',
+                        primary: 'oklch(var(--primary) / <alpha-value>)',
+                        'primary-foreground': 'oklch(var(--primary-foreground) / <alpha-value>)',
+                        secondary: 'oklch(var(--secondary) / <alpha-value>)',
+                        'secondary-foreground': 'oklch(var(--secondary-foreground) / <alpha-value>)',
+                        muted: 'oklch(var(--muted) / <alpha-value>)',
+                        'muted-foreground': 'oklch(var(--muted-foreground) / <alpha-value>)',
+                        accent: 'oklch(var(--accent) / <alpha-value>)',
+                        'accent-foreground': 'oklch(var(--accent-foreground) / <alpha-value>)',
+                        border: 'oklch(var(--border) / <alpha-value>)',
+                    },
+                    borderRadius: { DEFAULT: 'var(--radius)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --radius: 0.625rem;
+            --background: 1 0 0; --foreground: 0.145 0 0;
+            --card: 1 0 0; --card-foreground: 0.145 0 0;
+            --primary: 0.205 0 0; --primary-foreground: 0.985 0 0;
+            --secondary: 0.97 0 0; --secondary-foreground: 0.205 0 0;
+            --muted: 0.97 0 0; --muted-foreground: 0.556 0 0;
+            --accent: 0.97 0 0; --accent-foreground: 0.205 0 0;
+            --border: 0.922 0 0;
+        }
+        .dark {
+            --background: 0.145 0 0; --foreground: 0.985 0 0;
+            --card: 0.205 0 0; --card-foreground: 0.985 0 0;
+            --primary: 0.922 0 0; --primary-foreground: 0.205 0 0;
+            --secondary: 0.269 0 0; --secondary-foreground: 0.985 0 0;
+            --muted: 0.269 0 0; --muted-foreground: 0.708 0 0;
+            --accent: 0.269 0 0; --accent-foreground: 0.985 0 0;
+            --border: 0.3 0 0;
+        }
+        .agent-card { transition: all 0.2s; }
+        .agent-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1); }
+        .category-badge { display: inline-flex; padding: 0.125rem 0.5rem; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 0.25rem; }
+        .cat-core { background: oklch(0.488 0.243 264.376); color: white; }
+        .cat-builder { background: oklch(0.7 0.15 150); color: white; }
+        .cat-frontend { background: oklch(0.6 0.2 330); color: white; }
+        .cat-backend { background: oklch(0.55 0.2 200); color: white; }
+        .cat-devops { background: oklch(0.5 0.15 180); color: white; }
+        .cat-quality { background: oklch(0.55 0.15 60); color: white; }
+    </style>
+</head>
+<body class="bg-background text-foreground antialiased min-h-screen">
+    <header class="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-3 text-foreground hover:text-primary transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span class="text-sm font-medium">Back to Home</span>
+                </a>
+            </div>
+            <div class="flex items-center gap-4">
+                <input type="text" id="search" placeholder="Search agents..." class="px-4 py-2 rounded-[var(--radius)] bg-muted border border-border text-sm w-64 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                <button id="theme-toggle" class="p-2 rounded-[var(--radius)] hover:bg-accent">
+                    <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>
+                    <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Agents</h1>
+            <p class="text-muted-foreground">23 specialized agents that handle different aspects of Laravel development</p>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mb-8" id="filters">
+            <button data-filter="all" class="filter-btn active px-4 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground">All (23)</button>
+            <button data-filter="core" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Core (1)</button>
+            <button data-filter="builder" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Builders (5)</button>
+            <button data-filter="frontend" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Frontend (2)</button>
+            <button data-filter="backend" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Backend (8)</button>
+            <button data-filter="devops" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">DevOps (3)</button>
+            <button data-filter="quality" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Quality (4)</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="agents-grid">
+            <!-- Core -->
+            <a href="agents/laravel-architect.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="core" data-name="laravel-architect">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-architect</h3>
+                    <span class="category-badge cat-core">Core</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Senior architect that analyzes requests, decides implementation approach (Feature/Module/Service/Action), enforces SOLID/DRY, and delegates to specialized builders.</p>
+                <div class="text-xs text-muted-foreground">Delegates to: All builder agents</div>
+            </a>
+
+            <!-- Builders -->
+            <a href="agents/laravel-feature-builder.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="laravel-feature-builder">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-feature-builder</h3>
+                    <span class="category-badge cat-builder">Builder</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Builds complete features with CRUD operations, views, API endpoints, migrations, and tests in a self-contained structure.</p>
+                <div class="text-xs text-muted-foreground">Creates: app/Features/&lt;Name&gt;/</div>
+            </a>
+
+            <a href="agents/laravel-module-builder.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="laravel-module-builder">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-module-builder</h3>
+                    <span class="category-badge cat-builder">Builder</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Builds reusable domain modules without routes/views. Pure business logic that can be shared across features.</p>
+                <div class="text-xs text-muted-foreground">Creates: app/Modules/&lt;Name&gt;/</div>
+            </a>
+
+            <a href="agents/laravel-service-builder.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="laravel-service-builder">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-service-builder</h3>
+                    <span class="category-badge cat-builder">Builder</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Creates services for orchestrating operations and actions for single discrete operations with proper patterns.</p>
+                <div class="text-xs text-muted-foreground">Creates: app/Services/ or app/Actions/</div>
+            </a>
+
+            <a href="agents/laravel-api-builder.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="laravel-api-builder">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-api-builder</h3>
+                    <span class="category-badge cat-builder">Builder</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Builds REST APIs with versioning, OpenAPI documentation, rate limiting, and proper resource transformations.</p>
+                <div class="text-xs text-muted-foreground">Creates: routes/api.php, app/Http/Controllers/Api/</div>
+            </a>
+
+            <a href="agents/laravel-package.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="laravel-package">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-package</h3>
+                    <span class="category-badge cat-builder">Builder</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Creates distributable Laravel packages with proper structure, service providers, and Packagist publishing.</p>
+                <div class="text-xs text-muted-foreground">Creates: packages/&lt;vendor&gt;/&lt;name&gt;/</div>
+            </a>
+
+            <!-- Frontend -->
+            <a href="agents/laravel-livewire.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="frontend" data-name="laravel-livewire">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-livewire</h3>
+                    <span class="category-badge cat-frontend">Frontend</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Creates Livewire 3 reactive components with forms, tables, modals, polling, and real-time updates.</p>
+                <div class="text-xs text-muted-foreground">Creates: app/Livewire/, resources/views/livewire/</div>
+            </a>
+
+            <a href="agents/laravel-filament.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="frontend" data-name="laravel-filament">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-filament</h3>
+                    <span class="category-badge cat-frontend">Frontend</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Builds Filament admin panels with resources, pages, widgets, relation managers, and custom actions.</p>
+                <div class="text-xs text-muted-foreground">Creates: app/Filament/Resources/</div>
+            </a>
+
+            <!-- Backend -->
+            <a href="agents/laravel-auth.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="backend" data-name="laravel-auth">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-auth</h3>
+                    <span class="category-badge cat-backend">Backend</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Sets up authentication and authorization with policies, gates, roles/permissions using Sanctum or Passport.</p>
+                <div class="text-xs text-muted-foreground">Creates: app/Policies/, config/auth.php</div>
+            </a>
+
+            <a href="agents/laravel-database.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="backend" data-name="laravel-database">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-database</h3>
+                    <span class="category-badge cat-backend">Backend</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Creates migrations, optimizes queries, fixes N+1 problems, designs schemas, and manages relationships.</p>
+                <div class="text-xs text-muted-foreground">Creates: database/migrations/</div>
+            </a>
+
+            <a href="agents/laravel-queue.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="backend" data-name="laravel-queue">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-queue</h3>
+                    <span class="category-badge cat-backend">Backend</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Creates queued jobs, events, listeners, and notifications with proper retry logic and failure handling.</p>
+                <div class="text-xs text-muted-foreground">Creates: app/Jobs/, app/Events/, app/Listeners/</div>
+            </a>
+
+            <a href="agents/laravel-reverb.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="backend" data-name="laravel-reverb">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-reverb</h3>
+                    <span class="category-badge cat-backend">Backend</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Sets up Laravel Reverb WebSocket server for real-time features with broadcasting configuration.</p>
+                <div class="text-xs text-muted-foreground">Creates: config/broadcasting.php</div>
+            </a>
+
+            <a href="agents/laravel-pennant.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="backend" data-name="laravel-pennant">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-pennant</h3>
+                    <span class="category-badge cat-backend">Backend</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Creates feature flags and A/B tests using Laravel Pennant with proper scoping and resolution.</p>
+                <div class="text-xs text-muted-foreground">Creates: app/Features/</div>
+            </a>
+
+            <a href="agents/laravel-ai.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="backend" data-name="laravel-ai">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-ai</h3>
+                    <span class="category-badge cat-backend">Backend</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Creates AI-powered features using Prism PHP for LLM integration with proper prompting and response handling.</p>
+                <div class="text-xs text-muted-foreground">Creates: app/Services/AI/</div>
+            </a>
+
+            <a href="agents/laravel-migration.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="backend" data-name="laravel-migration">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-migration</h3>
+                    <span class="category-badge cat-backend">Backend</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Handles Laravel/PHP version upgrades, legacy migrations, and codebase modernization with Rector.</p>
+                <div class="text-xs text-muted-foreground">Uses: rector, php-cs-fixer</div>
+            </a>
+
+            <a href="agents/laravel-performance.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="backend" data-name="laravel-performance">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-performance</h3>
+                    <span class="category-badge cat-backend">Backend</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Optimizes application performance with caching strategies, query optimization, and Pulse monitoring setup.</p>
+                <div class="text-xs text-muted-foreground">Creates: config/cache.php, Pulse dashboards</div>
+            </a>
+
+            <!-- DevOps -->
+            <a href="agents/laravel-deploy.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="laravel-deploy">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-deploy</h3>
+                    <span class="category-badge cat-devops">DevOps</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Configures deployment for Forge, Vapor, Docker, and Bref with zero-downtime strategies and health checks.</p>
+                <div class="text-xs text-muted-foreground">Creates: Dockerfile, serverless.yml</div>
+            </a>
+
+            <a href="agents/laravel-cicd.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="laravel-cicd">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-cicd</h3>
+                    <span class="category-badge cat-devops">DevOps</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Sets up CI/CD pipelines for GitHub Actions and GitLab CI with testing, linting, and deployment stages.</p>
+                <div class="text-xs text-muted-foreground">Creates: .github/workflows/</div>
+            </a>
+
+            <a href="agents/laravel-git.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="laravel-git">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-git</h3>
+                    <span class="category-badge cat-devops">DevOps</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Handles git operations including smart commits, pull request creation, and release management with changelogs.</p>
+                <div class="text-xs text-muted-foreground">Uses: git, gh CLI</div>
+            </a>
+
+            <!-- Quality -->
+            <a href="agents/laravel-testing.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="quality" data-name="laravel-testing">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-testing</h3>
+                    <span class="category-badge cat-quality">Quality</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Generates Pest PHP tests - unit, feature, API, and browser tests with proper assertions and mocking.</p>
+                <div class="text-xs text-muted-foreground">Creates: tests/Unit/, tests/Feature/</div>
+            </a>
+
+            <a href="agents/laravel-security.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="quality" data-name="laravel-security">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-security</h3>
+                    <span class="category-badge cat-quality">Quality</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Runs OWASP security audits, implements security headers, and fixes vulnerabilities with false positive filtering.</p>
+                <div class="text-xs text-muted-foreground">Checks: SQL injection, XSS, CSRF, mass assignment</div>
+            </a>
+
+            <a href="agents/laravel-review.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="quality" data-name="laravel-review">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-review</h3>
+                    <span class="category-badge cat-quality">Quality</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Orchestrates code reviews with parallel specialized reviewers for security, quality, and Laravel best practices.</p>
+                <div class="text-xs text-muted-foreground">Delegates to: laravel-validator</div>
+            </a>
+
+            <a href="agents/laravel-refactor.html" class="agent-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="quality" data-name="laravel-refactor">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold">laravel-refactor</h3>
+                    <span class="category-badge cat-quality">Quality</span>
+                </div>
+                <p class="text-sm text-muted-foreground mb-3">Analyzes and refactors code for SOLID/DRY compliance, reducing complexity and improving maintainability.</p>
+                <div class="text-xs text-muted-foreground">Uses: Pint, PHPStan, custom rules</div>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Theme toggle
+        const html = document.documentElement;
+        const themeToggle = document.getElementById('theme-toggle');
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+        });
+
+        // Filter functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const agentCards = document.querySelectorAll('.agent-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-primary-foreground');
+                    b.classList.add('bg-muted', 'text-muted-foreground');
+                });
+                btn.classList.remove('bg-muted', 'text-muted-foreground');
+                btn.classList.add('bg-primary', 'text-primary-foreground');
+
+                const filter = btn.dataset.filter;
+                agentCards.forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('search');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            agentCards.forEach(card => {
+                const name = card.dataset.name.toLowerCase();
+                const text = card.textContent.toLowerCase();
+                if (name.includes(query) || text.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

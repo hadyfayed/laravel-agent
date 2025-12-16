@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>laravel-testing - Laravel Agent Skill</title>
+    <meta name="description" content="Write comprehensive tests using Pest PHP for Laravel applications">
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: 'oklch(var(--background) / <alpha-value>)',
+                        foreground: 'oklch(var(--foreground) / <alpha-value>)',
+                        card: 'oklch(var(--card) / <alpha-value>)',
+                        'card-foreground': 'oklch(var(--card-foreground) / <alpha-value>)',
+                        primary: 'oklch(var(--primary) / <alpha-value>)',
+                        'primary-foreground': 'oklch(var(--primary-foreground) / <alpha-value>)',
+                        muted: 'oklch(var(--muted) / <alpha-value>)',
+                        'muted-foreground': 'oklch(var(--muted-foreground) / <alpha-value>)',
+                        accent: 'oklch(var(--accent) / <alpha-value>)',
+                        border: 'oklch(var(--border) / <alpha-value>)',
+                    },
+                    borderRadius: { DEFAULT: 'var(--radius)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --radius: 0.625rem;
+            --background: 1 0 0; --foreground: 0.145 0 0;
+            --card: 1 0 0; --card-foreground: 0.145 0 0;
+            --primary: 0.205 0 0; --primary-foreground: 0.985 0 0;
+            --muted: 0.97 0 0; --muted-foreground: 0.556 0 0;
+            --accent: 0.97 0 0; --border: 0.922 0 0;
+        }
+        .dark {
+            --background: 0.145 0 0; --foreground: 0.985 0 0;
+            --card: 0.205 0 0; --card-foreground: 0.985 0 0;
+            --primary: 0.922 0 0; --primary-foreground: 0.205 0 0;
+            --muted: 0.269 0 0; --muted-foreground: 0.708 0 0;
+            --accent: 0.269 0 0; --border: 0.3 0 0;
+        }
+        pre { background: oklch(0.205 0 0) !important; border-radius: var(--radius); overflow-x: auto; padding: 1rem; margin: 1rem 0; }
+        .dark pre { background: oklch(0.145 0 0) !important; }
+        code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        code:not(pre code) { background: oklch(var(--muted)); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; }
+        .trigger-tag { display: inline-flex; padding: 0.25rem 0.625rem; font-size: 0.75rem; border-radius: 0.25rem; background: oklch(var(--accent)); margin: 0.125rem; }
+    </style>
+</head>
+<body class="bg-background text-foreground antialiased min-h-screen">
+    <header class="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-50">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../skills.html" class="flex items-center gap-3 text-foreground hover:text-primary transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span class="text-sm font-medium">All Skills</span>
+            </a>
+            <button id="theme-toggle" class="p-2 rounded-[var(--radius)] hover:bg-accent">
+                <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>
+                <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-8">
+        <div class="mb-8">
+            <div class="w-16 h-16 rounded-[var(--radius)] bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h1 class="text-3xl font-bold mb-2">laravel-testing</h1>
+            <p class="text-xl text-muted-foreground mb-4">Write comprehensive tests using Pest PHP for Laravel applications</p>
+            <div class="flex flex-wrap gap-1">
+                <span class="trigger-tag">test</span>
+                <span class="trigger-tag">testing</span>
+                <span class="trigger-tag">pest</span>
+                <span class="trigger-tag">phpunit</span>
+                <span class="trigger-tag">coverage</span>
+                <span class="trigger-tag">tdd</span>
+                <span class="trigger-tag">unit test</span>
+                <span class="trigger-tag">feature test</span>
+            </div>
+        </div>
+
+        <div class="prose prose-neutral dark:prose-invert max-w-none">
+            <h2>When to Use</h2>
+            <ul>
+                <li>Writing unit or feature tests</li>
+                <li>Implementing TDD workflow</li>
+                <li>Improving test coverage</li>
+                <li>Testing APIs</li>
+                <li>Browser testing with Dusk</li>
+            </ul>
+
+            <h2>Quick Start</h2>
+            <pre><code class="text-green-400">/laravel-agent:test:make &lt;ClassName&gt;
+/laravel-agent:test:coverage</code></pre>
+
+            <h2>Complete Feature Test Example</h2>
+            <pre><code class="text-green-400">&lt;?php
+
+declare(strict_types=1);
+
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this-&gt;user = User::factory()-&gt;create();
+    $this-&gt;product = Product::factory()-&gt;create(['price' =&gt; 99.99]);
+});
+
+describe('Order Creation', function () {
+    it('allows authenticated users to create orders', function () {
+        $response = $this-&gt;actingAs($this-&gt;user)
+            -&gt;postJson('/api/orders', [
+                'items' =&gt; [
+                    ['product_id' =&gt; $this-&gt;product-&gt;id, 'quantity' =&gt; 2],
+                ],
+            ]);
+
+        $response-&gt;assertCreated()
+            -&gt;assertJsonStructure([
+                'data' =&gt; ['id', 'order_number', 'total'],
+            ]);
+
+        $this-&gt;assertDatabaseHas('orders', [
+            'user_id' =&gt; $this-&gt;user-&gt;id,
+        ]);
+    });
+
+    it('rejects unauthenticated requests', function () {
+        $this-&gt;postJson('/api/orders', [])-&gt;assertUnauthorized();
+    });
+
+    it('validates required fields', function () {
+        $this-&gt;actingAs($this-&gt;user)
+            -&gt;postJson('/api/orders', [])
+            -&gt;assertUnprocessable()
+            -&gt;assertJsonValidationErrors(['items']);
+    });
+});</code></pre>
+
+            <h2>Unit Test Example</h2>
+            <pre><code class="text-green-400">&lt;?php
+
+declare(strict_types=1);
+
+use App\Services\PriceCalculator;
+
+describe('PriceCalculator', function () {
+    beforeEach(function () {
+        $this-&gt;calculator = new PriceCalculator();
+    });
+
+    it('calculates subtotal', function () {
+        $items = [
+            ['price' =&gt; 10.00, 'quantity' =&gt; 2],
+            ['price' =&gt; 25.00, 'quantity' =&gt; 1],
+        ];
+
+        expect($this-&gt;calculator-&gt;subtotal($items))-&gt;toBe(45.00);
+    });
+
+    it('applies percentage discount', function () {
+        expect($this-&gt;calculator-&gt;applyDiscount(100.00, 20))-&gt;toBe(80.00);
+    });
+});</code></pre>
+
+            <h2>Testing Patterns</h2>
+
+            <h3>Testing Events</h3>
+            <pre><code class="text-green-400">use Illuminate\Support\Facades\Event;
+
+it('dispatches OrderCreated event', function () {
+    Event::fake();
+
+    Order::factory()-&gt;create();
+
+    Event::assertDispatched(OrderCreated::class);
+});</code></pre>
+
+            <h3>Testing Jobs</h3>
+            <pre><code class="text-green-400">use Illuminate\Support\Facades\Queue;
+
+it('queues SendOrderConfirmation job', function () {
+    Queue::fake();
+
+    $order = Order::factory()-&gt;create();
+    $order-&gt;confirm();
+
+    Queue::assertPushed(SendOrderConfirmation::class);
+});</code></pre>
+
+            <h3>Testing Notifications</h3>
+            <pre><code class="text-green-400">use Illuminate\Support\Facades\Notification;
+
+it('sends confirmation notification', function () {
+    Notification::fake();
+
+    $user = User::factory()-&gt;create();
+    $order = Order::factory()-&gt;for($user)-&gt;create();
+    $order-&gt;sendConfirmation();
+
+    Notification::assertSentTo($user, OrderConfirmation::class);
+});</code></pre>
+
+            <h3>Testing Exceptions</h3>
+            <pre><code class="text-green-400">it('throws exception for invalid state', function () {
+    $order = Order::factory()-&gt;delivered()-&gt;create();
+
+    expect(fn () =&gt; $order-&gt;cancel())
+        -&gt;toThrow(InvalidStateException::class);
+});</code></pre>
+
+            <h2>Common Pitfalls</h2>
+            <div class="bg-card border border-border rounded-[var(--radius)] p-4 not-prose">
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-start gap-2">
+                        <span class="text-red-500 font-bold">1.</span>
+                        <div><strong>Not Using RefreshDatabase</strong> - Always reset database state between tests</div>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-red-500 font-bold">2.</span>
+                        <div><strong>Testing Implementation</strong> - Test behavior, not implementation details</div>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-red-500 font-bold">3.</span>
+                        <div><strong>Slow Tests</strong> - Mock external services to keep tests fast</div>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-red-500 font-bold">4.</span>
+                        <div><strong>Missing Edge Cases</strong> - Test boundaries and error conditions</div>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-red-500 font-bold">5.</span>
+                        <div><strong>No Assertions</strong> - Every test needs clear assertions</div>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-red-500 font-bold">6.</span>
+                        <div><strong>Shared State</strong> - Use beforeEach for test isolation</div>
+                    </li>
+                </ul>
+            </div>
+
+            <h2>Package Integration</h2>
+            <ul>
+                <li><strong>pestphp/pest</strong> - Testing framework</li>
+                <li><strong>pestphp/pest-plugin-laravel</strong> - Laravel helpers</li>
+                <li><strong>mockery/mockery</strong> - Mocking library</li>
+                <li><strong>laravel/dusk</strong> - Browser testing</li>
+            </ul>
+
+            <h2>Best Practices</h2>
+            <ul>
+                <li>One assertion concept per test</li>
+                <li>Use descriptive test names</li>
+                <li>Test edge cases and errors</li>
+                <li>Keep tests fast (mock slow operations)</li>
+                <li>Use factories for test data</li>
+                <li>Follow Arrange-Act-Assert pattern</li>
+            </ul>
+
+            <h2>Related Commands</h2>
+            <ul>
+                <li><a href="../commands/test-make.html" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests</li>
+                <li><a href="../commands/test-coverage.html" class="text-primary hover:underline">/laravel-agent:test:coverage</a> - Run coverage</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        const html = document.documentElement;
+        const themeToggle = document.getElementById('theme-toggle');
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+        });
+    </script>
+</body>
+</html>

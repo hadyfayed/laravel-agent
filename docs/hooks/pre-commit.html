@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pre-commit.sh - Laravel Agent Hook</title>
+    <meta name="description" content="Comprehensive pre-commit validation hook for Laravel development">
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: 'oklch(var(--background) / <alpha-value>)',
+                        foreground: 'oklch(var(--foreground) / <alpha-value>)',
+                        card: 'oklch(var(--card) / <alpha-value>)',
+                        'card-foreground': 'oklch(var(--card-foreground) / <alpha-value>)',
+                        primary: 'oklch(var(--primary) / <alpha-value>)',
+                        'primary-foreground': 'oklch(var(--primary-foreground) / <alpha-value>)',
+                        muted: 'oklch(var(--muted) / <alpha-value>)',
+                        'muted-foreground': 'oklch(var(--muted-foreground) / <alpha-value>)',
+                        accent: 'oklch(var(--accent) / <alpha-value>)',
+                        border: 'oklch(var(--border) / <alpha-value>)',
+                    },
+                    borderRadius: { DEFAULT: 'var(--radius)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --radius: 0.625rem;
+            --background: 1 0 0; --foreground: 0.145 0 0;
+            --card: 1 0 0; --card-foreground: 0.145 0 0;
+            --primary: 0.205 0 0; --primary-foreground: 0.985 0 0;
+            --muted: 0.97 0 0; --muted-foreground: 0.556 0 0;
+            --accent: 0.97 0 0; --border: 0.922 0 0;
+        }
+        .dark {
+            --background: 0.145 0 0; --foreground: 0.985 0 0;
+            --card: 0.205 0 0; --card-foreground: 0.985 0 0;
+            --primary: 0.922 0 0; --primary-foreground: 0.205 0 0;
+            --muted: 0.269 0 0; --muted-foreground: 0.708 0 0;
+            --accent: 0.269 0 0; --border: 0.3 0 0;
+        }
+        pre { background: oklch(0.205 0 0) !important; border-radius: var(--radius); overflow-x: auto; padding: 1rem; margin: 1rem 0; }
+        .dark pre { background: oklch(0.145 0 0) !important; }
+        code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        code:not(pre code) { background: oklch(var(--muted)); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; }
+        .event-badge { display: inline-flex; padding: 0.25rem 0.5rem; font-size: 0.7rem; font-weight: 600; border-radius: 0.25rem; background: oklch(0.55 0.2 200); color: white; }
+    </style>
+</head>
+<body class="bg-background text-foreground antialiased min-h-screen">
+    <header class="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-50">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../hooks.html" class="flex items-center gap-3 text-foreground hover:text-primary transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span class="text-sm font-medium">All Hooks</span>
+            </a>
+            <button id="theme-toggle" class="p-2 rounded-[var(--radius)] hover:bg-accent">
+                <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>
+                <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-8">
+        <div class="mb-8">
+            <span class="event-badge mb-4">UserPromptSubmit</span>
+            <h1 class="text-3xl font-bold mb-2 font-mono">pre-commit.sh</h1>
+            <p class="text-xl text-muted-foreground">Comprehensive pre-commit validation with PHP syntax, Pint formatting, PHPStan analysis, and security scanning.</p>
+        </div>
+
+        <div class="prose prose-neutral dark:prose-invert max-w-none">
+            <h2>Overview</h2>
+            <p>The pre-commit hook runs before <code>git commit</code> commands to ensure code quality. It validates PHP syntax, applies formatting, runs static analysis, and checks for security issues.</p>
+
+            <h2>Checks Performed</h2>
+
+            <h3>PHP Checks</h3>
+            <ol>
+                <li><strong>Syntax Check</strong> - Validates PHP syntax with <code>php -l</code></li>
+                <li><strong>Laravel Pint</strong> - Auto-formats code and re-stages files</li>
+                <li><strong>PHPStan</strong> - Static analysis for type errors</li>
+                <li><strong>Security Scan</strong> - Detects debug functions and hardcoded secrets</li>
+            </ol>
+
+            <h3>Blade Checks</h3>
+            <ul>
+                <li>Missing <code>@csrf</code> in forms</li>
+                <li>Unescaped output (<code>{!! !!}</code>) warnings</li>
+            </ul>
+
+            <h3>Migration Checks</h3>
+            <ul>
+                <li>Destructive operations (dropColumn, dropTable, truncate)</li>
+                <li>Missing <code>down()</code> method</li>
+            </ul>
+
+            <h3>Environment Checks</h3>
+            <ul>
+                <li>Blocks <code>.env</code> file commits</li>
+            </ul>
+
+            <h2>Example Output</h2>
+            <pre><code class="text-green-400">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Laravel Agent: Pre-Commit Checks
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Staged files:
+  PHP: 5 files
+  Blade: 2 files
+
+PHP Checks
+────────────────────────────────────────
+[1/4] PHP Syntax Check...
+[✓] Syntax check passed
+[2/4] Laravel Pint...
+[✓] Pint formatting applied
+[3/4] PHPStan...
+[✓] PHPStan passed
+[4/4] Security Scan...
+[✓] Security scan passed
+
+Blade Checks
+────────────────────────────────────────
+[✓] Blade checks passed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+All pre-commit checks PASSED!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</code></pre>
+
+            <h2>Installation</h2>
+            <p>Add to <code>.claude/settings.json</code>:</p>
+            <pre><code class="text-green-400">{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "git commit",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/pre-commit.sh"
+      }
+    ]
+  }
+}</code></pre>
+
+            <h2>Configuration</h2>
+            <p>Environment variables:</p>
+            <pre><code class="text-green-400"># Number of parallel jobs
+export PARALLEL_JOBS=4
+
+# Skip specific checks
+export SKIP_PHPSTAN=1
+export SKIP_PINT=1</code></pre>
+
+            <h2>Requirements</h2>
+            <p>Optional but recommended:</p>
+            <pre><code class="text-green-400"># Code style
+composer require laravel/pint --dev
+
+# Static analysis
+composer require phpstan/phpstan --dev</code></pre>
+
+            <h2>Exit Codes</h2>
+            <div class="overflow-x-auto not-prose">
+                <table class="w-full text-sm">
+                    <thead><tr class="border-b border-border"><th class="text-left py-2 px-3">Code</th><th class="text-left py-2 px-3">Meaning</th></tr></thead>
+                    <tbody>
+                        <tr class="border-b border-border"><td class="py-2 px-3 text-green-500 font-bold">0</td><td class="py-2 px-3">Success - all checks passed</td></tr>
+                        <tr class="border-b border-border"><td class="py-2 px-3 text-amber-500 font-bold">1</td><td class="py-2 px-3">Warning - non-blocking issues</td></tr>
+                        <tr class="border-b border-border"><td class="py-2 px-3 text-red-500 font-bold">2</td><td class="py-2 px-3">Error - blocks the commit</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Related Hooks</h2>
+            <ul>
+                <li><a href="security-scan.html" class="text-primary hover:underline">security-scan.sh</a> - Detailed security scanning</li>
+                <li><a href="blade-lint.html" class="text-primary hover:underline">blade-lint.sh</a> - Blade template validation</li>
+                <li><a href="migration-safety.html" class="text-primary hover:underline">migration-safety.sh</a> - Migration safety checks</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        const html = document.documentElement;
+        const themeToggle = document.getElementById('theme-toggle');
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+        });
+    </script>
+</body>
+</html>

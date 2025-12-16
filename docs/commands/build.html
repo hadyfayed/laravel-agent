@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>/laravel-agent:build - Laravel Agent</title>
+    <meta name="description" content="Intelligent build command - architect analyzes and decides implementation approach">
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: 'oklch(var(--background) / <alpha-value>)',
+                        foreground: 'oklch(var(--foreground) / <alpha-value>)',
+                        card: 'oklch(var(--card) / <alpha-value>)',
+                        'card-foreground': 'oklch(var(--card-foreground) / <alpha-value>)',
+                        primary: 'oklch(var(--primary) / <alpha-value>)',
+                        'primary-foreground': 'oklch(var(--primary-foreground) / <alpha-value>)',
+                        secondary: 'oklch(var(--secondary) / <alpha-value>)',
+                        'secondary-foreground': 'oklch(var(--secondary-foreground) / <alpha-value>)',
+                        muted: 'oklch(var(--muted) / <alpha-value>)',
+                        'muted-foreground': 'oklch(var(--muted-foreground) / <alpha-value>)',
+                        accent: 'oklch(var(--accent) / <alpha-value>)',
+                        'accent-foreground': 'oklch(var(--accent-foreground) / <alpha-value>)',
+                        border: 'oklch(var(--border) / <alpha-value>)',
+                    },
+                    borderRadius: { DEFAULT: 'var(--radius)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --radius: 0.625rem;
+            --background: 1 0 0; --foreground: 0.145 0 0;
+            --card: 1 0 0; --card-foreground: 0.145 0 0;
+            --primary: 0.205 0 0; --primary-foreground: 0.985 0 0;
+            --secondary: 0.97 0 0; --secondary-foreground: 0.205 0 0;
+            --muted: 0.97 0 0; --muted-foreground: 0.556 0 0;
+            --accent: 0.97 0 0; --accent-foreground: 0.205 0 0;
+            --border: 0.922 0 0;
+        }
+        .dark {
+            --background: 0.145 0 0; --foreground: 0.985 0 0;
+            --card: 0.205 0 0; --card-foreground: 0.985 0 0;
+            --primary: 0.922 0 0; --primary-foreground: 0.205 0 0;
+            --secondary: 0.269 0 0; --secondary-foreground: 0.985 0 0;
+            --muted: 0.269 0 0; --muted-foreground: 0.708 0 0;
+            --accent: 0.269 0 0; --accent-foreground: 0.985 0 0;
+            --border: 0.3 0 0;
+        }
+        pre { background: oklch(0.205 0 0) !important; border-radius: var(--radius); overflow-x: auto; padding: 1rem; margin: 1rem 0; }
+        .dark pre { background: oklch(0.145 0 0) !important; }
+        code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        code:not(pre code) { background: oklch(var(--muted)); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; }
+        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; }
+        .badge-core { background: oklch(0.488 0.243 264.376); color: white; }
+    </style>
+</head>
+<body class="bg-background text-foreground antialiased min-h-screen">
+    <header class="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-50">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="../commands.html" class="flex items-center gap-3 text-foreground hover:text-primary transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span class="text-sm font-medium">All Commands</span>
+                </a>
+            </div>
+            <button id="theme-toggle" class="p-2 rounded-[var(--radius)] hover:bg-accent">
+                <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>
+                <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-8">
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="badge badge-core">Core</span>
+            </div>
+            <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:build</h1>
+            <p class="text-xl text-muted-foreground">Intelligent build - architect analyzes and decides implementation approach</p>
+        </div>
+
+        <div class="prose prose-neutral dark:prose-invert max-w-none">
+            <h2>Overview</h2>
+            <p>The <code>/build</code> command invokes the <strong>laravel-architect</strong> agent to analyze your request and determine the best implementation approach. It's the recommended entry point for creating new functionality.</p>
+
+            <h2>Usage</h2>
+            <pre><code class="text-green-400">/laravel-agent:build [description of what you want to build]</code></pre>
+
+            <h2>Examples</h2>
+            <pre><code class="text-green-400">/laravel-agent:build invoice management system with PDF export
+/laravel-agent:build user notification preferences
+/laravel-agent:build payment gateway integration
+/laravel-agent:build product catalog with categories and variants</code></pre>
+
+            <h2>Process</h2>
+            <p>When you invoke this command, the architect will:</p>
+            <ol>
+                <li><strong>Check for Laravel Boost MCP tools</strong> - Leverage existing tooling if available</li>
+                <li><strong>Scan codebase structure</strong> - Understand existing patterns and conventions</li>
+                <li><strong>Check pattern registry</strong> - Review <code>.ai/patterns/registry.json</code> (max 5 patterns)</li>
+                <li><strong>Decide implementation type</strong> - Feature, Module, Service, or Action</li>
+                <li><strong>Consider tenancy requirements</strong> - Check if multi-tenant isolation is needed</li>
+                <li><strong>Ensure SOLID/DRY compliance</strong> - Validate architectural decisions</li>
+                <li><strong>Delegate to appropriate builder</strong> - Hand off to specialized agent</li>
+                <li><strong>Verify with tests</strong> - Ensure implementation is properly tested</li>
+            </ol>
+
+            <h2>Decision Matrix</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-border">
+                            <th class="text-left py-3 px-4">Command Example</th>
+                            <th class="text-left py-3 px-4">Decision</th>
+                            <th class="text-left py-3 px-4">Result Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-border">
+                            <td class="py-3 px-4"><code>/build invoice system</code></td>
+                            <td class="py-3 px-4">Feature</td>
+                            <td class="py-3 px-4"><code>app/Features/Invoices/</code></td>
+                        </tr>
+                        <tr class="border-b border-border">
+                            <td class="py-3 px-4"><code>/build pricing calculator</code></td>
+                            <td class="py-3 px-4">Module</td>
+                            <td class="py-3 px-4"><code>app/Modules/Pricing/</code></td>
+                        </tr>
+                        <tr class="border-b border-border">
+                            <td class="py-3 px-4"><code>/build send welcome email</code></td>
+                            <td class="py-3 px-4">Action</td>
+                            <td class="py-3 px-4"><code>app/Actions/Users/SendWelcomeEmailAction.php</code></td>
+                        </tr>
+                        <tr class="border-b border-border">
+                            <td class="py-3 px-4"><code>/build payment service</code></td>
+                            <td class="py-3 px-4">Service</td>
+                            <td class="py-3 px-4"><code>app/Services/PaymentService.php</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Related Agent</h2>
+            <p>This command uses the <a href="../agents/laravel-architect.html" class="text-primary hover:underline">laravel-architect</a> agent, which then delegates to specialized builders based on the analysis.</p>
+
+            <h2>See Also</h2>
+            <ul>
+                <li><a href="feature-make.html" class="text-primary hover:underline">/laravel-agent:feature:make</a> - Direct feature creation (bypasses architect)</li>
+                <li><a href="module-make.html" class="text-primary hover:underline">/laravel-agent:module:make</a> - Create reusable domain module</li>
+                <li><a href="service-make.html" class="text-primary hover:underline">/laravel-agent:service:make</a> - Create service or action</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        const html = document.documentElement;
+        const themeToggle = document.getElementById('theme-toggle');
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+        });
+    </script>
+</body>
+</html>
