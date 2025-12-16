@@ -1,246 +1,338 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laravel Agent - AI-powered Laravel Development Assistant</title>
     <meta name="description" content="AI-powered Laravel development assistant for Claude Code with 23 agents, 42 commands, 12 skills, and 7 hooks.">
+    <meta name="keywords" content="Laravel, Claude Code, AI, development, assistant, PHP">
+    <meta property="og:title" content="Laravel Agent">
+    <meta property="og:description" content="AI-powered Laravel development assistant for Claude Code">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hadyfayed.github.io/laravel-agent/">
+    <link rel="canonical" href="https://hadyfayed.github.io/laravel-agent/">
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a',
-                        },
-                        surface: {
-                            light: '#f8fafc',
-                            DEFAULT: '#ffffff',
-                            dark: '#f1f5f9',
-                        },
-                        nav: '#1e293b',
+                        background: 'oklch(var(--background) / <alpha-value>)',
+                        foreground: 'oklch(var(--foreground) / <alpha-value>)',
+                        card: 'oklch(var(--card) / <alpha-value>)',
+                        'card-foreground': 'oklch(var(--card-foreground) / <alpha-value>)',
+                        primary: 'oklch(var(--primary) / <alpha-value>)',
+                        'primary-foreground': 'oklch(var(--primary-foreground) / <alpha-value>)',
+                        secondary: 'oklch(var(--secondary) / <alpha-value>)',
+                        'secondary-foreground': 'oklch(var(--secondary-foreground) / <alpha-value>)',
+                        muted: 'oklch(var(--muted) / <alpha-value>)',
+                        'muted-foreground': 'oklch(var(--muted-foreground) / <alpha-value>)',
+                        accent: 'oklch(var(--accent) / <alpha-value>)',
+                        'accent-foreground': 'oklch(var(--accent-foreground) / <alpha-value>)',
+                        destructive: 'oklch(var(--destructive) / <alpha-value>)',
+                        border: 'oklch(var(--border) / <alpha-value>)',
+                        input: 'oklch(var(--input) / <alpha-value>)',
+                        ring: 'oklch(var(--ring) / <alpha-value>)',
+                        sidebar: 'oklch(var(--sidebar) / <alpha-value>)',
+                        'sidebar-foreground': 'oklch(var(--sidebar-foreground) / <alpha-value>)',
+                        'sidebar-primary': 'oklch(var(--sidebar-primary) / <alpha-value>)',
+                        'sidebar-accent': 'oklch(var(--sidebar-accent) / <alpha-value>)',
+                        'sidebar-border': 'oklch(var(--sidebar-border) / <alpha-value>)',
+                    },
+                    borderRadius: {
+                        DEFAULT: 'var(--radius)',
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        :root {
+            --radius: 0.625rem;
+            --background: 1 0 0;
+            --foreground: 0.145 0 0;
+            --card: 1 0 0;
+            --card-foreground: 0.145 0 0;
+            --primary: 0.205 0 0;
+            --primary-foreground: 0.985 0 0;
+            --secondary: 0.97 0 0;
+            --secondary-foreground: 0.205 0 0;
+            --muted: 0.97 0 0;
+            --muted-foreground: 0.556 0 0;
+            --accent: 0.97 0 0;
+            --accent-foreground: 0.205 0 0;
+            --destructive: 0.577 0.245 27.325;
+            --border: 0.922 0 0;
+            --input: 0.922 0 0;
+            --ring: 0.708 0 0;
+            --sidebar: 0.985 0 0;
+            --sidebar-foreground: 0.145 0 0;
+            --sidebar-primary: 0.205 0 0;
+            --sidebar-accent: 0.97 0 0;
+            --sidebar-border: 0.922 0 0;
+        }
 
-        /* Smooth scroll */
-        html { scroll-behavior: smooth; }
+        .dark {
+            --background: 0.145 0 0;
+            --foreground: 0.985 0 0;
+            --card: 0.205 0 0;
+            --card-foreground: 0.985 0 0;
+            --primary: 0.922 0 0;
+            --primary-foreground: 0.205 0 0;
+            --secondary: 0.269 0 0;
+            --secondary-foreground: 0.985 0 0;
+            --muted: 0.269 0 0;
+            --muted-foreground: 0.708 0 0;
+            --accent: 0.269 0 0;
+            --accent-foreground: 0.985 0 0;
+            --destructive: 0.704 0.191 22.216;
+            --border: 0.3 0 0;
+            --input: 0.3 0 0;
+            --ring: 0.556 0 0;
+            --sidebar: 0.175 0 0;
+            --sidebar-foreground: 0.985 0 0;
+            --sidebar-primary: 0.488 0.243 264.376;
+            --sidebar-accent: 0.269 0 0;
+            --sidebar-border: 0.3 0 0;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: oklch(var(--muted)); }
+        ::-webkit-scrollbar-thumb { background: oklch(var(--border)); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: oklch(var(--muted-foreground)); }
 
         /* Code blocks */
-        pre { background: #1e293b !important; }
+        pre {
+            background: oklch(0.205 0 0) !important;
+            border-radius: var(--radius);
+            overflow-x: auto;
+        }
+        .dark pre {
+            background: oklch(0.145 0 0) !important;
+        }
         code:not(pre code) {
-            background: #f1f5f9;
+            background: oklch(var(--muted));
+            color: oklch(var(--foreground));
             padding: 0.125rem 0.375rem;
             border-radius: 0.25rem;
             font-size: 0.875em;
-            color: #1e293b;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         }
 
-        /* Active nav item */
+        /* Active nav */
         .nav-item.active {
-            background: rgba(59, 130, 246, 0.1);
-            color: #2563eb;
-            border-left-color: #2563eb;
+            background: oklch(var(--sidebar-accent));
+            color: oklch(var(--sidebar-primary));
         }
+
+        /* Transitions */
+        * { transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
+
+        /* Badge styles */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+        }
+        .badge-primary { background: oklch(var(--primary)); color: oklch(var(--primary-foreground)); }
+        .badge-secondary { background: oklch(var(--secondary)); color: oklch(var(--secondary-foreground)); }
+        .badge-success { background: oklch(0.7 0.15 150); color: white; }
     </style>
 </head>
-<body class="bg-surface-light">
+<body class="bg-background text-foreground antialiased">
     <!-- Mobile menu button -->
-    <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-nav text-white shadow-lg">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 p-2.5 rounded-[var(--radius)] bg-card border border-border shadow-lg hover:bg-accent">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
     </button>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-nav transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-sidebar border-r border-sidebar-border transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto flex flex-col">
         <!-- Logo -->
-        <div class="flex items-center gap-3 px-6 py-5 border-b border-slate-700">
-            <div class="w-10 h-10 rounded-lg bg-primary-600 flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border">
+            <div class="w-10 h-10 rounded-[var(--radius)] bg-primary flex items-center justify-center">
+                <svg class="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
             </div>
             <div>
-                <h1 class="text-white font-bold text-lg">Laravel Agent</h1>
-                <p class="text-slate-400 text-xs">v1.1.0</p>
+                <h1 class="text-sidebar-foreground font-semibold text-lg">Laravel Agent</h1>
+                <p class="text-muted-foreground text-xs">v1.1.0</p>
             </div>
         </div>
 
         <!-- Navigation -->
-        <nav class="p-4">
+        <nav class="flex-1 p-4 space-y-6">
             <!-- Getting Started -->
-            <div class="mb-6">
-                <h2 class="text-slate-400 text-xs font-semibold uppercase tracking-wider px-3 mb-2">Getting Started</h2>
+            <div>
+                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Getting Started</h2>
                 <ul class="space-y-1">
-                    <li><a href="#installation" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <li><a href="#home" class="nav-item active flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        Home
+                    </a></li>
+                    <li><a href="#installation" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                         Installation
                     </a></li>
-                    <li><a href="#quickstart" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <li><a href="#quickstart" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         Quick Start
                     </a></li>
                 </ul>
             </div>
 
             <!-- Commands -->
-            <div class="mb-6">
-                <h2 class="text-slate-400 text-xs font-semibold uppercase tracking-wider px-3 mb-2">Commands</h2>
+            <div>
+                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Commands</h2>
                 <ul class="space-y-1">
-                    <li><a href="#commands" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <li><a href="#commands" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         All Commands
-                    </a></li>
-                    <li><a href="#build-commands" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                        Build Commands
-                    </a></li>
-                    <li><a href="#api-commands" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        API Commands
-                    </a></li>
-                    <li><a href="#testing-commands" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Testing Commands
-                    </a></li>
-                    <li><a href="#devops-commands" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>
-                        DevOps Commands
+                        <span class="ml-auto badge badge-secondary">42</span>
                     </a></li>
                 </ul>
             </div>
 
             <!-- Skills -->
-            <div class="mb-6">
-                <h2 class="text-slate-400 text-xs font-semibold uppercase tracking-wider px-3 mb-2">Skills</h2>
+            <div>
+                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Skills</h2>
                 <ul class="space-y-1">
-                    <li><a href="#skills" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                        Skills Overview
-                    </a></li>
-                    <li><a href="#available-skills" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                        Available Skills
-                    </a></li>
-                </ul>
-            </div>
-
-            <!-- Hooks -->
-            <div class="mb-6">
-                <h2 class="text-slate-400 text-xs font-semibold uppercase tracking-wider px-3 mb-2">Hooks</h2>
-                <ul class="space-y-1">
-                    <li><a href="#hooks" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                        Hooks Overview
+                    <li><a href="#skills" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        Auto-Invoked Skills
+                        <span class="ml-auto badge badge-secondary">12</span>
                     </a></li>
                 </ul>
             </div>
 
             <!-- Agents -->
-            <div class="mb-6">
-                <h2 class="text-slate-400 text-xs font-semibold uppercase tracking-wider px-3 mb-2">Agents</h2>
+            <div>
+                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Agents</h2>
                 <ul class="space-y-1">
-                    <li><a href="#agents" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        All Agents
+                    <li><a href="#agents" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Specialized Agents
+                        <span class="ml-auto badge badge-secondary">23</span>
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Hooks -->
+            <div>
+                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Automation</h2>
+                <ul class="space-y-1">
+                    <li><a href="#hooks" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Hooks
+                        <span class="ml-auto badge badge-secondary">7</span>
+                    </a></li>
+                    <li><a href="#architecture" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        Architecture
                     </a></li>
                 </ul>
             </div>
 
             <!-- Resources -->
-            <div class="mb-6">
-                <h2 class="text-slate-400 text-xs font-semibold uppercase tracking-wider px-3 mb-2">Resources</h2>
+            <div>
+                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Resources</h2>
                 <ul class="space-y-1">
-                    <li><a href="https://github.com/hadyfayed/laravel-agent" target="_blank" class="nav-item flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg border-l-2 border-transparent transition-all">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <li><a href="#packages" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        Package Integrations
+                        <span class="ml-auto badge badge-secondary">85+</span>
+                    </a></li>
+                    <li><a href="https://github.com/hadyfayed/laravel-agent" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                        <svg class="w-4 h-4 text-muted-foreground" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                         GitHub
+                        <svg class="w-3 h-3 ml-auto text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     </a></li>
                 </ul>
             </div>
         </nav>
+
+        <!-- Theme Toggle -->
+        <div class="p-4 border-t border-sidebar-border">
+            <button id="theme-toggle" class="flex items-center gap-3 w-full px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
+                <svg id="theme-icon-light" class="w-4 h-4 text-muted-foreground hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                <svg id="theme-icon-dark" class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <span id="theme-text">Dark mode</span>
+            </button>
+        </div>
     </aside>
 
-    <!-- Overlay for mobile -->
+    <!-- Overlay -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 lg:hidden hidden"></div>
 
     <!-- Main Content -->
     <main class="lg:ml-72 min-h-screen">
         <!-- Header -->
-        <header class="sticky top-0 z-20 bg-surface/80 backdrop-blur-sm border-b border-slate-200">
-            <div class="max-w-4xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
-                <div class="lg:hidden w-8"></div>
-                <div class="flex-1 max-w-md mx-auto lg:mx-0">
+        <header class="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b border-border">
+            <div class="max-w-5xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
+                <div class="lg:hidden w-10"></div>
+                <div class="flex-1 max-w-md">
                     <div class="relative">
-                        <input type="text" placeholder="Search documentation..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 bg-surface focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <input type="text" id="search-input" placeholder="Search documentation..." class="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius)] border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <kbd class="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 text-xs text-muted-foreground bg-muted rounded border border-border">/</kbd>
                     </div>
                 </div>
-                <a href="https://github.com/hadyfayed/laravel-agent" target="_blank" class="hidden lg:flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                    Star on GitHub
-                </a>
+                <div class="flex items-center gap-3">
+                    <a href="https://github.com/hadyfayed/laravel-agent" target="_blank" class="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-[var(--radius)] hover:opacity-90">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        Star
+                    </a>
+                </div>
             </div>
         </header>
 
         <!-- Content -->
-        <div class="max-w-4xl mx-auto px-6 lg:px-8 py-12">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 py-12">
             <!-- Hero -->
-            <section class="mb-16">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="px-3 py-1 text-xs font-medium bg-primary-100 text-primary-700 rounded-full">v1.1.0</span>
-                    <span class="px-3 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">Claude Code Plugin</span>
+            <section id="home" class="mb-20 scroll-mt-20">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="badge badge-primary">v1.1.0</span>
+                    <span class="badge badge-success">Claude Code Plugin</span>
                 </div>
-                <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-4">Laravel Agent</h1>
-                <p class="text-xl text-slate-600 mb-8">AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.</p>
+                <h1 class="text-4xl lg:text-5xl font-bold text-foreground mb-6 tracking-tight">Laravel Agent</h1>
+                <p class="text-xl text-muted-foreground mb-10 max-w-2xl leading-relaxed">AI-powered Laravel development assistant. Architecture decisions, code generation, testing, deployment, and more.</p>
 
-                <!-- Stats -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-surface rounded-xl p-4 border border-slate-200">
-                        <div class="text-3xl font-bold text-primary-600">23</div>
-                        <div class="text-sm text-slate-600">Agents</div>
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                    <div class="bg-card rounded-[var(--radius)] p-5 border border-border">
+                        <div class="text-3xl font-bold text-foreground mb-1">23</div>
+                        <div class="text-sm text-muted-foreground">Specialized Agents</div>
                     </div>
-                    <div class="bg-surface rounded-xl p-4 border border-slate-200">
-                        <div class="text-3xl font-bold text-primary-600">42</div>
-                        <div class="text-sm text-slate-600">Commands</div>
+                    <div class="bg-card rounded-[var(--radius)] p-5 border border-border">
+                        <div class="text-3xl font-bold text-foreground mb-1">42</div>
+                        <div class="text-sm text-muted-foreground">Commands</div>
                     </div>
-                    <div class="bg-surface rounded-xl p-4 border border-slate-200">
-                        <div class="text-3xl font-bold text-primary-600">12</div>
-                        <div class="text-sm text-slate-600">Skills</div>
+                    <div class="bg-card rounded-[var(--radius)] p-5 border border-border">
+                        <div class="text-3xl font-bold text-foreground mb-1">12</div>
+                        <div class="text-sm text-muted-foreground">Auto-Invoked Skills</div>
                     </div>
-                    <div class="bg-surface rounded-xl p-4 border border-slate-200">
-                        <div class="text-3xl font-bold text-primary-600">7</div>
-                        <div class="text-sm text-slate-600">Hooks</div>
+                    <div class="bg-card rounded-[var(--radius)] p-5 border border-border">
+                        <div class="text-3xl font-bold text-foreground mb-1">85+</div>
+                        <div class="text-sm text-muted-foreground">Package Integrations</div>
                     </div>
                 </div>
 
                 <!-- Quick Install -->
-                <div class="bg-nav rounded-xl p-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-slate-400 text-sm">Quick Install</span>
-                        <button onclick="copyCode(this)" class="text-slate-400 hover:text-white transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <div class="bg-card rounded-[var(--radius)] border border-border overflow-hidden">
+                    <div class="flex items-center justify-between px-4 py-3 bg-muted border-b border-border">
+                        <span class="text-sm font-medium text-foreground">Quick Install</span>
+                        <button onclick="copyCode(this, 'install-code')" class="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-accent">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                         </button>
                     </div>
-                    <pre class="text-sm text-slate-300 overflow-x-auto"><code># Add the marketplace
+                    <pre class="p-4 text-sm overflow-x-auto"><code id="install-code" class="text-gray-300"># Add the marketplace
 /plugin marketplace add hadyfayed/laravel-agent
 
 # Install the plugin
@@ -249,374 +341,601 @@
             </section>
 
             <!-- Installation -->
-            <section id="installation" class="mb-16 scroll-mt-20">
-                <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    </span>
-                    Installation
-                </h2>
-                <div class="prose prose-slate max-w-none">
-                    <h3>Prerequisites</h3>
-                    <ul>
-                        <li>Claude Code CLI installed</li>
-                        <li>Laravel project (8.x or higher)</li>
-                    </ul>
+            <section id="installation" class="mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-foreground">Installation</h2>
+                </div>
 
-                    <h3>Install via Plugin Marketplace</h3>
-                    <div class="bg-nav rounded-xl p-4 not-prose mb-4">
-                        <pre class="text-sm text-slate-300"><code>/plugin marketplace add hadyfayed/laravel-agent
-/plugin install laravel-agent@hadyfayed-laravel-agent</code></pre>
+                <div class="space-y-6">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+                        <h3 class="font-semibold text-foreground mb-3">Requirements</h3>
+                        <ul class="space-y-2 text-muted-foreground">
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Claude Code with Plugin support
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Laravel 10+ project
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                PHP 8.1 or higher
+                            </li>
+                        </ul>
                     </div>
 
-                    <h3>Verify Installation</h3>
-                    <p>After installation, verify by running:</p>
-                    <div class="bg-nav rounded-xl p-4 not-prose">
-                        <pre class="text-sm text-slate-300"><code>/laravel-agent:patterns</code></pre>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+                        <h3 class="font-semibold text-foreground mb-3">Verify Installation</h3>
+                        <p class="text-muted-foreground mb-4">After installation, verify by running:</p>
+                        <div class="bg-muted rounded-[var(--radius)] p-3">
+                            <code class="text-sm text-foreground">/laravel-agent:patterns</code>
+                        </div>
+                    </div>
+
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+                        <h3 class="font-semibold text-foreground mb-3">Recommended Packages</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-sm font-medium text-foreground mb-2">Code Quality</h4>
+                                <div class="bg-muted rounded-[var(--radius)] p-3 text-sm">
+                                    <code class="text-muted-foreground">composer require laravel/pint --dev<br>composer require larastan/larastan --dev</code>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-foreground mb-2">Testing</h4>
+                                <div class="bg-muted rounded-[var(--radius)] p-3 text-sm">
+                                    <code class="text-muted-foreground">composer require pestphp/pest --dev<br>composer require pestphp/pest-plugin-laravel --dev</code>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- Quick Start -->
-            <section id="quickstart" class="mb-16 scroll-mt-20">
-                <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </span>
-                    Quick Start
-                </h2>
-                <div class="prose prose-slate max-w-none">
-                    <h3>Build a Feature</h3>
-                    <p>The intelligent build command analyzes your request and decides the best approach:</p>
-                    <div class="bg-nav rounded-xl p-4 not-prose mb-4">
-                        <pre class="text-sm text-slate-300"><code>/laravel-agent:build user authentication with email verification</code></pre>
+            <section id="quickstart" class="mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-foreground">Quick Start</h2>
+                </div>
+
+                <div class="grid gap-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                <span class="text-sm font-bold text-primary">1</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-foreground mb-2">Build a Feature</h3>
+                                <p class="text-muted-foreground text-sm mb-3">The intelligent build command analyzes your request and decides the best approach:</p>
+                                <div class="bg-muted rounded-[var(--radius)] p-3">
+                                    <code class="text-sm text-foreground">/laravel-agent:build user authentication with email verification</code>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <h3>Create an API</h3>
-                    <div class="bg-nav rounded-xl p-4 not-prose mb-4">
-                        <pre class="text-sm text-slate-300"><code>/laravel-agent:api:make products --versioned</code></pre>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                <span class="text-sm font-bold text-primary">2</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-foreground mb-2">Create an API</h3>
+                                <p class="text-muted-foreground text-sm mb-3">Generate versioned REST APIs with documentation:</p>
+                                <div class="bg-muted rounded-[var(--radius)] p-3">
+                                    <code class="text-sm text-foreground">/laravel-agent:api:make products --versioned</code>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <h3>Generate Tests</h3>
-                    <div class="bg-nav rounded-xl p-4 not-prose mb-4">
-                        <pre class="text-sm text-slate-300"><code>/laravel-agent:test:make App/Services/PaymentService</code></pre>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                <span class="text-sm font-bold text-primary">3</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-foreground mb-2">Generate Tests</h3>
+                                <p class="text-muted-foreground text-sm mb-3">Create comprehensive Pest tests for any class:</p>
+                                <div class="bg-muted rounded-[var(--radius)] p-3">
+                                    <code class="text-sm text-foreground">/laravel-agent:test:make App/Services/PaymentService</code>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <h3>Security Audit</h3>
-                    <div class="bg-nav rounded-xl p-4 not-prose">
-                        <pre class="text-sm text-slate-300"><code>/laravel-agent:security:audit</code></pre>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                <span class="text-sm font-bold text-primary">4</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-foreground mb-2">Security Audit</h3>
+                                <p class="text-muted-foreground text-sm mb-3">Run OWASP security audit on your application:</p>
+                                <div class="bg-muted rounded-[var(--radius)] p-3">
+                                    <code class="text-sm text-foreground">/laravel-agent:security:audit</code>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- Commands -->
-            <section id="commands" class="mb-16 scroll-mt-20">
-                <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </span>
-                    Commands
-                </h2>
-                <p class="text-slate-600 mb-6">42 commands organized by category for all your Laravel development needs.</p>
+            <section id="commands" class="mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-foreground">Commands</h2>
+                    <span class="badge badge-secondary ml-2">42 total</span>
+                </div>
 
-                <!-- Command Categories -->
-                <div class="grid gap-4">
-                    <!-- Build Commands -->
-                    <div id="build-commands" class="bg-surface rounded-xl border border-slate-200 p-6 scroll-mt-20">
-                        <h3 class="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                            Build Commands
-                        </h3>
-                        <div class="space-y-2">
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/build</code>
-                                <span class="text-sm text-slate-600">Intelligent build - architect analyzes and decides implementation approach</span>
+                <div class="space-y-4">
+                    <!-- Core -->
+                    <details class="bg-card rounded-[var(--radius)] border border-border group" open>
+                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <span class="font-semibold text-foreground">Core</span>
                             </div>
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/feature:make</code>
-                                <span class="text-sm text-slate-600">Create a complete Laravel feature directly</span>
+                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 space-y-2">
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/build</code>
+                                <span class="text-sm text-muted-foreground">Intelligent build - architect analyzes and delegates</span>
                             </div>
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/module:make</code>
-                                <span class="text-sm text-slate-600">Create a reusable domain module with contracts, services, DTOs</span>
-                            </div>
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/service:make</code>
-                                <span class="text-sm text-slate-600">Create a service class or action with proper patterns</span>
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/patterns</code>
+                                <span class="text-sm text-muted-foreground">View current pattern usage (max 5)</span>
                             </div>
                         </div>
-                    </div>
+                    </details>
 
-                    <!-- API Commands -->
-                    <div id="api-commands" class="bg-surface rounded-xl border border-slate-200 p-6 scroll-mt-20">
-                        <h3 class="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            API Commands
-                        </h3>
-                        <div class="space-y-2">
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/api:make</code>
-                                <span class="text-sm text-slate-600">Create a versioned API resource with documentation</span>
+                    <!-- Builders -->
+                    <details class="bg-card rounded-[var(--radius)] border border-border group">
+                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                <span class="font-semibold text-foreground">Builders</span>
                             </div>
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/api:docs</code>
-                                <span class="text-sm text-slate-600">Generate API documentation</span>
+                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 space-y-2">
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/feature:make</code>
+                                <span class="text-sm text-muted-foreground">Create complete feature (CRUD, views, API, tests)</span>
+                            </div>
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/module:make</code>
+                                <span class="text-sm text-muted-foreground">Create reusable domain module</span>
+                            </div>
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/service:make</code>
+                                <span class="text-sm text-muted-foreground">Create service or action class</span>
                             </div>
                         </div>
-                    </div>
+                    </details>
 
-                    <!-- Testing Commands -->
-                    <div id="testing-commands" class="bg-surface rounded-xl border border-slate-200 p-6 scroll-mt-20">
-                        <h3 class="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Testing Commands
-                        </h3>
-                        <div class="space-y-2">
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/test:make</code>
-                                <span class="text-sm text-slate-600">Generate comprehensive tests for a class or feature</span>
+                    <!-- API -->
+                    <details class="bg-card rounded-[var(--radius)] border border-border group">
+                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span class="font-semibold text-foreground">API</span>
                             </div>
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/test:coverage</code>
-                                <span class="text-sm text-slate-600">Run tests with coverage report</span>
+                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 space-y-2">
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/api:make</code>
+                                <span class="text-sm text-muted-foreground">Create versioned API resource</span>
+                            </div>
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/api:docs</code>
+                                <span class="text-sm text-muted-foreground">Generate OpenAPI documentation</span>
                             </div>
                         </div>
-                    </div>
+                    </details>
 
-                    <!-- DevOps Commands -->
-                    <div id="devops-commands" class="bg-surface rounded-xl border border-slate-200 p-6 scroll-mt-20">
-                        <h3 class="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>
-                            DevOps Commands
-                        </h3>
-                        <div class="space-y-2">
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/deploy:setup</code>
-                                <span class="text-sm text-slate-600">Configure deployment for your Laravel application</span>
+                    <!-- Testing -->
+                    <details class="bg-card rounded-[var(--radius)] border border-border group">
+                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span class="font-semibold text-foreground">Testing</span>
                             </div>
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/cicd:setup</code>
-                                <span class="text-sm text-slate-600">Configure CI/CD pipeline</span>
+                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 space-y-2">
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/test:make</code>
+                                <span class="text-sm text-muted-foreground">Generate Pest tests</span>
                             </div>
-                            <div class="flex items-start gap-3 p-3 bg-surface-dark rounded-lg">
-                                <code class="text-sm text-primary-600 font-mono whitespace-nowrap">/security:audit</code>
-                                <span class="text-sm text-slate-600">Run security audit on your application</span>
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/test:coverage</code>
+                                <span class="text-sm text-muted-foreground">Run coverage analysis</span>
                             </div>
                         </div>
-                    </div>
+                    </details>
+
+                    <!-- DevOps -->
+                    <details class="bg-card rounded-[var(--radius)] border border-border group">
+                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>
+                                <span class="font-semibold text-foreground">DevOps</span>
+                            </div>
+                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 space-y-2">
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/deploy:setup</code>
+                                <span class="text-sm text-muted-foreground">Setup deployment (Forge, Vapor, Docker)</span>
+                            </div>
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/cicd:setup</code>
+                                <span class="text-sm text-muted-foreground">Setup CI/CD pipeline</span>
+                            </div>
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/security:audit</code>
+                                <span class="text-sm text-muted-foreground">Run OWASP security audit</span>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Git -->
+                    <details class="bg-card rounded-[var(--radius)] border border-border group">
+                        <summary class="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-accent/50 rounded-[var(--radius)]">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                <span class="font-semibold text-foreground">Git & Review</span>
+                            </div>
+                            <svg class="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 space-y-2">
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/git:commit</code>
+                                <span class="text-sm text-muted-foreground">Create conventional commit</span>
+                            </div>
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/git:pr</code>
+                                <span class="text-sm text-muted-foreground">Create pull request</span>
+                            </div>
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/review:staged</code>
+                                <span class="text-sm text-muted-foreground">Review staged changes</span>
+                            </div>
+                            <div class="flex items-start gap-4 p-3 bg-muted/50 rounded-[var(--radius)]">
+                                <code class="text-sm text-primary font-mono whitespace-nowrap">/review:pr</code>
+                                <span class="text-sm text-muted-foreground">Review pull request</span>
+                            </div>
+                        </div>
+                    </details>
                 </div>
             </section>
 
             <!-- Skills -->
-            <section id="skills" class="mb-16 scroll-mt-20">
-                <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                    </span>
-                    Skills
-                </h2>
-                <p class="text-slate-600 mb-6">12 auto-invoked skills that Claude automatically applies when relevant. No commands needed - just describe what you need.</p>
+            <section id="skills" class="mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-foreground">Auto-Invoked Skills</h2>
+                    <span class="badge badge-secondary ml-2">12 total</span>
+                </div>
 
-                <div id="available-skills" class="grid md:grid-cols-2 gap-4 scroll-mt-20">
-                    <div class="bg-surface rounded-xl border border-slate-200 p-4">
+                <p class="text-muted-foreground mb-6">Skills are automatically activated based on context. No commands needed - just describe what you need.</p>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="font-medium text-slate-900">laravel-database</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-database</span>
                         </div>
-                        <p class="text-sm text-slate-600">N+1 fixes, index strategies, migrations</p>
+                        <p class="text-xs text-muted-foreground">Migrations, queries, N+1 optimization</p>
                     </div>
-                    <div class="bg-surface rounded-xl border border-slate-200 p-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="font-medium text-slate-900">laravel-testing</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-testing</span>
                         </div>
-                        <p class="text-sm text-slate-600">Pest patterns, factories, mocking</p>
+                        <p class="text-xs text-muted-foreground">Pest patterns, factories, mocking</p>
                     </div>
-                    <div class="bg-surface rounded-xl border border-slate-200 p-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="font-medium text-slate-900">laravel-auth</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-auth</span>
                         </div>
-                        <p class="text-sm text-slate-600">Policies, gates, Sanctum authentication</p>
+                        <p class="text-xs text-muted-foreground">Policies, gates, Sanctum</p>
                     </div>
-                    <div class="bg-surface rounded-xl border border-slate-200 p-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="font-medium text-slate-900">laravel-livewire</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-livewire</span>
                         </div>
-                        <p class="text-sm text-slate-600">Events, polling, loading states</p>
+                        <p class="text-xs text-muted-foreground">Events, polling, loading states</p>
                     </div>
-                    <div class="bg-surface rounded-xl border border-slate-200 p-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="font-medium text-slate-900">laravel-filament</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-filament</span>
                         </div>
-                        <p class="text-sm text-slate-600">Relation managers, custom actions</p>
+                        <p class="text-xs text-muted-foreground">Resources, actions, widgets</p>
                     </div>
-                    <div class="bg-surface rounded-xl border border-slate-200 p-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="font-medium text-slate-900">laravel-performance</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-performance</span>
                         </div>
-                        <p class="text-sm text-slate-600">Pulse setup, memory optimization</p>
+                        <p class="text-xs text-muted-foreground">Caching, optimization, Pulse</p>
                     </div>
-                    <div class="bg-surface rounded-xl border border-slate-200 p-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="font-medium text-slate-900">laravel-security</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-security</span>
                         </div>
-                        <p class="text-sm text-slate-600">Security middleware, password rules</p>
+                        <p class="text-xs text-muted-foreground">OWASP, middleware, validation</p>
                     </div>
-                    <div class="bg-surface rounded-xl border border-slate-200 p-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="font-medium text-slate-900">laravel-deploy</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-deploy</span>
                         </div>
-                        <p class="text-sm text-slate-600">Zero-downtime deployment, health checks</p>
+                        <p class="text-xs text-muted-foreground">Zero-downtime, health checks</p>
                     </div>
-                    <div class="bg-surface rounded-xl border border-slate-200 p-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="font-medium text-slate-900">laravel-queue</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-queue</span>
                         </div>
-                        <p class="text-sm text-slate-600">Unique jobs, rate limiting, testing</p>
+                        <p class="text-xs text-muted-foreground">Jobs, rate limiting, Horizon</p>
                     </div>
-                    <div class="bg-surface rounded-xl border border-slate-200 p-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="font-medium text-slate-900">laravel-websocket</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-websocket</span>
                         </div>
-                        <p class="text-sm text-slate-600">Scaling, reconnection, testing</p>
+                        <p class="text-xs text-muted-foreground">Reverb, broadcasting, events</p>
+                    </div>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-feature</span>
+                        </div>
+                        <p class="text-xs text-muted-foreground">Full feature development</p>
+                    </div>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4 hover:border-primary/50 transition-colors">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="font-medium text-foreground text-sm">laravel-api</span>
+                        </div>
+                        <p class="text-xs text-muted-foreground">REST API development</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Hooks -->
-            <section id="hooks" class="mb-16 scroll-mt-20">
-                <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                    </span>
-                    Hooks
-                </h2>
-                <p class="text-slate-600 mb-6">7 quality hooks that run automatically to ensure code quality.</p>
+            <!-- Agents -->
+            <section id="agents" class="mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-foreground">Specialized Agents</h2>
+                    <span class="badge badge-secondary ml-2">23 total</span>
+                </div>
 
-                <div class="bg-surface rounded-xl border border-slate-200 overflow-hidden">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-architect</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-feature-builder</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-api-builder</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-module-builder</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-service-builder</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-testing</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-database</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-migration</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-auth</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-security</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-deploy</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-cicd</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-queue</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-livewire</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-filament</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-reverb</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-pennant</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-refactor</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-review</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-git</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-ai</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-validator</div>
+                    <div class="px-4 py-3 bg-card rounded-[var(--radius)] border border-border text-sm font-medium text-foreground">laravel-package</div>
+                </div>
+            </section>
+
+            <!-- Hooks -->
+            <section id="hooks" class="mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-foreground">Hooks</h2>
+                    <span class="badge badge-secondary ml-2">7 total</span>
+                </div>
+
+                <p class="text-muted-foreground mb-6">Pre-configured hooks for Laravel code quality that run automatically.</p>
+
+                <div class="bg-card rounded-[var(--radius)] border border-border overflow-hidden">
                     <table class="w-full">
-                        <thead class="bg-surface-dark">
+                        <thead class="bg-muted">
                             <tr>
-                                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-900">Hook</th>
-                                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-900">Description</th>
+                                <th class="text-left px-6 py-3 text-sm font-semibold text-foreground">Hook</th>
+                                <th class="text-left px-6 py-3 text-sm font-semibold text-foreground">Purpose</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-200">
+                        <tbody class="divide-y divide-border">
                             <tr>
-                                <td class="px-4 py-3"><code class="text-sm text-primary-600">pre-commit</code></td>
-                                <td class="px-4 py-3 text-sm text-slate-600">Runs Pint, PHPStan, and security checks before commit</td>
+                                <td class="px-6 py-4"><code class="text-sm text-primary">pre-commit.sh</code></td>
+                                <td class="px-6 py-4 text-sm text-muted-foreground">Syntax, Pint, PHPStan, security checks</td>
                             </tr>
                             <tr>
-                                <td class="px-4 py-3"><code class="text-sm text-primary-600">pre-push</code></td>
-                                <td class="px-4 py-3 text-sm text-slate-600">Full test suite and security audit before push</td>
+                                <td class="px-6 py-4"><code class="text-sm text-primary">post-edit.sh</code></td>
+                                <td class="px-6 py-4 text-sm text-muted-foreground">Auto-format PHP, update IDE helper</td>
                             </tr>
                             <tr>
-                                <td class="px-4 py-3"><code class="text-sm text-primary-600">post-checkout</code></td>
-                                <td class="px-4 py-3 text-sm text-slate-600">Auto-runs migrations and composer install</td>
+                                <td class="px-6 py-4"><code class="text-sm text-primary">security-scan.sh</code></td>
+                                <td class="px-6 py-4 text-sm text-muted-foreground">Detect secrets, API keys, debug functions</td>
                             </tr>
                             <tr>
-                                <td class="px-4 py-3"><code class="text-sm text-primary-600">migration-check</code></td>
-                                <td class="px-4 py-3 text-sm text-slate-600">Validates migration safety and performance</td>
+                                <td class="px-6 py-4"><code class="text-sm text-primary">migration-safety.sh</code></td>
+                                <td class="px-6 py-4 text-sm text-muted-foreground">Warn about destructive operations</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4"><code class="text-sm text-primary">blade-lint.sh</code></td>
+                                <td class="px-6 py-4 text-sm text-muted-foreground">Validate CSRF, XSS, directives</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4"><code class="text-sm text-primary">test-runner.sh</code></td>
+                                <td class="px-6 py-4 text-sm text-muted-foreground">Run related tests on changes</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4"><code class="text-sm text-primary">env-check.sh</code></td>
+                                <td class="px-6 py-4 text-sm text-muted-foreground">Block .env commits, validate examples</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- Agents -->
-            <section id="agents" class="mb-16 scroll-mt-20">
-                <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </span>
-                    Agents
-                </h2>
-                <p class="text-slate-600 mb-6">23 specialized agents covering the entire Laravel development lifecycle.</p>
+            <!-- Architecture -->
+            <section id="architecture" class="mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-foreground">Architecture</h2>
+                </div>
 
-                <div class="grid md:grid-cols-3 gap-3">
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-architect</span>
+                <div class="bg-card rounded-[var(--radius)] border border-border p-6 mb-6">
+                    <h3 class="font-semibold text-foreground mb-4">How It Works</h3>
+                    <div class="font-mono text-sm text-muted-foreground whitespace-pre leading-relaxed">
+User Request
+     |
+     v
++-------------+
+|  Architect  | --- Analyzes request, decides implementation
++-------------+
+     |
+     v
++-------------------------------------------+
+|           Builder Selection               |
++-------------+-------------+---------------+
+|   Feature   |   Module    |   Service     |
+|   Builder   |   Builder   |   Builder     |
++-------------+-------------+---------------+
+     |
+     v
++-------------+
+|   Testing   | --- Generates Pest tests
++-------------+
+     |
+     v
++-------------+
+|   Review    | --- Code quality check
++-------------+</div>
+                </div>
+
+                <div class="bg-card rounded-[var(--radius)] border border-border overflow-hidden">
+                    <div class="px-6 py-3 bg-muted border-b border-border">
+                        <h3 class="font-semibold text-foreground text-sm">Decision Matrix</h3>
                     </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-feature-builder</span>
+                    <table class="w-full">
+                        <thead class="bg-muted/50">
+                            <tr>
+                                <th class="text-left px-6 py-3 text-sm font-medium text-foreground">Request Type</th>
+                                <th class="text-left px-6 py-3 text-sm font-medium text-foreground">Implementation</th>
+                                <th class="text-left px-6 py-3 text-sm font-medium text-foreground">Location</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border">
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-muted-foreground">CRUD + UI + API</td>
+                                <td class="px-6 py-3 text-sm text-foreground font-medium">Feature</td>
+                                <td class="px-6 py-3 text-sm text-muted-foreground font-mono">app/Features/&lt;Name&gt;/</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-muted-foreground">Reusable logic, no UI</td>
+                                <td class="px-6 py-3 text-sm text-foreground font-medium">Module</td>
+                                <td class="px-6 py-3 text-sm text-muted-foreground font-mono">app/Modules/&lt;Name&gt;/</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-muted-foreground">Orchestrates operations</td>
+                                <td class="px-6 py-3 text-sm text-foreground font-medium">Service</td>
+                                <td class="px-6 py-3 text-sm text-muted-foreground font-mono">app/Services/</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 text-sm text-muted-foreground">Single operation</td>
+                                <td class="px-6 py-3 text-sm text-foreground font-medium">Action</td>
+                                <td class="px-6 py-3 text-sm text-muted-foreground font-mono">app/Actions/&lt;Domain&gt;/</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Packages -->
+            <section id="packages" class="mb-20 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                     </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-api-builder</span>
+                    <h2 class="text-2xl font-bold text-foreground">Package Integrations</h2>
+                    <span class="badge badge-secondary ml-2">85+ packages</span>
+                </div>
+
+                <p class="text-muted-foreground mb-6">The agents detect and adapt to installed packages automatically.</p>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4">
+                        <h4 class="font-medium text-foreground mb-3 text-sm">Architecture</h4>
+                        <p class="text-xs text-muted-foreground">nwidart/laravel-modules, lorisleiva/laravel-actions</p>
                     </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-module-builder</span>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4">
+                        <h4 class="font-medium text-foreground mb-3 text-sm">AI/LLM</h4>
+                        <p class="text-xs text-muted-foreground">prism-php/prism, laravel/mcp</p>
                     </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-service-builder</span>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4">
+                        <h4 class="font-medium text-foreground mb-3 text-sm">Admin</h4>
+                        <p class="text-xs text-muted-foreground">filament/filament, bezhansalleh/filament-shield</p>
                     </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-testing</span>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4">
+                        <h4 class="font-medium text-foreground mb-3 text-sm">Testing</h4>
+                        <p class="text-xs text-muted-foreground">pestphp/pest, laravel/dusk</p>
                     </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-database</span>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4">
+                        <h4 class="font-medium text-foreground mb-3 text-sm">Performance</h4>
+                        <p class="text-xs text-muted-foreground">laravel/octane, laravel/horizon, laravel/pulse</p>
                     </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-migration</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-auth</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-security</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-deploy</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-cicd</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-queue</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-livewire</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-filament</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-reverb</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-pennant</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-refactor</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-review</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-git</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-ai</span>
-                    </div>
-                    <div class="px-4 py-3 bg-surface rounded-lg border border-slate-200 text-sm">
-                        <span class="font-medium text-slate-900">laravel-validator</span>
+                    <div class="bg-card rounded-[var(--radius)] border border-border p-4">
+                        <h4 class="font-medium text-foreground mb-3 text-sm">Notifications</h4>
+                        <p class="text-xs text-muted-foreground">55+ channels (Telegram, Discord, Twilio, etc.)</p>
                     </div>
                 </div>
             </section>
 
             <!-- Footer -->
-            <footer class="border-t border-slate-200 pt-8 mt-16">
+            <footer class="border-t border-border pt-8">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <p class="text-sm text-slate-500">MIT License - Laravel Agent by <a href="https://github.com/hadyfayed" class="text-primary-600 hover:text-primary-700">hadyfayed</a></p>
+                    <p class="text-sm text-muted-foreground">MIT License - Laravel Agent by <a href="https://github.com/hadyfayed" class="text-foreground hover:underline">hadyfayed</a></p>
                     <div class="flex items-center gap-4">
-                        <a href="https://github.com/hadyfayed/laravel-agent" class="text-slate-400 hover:text-slate-600">
+                        <a href="https://github.com/hadyfayed/laravel-agent" target="_blank" class="text-muted-foreground hover:text-foreground transition-colors">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                         </a>
                     </div>
@@ -626,7 +945,32 @@
     </main>
 
     <script>
-        // Mobile menu toggle
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        const themeText = document.getElementById('theme-text');
+        const themeIconLight = document.getElementById('theme-icon-light');
+        const themeIconDark = document.getElementById('theme-icon-dark');
+
+        // Check for saved preference or system preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            updateThemeUI(true);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = html.classList.toggle('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+            updateThemeUI(isDark);
+        });
+
+        function updateThemeUI(isDark) {
+            themeText.textContent = isDark ? 'Light mode' : 'Dark mode';
+            themeIconLight.classList.toggle('hidden', !isDark);
+            themeIconDark.classList.toggle('hidden', isDark);
+        }
+
+        // Mobile menu
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -641,24 +985,23 @@
             overlay.classList.add('hidden');
         });
 
-        // Copy code functionality
-        function copyCode(button) {
-            const pre = button.closest('div').querySelector('pre');
-            const code = pre.textContent;
+        // Copy code
+        function copyCode(button, codeId) {
+            const code = document.getElementById(codeId).textContent;
             navigator.clipboard.writeText(code).then(() => {
-                button.innerHTML = '<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+                button.innerHTML = '<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
                 setTimeout(() => {
-                    button.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
+                    button.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
                 }, 2000);
             });
         }
 
-        // Active nav item on scroll
+        // Active nav on scroll
         const sections = document.querySelectorAll('section[id]');
         const navItems = document.querySelectorAll('.nav-item');
 
         window.addEventListener('scroll', () => {
-            let current = '';
+            let current = 'home';
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
                 if (scrollY >= sectionTop - 100) {
@@ -674,13 +1017,22 @@
             });
         });
 
-        // Simple search functionality
-        const searchInput = document.querySelector('input[type="text"]');
+        // Search
+        const searchInput = document.getElementById('search-input');
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+            if (e.key === 'Escape') {
+                searchInput.blur();
+            }
+        });
+
         searchInput.addEventListener('keyup', (e) => {
             if (e.key === 'Enter') {
                 const query = e.target.value.toLowerCase();
-                const allSections = document.querySelectorAll('section[id]');
-                for (const section of allSections) {
+                for (const section of sections) {
                     if (section.textContent.toLowerCase().includes(query)) {
                         section.scrollIntoView({ behavior: 'smooth' });
                         break;

@@ -1,8 +1,14 @@
 # Laravel Agent
 
+[![Documentation](https://img.shields.io/badge/docs-hadyfayed.github.io-blue)](https://hadyfayed.github.io/laravel-agent/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple)](https://claude.ai/code)
+
 > AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.
 
-A Claude Code plugin with **23 specialized agents**, **42 commands**, and **12 auto-invoked skills** covering the entire Laravel development lifecycle.
+A Claude Code plugin with **23 specialized agents**, **42 commands**, **12 auto-invoked skills**, and **7 quality hooks** covering the entire Laravel development lifecycle.
+
+**[View Documentation](https://hadyfayed.github.io/laravel-agent/)**
 
 ## Features
 
@@ -290,6 +296,16 @@ See `mcp/README.md` for details.
 
 - Claude Code with Plugin support
 - Laravel 10+ project
+
+## Documentation
+
+Visit the [documentation site](https://hadyfayed.github.io/laravel-agent/) for:
+
+- Getting started guide
+- Complete command reference
+- Skills and hooks documentation
+- Architecture overview
+- Package integrations
 
 ## License
 
