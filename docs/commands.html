@@ -1,611 +1,396 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commands - Laravel Agent</title>
-    <meta name="description" content="42 commands for Laravel development with Claude Code">
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        background: 'oklch(var(--background) / <alpha-value>)',
-                        foreground: 'oklch(var(--foreground) / <alpha-value>)',
-                        card: 'oklch(var(--card) / <alpha-value>)',
-                        'card-foreground': 'oklch(var(--card-foreground) / <alpha-value>)',
-                        primary: 'oklch(var(--primary) / <alpha-value>)',
-                        'primary-foreground': 'oklch(var(--primary-foreground) / <alpha-value>)',
-                        secondary: 'oklch(var(--secondary) / <alpha-value>)',
-                        'secondary-foreground': 'oklch(var(--secondary-foreground) / <alpha-value>)',
-                        muted: 'oklch(var(--muted) / <alpha-value>)',
-                        'muted-foreground': 'oklch(var(--muted-foreground) / <alpha-value>)',
-                        accent: 'oklch(var(--accent) / <alpha-value>)',
-                        'accent-foreground': 'oklch(var(--accent-foreground) / <alpha-value>)',
-                        border: 'oklch(var(--border) / <alpha-value>)',
-                        sidebar: 'oklch(var(--sidebar) / <alpha-value>)',
-                        'sidebar-foreground': 'oklch(var(--sidebar-foreground) / <alpha-value>)',
-                        'sidebar-primary': 'oklch(var(--sidebar-primary) / <alpha-value>)',
-                        'sidebar-accent': 'oklch(var(--sidebar-accent) / <alpha-value>)',
-                        'sidebar-border': 'oklch(var(--sidebar-border) / <alpha-value>)',
-                    },
-                    borderRadius: { DEFAULT: 'var(--radius)' }
-                }
-            }
-        }
-    </script>
-    <style>
-        :root {
-            --radius: 0.625rem;
-            --background: 1 0 0; --foreground: 0.145 0 0;
-            --card: 1 0 0; --card-foreground: 0.145 0 0;
-            --primary: 0.205 0 0; --primary-foreground: 0.985 0 0;
-            --secondary: 0.97 0 0; --secondary-foreground: 0.205 0 0;
-            --muted: 0.97 0 0; --muted-foreground: 0.556 0 0;
-            --accent: 0.97 0 0; --accent-foreground: 0.205 0 0;
-            --border: 0.922 0 0;
-            --sidebar: 0.985 0 0; --sidebar-foreground: 0.145 0 0;
-            --sidebar-primary: 0.205 0 0; --sidebar-accent: 0.97 0 0; --sidebar-border: 0.922 0 0;
-        }
-        .dark {
-            --background: 0.145 0 0; --foreground: 0.985 0 0;
-            --card: 0.205 0 0; --card-foreground: 0.985 0 0;
-            --primary: 0.922 0 0; --primary-foreground: 0.205 0 0;
-            --secondary: 0.269 0 0; --secondary-foreground: 0.985 0 0;
-            --muted: 0.269 0 0; --muted-foreground: 0.708 0 0;
-            --accent: 0.269 0 0; --accent-foreground: 0.985 0 0;
-            --border: 0.3 0 0;
-            --sidebar: 0.175 0 0; --sidebar-foreground: 0.985 0 0;
-            --sidebar-primary: 0.488 0.243 264.376; --sidebar-accent: 0.269 0 0; --sidebar-border: 0.3 0 0;
-        }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: oklch(var(--muted)); }
-        ::-webkit-scrollbar-thumb { background: oklch(var(--border)); border-radius: 4px; }
-        .nav-item.active { background: oklch(var(--sidebar-accent)); color: oklch(var(--sidebar-primary)); }
-        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; }
-        .badge-secondary { background: oklch(var(--secondary)); color: oklch(var(--secondary-foreground)); }
-        .badge-core { background: oklch(0.488 0.243 264.376); color: white; }
-        .badge-builder { background: oklch(0.7 0.15 150); color: white; }
-        .badge-api { background: oklch(0.65 0.2 30); color: white; }
-        .badge-testing { background: oklch(0.6 0.15 280); color: white; }
-        .badge-database { background: oklch(0.55 0.2 200); color: white; }
-        .badge-frontend { background: oklch(0.6 0.2 330); color: white; }
-        .badge-security { background: oklch(0.55 0.2 25); color: white; }
-        .badge-devops { background: oklch(0.5 0.15 180); color: white; }
-        .badge-review { background: oklch(0.55 0.15 60); color: white; }
-        .badge-data { background: oklch(0.6 0.15 120); color: white; }
-        .badge-ai { background: oklch(0.6 0.2 300); color: white; }
-        .command-card { transition: all 0.2s; }
-        .command-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1); }
-    </style>
-</head>
-<body class="bg-background text-foreground antialiased">
-    <button id="mobile-menu-btn" class="lg:hidden fixed top-4 left-4 z-50 p-2.5 rounded-[var(--radius)] bg-card border border-border shadow-lg hover:bg-accent">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
+---
+layout: list
+title: Commands
+description: 42 commands for Laravel development with Claude Code
+nav_active: Commands
+---
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-sidebar border-r border-sidebar-border transform -translate-x-full lg:translate-x-0 transition-transform duration-200 overflow-y-auto flex flex-col">
-        <div class="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border">
-            <a href="index.html" class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-[var(--radius)] bg-primary flex items-center justify-center">
-                    <svg class="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <div>
-                    <h1 class="text-sidebar-foreground font-semibold text-lg">Laravel Agent</h1>
-                    <p class="text-muted-foreground text-xs">v1.1.0</p>
-                </div>
-            </a>
+<header class="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-20">
+    <div class="max-w-5xl mx-auto px-6 lg:px-8 py-4">
+        <div class="flex items-center gap-4">
+            <div class="lg:hidden w-10"></div>
+            <input type="text" id="search" placeholder="Search commands..." class="flex-1 px-4 py-2 rounded-[var(--radius)] bg-muted border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
         </div>
+    </div>
+</header>
 
-        <nav class="flex-1 p-4 space-y-6">
-            <div>
-                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Getting Started</h2>
-                <ul class="space-y-1">
-                    <li><a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        Home
-                    </a></li>
-                    <li><a href="index.html#installation" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        Installation
-                    </a></li>
-                    <li><a href="index.html#quickstart" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        Quick Start
-                    </a></li>
-                </ul>
+<div class="max-w-5xl mx-auto px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2">Commands</h1>
+        <p class="text-muted-foreground">42 commands for Laravel development with Claude Code</p>
+    </div>
+
+    <div class="flex flex-wrap gap-2 mb-8" id="filters">
+        <button data-filter="all" class="filter-btn active px-4 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground">All (42)</button>
+        <button data-filter="core" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Core (2)</button>
+        <button data-filter="builder" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Builders (3)</button>
+        <button data-filter="api" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">API (2)</button>
+        <button data-filter="testing" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Testing (2)</button>
+        <button data-filter="database" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Database (2)</button>
+        <button data-filter="frontend" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Frontend (2)</button>
+        <button data-filter="security" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Security (2)</button>
+        <button data-filter="devops" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">DevOps (9)</button>
+        <button data-filter="ai" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">AI (4)</button>
+        <button data-filter="data" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Data (7)</button>
+        <button data-filter="review" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Review (7)</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="commands-grid">
+        <!-- Core -->
+        <a href="{{ 'commands/build.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="core" data-name="build">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:build</code>
+                <span class="badge badge-core">Core</span>
             </div>
-
-            <div>
-                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Reference</h2>
-                <ul class="space-y-1">
-                    <li><a href="commands.html" class="nav-item active flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Commands <span class="ml-auto badge badge-secondary">42</span>
-                    </a></li>
-                    <li><a href="skills.html" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                        Skills <span class="ml-auto badge badge-secondary">12</span>
-                    </a></li>
-                    <li><a href="agents.html" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Agents <span class="ml-auto badge badge-secondary">23</span>
-                    </a></li>
-                    <li><a href="hooks.html" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Hooks <span class="ml-auto badge badge-secondary">7</span>
-                    </a></li>
-                    <li><a href="index.html#packages" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                        Packages <span class="ml-auto badge badge-secondary">85+</span>
-                    </a></li>
-                </ul>
+            <p class="text-sm text-muted-foreground">Intelligent build - architect analyzes and decides implementation approach</p>
+        </a>
+        <a href="{{ 'commands/patterns.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="core" data-name="patterns">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:patterns</code>
+                <span class="badge badge-core">Core</span>
             </div>
+            <p class="text-sm text-muted-foreground">View current pattern usage (max 5 patterns per project)</p>
+        </a>
 
-            <div>
-                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Architecture</h2>
-                <ul class="space-y-1">
-                    <li><a href="index.html#architecture" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                        How It Works
-                    </a></li>
-                </ul>
+        <!-- Builders -->
+        <a href="{{ 'commands/feature-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="feature:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:feature:make</code>
+                <span class="badge badge-builder">Builder</span>
             </div>
-
-            <div>
-                <h2 class="text-muted-foreground text-xs font-semibold uppercase tracking-wider px-3 mb-2">Resources</h2>
-                <ul class="space-y-1">
-                    <li><a href="https://github.com/hadyfayed/laravel-agent" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                        <svg class="w-4 h-4 text-muted-foreground" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                        GitHub
-                        <svg class="w-3 h-3 ml-auto text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    </a></li>
-                </ul>
+            <p class="text-sm text-muted-foreground">Create complete feature (CRUD, views, API, tests)</p>
+        </a>
+        <a href="{{ 'commands/module-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="module:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:module:make</code>
+                <span class="badge badge-builder">Builder</span>
             </div>
-        </nav>
-
-        <div class="p-4 border-t border-sidebar-border">
-            <button id="theme-toggle" class="flex items-center gap-3 w-full px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-[var(--radius)] text-sm">
-                <svg id="theme-icon-light" class="w-4 h-4 text-muted-foreground hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                <svg id="theme-icon-dark" class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                <span id="theme-text">Dark mode</span>
-            </button>
-        </div>
-    </aside>
-
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 lg:hidden hidden"></div>
-
-    <main class="lg:ml-72 min-h-screen">
-        <header class="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-20">
-            <div class="max-w-5xl mx-auto px-6 lg:px-8 py-4">
-                <div class="flex items-center gap-4">
-                    <div class="lg:hidden w-10"></div>
-                    <input type="text" id="search" placeholder="Search commands..." class="flex-1 px-4 py-2 rounded-[var(--radius)] bg-muted border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
-                </div>
+            <p class="text-sm text-muted-foreground">Create reusable domain module with contracts, services, DTOs</p>
+        </a>
+        <a href="{{ 'commands/service-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="service:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:service:make</code>
+                <span class="badge badge-builder">Builder</span>
             </div>
-        </header>
+            <p class="text-sm text-muted-foreground">Create a service class or action with proper patterns</p>
+        </a>
 
-        <div class="max-w-5xl mx-auto px-6 lg:px-8 py-8">
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold mb-2">Commands</h1>
-                <p class="text-muted-foreground">42 commands for Laravel development with Claude Code</p>
+        <!-- API -->
+        <a href="{{ 'commands/api-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="api" data-name="api:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:api:make</code>
+                <span class="badge badge-api">API</span>
             </div>
-
-            <div class="flex flex-wrap gap-2 mb-8" id="filters">
-                <button data-filter="all" class="filter-btn active px-4 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground">All (42)</button>
-                <button data-filter="core" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Core (2)</button>
-                <button data-filter="builder" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Builders (3)</button>
-                <button data-filter="api" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">API (2)</button>
-                <button data-filter="testing" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Testing (2)</button>
-                <button data-filter="database" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Database (2)</button>
-                <button data-filter="frontend" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Frontend (2)</button>
-                <button data-filter="security" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Security (2)</button>
-                <button data-filter="devops" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">DevOps (9)</button>
-                <button data-filter="ai" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">AI (4)</button>
-                <button data-filter="data" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Data (7)</button>
-                <button data-filter="review" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Review (7)</button>
+            <p class="text-sm text-muted-foreground">Create a versioned API resource with documentation</p>
+        </a>
+        <a href="{{ 'commands/api-docs.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="api" data-name="api:docs">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:api:docs</code>
+                <span class="badge badge-api">API</span>
             </div>
+            <p class="text-sm text-muted-foreground">Generate OpenAPI/Swagger API documentation</p>
+        </a>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="commands-grid">
-                <!-- Core -->
-                <a href="commands/build.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="core" data-name="build">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:build</code>
-                        <span class="badge badge-core">Core</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Intelligent build - architect analyzes and decides implementation approach</p>
-                </a>
-                <a href="commands/patterns.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="core" data-name="patterns">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:patterns</code>
-                        <span class="badge badge-core">Core</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">View current pattern usage (max 5 patterns per project)</p>
-                </a>
-
-                <!-- Builders -->
-                <a href="commands/feature-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="feature:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:feature:make</code>
-                        <span class="badge badge-builder">Builder</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create complete feature (CRUD, views, API, tests)</p>
-                </a>
-                <a href="commands/module-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="module:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:module:make</code>
-                        <span class="badge badge-builder">Builder</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create reusable domain module with contracts, services, DTOs</p>
-                </a>
-                <a href="commands/service-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="service:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:service:make</code>
-                        <span class="badge badge-builder">Builder</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create a service class or action with proper patterns</p>
-                </a>
-
-                <!-- API -->
-                <a href="commands/api-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="api" data-name="api:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:api:make</code>
-                        <span class="badge badge-api">API</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create a versioned API resource with documentation</p>
-                </a>
-                <a href="commands/api-docs.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="api" data-name="api:docs">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:api:docs</code>
-                        <span class="badge badge-api">API</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Generate OpenAPI/Swagger API documentation</p>
-                </a>
-
-                <!-- Testing -->
-                <a href="commands/test-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="testing" data-name="test:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:test:make</code>
-                        <span class="badge badge-testing">Testing</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Generate comprehensive Pest tests for a class or feature</p>
-                </a>
-                <a href="commands/test-coverage.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="testing" data-name="test:coverage">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:test:coverage</code>
-                        <span class="badge badge-testing">Testing</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Run tests with coverage report and analysis</p>
-                </a>
-
-                <!-- Database -->
-                <a href="commands/db-optimize.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="database" data-name="db:optimize">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:db:optimize</code>
-                        <span class="badge badge-database">Database</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Analyze and optimize database queries and schema</p>
-                </a>
-                <a href="commands/db-diagram.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="database" data-name="db:diagram">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:db:diagram</code>
-                        <span class="badge badge-database">Database</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Generate database schema ER diagram</p>
-                </a>
-
-                <!-- Frontend -->
-                <a href="commands/livewire-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="frontend" data-name="livewire:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:livewire:make</code>
-                        <span class="badge badge-frontend">Frontend</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create Livewire component with form, table, or modal</p>
-                </a>
-                <a href="commands/filament-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="frontend" data-name="filament:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:filament:make</code>
-                        <span class="badge badge-frontend">Frontend</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create Filament resource, page, or widget</p>
-                </a>
-
-                <!-- Security -->
-                <a href="commands/auth-setup.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="security" data-name="auth:setup">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:auth:setup</code>
-                        <span class="badge badge-security">Security</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Setup authentication and authorization</p>
-                </a>
-                <a href="commands/security-audit.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="security" data-name="security:audit">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:security:audit</code>
-                        <span class="badge badge-security">Security</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Run OWASP security audit</p>
-                </a>
-
-                <!-- DevOps -->
-                <a href="commands/job-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="job:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:job:make</code>
-                        <span class="badge badge-devops">DevOps</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create queued job, event, listener, or notification</p>
-                </a>
-                <a href="commands/broadcast-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="broadcast:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:broadcast:make</code>
-                        <span class="badge badge-devops">DevOps</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create broadcast event with channel configuration</p>
-                </a>
-                <a href="commands/deploy-setup.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="deploy:setup">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:deploy:setup</code>
-                        <span class="badge badge-devops">DevOps</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Configure deployment (Forge, Vapor, Docker)</p>
-                </a>
-                <a href="commands/cicd-setup.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="cicd:setup">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:cicd:setup</code>
-                        <span class="badge badge-devops">DevOps</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Configure CI/CD pipeline</p>
-                </a>
-                <a href="commands/reverb-setup.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="reverb:setup">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:reverb:setup</code>
-                        <span class="badge badge-devops">DevOps</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Setup Laravel Reverb WebSocket server</p>
-                </a>
-                <a href="commands/feature-flag-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="feature-flag:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:feature-flag:make</code>
-                        <span class="badge badge-devops">DevOps</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create feature flag with Laravel Pennant</p>
-                </a>
-                <a href="commands/backup-setup.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="backup:setup">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:backup:setup</code>
-                        <span class="badge badge-devops">DevOps</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Configure automated backups</p>
-                </a>
-                <a href="commands/health-setup.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="health:setup">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:health:setup</code>
-                        <span class="badge badge-devops">DevOps</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Setup health monitoring</p>
-                </a>
-                <a href="commands/notification-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="notification:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:notification:make</code>
-                        <span class="badge badge-devops">DevOps</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create multi-channel notification (55+ channels)</p>
-                </a>
-
-                <!-- AI -->
-                <a href="commands/ai-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="ai" data-name="ai:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:ai:make</code>
-                        <span class="badge badge-ai">AI</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create AI-powered feature using Prism PHP</p>
-                </a>
-                <a href="commands/bug-fix.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="ai" data-name="bug:fix">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:bug:fix</code>
-                        <span class="badge badge-ai">AI</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">AI-powered bug analysis and fix suggestions</p>
-                </a>
-                <a href="commands/docs-generate.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="ai" data-name="docs:generate">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:docs:generate</code>
-                        <span class="badge badge-ai">AI</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">AI-powered documentation generation</p>
-                </a>
-                <a href="commands/pdf-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="ai" data-name="pdf:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:pdf:make</code>
-                        <span class="badge badge-ai">AI</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Generate PDF templates (invoices, reports)</p>
-                </a>
-
-                <!-- Data -->
-                <a href="commands/seo-setup.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="seo:setup">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:seo:setup</code>
-                        <span class="badge badge-data">Data</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Setup SEO infrastructure</p>
-                </a>
-                <a href="commands/geo-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="geo:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:geo:make</code>
-                        <span class="badge badge-data">Data</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create geolocation features</p>
-                </a>
-                <a href="commands/search-setup.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="search:setup">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:search:setup</code>
-                        <span class="badge badge-data">Data</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Configure Scout + Meilisearch/Algolia</p>
-                </a>
-                <a href="commands/dto-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="dto:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:dto:make</code>
-                        <span class="badge badge-data">Data</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create Data Transfer Objects</p>
-                </a>
-                <a href="commands/webhook-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="webhook:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:webhook:make</code>
-                        <span class="badge badge-data">Data</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create webhook handlers</p>
-                </a>
-                <a href="commands/import-make.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="import:make">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:import:make</code>
-                        <span class="badge badge-data">Data</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create CSV/Excel importers</p>
-                </a>
-                <a href="commands/migrate-from-legacy.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="migrate:from-legacy">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:migrate:from-legacy</code>
-                        <span class="badge badge-data">Data</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Migrate from legacy systems</p>
-                </a>
-
-                <!-- Review -->
-                <a href="commands/review-staged.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="review:staged">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:review:staged</code>
-                        <span class="badge badge-review">Review</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Review staged changes before commit</p>
-                </a>
-                <a href="commands/review-pr.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="review:pr">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:review:pr</code>
-                        <span class="badge badge-review">Review</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Review pull request</p>
-                </a>
-                <a href="commands/review-audit.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="review:audit">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:review:audit</code>
-                        <span class="badge badge-review">Review</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Full codebase audit</p>
-                </a>
-                <a href="commands/refactor.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="refactor">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:refactor</code>
-                        <span class="badge badge-review">Review</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Refactor for SOLID/DRY compliance</p>
-                </a>
-                <a href="commands/git-commit.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="git:commit">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:git:commit</code>
-                        <span class="badge badge-review">Review</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Smart commit with security review</p>
-                </a>
-                <a href="commands/git-pr.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="git:pr">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:git:pr</code>
-                        <span class="badge badge-review">Review</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create pull request</p>
-                </a>
-                <a href="commands/git-release.html" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="git:release">
-                    <div class="flex items-start justify-between mb-3">
-                        <code class="text-sm font-mono text-primary">/laravel-agent:git:release</code>
-                        <span class="badge badge-review">Review</span>
-                    </div>
-                    <p class="text-sm text-muted-foreground">Create release with changelog</p>
-                </a>
+        <!-- Testing -->
+        <a href="{{ 'commands/test-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="testing" data-name="test:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:test:make</code>
+                <span class="badge badge-testing">Testing</span>
             </div>
-        </div>
-    </main>
+            <p class="text-sm text-muted-foreground">Generate comprehensive Pest tests for a class or feature</p>
+        </a>
+        <a href="{{ 'commands/test-coverage.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="testing" data-name="test:coverage">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:test:coverage</code>
+                <span class="badge badge-testing">Testing</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Run tests with coverage report and analysis</p>
+        </a>
 
-    <script>
-        // Theme toggle
-        const html = document.documentElement;
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeText = document.getElementById('theme-text');
-        const themeIconLight = document.getElementById('theme-icon-light');
-        const themeIconDark = document.getElementById('theme-icon-dark');
+        <!-- Database -->
+        <a href="{{ 'commands/db-optimize.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="database" data-name="db:optimize">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:db:optimize</code>
+                <span class="badge badge-database">Database</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Analyze and optimize database queries and schema</p>
+        </a>
+        <a href="{{ 'commands/db-diagram.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="database" data-name="db:diagram">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:db:diagram</code>
+                <span class="badge badge-database">Database</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Generate database schema ER diagram</p>
+        </a>
 
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
-            updateThemeUI(true);
-        }
+        <!-- Frontend -->
+        <a href="{{ 'commands/livewire-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="frontend" data-name="livewire:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:livewire:make</code>
+                <span class="badge badge-frontend">Frontend</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create Livewire component with form, table, or modal</p>
+        </a>
+        <a href="{{ 'commands/filament-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="frontend" data-name="filament:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:filament:make</code>
+                <span class="badge badge-frontend">Frontend</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create Filament resource, page, or widget</p>
+        </a>
 
-        themeToggle.addEventListener('click', () => {
-            const isDark = html.classList.toggle('dark');
-            localStorage.theme = isDark ? 'dark' : 'light';
-            updateThemeUI(isDark);
-        });
+        <!-- Security -->
+        <a href="{{ 'commands/auth-setup.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="security" data-name="auth:setup">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:auth:setup</code>
+                <span class="badge badge-security">Security</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Setup authentication and authorization</p>
+        </a>
+        <a href="{{ 'commands/security-audit.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="security" data-name="security:audit">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:security:audit</code>
+                <span class="badge badge-security">Security</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Run OWASP security audit</p>
+        </a>
 
-        function updateThemeUI(isDark) {
-            themeText.textContent = isDark ? 'Light mode' : 'Dark mode';
-            themeIconLight.classList.toggle('hidden', !isDark);
-            themeIconDark.classList.toggle('hidden', isDark);
-        }
+        <!-- DevOps -->
+        <a href="{{ 'commands/job-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="job:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:job:make</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create queued job, event, listener, or notification</p>
+        </a>
+        <a href="{{ 'commands/broadcast-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="broadcast:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:broadcast:make</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create broadcast event with channel configuration</p>
+        </a>
+        <a href="{{ 'commands/deploy-setup.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="deploy:setup">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:deploy:setup</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Configure deployment (Forge, Vapor, Docker)</p>
+        </a>
+        <a href="{{ 'commands/cicd-setup.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="cicd:setup">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:cicd:setup</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Configure CI/CD pipeline</p>
+        </a>
+        <a href="{{ 'commands/reverb-setup.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="reverb:setup">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:reverb:setup</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Setup Laravel Reverb WebSocket server</p>
+        </a>
+        <a href="{{ 'commands/feature-flag-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="feature-flag:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:feature-flag:make</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create feature flag with Laravel Pennant</p>
+        </a>
+        <a href="{{ 'commands/backup-setup.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="backup:setup">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:backup:setup</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Configure automated backups</p>
+        </a>
+        <a href="{{ 'commands/health-setup.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="health:setup">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:health:setup</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Setup health monitoring</p>
+        </a>
+        <a href="{{ 'commands/notification-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="notification:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:notification:make</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create multi-channel notification (55+ channels)</p>
+        </a>
 
-        // Mobile menu
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
+        <!-- AI -->
+        <a href="{{ 'commands/ai-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="ai" data-name="ai:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:ai:make</code>
+                <span class="badge badge-ai">AI</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create AI-powered feature using Prism PHP</p>
+        </a>
+        <a href="{{ 'commands/bug-fix.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="ai" data-name="bug:fix">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:bug:fix</code>
+                <span class="badge badge-ai">AI</span>
+            </div>
+            <p class="text-sm text-muted-foreground">AI-powered bug analysis and fix suggestions</p>
+        </a>
+        <a href="{{ 'commands/docs-generate.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="ai" data-name="docs:generate">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:docs:generate</code>
+                <span class="badge badge-ai">AI</span>
+            </div>
+            <p class="text-sm text-muted-foreground">AI-powered documentation generation</p>
+        </a>
+        <a href="{{ 'commands/pdf-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="ai" data-name="pdf:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:pdf:make</code>
+                <span class="badge badge-ai">AI</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Generate PDF templates (invoices, reports)</p>
+        </a>
 
-        mobileMenuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        });
+        <!-- Data -->
+        <a href="{{ 'commands/seo-setup.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="seo:setup">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:seo:setup</code>
+                <span class="badge badge-data">Data</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Setup SEO infrastructure</p>
+        </a>
+        <a href="{{ 'commands/geo-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="geo:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:geo:make</code>
+                <span class="badge badge-data">Data</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create geolocation features</p>
+        </a>
+        <a href="{{ 'commands/search-setup.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="search:setup">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:search:setup</code>
+                <span class="badge badge-data">Data</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Configure Scout + Meilisearch/Algolia</p>
+        </a>
+        <a href="{{ 'commands/dto-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="dto:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:dto:make</code>
+                <span class="badge badge-data">Data</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create Data Transfer Objects</p>
+        </a>
+        <a href="{{ 'commands/webhook-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="webhook:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:webhook:make</code>
+                <span class="badge badge-data">Data</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create webhook handlers</p>
+        </a>
+        <a href="{{ 'commands/import-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="import:make">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:import:make</code>
+                <span class="badge badge-data">Data</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create CSV/Excel importers</p>
+        </a>
+        <a href="{{ 'commands/migrate-from-legacy.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="migrate:from-legacy">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:migrate:from-legacy</code>
+                <span class="badge badge-data">Data</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Migrate from legacy systems</p>
+        </a>
 
-        overlay.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
-        });
+        <!-- Review -->
+        <a href="{{ 'commands/review-staged.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="review:staged">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:review:staged</code>
+                <span class="badge badge-review">Review</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Review staged changes before commit</p>
+        </a>
+        <a href="{{ 'commands/review-pr.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="review:pr">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:review:pr</code>
+                <span class="badge badge-review">Review</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Review pull request</p>
+        </a>
+        <a href="{{ 'commands/review-audit.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="review:audit">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:review:audit</code>
+                <span class="badge badge-review">Review</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Full codebase audit</p>
+        </a>
+        <a href="{{ 'commands/refactor.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="refactor">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:refactor</code>
+                <span class="badge badge-review">Review</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Refactor for SOLID/DRY compliance</p>
+        </a>
+        <a href="{{ 'commands/git-commit.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="git:commit">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:git:commit</code>
+                <span class="badge badge-review">Review</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Smart commit with security review</p>
+        </a>
+        <a href="{{ 'commands/git-pr.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="git:pr">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:git:pr</code>
+                <span class="badge badge-review">Review</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create pull request</p>
+        </a>
+        <a href="{{ 'commands/git-release.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="git:release">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:git:release</code>
+                <span class="badge badge-review">Review</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Create release with changelog</p>
+        </a>
+    </div>
+</div>
 
-        // Filter functionality
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        const commandCards = document.querySelectorAll('.command-card');
+<script>
+    // Filter functionality
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const commandCards = document.querySelectorAll('.command-card');
 
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => {
-                    b.classList.remove('bg-primary', 'text-primary-foreground');
-                    b.classList.add('bg-muted', 'text-muted-foreground');
-                });
-                btn.classList.remove('bg-muted', 'text-muted-foreground');
-                btn.classList.add('bg-primary', 'text-primary-foreground');
-
-                const filter = btn.dataset.filter;
-                commandCards.forEach(card => {
-                    if (filter === 'all' || card.dataset.category === filter) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => {
+                b.classList.remove('bg-primary', 'text-primary-foreground');
+                b.classList.add('bg-muted', 'text-muted-foreground');
             });
-        });
+            btn.classList.remove('bg-muted', 'text-muted-foreground');
+            btn.classList.add('bg-primary', 'text-primary-foreground');
 
-        // Search functionality
-        const searchInput = document.getElementById('search');
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
+            const filter = btn.dataset.filter;
             commandCards.forEach(card => {
-                const name = card.dataset.name.toLowerCase();
-                const text = card.textContent.toLowerCase();
-                if (name.includes(query) || text.includes(query)) {
+                if (filter === 'all' || card.dataset.category === filter) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
                 }
             });
         });
-    </script>
-</body>
-</html>
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('search');
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        commandCards.forEach(card => {
+            const name = card.dataset.name.toLowerCase();
+            const text = card.textContent.toLowerCase();
+            if (name.includes(query) || text.includes(query)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+</script>

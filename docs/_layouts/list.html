@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    {% include head.html %}
+</head>
+<body class="bg-background text-foreground antialiased min-h-screen">
+    {% include sidebar.html %}
+
+    <!-- Main Content -->
+    <main class="lg:ml-72 min-h-screen">
+        {{ content }}
+    </main>
+
+    {% include scripts.html %}
+    {% if page.custom_scripts %}
+    {{ page.custom_scripts }}
+    {% endif %}
+</body>
+</html>
