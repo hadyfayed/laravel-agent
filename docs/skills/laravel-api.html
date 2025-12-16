@@ -58,40 +58,299 @@ back_text: All Skills
 # Authentication
 "Set up Sanctum authentication for my API with token abilities"</code></pre>
 
-    <h2>API Response Patterns</h2>
-    <p>The skill ensures consistent response structures:</p>
-    <pre class="language-php"><code class="language-php">// Collection response with pagination
-{
-    "data": [...],
-    "meta": {
-        "current_page": 1,
-        "per_page": 15,
-        "total": 100
-    },
-    "links": {
-        "first": "...",
-        "last": "...",
-        "next": "..."
-    }
-}
+    <h2>JSON Resource Implementation</h2>
+    <p>Transform your models into consistent API responses:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
 
-// Single resource response
-{
-    "data": {
-        "id": 1,
-        "type": "products",
-        "attributes": {...},
-        "relationships": {...}
-    }
-}
+namespace App\Http\Resources;
 
-// Error response
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ProductResource extends JsonResource
 {
-    "message": "Validation failed",
-    "errors": {
-        "email": ["The email field is required."]
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' =&gt; $this-&gt;id,
+            'name' =&gt; $this-&gt;name,
+            'slug' =&gt; $this-&gt;slug,
+            'price' =&gt; [
+                'amount' =&gt; $this-&gt;price,
+                'formatted' =&gt; number_format($this-&gt;price, 2),
+                'currency' =&gt; 'USD',
+            ],
+            'in_stock' =&gt; $this-&gt;stock_quantity &gt; 0,
+
+            // Conditional relationships - only included if loaded
+            'category' =&gt; new CategoryResource($this-&gt;whenLoaded('category')),
+            'reviews' =&gt; ReviewResource::collection($this-&gt;whenLoaded('reviews')),
+
+            // Conditional counts
+            'reviews_count' =&gt; $this-&gt;whenCounted('reviews'),
+
+            // Conditional fields based on user
+            'cost' =&gt; $this-&gt;when($request-&gt;user()?-&gt;isAdmin(), $this-&gt;cost),
+
+            'created_at' =&gt; $this-&gt;created_at-&gt;toISOString(),
+        ];
+    }
+
+    // Wrap single resources
+    public function with(Request $request): array
+    {
+        return [
+            'meta' =&gt; [
+                'api_version' =&gt; 'v1',
+            ],
+        ];
     }
 }</code></pre>
+
+    <h2>Resource Collection with Custom Pagination</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+
+class ProductCollection extends ResourceCollection
+{
+    public $collects = ProductResource::class;
+
+    public function toArray(Request $request): array
+    {
+        return [
+            'data' =&gt; $this-&gt;collection,
+            'meta' =&gt; [
+                'total' =&gt; $this-&gt;total(),
+                'per_page' =&gt; $this-&gt;perPage(),
+                'current_page' =&gt; $this-&gt;currentPage(),
+                'last_page' =&gt; $this-&gt;lastPage(),
+                'has_more' =&gt; $this-&gt;hasMorePages(),
+            ],
+        ];
+    }
+}
+
+// Usage in controller
+public function index(Request $request)
+{
+    $products = Product::query()
+        -&gt;with(['category', 'reviews'])
+        -&gt;withCount('reviews')
+        -&gt;when($request-&gt;category, fn ($q, $cat) =&gt; $q-&gt;where('category_id', $cat))
+        -&gt;when($request-&gt;search, fn ($q, $s) =&gt; $q-&gt;where('name', 'like', "%{$s}%"))
+        -&gt;paginate($request-&gt;per_page ?? 15);
+
+    return new ProductCollection($products);
+}</code></pre>
+
+    <h2>API Response Patterns</h2>
+    <p>The skill ensures consistent response structures:</p>
+    <pre class="language-json"><code class="language-json">// Collection response with pagination
+{
+    "data": [
+        {"id": 1, "name": "Product 1", "price": {"amount": 29.99}},
+        {"id": 2, "name": "Product 2", "price": {"amount": 49.99}}
+    ],
+    "meta": {
+        "total": 100,
+        "per_page": 15,
+        "current_page": 1,
+        "last_page": 7,
+        "has_more": true
+    },
+    "links": {
+        "first": "/api/v1/products?page=1",
+        "last": "/api/v1/products?page=7",
+        "next": "/api/v1/products?page=2",
+        "prev": null
+    }
+}
+
+// Error response (422 Validation)
+{
+    "message": "The given data was invalid.",
+    "errors": {
+        "email": ["The email field is required."],
+        "password": ["The password must be at least 8 characters."]
+    }
+}</code></pre>
+
+    <h2>API Versioning Setup</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// routes/api.php - URL-based versioning (recommended)
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('v1')-&gt;group(function () {
+    Route::apiResource('products', App\Http\Controllers\Api\V1\ProductController::class);
+    Route::apiResource('orders', App\Http\Controllers\Api\V1\OrderController::class);
+});
+
+Route::prefix('v2')-&gt;group(function () {
+    Route::apiResource('products', App\Http\Controllers\Api\V2\ProductController::class);
+});
+
+// app/Http/Controllers/Api/V1/ProductController.php
+namespace App\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\ProductResource;
+use App\Models\Product;
+
+class ProductController extends Controller
+{
+    public function index()
+    {
+        return ProductResource::collection(
+            Product::with('category')-&gt;paginate()
+        );
+    }
+
+    public function show(Product $product)
+    {
+        return new ProductResource($product-&gt;load('category', 'reviews'));
+    }
+}</code></pre>
+
+    <h2>Rate Limiting Configuration</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// app/Providers/AppServiceProvider.php
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
+
+public function boot(): void
+{
+    // Default API rate limit
+    RateLimiter::for('api', function ($request) {
+        return Limit::perMinute(60)-&gt;by($request-&gt;user()?-&gt;id ?: $request-&gt;ip());
+    });
+
+    // Stricter limit for expensive operations
+    RateLimiter::for('exports', function ($request) {
+        return Limit::perHour(10)-&gt;by($request-&gt;user()-&gt;id);
+    });
+
+    // Different limits by subscription tier
+    RateLimiter::for('tiered', function ($request) {
+        $user = $request-&gt;user();
+
+        return match ($user?-&gt;subscription_tier) {
+            'enterprise' =&gt; Limit::none(),
+            'pro' =&gt; Limit::perMinute(1000)-&gt;by($user-&gt;id),
+            default =&gt; Limit::perMinute(100)-&gt;by($user?-&gt;id ?: $request-&gt;ip()),
+        };
+    });
+}
+
+// Apply in routes
+Route::middleware(['throttle:api'])-&gt;group(function () {
+    Route::apiResource('products', ProductController::class);
+});
+
+Route::middleware(['throttle:exports'])-&gt;group(function () {
+    Route::get('/export/orders', [ExportController::class, 'orders']);
+});</code></pre>
+
+    <h2>Sanctum API Authentication</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// routes/api.php
+Route::post('/auth/token', function (Request $request) {
+    $request-&gt;validate([
+        'email' =&gt; 'required|email',
+        'password' =&gt; 'required',
+        'device_name' =&gt; 'required',
+    ]);
+
+    $user = User::where('email', $request-&gt;email)-&gt;first();
+
+    if (!$user || !Hash::check($request-&gt;password, $user-&gt;password)) {
+        throw ValidationException::withMessages([
+            'email' =&gt; ['The provided credentials are incorrect.'],
+        ]);
+    }
+
+    // Create token with abilities (permissions)
+    $token = $user-&gt;createToken($request-&gt;device_name, [
+        'products:read',
+        'products:write',
+        'orders:read',
+    ]);
+
+    return response()-&gt;json([
+        'token' =&gt; $token-&gt;plainTextToken,
+        'expires_at' =&gt; now()-&gt;addDays(30)-&gt;toISOString(),
+    ]);
+});
+
+// Protected routes
+Route::middleware('auth:sanctum')-&gt;group(function () {
+    Route::get('/user', fn (Request $request) =&gt; $request-&gt;user());
+
+    // Check token abilities
+    Route::middleware('ability:products:write')-&gt;group(function () {
+        Route::post('/products', [ProductController::class, 'store']);
+        Route::put('/products/{product}', [ProductController::class, 'update']);
+    });
+});</code></pre>
+
+    <h2>Testing API Endpoints</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use App\Models\Product;
+use App\Models\User;
+
+it('lists products with pagination', function () {
+    Product::factory()-&gt;count(20)-&gt;create();
+
+    $response = $this-&gt;getJson('/api/v1/products?per_page=10');
+
+    $response
+        -&gt;assertOk()
+        -&gt;assertJsonCount(10, 'data')
+        -&gt;assertJsonStructure([
+            'data' =&gt; [['id', 'name', 'price']],
+            'meta' =&gt; ['total', 'per_page', 'current_page'],
+        ]);
+});
+
+it('requires authentication for protected routes', function () {
+    $this-&gt;postJson('/api/v1/products', ['name' =&gt; 'Test'])
+        -&gt;assertUnauthorized();
+});
+
+it('creates product with valid token', function () {
+    $user = User::factory()-&gt;create();
+    $token = $user-&gt;createToken('test', ['products:write'])-&gt;plainTextToken;
+
+    $response = $this-&gt;withToken($token)
+        -&gt;postJson('/api/v1/products', [
+            'name' =&gt; 'New Product',
+            'price' =&gt; 29.99,
+        ]);
+
+    $response-&gt;assertCreated()
+        -&gt;assertJsonPath('data.name', 'New Product');
+});
+
+it('respects rate limits', function () {
+    $user = User::factory()-&gt;create();
+
+    // Exhaust rate limit
+    for ($i = 0; $i &lt; 60; $i++) {
+        $this-&gt;actingAs($user)-&gt;getJson('/api/v1/products');
+    }
+
+    // Next request should be rate limited
+    $this-&gt;actingAs($user)
+        -&gt;getJson('/api/v1/products')
+        -&gt;assertStatus(429);
+});</code></pre>
 
     <h2>Common Patterns</h2>
     <div class="overflow-x-auto not-prose">
