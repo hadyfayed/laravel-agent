@@ -1,0 +1,54 @@
+---
+layout: page
+title: post-edit.sh
+description: Auto-formats PHP files after edit/write operations and updates IDE helper files for better autocompletion
+nav_active: Hooks
+back_url: /hooks.html
+back_text: All Hooks
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="event-badge event-post">PostToolUse</span>
+    </div>
+    <h1 class="text-3xl font-bold mb-2">post-edit.sh</h1>
+    <p class="text-xl text-muted-foreground">Auto-formats PHP files after edit/write operations and updates IDE helper files for better autocompletion</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Checks Performed</h2>
+    <div class="space-y-2 not-prose">
+        <div class="check-item">
+            <svg class="check-icon text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-sm">Auto-format PHP with Pint</span>
+        </div>
+        <div class="check-item">
+            <svg class="check-icon text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-sm">Update IDE helper models</span>
+        </div>
+    </div>
+
+    <h2>Overview</h2>
+    <p>Auto-formats PHP files after edit/write operations and updates IDE helper files for better autocompletion. This hook runs on the <code>PostToolUse</code> event.</p>
+
+    <h2>Configuration</h2>
+    <p>Add this hook to your <code>.claude/settings.json</code>:</p>
+    <pre><code class="text-green-400">{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/post-edit.sh"
+      }
+    ]
+  }
+}</code></pre>
+</div>
+
+<style>
+    .event-badge { display: inline-flex; padding: 0.25rem 0.625rem; font-size: 0.7rem; font-weight: 600; border-radius: 9999px; }
+    .event-submit { background: oklch(0.55 0.18 150); color: white; }
+    .event-post { background: oklch(0.55 0.18 250); color: white; }
+    .check-item { display: flex; align-items: center; gap: 0.5rem; }
+    .check-icon { width: 1rem; height: 1rem; flex-shrink: 0; }
+</style>

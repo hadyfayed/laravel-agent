@@ -1,7 +1,7 @@
 ---
 layout: page
-title: pre-commit.sh
-description: Comprehensive pre-commit validation with PHP syntax, Pint formatting, PHPStan analysis, security scanning, and Blade template checks
+title: blade-lint.sh
+description: Validates Blade templates for security and best practices. Checks CSRF tokens, XSS prevention, and directive usage
 nav_active: Hooks
 back_url: /hooks.html
 back_text: All Hooks
@@ -9,10 +9,10 @@ back_text: All Hooks
 
 <div class="mb-8">
     <div class="flex items-center gap-3 mb-4">
-        <span class="event-badge event-submit">UserPromptSubmit</span>
+        <span class="event-badge event-post">PostToolUse</span>
     </div>
-    <h1 class="text-3xl font-bold mb-2">pre-commit.sh</h1>
-    <p class="text-xl text-muted-foreground">Comprehensive pre-commit validation with PHP syntax, Pint formatting, PHPStan analysis, security scanning, and Blade template checks</p>
+    <h1 class="text-3xl font-bold mb-2">blade-lint.sh</h1>
+    <p class="text-xl text-muted-foreground">Validates Blade templates for security and best practices. Checks CSRF tokens, XSS prevention, and directive usage</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
@@ -20,33 +20,29 @@ back_text: All Hooks
     <div class="space-y-2 not-prose">
         <div class="check-item">
             <svg class="check-icon text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            <span class="text-sm">PHP syntax validation</span>
+            <span class="text-sm">Missing @csrf in forms</span>
         </div>
         <div class="check-item">
             <svg class="check-icon text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            <span class="text-sm">Laravel Pint auto-formatting</span>
+            <span class="text-sm">Unescaped output ({!! !!})</span>
         </div>
         <div class="check-item">
             <svg class="check-icon text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            <span class="text-sm">PHPStan static analysis</span>
-        </div>
-        <div class="check-item">
-            <svg class="check-icon text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            <span class="text-sm">Security scanning</span>
+            <span class="text-sm">Missing @method for PUT/DELETE</span>
         </div>
     </div>
 
     <h2>Overview</h2>
-    <p>Comprehensive pre-commit validation with PHP syntax, Pint formatting, PHPStan analysis, security scanning, and Blade template checks. This hook runs on the <code>UserPromptSubmit</code> event.</p>
+    <p>Validates Blade templates for security and best practices. Checks CSRF tokens, XSS prevention, and directive usage. This hook runs on the <code>PostToolUse</code> event.</p>
 
     <h2>Configuration</h2>
     <p>Add this hook to your <code>.claude/settings.json</code>:</p>
     <pre><code class="text-green-400">{
   "hooks": {
-    "UserPromptSubmit": [
+    "PostToolUse": [
       {
-        "matcher": "git commit",
-        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/pre-commit.sh"
+        "matcher": "Edit",
+        "command": "bash .claude-plugins/laravel-agent/hooks/scripts/blade-lint.sh"
       }
     ]
   }
