@@ -145,6 +145,17 @@ RateLimiter::for('uploads', function (Request $request) {
         <li><a href="{{ '/commands/api-docs.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:docs</a> - Generate documentation</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The API builder follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> use versioned routes (/api/v1/)</li>
+        <li><strong>ALWAYS</strong> use JSON Resources for responses</li>
+        <li><strong>ALWAYS</strong> include rate limiting middleware</li>
+        <li><strong>ALWAYS</strong> validate inputs with Form Requests</li>
+        <li><strong>NEVER</strong> expose internal IDs without need</li>
+        <li><strong>NEVER</strong> return sensitive data in responses</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - For full-stack features with views</li>

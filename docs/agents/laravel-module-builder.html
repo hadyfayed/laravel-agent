@@ -225,6 +225,16 @@ class PaymentServiceProvider extends ServiceProvider
         <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building reusable domain logic</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The module builder follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> define contracts (interfaces) first</li>
+        <li><strong>ALWAYS</strong> use DTOs for data transfer</li>
+        <li><strong>ALWAYS</strong> bind implementations in ServiceProvider</li>
+        <li><strong>NEVER</strong> add routes or controllers to modules</li>
+        <li><strong>NEVER</strong> couple to specific implementations</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - For full-stack features</li>

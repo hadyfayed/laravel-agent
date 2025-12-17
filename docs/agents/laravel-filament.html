@@ -222,6 +222,24 @@ Tables\Actions\BulkAction::make('export')
         <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building admin interfaces</li>
     </ul>
 
+    <h2>Best Practices</h2>
+    <ul>
+        <li><strong>Use Sections</strong> - Organize forms with sections and tabs</li>
+        <li><strong>Add searchable</strong> - Enable search on Select fields</li>
+        <li><strong>Relation managers</strong> - Use for nested CRUD operations</li>
+        <li><strong>Global search</strong> - Configure $recordTitleAttribute</li>
+    </ul>
+
+    <h2>Guardrails</h2>
+    <p>The Filament agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> set navigationIcon for resources</li>
+        <li><strong>ALWAYS</strong> implement proper authorization</li>
+        <li><strong>ALWAYS</strong> add soft deletes with restore action</li>
+        <li><strong>NEVER</strong> exceed 15 fields per form section</li>
+        <li><strong>NEVER</strong> skip relationship configuration on Select fields</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/skills/laravel-filament.html' | relative_url }}" class="text-primary hover:underline">laravel-filament skill</a> - Auto-invoked Filament expertise</li>

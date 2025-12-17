@@ -297,6 +297,16 @@ REDIS_PORT=6379</code></pre>
         <li><a href="{{ '/commands/cicd-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:cicd:setup</a> - Configure CI/CD pipeline</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The CI/CD agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> run tests before deployment</li>
+        <li><strong>ALWAYS</strong> use secrets for credentials, never hardcode</li>
+        <li><strong>ALWAYS</strong> cache dependencies for faster builds</li>
+        <li><strong>NEVER</strong> skip PHPStan or security checks</li>
+        <li><strong>NEVER</strong> deploy without successful test run</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-deploy.html' | relative_url }}" class="text-primary hover:underline">laravel-deploy</a> - Deployment configuration</li>

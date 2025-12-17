@@ -208,6 +208,16 @@ StoreUserRequest $request // GOOD
         <li><a href="{{ '/commands/review-audit.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:audit</a> - Full codebase audit</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The review agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> prioritize security issues as critical</li>
+        <li><strong>ALWAYS</strong> provide fix suggestions with issues</li>
+        <li><strong>ALWAYS</strong> check for test coverage on new code</li>
+        <li><strong>NEVER</strong> approve PRs with security vulnerabilities</li>
+        <li><strong>NEVER</strong> report issues with confidence &lt; 80%</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-security.html' | relative_url }}" class="text-primary hover:underline">laravel-security</a> - Security-focused agent</li>

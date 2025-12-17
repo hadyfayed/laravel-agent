@@ -151,6 +151,70 @@ foreach ($categories as $category) {
         <li><a href="{{ '/commands/db-diagram.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:diagram</a> - Generate schema diagram</li>
     </ul>
 
+    <h2>Version Upgrades</h2>
+    <p>The database agent also handles Laravel/PHP version upgrades:</p>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Upgrade</th>
+                    <th class="text-left py-3 px-4 font-medium">Key Changes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel 10 → 11</td>
+                    <td class="py-3 px-4">New bootstrap/app.php, middleware configuration</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel 11 → 12</td>
+                    <td class="py-3 px-4">PHP 8.3+ required, removed deprecated facades</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">PHP 8.2 → 8.3</td>
+                    <td class="py-3 px-4">Typed class constants, json_validate(), #[\Override]</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Package Integration</h2>
+    <p>Integrates with analysis and optimization packages:</p>
+    <ul>
+        <li><strong>beyondcode/laravel-query-detector</strong> - N+1 detection in development</li>
+        <li><strong>grazulex/laravel-devtoolbox</strong> - Comprehensive analysis</li>
+        <li><strong>laravel/scout</strong> - Full-text search with Meilisearch</li>
+        <li><strong>rectorphp/rector</strong> - Automated code upgrades</li>
+        <li><strong>kitloong/laravel-migrations-generator</strong> - Generate migrations from existing DB</li>
+    </ul>
+
+    <h2>Migration Safety Protocol</h2>
+    <pre class="language-bash"><code class="language-bash"># 1. Check status
+php artisan migrate:status
+
+# 2. Preview changes
+php artisan migrate --pretend
+
+# 3. Backup production
+mysqldump -u user -p database > backup.sql
+
+# 4. Run migration
+php artisan migrate
+
+# 5. Verify
+php artisan migrate:status</code></pre>
+
+    <h2>Guardrails</h2>
+    <p>The database agent enforces strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> backup before migrating or upgrading</li>
+        <li><strong>ALWAYS</strong> run <code>migrate --pretend</code> first</li>
+        <li><strong>ALWAYS</strong> run tests after changes</li>
+        <li><strong>NEVER</strong> upgrade multiple major versions at once</li>
+        <li><strong>NEVER</strong> mass-assign tenant IDs</li>
+        <li><strong>PREFER</strong> incremental upgrades (10 → 11 → 12)</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/skills/laravel-database.html' | relative_url }}" class="text-primary hover:underline">laravel-database skill</a> - Auto-invoked database expertise</li>

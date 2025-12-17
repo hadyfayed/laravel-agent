@@ -191,6 +191,25 @@ if (Gate::allows('access-admin')) {
         <li><a href="{{ '/commands/auth-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:auth:setup</a> - Setup authentication system</li>
     </ul>
 
+    <h2>Package Integration</h2>
+    <p>Integrates with authentication packages:</p>
+    <ul>
+        <li><strong>laravel/sanctum</strong> - SPA authentication and API tokens</li>
+        <li><strong>laravel/passport</strong> - OAuth2 server implementation</li>
+        <li><strong>spatie/laravel-permission</strong> - Role and permission management</li>
+        <li><strong>laravel/socialite</strong> - Social login providers</li>
+    </ul>
+
+    <h2>Guardrails</h2>
+    <p>The auth agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> use policies for model authorization</li>
+        <li><strong>ALWAYS</strong> rate limit authentication endpoints</li>
+        <li><strong>ALWAYS</strong> regenerate session after login</li>
+        <li><strong>NEVER</strong> expose user IDs in tokens without scoping</li>
+        <li><strong>NEVER</strong> store passwords in plain text</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/skills/laravel-auth.html' | relative_url }}" class="text-primary hover:underline">laravel-auth skill</a> - Auto-invoked auth expertise</li>

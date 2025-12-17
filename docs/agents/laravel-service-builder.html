@@ -248,6 +248,16 @@ it('creates an order with payment', function () {
         <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building business logic</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The service builder follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> use constructor injection for dependencies</li>
+        <li><strong>ALWAYS</strong> define return types and exceptions in docblocks</li>
+        <li><strong>ALWAYS</strong> wrap multi-step operations in transactions</li>
+        <li><strong>NEVER</strong> inject Request objects into services</li>
+        <li><strong>NEVER</strong> create services with more than 7 methods</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-module-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-module-builder</a> - For complete domain modules</li>

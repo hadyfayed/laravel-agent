@@ -201,6 +201,16 @@ REVERB_SCHEME=http</code></pre>
         <li><a href="{{ '/commands/broadcast-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:broadcast:make</a> - Create broadcast events</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The Reverb agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> authorize private channels properly</li>
+        <li><strong>ALWAYS</strong> use broadcastAs() for consistent event names</li>
+        <li><strong>ALWAYS</strong> keep broadcast payloads small</li>
+        <li><strong>NEVER</strong> broadcast sensitive data without channel auth</li>
+        <li><strong>NEVER</strong> forget to run queue workers for ShouldBroadcast</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/skills/laravel-websocket.html' | relative_url }}" class="text-primary hover:underline">laravel-websocket skill</a> - Auto-invoked WebSocket expertise</li>

@@ -335,6 +335,16 @@ class InstallCommand extends Command
         <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When extracting to package</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The package agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> use PSR-4 autoloading</li>
+        <li><strong>ALWAYS</strong> include comprehensive tests with Testbench</li>
+        <li><strong>ALWAYS</strong> support Laravel auto-discovery</li>
+        <li><strong>NEVER</strong> hardcode application-specific dependencies</li>
+        <li><strong>NEVER</strong> publish to Packagist without tests passing</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-module-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-module-builder</a> - Internal modules</li>

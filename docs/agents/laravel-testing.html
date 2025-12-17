@@ -187,6 +187,25 @@ it('processes payment successfully', function () {
         <li><a href="{{ '/commands/test-coverage.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:coverage</a> - Run tests with coverage report</li>
     </ul>
 
+    <h2>Best Practices</h2>
+    <ul>
+        <li><strong>One concept per test</strong> - Test one behavior at a time</li>
+        <li><strong>Descriptive names</strong> - it('creates order with valid data')</li>
+        <li><strong>Arrange-Act-Assert</strong> - Clear test structure</li>
+        <li><strong>Factories for data</strong> - Never hardcode test data</li>
+        <li><strong>Mock external services</strong> - Don't hit real APIs in tests</li>
+    </ul>
+
+    <h2>Guardrails</h2>
+    <p>The testing agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> use RefreshDatabase trait for database tests</li>
+        <li><strong>ALWAYS</strong> mock external services (payment gateways, APIs)</li>
+        <li><strong>ALWAYS</strong> test authorization (403 responses)</li>
+        <li><strong>NEVER</strong> share state between tests</li>
+        <li><strong>NEVER</strong> test private methods directly</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - Creates features with tests included</li>

@@ -327,6 +327,16 @@ DB::listen(function ($query) {
         <li><a href="{{ '/commands/db-optimize.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:optimize</a> - Database optimization</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The performance agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> profile before optimizing</li>
+        <li><strong>ALWAYS</strong> set TTL on cache entries</li>
+        <li><strong>ALWAYS</strong> use indexes for filtered columns</li>
+        <li><strong>NEVER</strong> optimize prematurely without data</li>
+        <li><strong>NEVER</strong> cache forever without invalidation strategy</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/skills/laravel-performance.html' | relative_url }}" class="text-primary hover:underline">laravel-performance skill</a> - Auto-invoked performance expertise</li>

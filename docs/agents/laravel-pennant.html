@@ -299,6 +299,16 @@ it('returns 404 when feature-gated route is disabled', function () {
         <li><a href="{{ '/commands/feature-flag-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:feature-flag:make</a> - Create feature flags</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The Pennant agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> use class-based features for type safety</li>
+        <li><strong>ALWAYS</strong> include tests for feature flag behavior</li>
+        <li><strong>ALWAYS</strong> document rollout schedules in code</li>
+        <li><strong>NEVER</strong> leave stale feature flags in production</li>
+        <li><strong>NEVER</strong> use feature flags for permanent configuration</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-feature-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-feature-builder</a> - Full-stack feature building</li>

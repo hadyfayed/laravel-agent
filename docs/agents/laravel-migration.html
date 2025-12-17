@@ -180,6 +180,16 @@ composer require laravel/framework:^11.0 -W</code></pre>
         <li><a href="{{ '/commands/migrate-from-legacy.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:migrate:from-legacy</a> - Migrate from legacy systems</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The migration agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> backup before version upgrades</li>
+        <li><strong>ALWAYS</strong> run tests after each migration step</li>
+        <li><strong>ALWAYS</strong> upgrade incrementally (not multiple versions)</li>
+        <li><strong>NEVER</strong> skip deprecated warning review</li>
+        <li><strong>NEVER</strong> modify vendor files directly</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-refactor.html' | relative_url }}" class="text-primary hover:underline">laravel-refactor</a> - Code quality refactoring</li>

@@ -216,6 +216,24 @@ class DeletePostModal extends Component
         <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building reactive features</li>
     </ul>
 
+    <h2>Best Practices</h2>
+    <ul>
+        <li><strong>Use wire:key</strong> - Always add keys to list items</li>
+        <li><strong>Debounce inputs</strong> - Use wire:model.live.debounce.300ms for search</li>
+        <li><strong>Computed properties</strong> - Use #[Computed] for derived data</li>
+        <li><strong>Small components</strong> - Keep components focused on one task</li>
+    </ul>
+
+    <h2>Guardrails</h2>
+    <p>The Livewire agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> use wire:key for list iterations</li>
+        <li><strong>ALWAYS</strong> authorize actions in component methods</li>
+        <li><strong>ALWAYS</strong> use form validation attributes</li>
+        <li><strong>NEVER</strong> store sensitive data in public properties</li>
+        <li><strong>NEVER</strong> use N+1 queries in render methods</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/skills/laravel-livewire.html' | relative_url }}" class="text-primary hover:underline">laravel-livewire skill</a> - Auto-invoked Livewire expertise</li>

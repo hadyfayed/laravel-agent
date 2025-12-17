@@ -195,6 +195,17 @@ parameters:
         <li><a href="{{ '/commands/refactor.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:refactor</a> - Analyze and refactor code</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The refactor agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> run tests before and after refactoring</li>
+        <li><strong>ALWAYS</strong> extract after 2nd occurrence (Rule of Three)</li>
+        <li><strong>ALWAYS</strong> keep methods under 20 lines</li>
+        <li><strong>NEVER</strong> refactor without test coverage</li>
+        <li><strong>NEVER</strong> change behavior while refactoring</li>
+        <li><strong>NEVER</strong> create god classes or services</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-review.html' | relative_url }}" class="text-primary hover:underline">laravel-review</a> - Code review agent</li>

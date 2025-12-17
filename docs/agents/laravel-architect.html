@@ -156,6 +156,112 @@ back_text: All Agents
         <li><a href="{{ '/commands/build.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:build</a> - Main entry point</li>
     </ul>
 
+    <h2>7-Phase Development Protocol</h2>
+    <p>The architect follows a structured approach for every request:</p>
+    <ol>
+        <li><strong>Discovery</strong> - Parse request, identify keywords, map dependencies</li>
+        <li><strong>Exploration</strong> - Scan codebase structure, patterns, related code</li>
+        <li><strong>Questions</strong> - Gather missing info (only if confidence &lt; 80%)</li>
+        <li><strong>Architecture</strong> - Design solution, create blueprint</li>
+        <li><strong>Implementation</strong> - Delegate to specialized builders</li>
+        <li><strong>Review</strong> - Validate with parallel reviewers</li>
+        <li><strong>Summary</strong> - Provide actionable completion report</li>
+    </ol>
+
+    <h2>Package-Aware Architecture</h2>
+    <p>The architect detects installed packages and adapts its approach:</p>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Package</th>
+                    <th class="text-left py-3 px-4 font-medium">Adaptation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>nwidart/laravel-modules</code></td>
+                    <td class="py-3 px-4">Uses nwidart module structure instead of app/Modules/</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>lorisleiva/laravel-actions</code></td>
+                    <td class="py-3 px-4">Uses AsAction pattern for single-purpose operations</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>laravel/octane</code></td>
+                    <td class="py-3 px-4">Applies Octane-safe practices (no static state)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>stancl/tenancy</code></td>
+                    <td class="py-3 px-4">Configures multi-tenant isolation</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>laravel/cashier</code></td>
+                    <td class="py-3 px-4">Integrates Stripe subscription billing</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Agent Capability Matrix</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Agent</th>
+                    <th class="text-left py-3 px-4 font-medium">Creates</th>
+                    <th class="text-left py-3 px-4 font-medium">Delegates To</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>laravel-feature-builder</code></td>
+                    <td class="py-3 px-4">Feature structure, views, tests</td>
+                    <td class="py-3 px-4">laravel-api-builder</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>laravel-module-builder</code></td>
+                    <td class="py-3 px-4">Module structure, contracts</td>
+                    <td class="py-3 px-4">-</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>laravel-service-builder</code></td>
+                    <td class="py-3 px-4">Services, actions, DTOs</td>
+                    <td class="py-3 px-4">-</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>laravel-api-builder</code></td>
+                    <td class="py-3 px-4">API controllers, resources, routes</td>
+                    <td class="py-3 px-4">-</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>laravel-filament</code></td>
+                    <td class="py-3 px-4">Admin resources, pages</td>
+                    <td class="py-3 px-4">laravel-auth</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Guardrails</h2>
+    <p>The architect enforces strict boundaries:</p>
+    <ul>
+        <li><strong>NEVER</strong> edit <code>.env</code>, <code>.git/*</code>, or CI/CD configs</li>
+        <li><strong>NEVER</strong> add patterns beyond the 5 limit without approval</li>
+        <li><strong>NEVER</strong> create god classes or methods &gt;20 lines</li>
+        <li><strong>NEVER</strong> skip tests</li>
+        <li><strong>NEVER</strong> accept tenant IDs from user input</li>
+        <li><strong>ALWAYS</strong> check existing conventions first</li>
+    </ul>
+
+    <h2>Error Recovery</h2>
+    <p>If an agent fails mid-execution:</p>
+    <ol>
+        <li><strong>Check state</strong> - Identify created/modified files</li>
+        <li><strong>Rollback</strong> - Use <code>git checkout -- .</code> to restore</li>
+        <li><strong>Resume</strong> - Run agent with <code>--continue</code> flag</li>
+    </ol>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/commands/feature-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:feature:make</a> - Bypass architect, direct to builder</li>

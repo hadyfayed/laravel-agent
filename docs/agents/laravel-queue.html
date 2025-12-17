@@ -210,6 +210,24 @@ RateLimiter::for('api-calls', function (object $job) {
         <li><a href="{{ '/commands/job-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:job:make</a> - Create jobs, events, listeners</li>
     </ul>
 
+    <h2>Package Integration</h2>
+    <p>Integrates with queue management packages:</p>
+    <ul>
+        <li><strong>laravel/horizon</strong> - Redis queue monitoring dashboard</li>
+        <li><strong>spatie/laravel-failed-job-monitor</strong> - Failed job notifications</li>
+        <li><strong>spatie/laravel-schedule-monitor</strong> - Schedule monitoring</li>
+    </ul>
+
+    <h2>Guardrails</h2>
+    <p>The queue agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> use SerializesModels trait for model properties</li>
+        <li><strong>ALWAYS</strong> implement failed() method for error handling</li>
+        <li><strong>ALWAYS</strong> set appropriate timeouts and retry limits</li>
+        <li><strong>NEVER</strong> store large data in job constructors (use file paths)</li>
+        <li><strong>NEVER</strong> forget to restart workers after deployment</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/skills/laravel-queue.html' | relative_url }}" class="text-primary hover:underline">laravel-queue skill</a> - Auto-invoked queue expertise</li>

@@ -308,6 +308,16 @@ ANTHROPIC_API_KEY=sk-ant-...</code></pre>
         <li><a href="{{ '/agents/laravel-architect.html' | relative_url }}" class="text-primary hover:underline">laravel-architect</a> - When building AI features</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The AI agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> store API keys in environment variables</li>
+        <li><strong>ALWAYS</strong> implement rate limiting for AI calls</li>
+        <li><strong>ALWAYS</strong> handle API errors gracefully</li>
+        <li><strong>NEVER</strong> expose raw AI responses without validation</li>
+        <li><strong>NEVER</strong> store sensitive user data in AI prompts</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-service-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-service-builder</a> - Service class patterns</li>

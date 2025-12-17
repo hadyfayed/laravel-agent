@@ -272,6 +272,100 @@ class InvoiceController extends Controller
         <li><a href="{{ '/commands/build.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:build</a> - Via architect delegation</li>
     </ul>
 
+    <h2>Package Integration</h2>
+    <p>The feature builder automatically integrates with installed packages:</p>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Package</th>
+                    <th class="text-left py-3 px-4 font-medium">Integration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>spatie/laravel-tags</code></td>
+                    <td class="py-3 px-4">Adds HasTags trait to models</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>spatie/laravel-sluggable</code></td>
+                    <td class="py-3 px-4">Configures slug generation on models</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>spatie/laravel-activitylog</code></td>
+                    <td class="py-3 px-4">Adds LogsActivity trait for audit trails</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>spatie/laravel-medialibrary</code></td>
+                    <td class="py-3 px-4">Configures media collections on models</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>laravel/cashier</code></td>
+                    <td class="py-3 px-4">Adds Billable trait for subscriptions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>maatwebsite/excel</code></td>
+                    <td class="py-3 px-4">Creates Import/Export classes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>barryvdh/laravel-dompdf</code></td>
+                    <td class="py-3 px-4">Generates PDF service for exports</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Post-Build Commands</h2>
+    <p>After creating a feature, these commands are run:</p>
+    <pre class="language-bash"><code class="language-bash"># Required
+composer dump-autoload
+
+# If IDE Helper installed
+php artisan ide-helper:models -N
+
+# If Laravel Pint installed
+vendor/bin/pint app/Features/&lt;Name&gt;/
+
+# Run migrations
+php artisan migrate:status
+php artisan migrate --pretend
+php artisan migrate
+
+# Run tests
+vendor/bin/pest --filter=&lt;Name&gt;</code></pre>
+
+    <h2>Guardrails</h2>
+    <p>The feature builder enforces strict rules:</p>
+    <ul>
+        <li><strong>NEVER</strong> mass-assign <code>created_for_id</code> or <code>created_by_id</code></li>
+        <li><strong>NEVER</strong> skip tests</li>
+        <li><strong>ALWAYS</strong> use strict types and return types</li>
+        <li><strong>ALWAYS</strong> run migrations with safety checks first</li>
+        <li><strong>ALWAYS</strong> register ServiceProvider in config/app.php</li>
+    </ul>
+
+    <h2>Output Format</h2>
+    <p>The builder produces a standardized completion report:</p>
+    <pre class="language-bash"><code class="language-bash">## laravel-feature-builder Complete
+
+### Summary
+- **Type**: Feature
+- **Name**: Invoices
+- **Status**: Success
+
+### Files Created
+- app/Features/Invoices/InvoicesServiceProvider.php
+- app/Features/Invoices/Domain/Models/Invoice.php
+- app/Features/Invoices/Http/Controllers/InvoicesController.php
+- ...
+
+### Routes
+- Web: /invoices (resource routes)
+- API: /api/v1/invoices (delegated to api-builder)
+
+### Permissions (Laratrust)
+- read-invoices, create-invoices, update-invoices, delete-invoices</code></pre>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-module-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-module-builder</a> - For reusable domain modules</li>

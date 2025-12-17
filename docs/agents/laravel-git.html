@@ -169,6 +169,17 @@ Generated with Laravel Agent
         <li><a href="{{ '/commands/git-release.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:git:release</a> - Create release with changelog</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The git agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> scan for secrets before committing</li>
+        <li><strong>ALWAYS</strong> use conventional commit messages</li>
+        <li><strong>ALWAYS</strong> include ticket references when available</li>
+        <li><strong>NEVER</strong> commit .env or credential files</li>
+        <li><strong>NEVER</strong> force push to main/master branches</li>
+        <li><strong>NEVER</strong> update git config without user consent</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/agents/laravel-cicd.html' | relative_url }}" class="text-primary hover:underline">laravel-cicd</a> - CI/CD pipeline setup</li>

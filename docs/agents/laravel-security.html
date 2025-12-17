@@ -173,6 +173,70 @@ $request->validate([
         <li><a href="{{ '/commands/review-audit.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:audit</a> - Full codebase audit</li>
     </ul>
 
+    <h2>OWASP Top 10 Coverage</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">OWASP</th>
+                    <th class="text-left py-3 px-4 font-medium">What's Checked</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">A01: Broken Access Control</td>
+                    <td class="py-3 px-4">Authorization calls, policy usage, route protection</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">A02: Cryptographic Failures</td>
+                    <td class="py-3 px-4">Password hashing, token generation, encryption usage</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">A03: Injection</td>
+                    <td class="py-3 px-4">SQL, command, LDAP injection patterns</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">A05: Security Misconfiguration</td>
+                    <td class="py-3 px-4">APP_DEBUG, session settings, headers</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">A07: Authentication Failures</td>
+                    <td class="py-3 px-4">Rate limiting, lockout, password policies</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>False Positive Filtering</h2>
+    <p>The agent validates findings using a confidence pipeline:</p>
+    <ol>
+        <li><strong>Code Exists?</strong> - Verify the pattern actually exists in code</li>
+        <li><strong>Context OK?</strong> - Check if in test file, constant, or framework-handled</li>
+        <li><strong>Confidence ≥80%?</strong> - Only report high-confidence issues</li>
+    </ol>
+    <p>Philosophy: <em>"When in doubt, leave it out."</em></p>
+
+    <h2>Package Integration</h2>
+    <p>Integrates with security packages:</p>
+    <ul>
+        <li><strong>spatie/laravel-csp</strong> - Content Security Policy configuration</li>
+        <li><strong>spatie/crypto</strong> - RSA encryption and digital signatures</li>
+        <li><strong>enlightn/enlightn</strong> - Comprehensive security analysis</li>
+        <li><strong>grazulex/laravel-devtoolbox</strong> - Unprotected route detection</li>
+    </ul>
+
+    <h2>Guardrails</h2>
+    <p>The security agent enforces strict rules:</p>
+    <ul>
+        <li><strong>NEVER</strong> commit secrets or credentials</li>
+        <li><strong>NEVER</strong> disable CSRF for web routes</li>
+        <li><strong>NEVER</strong> trust user input without validation</li>
+        <li><strong>ALWAYS</strong> use parameterized queries</li>
+        <li><strong>ALWAYS</strong> escape output in views</li>
+        <li><strong>ALWAYS</strong> validate and sanitize uploads</li>
+        <li><strong>NEVER</strong> report issues with confidence &lt; 80%</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/skills/laravel-security.html' | relative_url }}" class="text-primary hover:underline">laravel-security skill</a> - Auto-invoked security expertise</li>

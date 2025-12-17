@@ -226,6 +226,17 @@ class HealthController extends Controller
         <li><a href="{{ '/commands/deploy-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:deploy:setup</a> - Configure deployment</li>
     </ul>
 
+    <h2>Guardrails</h2>
+    <p>The deploy agent follows strict rules:</p>
+    <ul>
+        <li><strong>ALWAYS</strong> backup before deploying</li>
+        <li><strong>ALWAYS</strong> run <code>migrate --force</code> with --pretend first</li>
+        <li><strong>ALWAYS</strong> include health checks before switching</li>
+        <li><strong>ALWAYS</strong> keep at least 5 previous releases for rollback</li>
+        <li><strong>NEVER</strong> deploy with APP_DEBUG=true</li>
+        <li><strong>NEVER</strong> expose .env files in public</li>
+    </ul>
+
     <h2>See Also</h2>
     <ul>
         <li><a href="{{ '/skills/laravel-deploy.html' | relative_url }}" class="text-primary hover:underline">laravel-deploy skill</a> - Auto-invoked deployment expertise</li>
