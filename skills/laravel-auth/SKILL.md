@@ -254,3 +254,15 @@ final class PostController extends Controller
 - Use HTTPS in production
 - Regenerate session after login
 - Implement proper logout
+
+## Related Commands
+
+- `/laravel-agent:auth:setup` - Setup authentication and authorization
+
+## Related Agents
+
+- `laravel-auth` - Authentication and authorization specialist
+
+## Related Skills
+
+- `laravel-security` - Security audits and hardening

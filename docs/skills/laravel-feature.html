@@ -108,11 +108,115 @@ Claude: [skill activates] "I'll implement notifications using..."
         </table>
     </div>
 
+    <h2>Complete Model Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Features\Products\Domain\Models;
+
+use App\Features\Products\Domain\Enums\ProductStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+final class Product extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'price',
+        'category_id',
+        'status',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'price' =&gt; 'decimal:2',
+            'status' =&gt; ProductStatus::class,
+        ];
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this-&gt;belongsTo(Category::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query-&gt;where('status', ProductStatus::Active);
+    }
+}</code></pre>
+
+    <h2>Controller with Authorization</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Features\Products\Http\Controllers;
+
+use App\Features\Products\Domain\Actions\CreateProductAction;
+use App\Features\Products\Domain\Models\Product;
+use App\Features\Products\Http\Requests\StoreProductRequest;
+
+final class ProductController extends Controller
+{
+    public function __construct()
+    {
+        $this-&gt;authorizeResource(Product::class, 'product');
+    }
+
+    public function index()
+    {
+        $products = Product::query()
+            -&gt;with(['category'])
+            -&gt;latest()
+            -&gt;paginate(15);
+
+        return view('products.index', compact('products'));
+    }
+
+    public function store(StoreProductRequest $request, CreateProductAction $action)
+    {
+        $product = $action-&gt;execute($request-&gt;validated());
+
+        return redirect()
+            -&gt;route('products.show', $product)
+            -&gt;with('success', 'Product created successfully.');
+    }
+}</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Fat Controllers</strong> - Move business logic to Actions/Services</li>
+        <li><strong>Missing Authorization</strong> - Always use Policies with <code>authorizeResource()</code></li>
+        <li><strong>N+1 Queries</strong> - Eager load relationships with <code>with()</code></li>
+        <li><strong>No Validation</strong> - Use Form Requests, not inline validation</li>
+        <li><strong>Hardcoded Values</strong> - Use Enums for status fields</li>
+        <li><strong>Missing Tests</strong> - Every feature needs tests</li>
+    </ul>
+
+    <h2>Package Integration</h2>
+    <ul>
+        <li><strong>spatie/laravel-sluggable</strong> - Auto-generate slugs</li>
+        <li><strong>spatie/laravel-medialibrary</strong> - Handle file uploads</li>
+        <li><strong>spatie/laravel-activitylog</strong> - Track changes</li>
+        <li><strong>spatie/laravel-tags</strong> - Add tagging</li>
+    </ul>
+
     <h2>Best Practices</h2>
     <ol>
         <li><strong>Be specific</strong> - "Build invoice management with line items" triggers better than "make invoices"</li>
         <li><strong>Mention requirements</strong> - Include relationships, validations, special features</li>
         <li><strong>Use commands for precision</strong> - When you know exactly what you want, use <code>/build</code> directly</li>
+        <li><strong>Use <code>final class</code></strong> - For non-inheritable classes</li>
+        <li><strong>Declare <code>strict_types=1</code></strong> - For type safety</li>
+        <li><strong>Max 5 design patterns</strong> - Per project to avoid over-engineering</li>
     </ol>
 
     <h2>Related Commands</h2>

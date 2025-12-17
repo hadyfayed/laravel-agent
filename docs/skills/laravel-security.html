@@ -134,11 +134,67 @@ class SecurityHeaders
     </div>
 
     <h2>Common Pitfalls</h2>
+    <pre class="language-php"><code class="language-php">// 1. Using $guarded = [] - Allows mass assignment attacks
+// BAD
+protected $guarded = [];
+
+// GOOD - explicit fillable
+protected $fillable = ['name', 'email'];
+
+// 2. Trusting User Input in Raw Queries
+// DANGEROUS
+DB::statement("UPDATE users SET role = '{$request-&gt;role}'");
+
+// Safe
+DB::statement('UPDATE users SET role = ?', [$request-&gt;role]);
+
+// 3. Exposing Sensitive Data in Errors
+// config/app.php - in production
+'debug' =&gt; false,
+
+// 4. Missing Authorization Checks
+// BAD - no auth check
+public function update(Request $request, Post $post)
+{
+    $post-&gt;update($request-&gt;all());
+}
+
+// GOOD
+public function update(Request $request, Post $post)
+{
+    $this-&gt;authorize('update', $post);
+    $post-&gt;update($request-&gt;validated());
+}
+
+// 5. Storing Tokens/Secrets in Logs
+// BAD
+Log::info('Payment processed', $request-&gt;all());
+
+// GOOD
+Log::info('Payment processed', [
+    'amount' =&gt; $request-&gt;amount,
+    'card_last4' =&gt; substr($request-&gt;card_number, -4),
+]);</code></pre>
+
+    <h2>Package Integration</h2>
     <ul>
-        <li><strong>Using <code>{!! !!}</code></strong> - Only for trusted HTML, never user input</li>
-        <li><strong>Storing secrets in code</strong> - Use <code>.env</code> and config</li>
-        <li><strong>Exposing debug info</strong> - Never <code>APP_DEBUG=true</code> in production</li>
-        <li><strong>Weak password rules</strong> - Use <code>Password::min(8)->mixedCase()->numbers()</code></li>
+        <li><strong>spatie/laravel-permission</strong> - Role-based access control</li>
+        <li><strong>laravel/sanctum</strong> - API token authentication</li>
+        <li><strong>laravel/passport</strong> - OAuth2 server</li>
+        <li><strong>paragonie/ciphersweet</strong> - Searchable encryption</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Never store secrets in code</li>
+        <li>Use .env for sensitive config</li>
+        <li>Keep dependencies updated</li>
+        <li>Enable HTTPS in production</li>
+        <li>Use prepared statements</li>
+        <li>Validate all input</li>
+        <li>Log security events</li>
+        <li>Use Content Security Policy</li>
+        <li>Regular security audits with <code>composer audit</code></li>
     </ul>
 
     <h2>Password Validation</h2>

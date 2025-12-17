@@ -156,11 +156,58 @@ class ProcessWebhook implements ShouldQueue, ShouldBeUnique
 }</code></pre>
 
     <h2>Common Pitfalls</h2>
+    <pre class="language-php"><code class="language-php">// 1. Not Serializing Properly - Models must use SerializesModels
+// Bad - serializes entire model data
+public function __construct(public array $orderData) {}
+
+// Good - only serializes model ID
+use SerializesModels;
+public function __construct(public Order $order) {}
+
+// 2. Missing Failed Job Handler
+public function failed(\Throwable $e): void
+{
+    Log::error('Job failed', [
+        'order_id' =&gt; $this-&gt;order-&gt;id,
+        'error' =&gt; $e-&gt;getMessage(),
+    ]);
+}
+
+// 3. Not Setting Appropriate Timeouts
+public int $timeout = 30; // seconds
+public bool $failOnTimeout = true;
+
+// 4. Infinite Retry Loops
+public int $tries = 3;
+public array $backoff = [10, 60, 300]; // 10s, 1m, 5m
+
+// 5. Heavy Data in Queued Jobs
+// Bad - stores large data
+ProcessCsv::dispatch($csvContent);
+
+// Good - store file path
+ProcessCsv::dispatch($filePath);
+
+// 6. Not Restarting Workers After Deploy
+// php artisan queue:restart</code></pre>
+
+    <h2>Package Integration</h2>
     <ul>
-        <li><strong>Serializing large data</strong> - Pass IDs, not entire models with relationships</li>
-        <li><strong>Missing <code>implements ShouldQueue</code></strong> - Job runs synchronously without it</li>
-        <li><strong>Ignoring failures</strong> - Always implement <code>failed()</code> method</li>
-        <li><strong>Not setting timeouts</strong> - Jobs can hang indefinitely</li>
+        <li><strong>laravel/horizon</strong> - Redis queue monitoring dashboard</li>
+        <li><strong>spatie/laravel-failed-job-monitor</strong> - Failed job notifications</li>
+        <li><strong>spatie/laravel-schedule-monitor</strong> - Schedule monitoring</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Use specific queues for different priorities</li>
+        <li>Set appropriate timeouts and retry limits</li>
+        <li>Handle failures gracefully</li>
+        <li>Monitor queue length and worker health</li>
+        <li>Use Horizon for Redis queue monitoring</li>
+        <li>Serialize only what's needed</li>
+        <li>Use unique jobs to prevent duplicates</li>
+        <li>Test job dispatch and handling</li>
     </ul>
 
     <h2>Testing Jobs</h2>

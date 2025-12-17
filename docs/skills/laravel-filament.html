@@ -194,11 +194,60 @@ Tables\Actions\BulkAction::make('export')
     ->action(fn (Collection $records) => Excel::download($records))</code></pre>
 
     <h2>Common Pitfalls</h2>
+    <pre class="language-php"><code class="language-php">// 1. Missing Navigation Icon - Filament requires icons
+protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+// 2. Not Registering Resources - Add to Panel Provider
+-&gt;discoverResources(
+    in: app_path('Filament/Resources'),
+    for: 'App\\Filament\\Resources'
+)
+
+// 3. Form Field Name Mismatch - Match model attributes
+// BAD - if column is 'product_name'
+Forms\Components\TextInput::make('name'),
+
+// GOOD
+Forms\Components\TextInput::make('product_name'),
+
+// 4. Missing Relationship Method
+public function category(): BelongsTo
+{
+    return $this-&gt;belongsTo(Category::class);
+}
+
+// 5. Select Without Searchable - Large lists need search
+Forms\Components\Select::make('category_id')
+    -&gt;relationship('category', 'name')
+    -&gt;searchable()
+    -&gt;preload(),
+
+// 6. Not Using Soft Deletes - Add restore action
+Tables\Actions\RestoreAction::make(),
+Tables\Filters\TrashedFilter::make(),
+
+// 7. Heavy Queries in Table - Use withSum/withCount
+Tables\Columns\TextColumn::make('items_sum_price')
+    -&gt;label('Total'),</code></pre>
+
+    <h2>Package Integration</h2>
     <ul>
-        <li><strong>Missing relationship</strong> - Define <code>relationship()</code> on Select for models</li>
-        <li><strong>Slow tables</strong> - Add <code>->searchable()</code> sparingly, index columns</li>
-        <li><strong>Large forms</strong> - Use <code>Section</code> and <code>Tabs</code> components</li>
-        <li><strong>Authorization</strong> - Implement policies, use <code>can()</code> methods</li>
+        <li><strong>bezhansalleh/filament-shield</strong> - Roles and permissions</li>
+        <li><strong>filament/spatie-laravel-media-library-plugin</strong> - Media management</li>
+        <li><strong>filament/spatie-laravel-settings-plugin</strong> - Settings management</li>
+        <li><strong>ralphjsmit/laravel-seo</strong> - SEO fields</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Use Sections to organize forms</li>
+        <li>Add search to Select fields</li>
+        <li>Use soft deletes with restore action</li>
+        <li>Implement proper authorization</li>
+        <li>Add global search</li>
+        <li>Use relation managers for related data</li>
+        <li>Keep forms under 15 fields per section</li>
+        <li>Use tabs for complex resources</li>
     </ul>
 
     <h2>Related Commands</h2>

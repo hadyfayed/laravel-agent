@@ -223,3 +223,17 @@ DB::transaction(function () {
 - Use foreign key constraints
 - Monitor slow queries in production
 - Use database transactions for related operations
+
+## Related Commands
+
+- `/laravel-agent:db:optimize` - Analyze and optimize database queries
+- `/laravel-agent:db:diagram` - Generate database schema diagram
+
+## Related Agents
+
+- `laravel-database` - Database optimization specialist
+- `laravel-migration` - Migration specialist
+
+## Related Skills
+
+- `laravel-performance` - Query optimization and caching

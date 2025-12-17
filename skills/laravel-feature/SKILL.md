@@ -325,3 +325,14 @@ describe('ProductController', function () {
 - Include factory and tests
 - Use Enums for status fields
 - Implement soft deletes
+
+## Related Commands
+
+- `/laravel-agent:feature:make` - Create a complete Laravel feature
+- `/laravel-agent:module:make` - Create a reusable domain module
+- `/laravel-agent:service:make` - Create a service class or action
+
+## Related Agents
+
+- `laravel-feature-builder` - Feature creation specialist
+- `laravel-architect` - Architecture and planning

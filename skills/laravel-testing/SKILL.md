@@ -222,3 +222,12 @@ final class OrderFactory extends Factory
 - Keep tests fast (mock slow operations)
 - Use factories for test data
 - Follow Arrange-Act-Assert pattern
+
+## Related Commands
+
+- `/laravel-agent:test:make` - Generate comprehensive tests
+- `/laravel-agent:test:coverage` - Run tests with coverage report
+
+## Related Agents
+
+- `laravel-testing` - Testing specialist

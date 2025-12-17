@@ -160,11 +160,72 @@ public function handlePostCreated(int $id): void
 Livewire.dispatch('post-created', { id: 1 })</code></pre>
 
     <h2>Common Pitfalls</h2>
+    <pre class="language-php"><code class="language-php">// 1. Missing wire:key - Always use in loops
+@foreach($items as $item)
+    &lt;div wire:key="item-{{ $item-&gt;id }}"&gt;...&lt;/div&gt;
+@endforeach
+
+// 2. N+1 Queries in render() - Eager load relationships
+// BAD
+public function render()
+{
+    return view('livewire.posts', [
+        'posts' =&gt; Post::all(), // N+1 when accessing $post-&gt;author
+    ]);
+}
+
+// GOOD
+public function render()
+{
+    return view('livewire.posts', [
+        'posts' =&gt; Post::with('author')-&gt;get(),
+    ]);
+}
+
+// 3. Large Component State - Store IDs, not collections
+// BAD
+public Collection $products;
+
+// GOOD
+public array $productIds = [];
+
+// 4. Not Debouncing Search - Causes excessive requests
+// BAD
+&lt;input wire:model.live="search"&gt;
+
+// GOOD
+&lt;input wire:model.live.debounce.300ms="search"&gt;
+
+// 5. Forgetting to Reset Pagination
+public function updatedSearch(): void
+{
+    $this-&gt;resetPage();
+}
+
+// 6. Memory Leaks with File Uploads
+public function save(): void
+{
+    $path = $this-&gt;photo-&gt;store('photos');
+    $this-&gt;reset('photo'); // Clear temporary upload
+}</code></pre>
+
+    <h2>Package Integration</h2>
     <ul>
-        <li><strong>Too many requests</strong> - Use <code>.blur</code> or <code>.debounce</code> instead of <code>.live</code></li>
-        <li><strong>Large payloads</strong> - Keep component state minimal</li>
-        <li><strong>Missing wire:key</strong> - Always add keys in loops</li>
-        <li><strong>Forgetting @entangle</strong> - Use for Alpine.js integration</li>
+        <li><strong>livewire/livewire</strong> - Core framework</li>
+        <li><strong>wire-elements/modal</strong> - Modal dialogs</li>
+        <li><strong>rappasoft/laravel-livewire-tables</strong> - DataTables</li>
+        <li><strong>livewire/volt</strong> - Single-file components</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Use <code>wire:key</code> for list items</li>
+        <li>Debounce search inputs: <code>wire:model.live.debounce.300ms</code></li>
+        <li>Use <code>#[Computed]</code> for derived data</li>
+        <li>Keep components focused (single responsibility)</li>
+        <li>Use events for cross-component communication</li>
+        <li>Prefer <code>wire:navigate</code> for SPA-like navigation</li>
+        <li>Use loading states for better UX</li>
     </ul>
 
     <h2>Loading States</h2>

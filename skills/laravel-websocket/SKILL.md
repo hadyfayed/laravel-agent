@@ -465,3 +465,12 @@ final class MessageSent implements ShouldBroadcast, ShouldQueue
 - Queue broadcast events for performance
 - Use afterCommit for database-dependent events
 - Test channel authorization thoroughly
+
+## Related Commands
+
+- `/laravel-agent:reverb:setup` - Setup Laravel Reverb
+- `/laravel-agent:broadcast:make` - Create broadcast events
+
+## Related Agents
+
+- `laravel-reverb` - WebSocket specialist

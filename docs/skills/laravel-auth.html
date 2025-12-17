@@ -146,12 +146,76 @@ public function store(Request $request)
     }
 }</code></pre>
 
+    <h2>Encrypted Model Attributes</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+final class User extends Model
+{
+    // Using built-in cast
+    protected function casts(): array
+    {
+        return [
+            'api_key' =&gt; 'encrypted',
+            'settings' =&gt; 'encrypted:array',
+        ];
+    }
+}
+
+// Manual encryption
+use Illuminate\Support\Facades\Crypt;
+
+$encrypted = Crypt::encryptString($sensitive);
+$decrypted = Crypt::decryptString($encrypted);</code></pre>
+
     <h2>Common Pitfalls</h2>
+    <pre class="language-php"><code class="language-php">// 1. Storing Plain Passwords - Always use Hash
+// BAD
+$user-&gt;password = $request-&gt;password;
+
+// GOOD
+$user-&gt;password = Hash::make($request-&gt;password);
+
+// 2. No Policy Registration - Register in AuthServiceProvider
+protected $policies = [
+    Post::class =&gt; PostPolicy::class,
+];
+
+// 3. Missing Middleware - Protect routes
+Route::middleware('auth')-&gt;group(function () {
+    // Protected routes
+});
+
+// 4. Token Exposure - Never log tokens
+// BAD
+Log::info('Token: ' . $token-&gt;plainTextToken);
+
+// 5. No Rate Limiting - Rate limit login attempts
+Route::post('/login', [AuthController::class, 'login'])
+    -&gt;middleware('throttle:5,1');
+
+// 6. Session Fixation - Regenerate session after login
+$request-&gt;session()-&gt;regenerate();</code></pre>
+
+    <h2>Package Integration</h2>
     <ul>
-        <li><strong>Forgetting <code>authorize()</code></strong> - Always authorize in controllers</li>
-        <li><strong>Policy not registered</strong> - Add to <code>AuthServiceProvider</code></li>
-        <li><strong>Token exposure</strong> - Never log or expose API tokens</li>
-        <li><strong>Missing middleware</strong> - Protect route groups, not individual routes</li>
+        <li><strong>laravel/sanctum</strong> - API token authentication</li>
+        <li><strong>laravel/passport</strong> - Full OAuth2 server</li>
+        <li><strong>spatie/laravel-permission</strong> - Role & permission management</li>
+        <li><strong>laravel/fortify</strong> - Authentication backend</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Use policies for model authorization</li>
+        <li>Use gates for general abilities</li>
+        <li>Rate limit authentication endpoints</li>
+        <li>Use HTTPS in production</li>
+        <li>Regenerate session after login</li>
+        <li>Implement proper logout</li>
     </ul>
 
     <h2>Authorization Middleware</h2>

@@ -294,3 +294,11 @@ $this->dispatch('notify', message: 'Saved!');
 - Use events for cross-component communication
 - Prefer `wire:navigate` for SPA-like navigation
 - Use loading states for better UX
+
+## Related Commands
+
+- `/laravel-agent:livewire:make` - Create Livewire components
+
+## Related Agents
+
+- `laravel-livewire` - Livewire component specialist

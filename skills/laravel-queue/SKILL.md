@@ -446,3 +446,11 @@ it('handles job with specific queue', function () {
 - Use unique jobs to prevent duplicates
 - Test job dispatch and handling
 - Implement dead letter queues for failed jobs
+
+## Related Commands
+
+- `/laravel-agent:job:make` - Create queued jobs, events, listeners
+
+## Related Agents
+
+- `laravel-queue` - Queue and job specialist

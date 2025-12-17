@@ -59,7 +59,7 @@ back_text: All Skills
 "Set up Laravel Pulse to monitor my application performance"</code></pre>
 
     <h2>Caching Patterns</h2>
-    <pre class="language-php"><code class="language-php"><?php
+    <pre class="language-php"><code class="language-php">&lt;?php
 
 use Illuminate\Support\Facades\Cache;
 
@@ -104,7 +104,7 @@ class Product extends Model
 }</code></pre>
 
     <h2>Memory-Efficient Processing</h2>
-    <pre class="language-php"><code class="language-php"><?php
+    <pre class="language-php"><code class="language-php">&lt;?php
 
 // BAD: Loads all records into memory
 $users = User::all();
@@ -137,7 +137,7 @@ User::chunkById(1000, function ($users) {
 });</code></pre>
 
     <h2>Query Optimization</h2>
-    <pre class="language-php"><code class="language-php"><?php
+    <pre class="language-php"><code class="language-php">&lt;?php
 
 // BAD: N+1 queries
 $posts = Post::all();

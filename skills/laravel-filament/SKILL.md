@@ -361,3 +361,11 @@ public static function canDelete(Model $record): bool
 - Use relation managers for related data
 - Keep forms under 15 fields per section
 - Use tabs for complex resources
+
+## Related Commands
+
+- `/laravel-agent:filament:make` - Create Filament resources, pages, or widgets
+
+## Related Agents
+
+- `laravel-filament` - Filament admin panel specialist

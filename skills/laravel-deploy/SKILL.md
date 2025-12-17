@@ -446,3 +446,13 @@ echo "Rolled back to: $PREVIOUS"
 - Test migrations on staging first
 - Use health check endpoints
 - Set up alerting for failures
+
+## Related Commands
+
+- `/laravel-agent:deploy:setup` - Configure deployment
+- `/laravel-agent:cicd:setup` - Setup CI/CD pipeline
+
+## Related Agents
+
+- `laravel-deploy` - Deployment specialist
+- `laravel-cicd` - CI/CD pipeline specialist

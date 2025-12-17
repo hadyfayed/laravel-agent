@@ -130,12 +130,98 @@ describe('OrderService', function () {
         </table>
     </div>
 
+    <h2>Testing Events, Jobs & Notifications</h2>
+    <pre class="language-php"><code class="language-php">use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Notification;
+
+// Testing Events
+it('dispatches OrderCreated event', function () {
+    Event::fake();
+
+    Order::factory()-&gt;create();
+
+    Event::assertDispatched(OrderCreated::class);
+});
+
+// Testing Jobs
+it('queues SendOrderConfirmation job', function () {
+    Queue::fake();
+
+    $order = Order::factory()-&gt;create();
+    $order-&gt;confirm();
+
+    Queue::assertPushed(SendOrderConfirmation::class);
+});
+
+// Testing Notifications
+it('sends confirmation notification', function () {
+    Notification::fake();
+
+    $user = User::factory()-&gt;create();
+    $order = Order::factory()-&gt;for($user)-&gt;create();
+    $order-&gt;sendConfirmation();
+
+    Notification::assertSentTo($user, OrderConfirmation::class);
+});
+
+// Testing Exceptions
+it('throws exception for invalid state', function () {
+    $order = Order::factory()-&gt;delivered()-&gt;create();
+
+    expect(fn () =&gt; $order-&gt;cancel())
+        -&gt;toThrow(InvalidStateException::class);
+});</code></pre>
+
     <h2>Common Pitfalls</h2>
+    <pre class="language-php"><code class="language-php">// 1. Not Using RefreshDatabase - Always reset database state
+uses(RefreshDatabase::class);
+
+// 2. Testing Implementation - Test behavior, not implementation
+// BAD - testing internal method
+expect($service-&gt;calculateInternally())-&gt;toBe(100);
+
+// GOOD - testing behavior
+expect($service-&gt;getTotal())-&gt;toBe(100);
+
+// 3. Slow Tests - Mock external services
+$mock = Mockery::mock(PaymentGateway::class);
+$mock-&gt;shouldReceive('charge')-&gt;once()-&gt;andReturn(true);
+app()-&gt;instance(PaymentGateway::class, $mock);
+
+// 4. Missing Edge Cases - Test boundaries and errors
+it('rejects negative quantities', function () {
+    $this-&gt;postJson('/api/orders', ['quantity' =&gt; -1])
+        -&gt;assertUnprocessable();
+});
+
+// 5. No Assertions - Every test needs clear assertions
+// BAD
+it('does something', function () {
+    $service-&gt;process(); // No assertion!
+});
+
+// 6. Shared State - Use beforeEach for isolation
+beforeEach(function () {
+    $this-&gt;user = User::factory()-&gt;create();
+});</code></pre>
+
+    <h2>Package Integration</h2>
     <ul>
-        <li><strong>Testing implementation</strong> - Test behavior, not internal methods</li>
-        <li><strong>Slow tests</strong> - Use <code>RefreshDatabase</code> not <code>DatabaseMigrations</code></li>
-        <li><strong>Brittle assertions</strong> - Use <code>assertJsonStructure()</code> over exact matching</li>
-        <li><strong>Missing factories</strong> - Always use factories, never raw inserts</li>
+        <li><strong>pestphp/pest</strong> - Testing framework</li>
+        <li><strong>pestphp/pest-plugin-laravel</strong> - Laravel helpers</li>
+        <li><strong>mockery/mockery</strong> - Mocking library</li>
+        <li><strong>laravel/dusk</strong> - Browser testing</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>One assertion concept per test</li>
+        <li>Use descriptive test names</li>
+        <li>Test edge cases and errors</li>
+        <li>Keep tests fast (mock slow operations)</li>
+        <li>Use factories for test data</li>
+        <li>Follow Arrange-Act-Assert pattern</li>
     </ul>
 
     <h2>Testing HTTP Responses</h2>

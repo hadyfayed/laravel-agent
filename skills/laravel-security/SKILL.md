@@ -360,3 +360,15 @@ Log::channel('security')->warning('Failed login attempt', [
 - Use Content Security Policy
 - Implement proper session management
 - Regular security audits with `composer audit`
+
+## Related Commands
+
+- `/laravel-agent:security:audit` - Run security audit
+
+## Related Agents
+
+- `laravel-security` - Security audit specialist
+
+## Related Skills
+
+- `laravel-auth` - Authentication and authorization

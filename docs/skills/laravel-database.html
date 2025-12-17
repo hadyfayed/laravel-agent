@@ -134,12 +134,59 @@ public function up()
 }</code></pre>
 
     <h2>Common Pitfalls</h2>
+    <pre class="language-php"><code class="language-php">// 1. N+1 Queries - Always eager load relationships
+// BAD
+$posts = Post::all();
+foreach ($posts as $post) {
+    echo $post-&gt;author-&gt;name; // N+1!
+}
+
+// GOOD
+$posts = Post::with('author')-&gt;get();
+
+// 2. Missing Indexes - Add indexes for WHERE and ORDER BY
+Schema::table('orders', function (Blueprint $table) {
+    $table-&gt;index(['user_id', 'created_at']);
+    $table-&gt;index('status');
+});
+
+// 3. SELECT * - Only select needed columns
+// BAD
+$users = User::all();
+
+// GOOD
+$users = User::select(['id', 'name', 'email'])-&gt;get();
+
+// 4. No Chunking - Use chunk() for large datasets
+User::chunk(1000, function ($users) {
+    foreach ($users as $user) {
+        // Process
+    }
+});
+
+// 5. No Foreign Keys - Always use constraints
+$table-&gt;foreignId('user_id')-&gt;constrained()-&gt;cascadeOnDelete();
+
+// 6. No Transactions - Wrap related operations
+DB::transaction(function () {
+    $order = Order::create([...]);
+    $order-&gt;items()-&gt;createMany([...]);
+});</code></pre>
+
+    <h2>Package Integration</h2>
     <ul>
-        <li><strong>Missing indexes on foreign keys</strong> - Always index foreign key columns</li>
-        <li><strong>Using <code>get()</code> when you need <code>first()</code></strong> - Fetch only what you need</li>
-        <li><strong>Not using <code>select()</code></strong> - Don't fetch columns you don't use</li>
-        <li><strong>Destructive migrations</strong> - Always make migrations reversible</li>
-        <li><strong>Large table alterations</strong> - Use <code>pt-online-schema-change</code> for production</li>
+        <li><strong>beyondcode/laravel-query-detector</strong> - N+1 detection</li>
+        <li><strong>barryvdh/laravel-debugbar</strong> - Query profiling</li>
+        <li><strong>spatie/laravel-query-builder</strong> - API query building</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Design indexes based on actual queries</li>
+        <li>Use foreign key constraints</li>
+        <li>Monitor slow queries in production</li>
+        <li>Use database transactions for related operations</li>
+        <li>Prevent lazy loading in development: <code>Model::preventLazyLoading(!app()->isProduction())</code></li>
     </ul>
 
     <h2>Query Debugging</h2>

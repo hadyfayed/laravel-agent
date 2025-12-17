@@ -294,3 +294,12 @@ final class ProductResource extends JsonResource
 - Use database indexes strategically
 - Prevent lazy loading in development
 - Use Pulse for production insights
+
+## Related Commands
+
+- `/laravel-agent:db:optimize` - Database optimization
+
+## Related Skills
+
+- `laravel-database` - Query patterns and N+1 fixes
+- `laravel-queue` - Offload work to background jobs
