@@ -17,11 +17,247 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create queued job, event, listener, or notification. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/job:make</code> command generates queue components including queued jobs, events with broadcasting, event listeners, and multi-channel notifications. It leverages Laravel's queue system to handle background processing, event-driven architecture, and asynchronous notifications.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:job:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:job:make [Name] [type]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:job:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create a queued job
+/laravel-agent:job:make ProcessOrder
+
+# Create an event with broadcasting
+/laravel-agent:job:make OrderCreated event
+
+# Create an event listener
+/laravel-agent:job:make SendOrderEmail listener
+
+# Create a multi-channel notification
+/laravel-agent:job:make OrderShipped notification</code></pre>
+
+    <h2>Component Types</h2>
+    <p>The command supports multiple queue component types:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Case</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>job</code></td>
+                    <td class="py-3 px-4">Queued job (default)</td>
+                    <td class="py-3 px-4">Background processing, long-running tasks</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>event</code></td>
+                    <td class="py-3 px-4">Event with optional broadcasting</td>
+                    <td class="py-3 px-4">Event-driven architecture, real-time updates</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>listener</code></td>
+                    <td class="py-3 px-4">Event listener</td>
+                    <td class="py-3 px-4">Responding to events, triggering actions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>notification</code></td>
+                    <td class="py-3 px-4">Multi-channel notification</td>
+                    <td class="py-3 px-4">Email, SMS, Slack, database notifications</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>all</code></td>
+                    <td class="py-3 px-4">Event + Listener + Notification combo</td>
+                    <td class="py-3 px-4">Complete event-notification workflow</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Available Features</h2>
+    <p>Queue components can be enhanced with additional features:</p>
+    <ul>
+        <li><strong>batches</strong> - Batch multiple jobs together with progress tracking</li>
+        <li><strong>chains</strong> - Chain jobs in sequence with failure handling</li>
+        <li><strong>broadcasting</strong> - Broadcast events to WebSocket channels</li>
+        <li><strong>retries</strong> - Automatic retry logic with exponential backoff</li>
+    </ul>
+
+    <h2>Generated Job Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Jobs;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
+class ProcessOrder implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(
+        public Order $order
+    ) {}
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        // Process the order
+        $this->order->process();
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        // Handle failure
+    }
+}</code></pre>
+
+    <h2>Generated Event Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Events;
+
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class OrderCreated implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(
+        public Order $order
+    ) {}
+
+    /**
+     * Get the channels the event should broadcast on.
+     */
+    public function broadcastOn(): array
+    {
+        return [
+            new Channel('orders'),
+        ];
+    }
+}</code></pre>
+
+    <h2>Generated Listener Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Listeners;
+
+use App\Events\OrderCreated;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+
+class SendOrderEmail implements ShouldQueue
+{
+    use InteractsWithQueue;
+
+    /**
+     * Create the event listener.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the event.
+     */
+    public function handle(OrderCreated $event): void
+    {
+        // Send order confirmation email
+    }
+}</code></pre>
+
+    <h2>Generated Notification Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Notifications;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+
+class OrderShipped extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    /**
+     * Create a new notification instance.
+     */
+    public function __construct(
+        public Order $order
+    ) {}
+
+    /**
+     * Get the notification's delivery channels.
+     */
+    public function via(object $notifiable): array
+    {
+        return ['mail', 'database'];
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->line('Your order has been shipped!')
+            ->action('Track Order', url('/orders/'.$this->order->id))
+            ->line('Thank you for your purchase!');
+    }
+
+    /**
+     * Get the array representation of the notification.
+     */
+    public function toArray(object $notifiable): array
+    {
+        return [
+            'order_id' => $this->order->id,
+            'tracking_number' => $this->order->tracking_number,
+        ];
+    }
+}</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Use queued jobs for time-consuming tasks</strong> - Keep web requests fast by offloading heavy work</li>
+        <li><strong>Implement proper error handling</strong> - Use failed() method and configure retry strategies</li>
+        <li><strong>Batch related jobs</strong> - Use job batching for better progress tracking and failure handling</li>
+        <li><strong>Use events for decoupled architecture</strong> - Events allow multiple listeners without tight coupling</li>
+        <li><strong>Queue notifications</strong> - Always queue notifications to avoid slowing down the request cycle</li>
+    </ol>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <a href="{{ '/agents/laravel-queue.html' | relative_url }}" class="text-primary hover:underline">laravel-queue</a> agent.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/event-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:event:make</a> - Create event and listener pairs</li>
+        <li><a href="{{ '/commands/queue-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:queue:setup</a> - Configure queue drivers</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests for queue components</li>
+        <li><a href="{{ '/skills/laravel-queue.html' | relative_url }}" class="text-primary hover:underline">laravel-queue skill</a> - Auto-invoked for queue operations</li>
+    </ul>
 </div>

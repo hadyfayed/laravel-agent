@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:review:pr
-description: Review pull request
+description: Review a pull request with parallel specialized reviewers
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,267 @@ back_text: All Commands
         <span class="badge badge-review">Review</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:review:pr</h1>
-    <p class="text-xl text-muted-foreground">Review pull request</p>
+    <p class="text-xl text-muted-foreground">Review a pull request with parallel specialized reviewers</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Review pull request. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/review:pr</code> command runs a comprehensive code review on a pull request using 4 parallel specialized reviewers. Each reviewer focuses on a specific aspect of code quality, providing thorough analysis and actionable feedback.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:review:pr [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:review:pr [pr-number-or-branch]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:review:pr</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Review a specific PR by number
+/laravel-agent:review:pr 123
+
+# Review a feature branch against main
+/laravel-agent:review:pr feature/user-auth
+
+# Review current branch against main
+/laravel-agent:review:pr</code></pre>
+
+    <h2>Review Process</h2>
+    <p>The command follows a systematic 5-step review process:</p>
+
+    <h3>1. Gather PR Context</h3>
+    <p>First, the command gathers information about the pull request:</p>
+    <pre class="language-bash"><code class="language-bash"># Get PR info using GitHub CLI
+gh pr view $PR_NUMBER --json files,commits,body
+
+# Or get branch diff
+git fetch origin
+git diff origin/main...HEAD --name-only
+git diff origin/main...HEAD --stat</code></pre>
+
+    <h3>2. Identify Changed Files</h3>
+    <p>The command analyzes all PHP and Blade files affected by the changes:</p>
+    <pre class="language-bash"><code class="language-bash"># Get list of changed files
+git diff origin/main...HEAD --name-only | grep -E '\.(php|blade\.php)$'</code></pre>
+
+    <h3>3. Launch Parallel Reviewers</h3>
+    <p>Four specialized reviewers are spawned simultaneously using the Task tool to analyze different aspects of the code:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Reviewer</th>
+                    <th class="text-left py-3 px-4 font-medium">Focus Areas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Security Reviewer</strong></td>
+                    <td class="py-3 px-4">
+                        SQL injection patterns<br>
+                        XSS vulnerabilities<br>
+                        Mass assignment<br>
+                        Auth/authz gaps<br>
+                        CSRF protection<br>
+                        File upload security
+                    </td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Quality Reviewer</strong></td>
+                    <td class="py-3 px-4">
+                        SOLID violations<br>
+                        DRY violations<br>
+                        Cyclomatic complexity<br>
+                        Coupling issues<br>
+                        Naming conventions<br>
+                        Dead code
+                    </td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Laravel Reviewer</strong></td>
+                    <td class="py-3 px-4">
+                        N+1 queries<br>
+                        Eloquent best practices<br>
+                        Event patterns<br>
+                        Resource usage<br>
+                        Middleware patterns<br>
+                        Validation patterns
+                    </td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Testing Reviewer</strong></td>
+                    <td class="py-3 px-4">
+                        Test coverage for changes<br>
+                        Edge case testing<br>
+                        Assertion quality<br>
+                        Test isolation<br>
+                        New tests needed
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>4. Validate & Filter</h3>
+    <p>Only issues with confidence level >= 80% are included in the final report to ensure high-quality, actionable feedback.</p>
+
+    <h3>5. Generate Report</h3>
+    <p>A comprehensive review report is generated with the following structure:</p>
+
+    <pre class="language-markdown"><code class="language-markdown"># PR Review: #&lt;number&gt; - &lt;title&gt;
+
+## Overview
+- Files changed: X
+- Lines added: X
+- Lines removed: X
+- Review status: **Approved/Changes Requested/Comment**
+
+## Summary
+| Severity | Count |
+|----------|-------|
+| Critical | X |
+| Warning | X |
+| Suggestion | X |
+
+## Critical Issues (Block Merge)
+[Issues that must be fixed]
+
+## Warnings (Should Fix)
+[Issues that should be addressed]
+
+## Suggestions (Consider)
+[Improvements to consider]
+
+## Positive Findings
+[Good patterns observed]
+
+## Verdict
+[ ] **APPROVED** - Ready to merge
+[x] **CHANGES REQUESTED** - Address critical issues
+[ ] **COMMENT** - Suggestions only</code></pre>
+
+    <h2>GitHub Integration</h2>
+    <p>The review report can be posted directly to GitHub using the GitHub CLI:</p>
+
+    <pre class="language-bash"><code class="language-bash"># Post review as PR comment
+gh pr review $PR_NUMBER --body "$(cat review-report.md)"
+
+# Request changes
+gh pr review $PR_NUMBER --request-changes --body "$(cat review-report.md)"
+
+# Approve PR
+gh pr review $PR_NUMBER --approve --body "$(cat review-report.md)"</code></pre>
+
+    <h2>Review Severity Levels</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Severity</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                    <th class="text-left py-3 px-4 font-medium">Action Required</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Critical</strong></td>
+                    <td class="py-3 px-4">Security vulnerabilities, data loss risks, breaking changes</td>
+                    <td class="py-3 px-4">Must be fixed before merge</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Warning</strong></td>
+                    <td class="py-3 px-4">Performance issues, maintainability concerns, best practice violations</td>
+                    <td class="py-3 px-4">Should be addressed</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Suggestion</strong></td>
+                    <td class="py-3 px-4">Code improvements, style recommendations, optimization opportunities</td>
+                    <td class="py-3 px-4">Consider for future</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Allowed Tools</h2>
+    <p>This command uses the following tools to perform the review:</p>
+    <ul>
+        <li><strong>Task</strong> - Spawn parallel specialized reviewers</li>
+        <li><strong>Read</strong> - Read changed files for analysis</li>
+        <li><strong>Glob</strong> - Find files matching patterns</li>
+        <li><strong>Grep</strong> - Search for code patterns and anti-patterns</li>
+        <li><strong>Bash</strong> - Execute git and gh commands</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Review early and often</strong> - Run reviews on draft PRs to catch issues early</li>
+        <li><strong>Address critical issues first</strong> - Focus on security and blocking issues before merge</li>
+        <li><strong>Learn from positive findings</strong> - The report highlights good patterns to replicate</li>
+        <li><strong>Use GitHub integration</strong> - Post reviews directly to PR for team visibility</li>
+        <li><strong>Review before requesting human review</strong> - Catch automated issues before team review</li>
+    </ol>
+
+    <h2>What Gets Reviewed</h2>
+    <p>The parallel reviewers analyze the following aspects:</p>
+
+    <h3>Security Analysis</h3>
+    <ul>
+        <li>SQL injection vulnerabilities in raw queries and dynamic queries</li>
+        <li>Cross-site scripting (XSS) in Blade templates and JSON responses</li>
+        <li>Mass assignment vulnerabilities in models</li>
+        <li>Authentication and authorization gaps</li>
+        <li>CSRF token validation in forms</li>
+        <li>Insecure file upload handling</li>
+    </ul>
+
+    <h3>Code Quality Analysis</h3>
+    <ul>
+        <li>SOLID principle violations</li>
+        <li>Don't Repeat Yourself (DRY) violations</li>
+        <li>High cyclomatic complexity in methods</li>
+        <li>Tight coupling between components</li>
+        <li>Inconsistent naming conventions</li>
+        <li>Dead or unreachable code</li>
+    </ul>
+
+    <h3>Laravel Best Practices</h3>
+    <ul>
+        <li>N+1 query problems in Eloquent</li>
+        <li>Improper use of Eloquent relationships</li>
+        <li>Missing or improper event usage</li>
+        <li>Inefficient resource utilization</li>
+        <li>Incorrect middleware application</li>
+        <li>Missing or weak validation rules</li>
+    </ul>
+
+    <h3>Testing Coverage</h3>
+    <ul>
+        <li>Missing tests for new features</li>
+        <li>Inadequate edge case coverage</li>
+        <li>Weak or missing assertions</li>
+        <li>Test isolation issues</li>
+        <li>Identification of what new tests are needed</li>
+    </ul>
+
+    <h2>Example Review Workflow</h2>
+    <pre class="language-bash"><code class="language-bash"># 1. Create a feature branch and make changes
+git checkout -b feature/payment-integration
+
+# 2. Push changes and create PR
+git push origin feature/payment-integration
+gh pr create --title "Add payment integration" --body "Integrates Stripe payments"
+
+# 3. Run automated review
+/laravel-agent:review:pr feature/payment-integration
+
+# 4. Review the generated report and address critical issues
+
+# 5. Re-run review after fixes
+/laravel-agent:review:pr feature/payment-integration
+
+# 6. Post review to GitHub when satisfied
+gh pr review 123 --approve --body "$(cat review-report.md)"</code></pre>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests for code changes</li>
+        <li><a href="{{ '/commands/security-audit.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:security:audit</a> - Run security audit</li>
+        <li><a href="{{ '/commands/refactor.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:refactor</a> - Refactor code based on review feedback</li>
+    </ul>
 </div>

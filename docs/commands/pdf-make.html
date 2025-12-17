@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:pdf:make
-description: Generate PDF templates (invoices, reports)
+description: Create PDF generation feature using spatie/laravel-pdf
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,360 @@ back_text: All Commands
         <span class="badge badge-ai">AI</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:pdf:make</h1>
-    <p class="text-xl text-muted-foreground">Generate PDF templates (invoices, reports)</p>
+    <p class="text-xl text-muted-foreground">Create PDF generation feature using spatie/laravel-pdf or barryvdh/laravel-dompdf</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Generate PDF templates (invoices, reports). This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/pdf:make</code> command generates complete PDF generation features with templates, controllers, and views. It supports both modern spatie/laravel-pdf (Browsershot-based with CSS Grid/Flexbox support) and the simpler barryvdh/laravel-dompdf package.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:pdf:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:pdf:make [PDF Type] [options]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:pdf:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create an invoice PDF generator
+/laravel-agent:pdf:make Invoice
+
+# Create a report with DomPDF
+/laravel-agent:pdf:make Report --package=dompdf
+
+# Create a certificate PDF
+/laravel-agent:pdf:make Certificate
+
+# Create a contract PDF
+/laravel-agent:pdf:make Contract</code></pre>
+
+    <h2>What Gets Created</h2>
+    <p>A complete PDF generation feature includes the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">PDF Generator Class</td>
+                    <td class="py-3 px-4"><code>app/Pdf/</code></td>
+                    <td class="py-3 px-4">Main PDF generator with download, stream, and save methods</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">PDF Controller</td>
+                    <td class="py-3 px-4"><code>app/Http/Controllers/</code></td>
+                    <td class="py-3 px-4">Controller with download and stream endpoints</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Main Template</td>
+                    <td class="py-3 px-4"><code>resources/views/pdf/[type]/template.blade.php</code></td>
+                    <td class="py-3 px-4">Primary PDF layout and content</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Header Template</td>
+                    <td class="py-3 px-4"><code>resources/views/pdf/[type]/header.blade.php</code></td>
+                    <td class="py-3 px-4">Optional PDF header (Spatie only)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Footer Template</td>
+                    <td class="py-3 px-4"><code>resources/views/pdf/[type]/footer.blade.php</code></td>
+                    <td class="py-3 px-4">Optional PDF footer (Spatie only)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Routes</td>
+                    <td class="py-3 px-4"><code>routes/web.php</code></td>
+                    <td class="py-3 px-4">Download and view routes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/</code></td>
+                    <td class="py-3 px-4">Feature tests for PDF generation</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Package Options</h2>
+    <p>The command supports two PDF generation packages:</p>
+
+    <h3>Spatie Laravel PDF (Default)</h3>
+    <ul>
+        <li><strong>Modern</strong> - Uses Chrome/Chromium for rendering via Browsershot</li>
+        <li><strong>CSS Support</strong> - Full CSS Grid, Flexbox, and modern layout support</li>
+        <li><strong>Headers/Footers</strong> - Separate header and footer templates</li>
+        <li><strong>High Quality</strong> - Best for complex layouts and modern designs</li>
+    </ul>
+
+    <h3>Barryvdh DomPDF</h3>
+    <ul>
+        <li><strong>Simple</strong> - No external dependencies, pure PHP</li>
+        <li><strong>Lightweight</strong> - No Chromium installation required</li>
+        <li><strong>Basic CSS</strong> - Limited CSS support, best for simple layouts</li>
+        <li><strong>Easy Deploy</strong> - Works on any shared hosting</li>
+    </ul>
+
+    <h2>Example Output Structure</h2>
+    <p>For <code>/laravel-agent:pdf:make Invoice</code>:</p>
+    <pre class="language-bash"><code class="language-bash">app/
+├── Pdf/
+│   └── InvoicePdf.php
+└── Http/
+    └── Controllers/
+        └── InvoicePdfController.php
+
+resources/views/pdf/
+└── invoice/
+    ├── template.blade.php
+    ├── header.blade.php
+    └── footer.blade.php
+
+routes/
+└── web.php (updated)
+
+tests/Feature/
+└── InvoicePdfTest.php</code></pre>
+
+    <h2>Generated PDF Class (Spatie)</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Pdf;
+
+use App\Models\Invoice;
+use Spatie\LaravelPdf\Facades\Pdf;
+use Spatie\LaravelPdf\PdfBuilder;
+
+final class InvoicePdf
+{
+    public function __construct(
+        private readonly Invoice $invoice,
+    ) {}
+
+    public function generate(): PdfBuilder
+    {
+        return Pdf::view('pdf.invoice.template', [
+            'invoice' => $this->invoice,
+            'company' => config('app.company'),
+        ])
+        ->format('a4')
+        ->headerView('pdf.invoice.header', ['invoice' => $this->invoice])
+        ->footerView('pdf.invoice.footer');
+    }
+
+    public function download(): \Symfony\Component\HttpFoundation\Response
+    {
+        return $this->generate()
+            ->name("invoice-{$this->invoice->number}.pdf")
+            ->download();
+    }
+
+    public function save(string $path): void
+    {
+        $this->generate()->save($path);
+    }
+
+    public function stream(): \Symfony\Component\HttpFoundation\Response
+    {
+        return $this->generate()
+            ->name("invoice-{$this->invoice->number}.pdf")
+            ->inline();
+    }
+}</code></pre>
+
+    <h2>Generated PDF Class (DomPDF)</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Pdf;
+
+use App\Models\Invoice;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+final class InvoicePdf
+{
+    public function __construct(
+        private readonly Invoice $invoice,
+    ) {}
+
+    public function generate(): \Barryvdh\DomPDF\PDF
+    {
+        return Pdf::loadView('pdf.invoice.template', [
+            'invoice' => $this->invoice,
+            'company' => config('app.company'),
+        ])
+        ->setPaper('a4', 'portrait')
+        ->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ]);
+    }
+
+    public function download(): \Symfony\Component\HttpFoundation\Response
+    {
+        return $this->generate()->download("invoice-{$this->invoice->number}.pdf");
+    }
+
+    public function stream(): \Symfony\Component\HttpFoundation\Response
+    {
+        return $this->generate()->stream("invoice-{$this->invoice->number}.pdf");
+    }
+
+    public function save(string $path): void
+    {
+        $this->generate()->save($path);
+    }
+}</code></pre>
+
+    <h2>Generated Controller</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Models\Invoice;
+use App\Pdf\InvoicePdf;
+use Illuminate\Http\Request;
+
+final class InvoicePdfController extends Controller
+{
+    public function download(Invoice $invoice)
+    {
+        $this->authorize('view', $invoice);
+
+        return (new InvoicePdf($invoice))->download();
+    }
+
+    public function stream(Invoice $invoice)
+    {
+        $this->authorize('view', $invoice);
+
+        return (new InvoicePdf($invoice))->stream();
+    }
+}</code></pre>
+
+    <h2>Generated Blade Template</h2>
+    <pre class="language-html"><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;title&gt;Invoice #{{ $invoice-&gt;number }}&lt;/title&gt;
+    &lt;style&gt;
+        * { font-family: 'DejaVu Sans', sans-serif; }
+        body { font-size: 12px; line-height: 1.4; color: #333; }
+        .header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px; }
+        .company-name { font-size: 24px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f5f5f5; }
+        .total-row { font-weight: bold; font-size: 14px; }
+        .text-right { text-align: right; }
+        .footer { margin-top: 40px; font-size: 10px; color: #666; text-align: center; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="header"&gt;
+        &lt;div class="company-name"&gt;{{ $company['name'] ?? config('app.name') }}&lt;/div&gt;
+        &lt;div&gt;{{ $company['address'] ?? '' }}&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;h1&gt;Invoice #{{ $invoice-&gt;number }}&lt;/h1&gt;
+    &lt;p&gt;&lt;strong&gt;Date:&lt;/strong&gt; {{ $invoice-&gt;date-&gt;format('F j, Y') }}&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Due:&lt;/strong&gt; {{ $invoice-&gt;due_date-&gt;format('F j, Y') }}&lt;/p&gt;
+
+    &lt;h2&gt;Bill To&lt;/h2&gt;
+    &lt;p&gt;{{ $invoice-&gt;customer-&gt;name }}&lt;br&gt;{{ $invoice-&gt;customer-&gt;address }}&lt;/p&gt;
+
+    &lt;table&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th&gt;Description&lt;/th&gt;
+                &lt;th class="text-right"&gt;Qty&lt;/th&gt;
+                &lt;th class="text-right"&gt;Price&lt;/th&gt;
+                &lt;th class="text-right"&gt;Total&lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            @foreach($invoice-&gt;items as $item)
+            &lt;tr&gt;
+                &lt;td&gt;{{ $item-&gt;description }}&lt;/td&gt;
+                &lt;td class="text-right"&gt;{{ $item-&gt;quantity }}&lt;/td&gt;
+                &lt;td class="text-right"&gt;{{ $item-&gt;unit_price_formatted }}&lt;/td&gt;
+                &lt;td class="text-right"&gt;{{ $item-&gt;total_formatted }}&lt;/td&gt;
+            &lt;/tr&gt;
+            @endforeach
+            &lt;tr class="total-row"&gt;
+                &lt;td colspan="3" class="text-right"&gt;Total&lt;/td&gt;
+                &lt;td class="text-right"&gt;{{ $invoice-&gt;total_formatted }}&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    &lt;div class="footer"&gt;
+        &lt;p&gt;Thank you for your business!&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <h2>Generated Routes</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+Route::middleware('auth')->group(function () {
+    Route::get('/invoices/{invoice}/pdf', [InvoicePdfController::class, 'download'])
+        ->name('invoices.pdf.download');
+    Route::get('/invoices/{invoice}/pdf/view', [InvoicePdfController::class, 'stream'])
+        ->name('invoices.pdf.stream');
+});</code></pre>
+
+    <h2>Usage Examples</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Download PDF
+return (new InvoicePdf($invoice))->download();
+
+// Stream (view in browser)
+return (new InvoicePdf($invoice))->stream();
+
+// Save to storage
+(new InvoicePdf($invoice))->save(storage_path('app/pdfs/invoice-123.pdf'));</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Choose the right package</strong> - Use Spatie for modern layouts, DomPDF for simple documents</li>
+        <li><strong>Use web-safe fonts</strong> - DejaVu Sans is included with both packages</li>
+        <li><strong>Test PDF rendering</strong> - Different packages render CSS differently</li>
+        <li><strong>Optimize images</strong> - Large images increase PDF file size significantly</li>
+        <li><strong>Add authorization</strong> - Always verify users can access the PDF data</li>
+        <li><strong>Consider async generation</strong> - Queue large PDFs to avoid timeouts</li>
+    </ol>
+
+    <h2>Common PDF Types</h2>
+    <ul>
+        <li><strong>Invoice</strong> - Billing documents with line items and totals</li>
+        <li><strong>Report</strong> - Analytics, summaries, and data visualizations</li>
+        <li><strong>Certificate</strong> - Completion certificates, awards, diplomas</li>
+        <li><strong>Contract</strong> - Legal agreements, terms and conditions</li>
+        <li><strong>Receipt</strong> - Purchase confirmations and transaction records</li>
+        <li><strong>Label</strong> - Shipping labels, product labels, badges</li>
+    </ul>
+
+    <h2>Next Steps</h2>
+    <ol>
+        <li>Customize the PDF template in <code>resources/views/pdf/[type]/</code></li>
+        <li>Add company configuration to <code>config/app.php</code></li>
+        <li>Test with sample data to verify rendering</li>
+        <li>Add custom fonts if needed (see package documentation)</li>
+        <li>Configure paper size and orientation in the generator class</li>
+    </ol>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/mail-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:mail:make</a> - Create email templates with PDF attachments</li>
+        <li><a href="{{ '/commands/resource-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:resource:make</a> - Create models for PDF data</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate PDF generation tests</li>
+    </ul>
 </div>

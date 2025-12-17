@@ -17,11 +17,158 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Generate database schema ER diagram. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/db:diagram</code> command generates a visual diagram of your database schema by analyzing Laravel migrations. It creates Entity-Relationship Diagrams (ERD) in multiple formats including Mermaid.js, DBML, and PlantUML, making it easy to visualize and document your database structure.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:db:diagram [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:db:diagram [format] [tables]</code></pre>
+
+    <h2>Arguments</h2>
+    <ul>
+        <li><strong>format</strong> (optional) - Output format: <code>mermaid</code> (default), <code>dbml</code>, or <code>plantuml</code></li>
+        <li><strong>tables</strong> (optional) - Comma-separated list of specific tables to include</li>
+    </ul>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:db:diagram</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Generate full schema diagram in default Mermaid format
+/laravel-agent:db:diagram
+
+# Generate diagram in Mermaid.js format
+/laravel-agent:db:diagram mermaid
+
+# Generate diagram in DBML format for dbdiagram.io
+/laravel-agent:db:diagram dbml
+
+# Generate diagram in PlantUML format
+/laravel-agent:db:diagram plantuml
+
+# Generate diagram for specific tables only
+/laravel-agent:db:diagram users,orders,products
+
+# Generate DBML diagram for specific tables
+/laravel-agent:db:diagram dbml users,orders</code></pre>
+
+    <h2>How It Works</h2>
+    <p>The command analyzes your database schema through a three-step process:</p>
+
+    <ol>
+        <li><strong>Analyze Schema</strong> - Reads all migration files in your <code>database/migrations</code> directory</li>
+        <li><strong>Extract Structure</strong> - Identifies table definitions, columns, data types, and relationships</li>
+        <li><strong>Generate Diagram</strong> - Creates a visual representation in your chosen format</li>
+    </ol>
+
+    <h2>Output Formats</h2>
+
+    <h3>Mermaid.js (Default)</h3>
+    <p>The default format generates Mermaid.js ERD syntax that renders natively in:</p>
+    <ul>
+        <li>GitHub README and markdown files</li>
+        <li>GitLab documentation</li>
+        <li>VS Code with Mermaid extensions</li>
+        <li>Many documentation platforms</li>
+    </ul>
+
+    <h3>DBML (Database Markup Language)</h3>
+    <p>Export to DBML format for use with <a href="https://dbdiagram.io" target="_blank" class="text-primary hover:underline">dbdiagram.io</a>, an interactive database diagram editor. Perfect for:</p>
+    <ul>
+        <li>Interactive editing and refinement</li>
+        <li>Sharing with team members</li>
+        <li>Exporting to various image formats</li>
+    </ul>
+
+    <h3>PlantUML</h3>
+    <p>Generate PlantUML format for integration with documentation systems and wikis that support PlantUML rendering.</p>
+
+    <h2>Example Output</h2>
+    <p>Here's an example of a generated Mermaid.js ERD:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Database Schema
+
+```mermaid
+erDiagram
+    users ||--o{ orders : places
+    orders ||--|{ order_items : contains
+    products ||--o{ order_items : "ordered in"
+
+    users {
+        bigint id PK
+        string name
+        string email UK
+        timestamp created_at
+    }
+
+    orders {
+        bigint id PK
+        bigint user_id FK
+        string status
+        decimal total
+        timestamp created_at
+    }
+
+    products {
+        bigint id PK
+        string name
+        string description
+        decimal price
+    }
+
+    order_items {
+        bigint id PK
+        bigint order_id FK
+        bigint product_id FK
+        integer quantity
+        decimal price
+    }
+```</code></pre>
+
+    <h2>Relationship Mapping</h2>
+    <p>The command automatically detects relationships based on:</p>
+    <ul>
+        <li><strong>Foreign Keys</strong> - Explicit foreign key constraints in migrations</li>
+        <li><strong>Naming Conventions</strong> - Columns ending in <code>_id</code> (e.g., <code>user_id</code>)</li>
+        <li><strong>Pivot Tables</strong> - Many-to-many relationship tables</li>
+    </ul>
+
+    <h2>Supported Column Types</h2>
+    <p>The diagram includes common Laravel migration column types:</p>
+    <ul>
+        <li>Primary keys (<code>id</code>, <code>bigIncrements</code>, <code>uuid</code>)</li>
+        <li>Strings (<code>string</code>, <code>text</code>, <code>char</code>)</li>
+        <li>Numeric (<code>integer</code>, <code>bigInteger</code>, <code>decimal</code>, <code>float</code>)</li>
+        <li>Dates (<code>timestamp</code>, <code>date</code>, <code>datetime</code>)</li>
+        <li>Boolean (<code>boolean</code>)</li>
+        <li>JSON (<code>json</code>, <code>jsonb</code>)</li>
+        <li>Foreign keys and indexes</li>
+    </ul>
+
+    <h2>Use Cases</h2>
+    <ul>
+        <li><strong>Documentation</strong> - Add schema diagrams to your project README or wiki</li>
+        <li><strong>Onboarding</strong> - Help new developers understand the database structure</li>
+        <li><strong>Planning</strong> - Visualize changes before creating migrations</li>
+        <li><strong>Code Reviews</strong> - Include diagrams in PRs that modify schema</li>
+        <li><strong>Architecture Discussions</strong> - Share visual representations with stakeholders</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Keep diagrams updated</strong> - Regenerate after schema changes</li>
+        <li><strong>Use specific tables for focus</strong> - Generate targeted diagrams for complex areas</li>
+        <li><strong>Choose the right format</strong> - Mermaid for documentation, DBML for collaboration</li>
+        <li><strong>Include in documentation</strong> - Add generated diagrams to your project docs</li>
+        <li><strong>Review relationships</strong> - Verify detected relationships match your intent</li>
+    </ol>
+
+    <h2>Tips</h2>
+    <ul>
+        <li>For large databases, generate diagrams for related table groups instead of the entire schema</li>
+        <li>Use DBML format when you need to manually adjust the layout or styling</li>
+        <li>Mermaid diagrams can be embedded directly in GitHub markdown files</li>
+        <li>Consider generating separate diagrams for different bounded contexts or modules</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/migration-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:migration:make</a> - Generate new migrations</li>
+        <li><a href="{{ '/commands/model-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:model:make</a> - Create Eloquent models</li>
+        <li><a href="{{ '/skills/database-design.html' | relative_url }}" class="text-primary hover:underline">database-design skill</a> - Auto-invoked for database tasks</li>
+    </ul>
 </div>

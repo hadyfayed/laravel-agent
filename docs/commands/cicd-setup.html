@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:cicd:setup
-description: Configure CI/CD pipeline
+description: Configure CI/CD pipeline for your Laravel application
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,357 @@ back_text: All Commands
         <span class="badge badge-devops">DevOps</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:cicd:setup</h1>
-    <p class="text-xl text-muted-foreground">Configure CI/CD pipeline</p>
+    <p class="text-xl text-muted-foreground">Configure CI/CD pipeline for your Laravel application</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Configure CI/CD pipeline. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/cicd:setup</code> command provides an interactive wizard to configure continuous integration and deployment pipelines for your Laravel application. It supports GitHub Actions, GitLab CI, and Bitbucket Pipelines, with intelligent detection of your existing tools and customizable pipeline stages.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:cicd:setup [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:cicd:setup [platform]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:cicd:setup</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Interactive wizard - asks which platform to use
+/laravel-agent:cicd:setup
+
+# Configure GitHub Actions directly
+/laravel-agent:cicd:setup github
+
+# Configure GitLab CI directly
+/laravel-agent:cicd:setup gitlab
+
+# Configure Bitbucket Pipelines directly
+/laravel-agent:cicd:setup bitbucket</code></pre>
+
+    <h2>Supported Platforms</h2>
+    <p>The command supports three major CI/CD platforms:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Platform</th>
+                    <th class="text-left py-3 px-4 font-medium">Configuration File</th>
+                    <th class="text-left py-3 px-4 font-medium">Key Features</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">GitHub Actions</td>
+                    <td class="py-3 px-4"><code>.github/workflows/ci.yml</code></td>
+                    <td class="py-3 px-4">Matrix testing, parallel jobs, MySQL/Redis services</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">GitLab CI</td>
+                    <td class="py-3 px-4"><code>.gitlab-ci.yml</code></td>
+                    <td class="py-3 px-4">Stage-based pipeline, environment deployments</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Bitbucket Pipelines</td>
+                    <td class="py-3 px-4"><code>bitbucket-pipelines.yml</code></td>
+                    <td class="py-3 px-4">PR pipelines, branch-specific deployments</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Setup Process</h2>
+    <p>The wizard walks you through a structured setup process:</p>
+
+    <h3>1. Environment Check</h3>
+    <p>The command automatically detects your installed tools and dependencies:</p>
+    <pre class="language-bash"><code class="language-bash"># Testing tools detection
+composer show pestphp/pest 2>/dev/null && echo "PEST=yes" || echo "PEST=no"
+composer show larastan/larastan 2>/dev/null && echo "LARASTAN=yes" || echo "LARASTAN=no"
+composer show laravel/pint 2>/dev/null && echo "PINT=yes" || echo "PINT=no"
+
+# Deployment tools detection
+composer show laravel/vapor-core 2>/dev/null && echo "VAPOR=yes" || echo "VAPOR=no"
+ls -la Dockerfile 2>/dev/null && echo "DOCKER=yes" || echo "DOCKER=no"</code></pre>
+
+    <h3>2. Platform Selection</h3>
+    <p>If you don't specify a platform in the command, you'll be prompted to choose:</p>
+    <ul>
+        <li>GitHub Actions</li>
+        <li>GitLab CI</li>
+        <li>Bitbucket Pipelines</li>
+    </ul>
+
+    <h3>3. Feature Selection</h3>
+    <p>Choose which pipeline stages to include:</p>
+    <ul>
+        <li><strong>Run tests</strong> - Execute Pest/PHPUnit test suite (recommended)</li>
+        <li><strong>Code style</strong> - Check Laravel Pint formatting (recommended)</li>
+        <li><strong>Static analysis</strong> - Run Larastan type checking</li>
+        <li><strong>Security scan</strong> - Run composer audit for vulnerabilities</li>
+        <li><strong>Code coverage</strong> - Generate and upload to Codecov</li>
+        <li><strong>Auto-deploy to staging</strong> - Automatic deployment on main branch</li>
+        <li><strong>Manual deploy to production</strong> - Manual approval workflow</li>
+    </ul>
+
+    <h3>4. Deployment Target</h3>
+    <p>If deployment is enabled, select your deployment target:</p>
+    <ul>
+        <li><strong>Forge</strong> - Laravel Forge deployment hook</li>
+        <li><strong>Vapor</strong> - Laravel Vapor serverless deployment</li>
+        <li><strong>Docker</strong> - Custom server with Docker containers</li>
+        <li><strong>Bref</strong> - AWS Lambda via Bref framework</li>
+        <li><strong>None</strong> - CI only, no deployment</li>
+    </ul>
+
+    <h3>5. Pipeline Configuration</h3>
+    <p>The command invokes the CI/CD agent to generate your pipeline configuration with your selected options.</p>
+
+    <h3>6. Results Report</h3>
+    <p>You'll receive a comprehensive summary of what was configured and next steps.</p>
+
+    <h2>GitHub Actions Configuration</h2>
+    <p>For GitHub Actions (<code>/cicd:setup github</code>), the command creates:</p>
+
+    <h3>Files Created</h3>
+    <pre class="language-bash"><code class="language-bash">.github/
+└── workflows/
+    ├── ci.yml        # Main CI pipeline
+    └── deploy.yml    # Deployment workflow (if enabled)</code></pre>
+
+    <h3>Pipeline Features</h3>
+    <ul>
+        <li>Matrix testing across PHP 8.2 and 8.3</li>
+        <li>MySQL and Redis service containers</li>
+        <li>Parallel lint and security jobs</li>
+        <li>Forge or Vapor deployment integration</li>
+        <li>Caching for Composer dependencies</li>
+    </ul>
+
+    <h3>Example Workflow</h3>
+    <pre class="language-yaml"><code class="language-yaml">name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [8.2, 8.3]
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: testing
+          MYSQL_ROOT_PASSWORD: password
+      redis:
+        image: redis:alpine
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, pdo_mysql, redis
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run tests
+        run: php artisan test
+        env:
+          DB_CONNECTION: mysql
+          DB_DATABASE: testing
+          REDIS_HOST: redis</code></pre>
+
+    <h2>GitLab CI Configuration</h2>
+    <p>For GitLab CI (<code>/cicd:setup gitlab</code>), the command creates:</p>
+
+    <h3>Files Created</h3>
+    <pre class="language-bash"><code class="language-bash">.gitlab-ci.yml    # Complete pipeline configuration</code></pre>
+
+    <h3>Pipeline Stages</h3>
+    <ol>
+        <li><strong>build</strong> - Install Composer dependencies</li>
+        <li><strong>test</strong> - Run Pest/PHPUnit tests</li>
+        <li><strong>lint</strong> - Code style checking with Pint</li>
+        <li><strong>security</strong> - Security scanning</li>
+        <li><strong>deploy</strong> - Environment-based deployments</li>
+    </ol>
+
+    <h3>Example Configuration</h3>
+    <pre class="language-yaml"><code class="language-yaml">stages:
+  - build
+  - test
+  - lint
+  - security
+  - deploy
+
+variables:
+  MYSQL_DATABASE: testing
+  MYSQL_ROOT_PASSWORD: password
+
+services:
+  - mysql:8.0
+  - redis:alpine
+
+build:
+  stage: build
+  image: php:8.3
+  script:
+    - composer install --prefer-dist --no-progress
+  cache:
+    paths:
+      - vendor/
+
+test:
+  stage: test
+  image: php:8.3
+  services:
+    - mysql:8.0
+    - redis:alpine
+  script:
+    - php artisan test</code></pre>
+
+    <h2>Bitbucket Pipelines Configuration</h2>
+    <p>For Bitbucket Pipelines (<code>/cicd:setup bitbucket</code>), the command creates:</p>
+
+    <h3>Files Created</h3>
+    <pre class="language-bash"><code class="language-bash">bitbucket-pipelines.yml    # Complete pipeline configuration</code></pre>
+
+    <h3>Pipeline Features</h3>
+    <ul>
+        <li>Pull request specific pipelines</li>
+        <li>Branch-specific deployment rules</li>
+        <li>Service containers for MySQL and Redis</li>
+        <li>Cached dependencies for faster builds</li>
+    </ul>
+
+    <h2>Required Secrets</h2>
+    <p>After configuration, you'll need to add repository secrets depending on your deployment target:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Deployment Target</th>
+                    <th class="text-left py-3 px-4 font-medium">Required Secrets</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel Forge</td>
+                    <td class="py-3 px-4"><code>FORGE_DEPLOY_URL</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel Vapor</td>
+                    <td class="py-3 px-4"><code>VAPOR_API_TOKEN</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Codecov</td>
+                    <td class="py-3 px-4"><code>CODECOV_TOKEN</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Custom Docker</td>
+                    <td class="py-3 px-4"><code>SSH_PRIVATE_KEY</code>, <code>SERVER_HOST</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Branch Protection</h2>
+    <p>After setting up your pipeline, configure these status checks as required on your main branch:</p>
+    <ul>
+        <li><strong>tests</strong> - All tests must pass</li>
+        <li><strong>lint</strong> - Code style must be clean</li>
+        <li><strong>security</strong> - No security vulnerabilities</li>
+    </ul>
+
+    <h2>Example Output Report</h2>
+    <p>After successful configuration, you'll receive a detailed report:</p>
+    <pre class="language-bash"><code class="language-bash">## CI/CD Pipeline Configured: GitHub Actions
+
+### Pipeline Stages
+1. Build - Install dependencies
+2. Test - Run Pest tests with MySQL/Redis
+3. Lint - Laravel Pint code style
+4. Security - Composer audit
+5. Deploy - Forge (staging auto, production manual)
+
+### Files Created
+- .github/workflows/ci.yml
+- .github/workflows/deploy.yml
+
+### Required Secrets
+Add these to your repository secrets:
+- [ ] FORGE_DEPLOY_URL
+- [ ] CODECOV_TOKEN (if coverage enabled)
+
+### Branch Protection
+Configure these status checks as required:
+- tests
+- lint
+- security
+
+### Test Run
+Create a PR to trigger the pipeline.</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Start simple</strong> - Begin with tests and linting, add deployment later</li>
+        <li><strong>Use caching</strong> - Cache Composer dependencies to speed up builds</li>
+        <li><strong>Matrix testing</strong> - Test on multiple PHP versions (8.2, 8.3)</li>
+        <li><strong>Parallel jobs</strong> - Run independent jobs (lint, security) in parallel</li>
+        <li><strong>Environment parity</strong> - Match CI services (MySQL, Redis) to production</li>
+        <li><strong>Auto-deploy staging</strong> - Deploy staging automatically, production manually</li>
+        <li><strong>Status checks</strong> - Require CI to pass before merging PRs</li>
+        <li><strong>Security scanning</strong> - Run composer audit to detect vulnerabilities</li>
+    </ol>
+
+    <h2>Testing Your Pipeline</h2>
+    <p>After configuration, test your pipeline:</p>
+    <ol>
+        <li>Create a new branch: <code>git checkout -b test-ci</code></li>
+        <li>Make a small change and commit</li>
+        <li>Push the branch: <code>git push origin test-ci</code></li>
+        <li>Create a pull request</li>
+        <li>Watch the pipeline run in your platform's UI</li>
+        <li>Verify all stages pass successfully</li>
+    </ol>
+
+    <h2>Troubleshooting</h2>
+
+    <h3>Tests Failing</h3>
+    <ul>
+        <li>Verify database migrations run before tests</li>
+        <li>Check environment variables are set correctly</li>
+        <li>Ensure service containers (MySQL, Redis) are accessible</li>
+    </ul>
+
+    <h3>Deployment Issues</h3>
+    <ul>
+        <li>Confirm deployment secrets are added to repository</li>
+        <li>Check webhook URLs are correct for Forge</li>
+        <li>Verify API tokens have sufficient permissions</li>
+    </ul>
+
+    <h3>Build Timeouts</h3>
+    <ul>
+        <li>Enable dependency caching</li>
+        <li>Use <code>--prefer-dist</code> for Composer installs</li>
+        <li>Consider parallel job execution</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <strong>laravel-cicd</strong> agent to generate pipeline configurations.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests for CI pipeline</li>
+        <li><a href="{{ '/commands/deploy-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:deploy:setup</a> - Configure deployment environments</li>
+    </ul>
 </div>

@@ -17,11 +17,335 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>AI-powered documentation generation. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/docs:generate</code> command analyzes your Laravel codebase and automatically generates comprehensive, well-structured documentation. It scans your directory structure, reads key files, extracts PHPDoc comments, and identifies patterns to create professional documentation tailored to your project.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:docs:generate [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:docs:generate [type] [target]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:docs:generate</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Generate README and basic documentation
+/laravel-agent:docs:generate
+
+# Generate API documentation
+/laravel-agent:docs:generate api
+
+# Generate architecture overview
+/laravel-agent:docs:generate architecture
+
+# Document a specific directory
+/laravel-agent:docs:generate app/Services
+
+# Generate model documentation
+/laravel-agent:docs:generate models</code></pre>
+
+    <h2>Documentation Types</h2>
+    <p>The command supports several documentation types, each tailored to specific needs:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                    <th class="text-left py-3 px-4 font-medium">Contents</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>README</strong></td>
+                    <td class="py-3 px-4">Project overview (default)</td>
+                    <td class="py-3 px-4">Features, installation, configuration, usage examples</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>API</strong></td>
+                    <td class="py-3 px-4">Endpoint documentation</td>
+                    <td class="py-3 px-4">Routes, request/response formats, authentication, examples</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Architecture</strong></td>
+                    <td class="py-3 px-4">System design documentation</td>
+                    <td class="py-3 px-4">Directory structure, design patterns, data flow diagrams, component interactions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Models</strong></td>
+                    <td class="py-3 px-4">Database documentation</td>
+                    <td class="py-3 px-4">Entity relationships, attributes, methods, scopes</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Documentation Process</h2>
+    <p>The command follows a systematic approach to generate accurate documentation:</p>
+
+    <h3>1. Codebase Analysis</h3>
+    <ul>
+        <li>Scans directory structure to understand project organization</li>
+        <li>Reads key configuration and source files</li>
+        <li>Identifies design patterns and architectural choices</li>
+        <li>Extracts PHPDoc comments and type hints</li>
+    </ul>
+
+    <h3>2. Documentation Generation</h3>
+    <p>Creates well-structured markdown documentation based on analysis:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Project Documentation
+
+### Overview
+&lt;Generated description based on code analysis>
+
+### Features
+- Feature 1: &lt;description>
+- Feature 2: &lt;description>
+
+### Installation
+```bash
+composer install
+php artisan migrate
+```
+
+### Architecture
+```
+app/
+├── Features/     # Self-contained business features
+├── Modules/      # Reusable domain logic
+├── Services/     # Business logic services
+└── Actions/      # Single-purpose actions
+```
+
+### Models
+| Model | Table | Relationships |
+|-------|-------|---------------|
+| User | users | hasMany(Order) |
+| Order | orders | belongsTo(User), hasMany(OrderItem) |
+```</code></pre>
+
+    <h3>3. Output Options</h3>
+    <p>Documentation can be generated in multiple formats:</p>
+    <ul>
+        <li><strong>Markdown files</strong> - Individual .md files for each section</li>
+        <li><strong>README.md</strong> - Single comprehensive project overview</li>
+        <li><strong>docs/ directory</strong> - Organized documentation structure</li>
+        <li><strong>Docusaurus/VitePress compatible</strong> - Static site generator ready</li>
+    </ul>
+
+    <h2>Generated Files</h2>
+    <p>The command creates a comprehensive documentation structure:</p>
+    <pre class="language-bash"><code class="language-bash">docs/
+├── README.md           # Project overview and introduction
+├── ARCHITECTURE.md     # System design and patterns
+├── API.md              # API reference and endpoints
+├── MODELS.md           # Database models and relationships
+└── DEPLOYMENT.md       # Deployment and configuration guide</code></pre>
+
+    <h2>Interactive Mode</h2>
+    <p>When run without arguments, the command provides interactive prompts:</p>
+
+    <h3>1. Documentation Type</h3>
+    <ul>
+        <li>README (project overview)</li>
+        <li>API reference</li>
+        <li>Architecture overview</li>
+        <li>Model documentation</li>
+        <li>All of the above</li>
+    </ul>
+
+    <h3>2. Target Scope</h3>
+    <ul>
+        <li>Entire project</li>
+        <li>Specific directory (select from list)</li>
+        <li>Specific feature/module</li>
+    </ul>
+
+    <h3>3. Output Format</h3>
+    <ul>
+        <li>Markdown files (individual documents)</li>
+        <li>Single README.md (all-in-one)</li>
+        <li>Docusaurus compatible (with frontmatter)</li>
+        <li>VitePress compatible (with config)</li>
+    </ul>
+
+    <h3>4. Diagram Generation</h3>
+    <ul>
+        <li><strong>Yes</strong> - Include Mermaid diagrams for architecture and relationships</li>
+        <li><strong>No</strong> - Text-only documentation</li>
+    </ul>
+
+    <h2>Example Output</h2>
+    <p>After successful generation, you'll receive a comprehensive report:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Documentation Generated
+
+### Files Created
+| File | Type | Description |
+|------|------|-------------|
+| docs/README.md | Overview | Project introduction and setup |
+| docs/API.md | Reference | API endpoints documentation |
+| docs/ARCHITECTURE.md | Design | System architecture overview |
+
+### Statistics
+- Models documented: 15
+- API endpoints: 32
+- Services: 8
+- Actions: 12
+
+### Next Steps
+1. Review generated documentation
+2. Add custom sections as needed
+3. Configure static site generator (optional)</code></pre>
+
+    <h2>Generated Architecture Documentation Example</h2>
+    <pre class="language-markdown"><code class="language-markdown"># Architecture Overview
+
+## Directory Structure
+
+```
+app/
+├── Features/          # Self-contained business features
+│   ├── Orders/       # Order management feature
+│   └── Payments/     # Payment processing feature
+├── Modules/          # Reusable domain logic
+│   ├── Inventory/    # Inventory management
+│   └── Shipping/     # Shipping calculations
+├── Services/         # Business logic services
+│   └── PaymentService.php
+└── Actions/          # Single-purpose actions
+    └── CreateOrderAction.php
+```
+
+## Design Patterns
+
+### Repository Pattern
+Used for data access abstraction in payment processing.
+
+### Service Layer
+Business logic encapsulated in dedicated service classes.
+
+### Action Pattern
+Single-responsibility actions for complex operations.
+
+## Component Interactions
+
+```mermaid
+graph TD
+    A[Controller] -->|uses| B[Service]
+    B -->|calls| C[Action]
+    C -->|accesses| D[Repository]
+    D -->|queries| E[Model]
+```</code></pre>
+
+    <h2>Generated Model Documentation Example</h2>
+    <pre class="language-markdown"><code class="language-markdown"># Database Models
+
+## User Model
+
+**Table:** `users`
+
+### Attributes
+- `id` - Primary key
+- `name` - string(255)
+- `email` - string(255), unique
+- `email_verified_at` - timestamp, nullable
+- `password` - string(255)
+
+### Relationships
+- `hasMany(Order)` - User's orders
+- `hasMany(Payment)` - User's payments
+- `belongsToMany(Role)` - User roles
+
+### Scopes
+- `active()` - Returns only active users
+- `verified()` - Returns only verified users
+
+### Methods
+- `isAdmin()` - Check if user has admin role
+- `getTotalSpent()` - Calculate total amount spent</code></pre>
+
+    <h2>Generated API Documentation Example</h2>
+    <pre class="language-markdown"><code class="language-markdown"># API Documentation
+
+## Authentication
+All endpoints require Bearer token authentication.
+
+```bash
+Authorization: Bearer {token}
+```
+
+## Endpoints
+
+### Products
+
+#### GET /api/v1/products
+List all products with pagination.
+
+**Query Parameters:**
+- `filter[name]` - Filter by product name
+- `filter[category]` - Filter by category
+- `sort` - Sort by field (name, price, created_at)
+- `page` - Page number
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Product Name",
+      "price": 99.99,
+      "category": "Electronics"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "total": 100
+  }
+}
+```
+
+#### POST /api/v1/products
+Create a new product.
+
+**Request Body:**
+```json
+{
+  "name": "Product Name",
+  "price": 99.99,
+  "category_id": 1
+}
+```</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Keep documentation current</strong> - Re-run the command after major changes</li>
+        <li><strong>Use PHPDoc comments</strong> - The command extracts information from docblocks</li>
+        <li><strong>Organize your code</strong> - Clear structure leads to better documentation</li>
+        <li><strong>Review and customize</strong> - Generated docs are a starting point; add your insights</li>
+        <li><strong>Include diagrams</strong> - Visual representations help understanding complex systems</li>
+        <li><strong>Document the "why"</strong> - The command captures the "what"; add the "why" manually</li>
+    </ol>
+
+    <h2>Use Cases</h2>
+    <ul>
+        <li><strong>Onboarding new developers</strong> - Comprehensive overview of the codebase</li>
+        <li><strong>Project handoffs</strong> - Complete documentation for client delivery</li>
+        <li><strong>API client development</strong> - Clear endpoint documentation for frontend teams</li>
+        <li><strong>Code reviews</strong> - Architecture documentation for review preparation</li>
+        <li><strong>Technical debt assessment</strong> - Understanding current system structure</li>
+    </ul>
+
+    <h2>Allowed Tools</h2>
+    <p>This command has access to the following tools for analysis and generation:</p>
+    <ul>
+        <li><strong>Task</strong> - Breaking down complex documentation tasks</li>
+        <li><strong>Read</strong> - Reading source files for analysis</li>
+        <li><strong>Glob</strong> - Finding files matching patterns</li>
+        <li><strong>Grep</strong> - Searching code for specific patterns</li>
+        <li><strong>Bash</strong> - Running Laravel artisan commands for insights</li>
+        <li><strong>Write</strong> - Creating new documentation files</li>
+        <li><strong>Edit</strong> - Updating existing documentation</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/api-docs.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:docs</a> - Generate OpenAPI/Swagger documentation</li>
+        <li><a href="{{ '/commands/refactor-analyze.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:refactor:analyze</a> - Analyze code for refactoring opportunities</li>
+    </ul>
 </div>

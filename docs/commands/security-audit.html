@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:security:audit
-description: Run OWASP security audit
+description: Audit your Laravel application for security vulnerabilities
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,225 @@ back_text: All Commands
         <span class="badge badge-security">Security</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:security:audit</h1>
-    <p class="text-xl text-muted-foreground">Run OWASP security audit</p>
+    <p class="text-xl text-muted-foreground">Audit your Laravel application for security vulnerabilities</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Run OWASP security audit. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/security:audit</code> command performs a comprehensive security audit of your Laravel application. It checks for common vulnerabilities including SQL injection, XSS, CSRF, authentication issues, insecure configurations, and dependency vulnerabilities. The audit can be run on the entire application or focused on specific security concerns.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:security:audit [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:security:audit [target] [focus]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:security:audit</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Full security audit
+/laravel-agent:security:audit
+
+# Focus on authentication security
+/laravel-agent:security:audit auth
+
+# Focus on SQL/command injection vulnerabilities
+/laravel-agent:security:audit injection
+
+# Focus on XSS vulnerabilities
+/laravel-agent:security:audit xss
+
+# Audit specific path
+/laravel-agent:security:audit app/Http/Controllers</code></pre>
+
+    <h2>Focus Areas</h2>
+    <p>The security audit can be focused on specific vulnerability types:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Focus</th>
+                    <th class="text-left py-3 px-4 font-medium">Command</th>
+                    <th class="text-left py-3 px-4 font-medium">What It Checks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Authentication</td>
+                    <td class="py-3 px-4"><code>/security:audit auth</code></td>
+                    <td class="py-3 px-4">Password hashing, session configuration, rate limiting, token expiration, 2FA</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Injection</td>
+                    <td class="py-3 px-4"><code>/security:audit injection</code></td>
+                    <td class="py-3 px-4">SQL injection, command injection, LDAP injection, NoSQL injection</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">XSS</td>
+                    <td class="py-3 px-4"><code>/security:audit xss</code></td>
+                    <td class="py-3 px-4">Unescaped Blade output, JavaScript injection, DOM-based XSS, stored XSS</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Headers</td>
+                    <td class="py-3 px-4"><code>/security:audit headers</code></td>
+                    <td class="py-3 px-4">Security headers, CORS settings, CSP policy, HSTS configuration</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Audit Process</h2>
+    <p>The security audit follows a systematic process:</p>
+
+    <h3>1. Environment Check</h3>
+    <p>First, the audit checks for security-related packages and runs dependency audits:</p>
+    <pre class="language-bash"><code class="language-bash"># Check for Content Security Policy package
+composer show spatie/laravel-csp 2>/dev/null && echo "CSP=yes" || echo "CSP=no"
+
+# Check for security scanner package
+composer show enlightn/enlightn 2>/dev/null && echo "ENLIGHTN=yes" || echo "ENLIGHTN=no"
+
+# Run Composer security audit
+composer audit</code></pre>
+
+    <h3>2. Security Agent Invocation</h3>
+    <p>The command uses the <code>laravel-security</code> specialized agent to perform deep code analysis:</p>
+    <pre class="language-bash"><code class="language-bash">Perform security audit:
+
+Action: audit
+Target: &lt;path or 'all'>
+Focus: &lt;injection|xss|csrf|auth|headers|all></code></pre>
+
+    <h3>3. Results Report</h3>
+    <p>A comprehensive report is generated with findings categorized by severity:</p>
+
+    <h2>Report Format</h2>
+    <p>The audit produces a detailed report with the following sections:</p>
+
+    <h3>Summary</h3>
+    <p>Overview of findings by severity level:</p>
+    <pre class="language-bash"><code class="language-bash">## Security Audit Results
+
+### Summary
+- Critical: X
+- High: X
+- Medium: X
+- Low: X</code></pre>
+
+    <h3>Vulnerabilities</h3>
+    <p>Detailed table of discovered vulnerabilities with actionable fixes:</p>
+    <pre class="language-bash"><code class="language-bash">### Vulnerabilities
+| Severity | Type | Location | Fix |
+|----------|------|----------|-----|
+| Critical | SQL Injection | file:line | Use parameterized query |
+| ... | ... | ... | ... |</code></pre>
+
+    <h3>Dependency Vulnerabilities</h3>
+    <p>Output from Composer's security audit showing vulnerable packages:</p>
+    <pre class="language-bash"><code class="language-bash">### Dependency Vulnerabilities
+&lt;output from composer audit></code></pre>
+
+    <h3>Configuration Issues</h3>
+    <p>Checklist of common configuration problems:</p>
+    <pre class="language-bash"><code class="language-bash">### Configuration Issues
+- [ ] APP_DEBUG enabled in production
+- [ ] Secure cookies not configured
+- ...</code></pre>
+
+    <h3>Recommendations</h3>
+    <p>Prioritized list of security improvements:</p>
+    <pre class="language-bash"><code class="language-bash">### Recommendations
+1. ...
+2. ...</code></pre>
+
+    <h2>Authentication Security Checks</h2>
+    <p>When focusing on authentication (<code>/security:audit auth</code>), the audit examines:</p>
+    <ul>
+        <li><strong>Password hashing</strong> - Verifies bcrypt/argon2 usage with proper cost factors</li>
+        <li><strong>Session configuration</strong> - Checks secure, httponly, and samesite cookie settings</li>
+        <li><strong>Rate limiting</strong> - Ensures login endpoints have throttling configured</li>
+        <li><strong>Token expiration</strong> - Validates API token and password reset lifetimes</li>
+        <li><strong>2FA implementation</strong> - Reviews two-factor authentication setup if present</li>
+    </ul>
+
+    <h2>Injection Vulnerability Checks</h2>
+    <p>When focusing on injection attacks (<code>/security:audit injection</code>), the audit scans for:</p>
+    <ul>
+        <li><strong>SQL injection</strong> - Raw queries without parameter binding, unsafe DB::raw() usage</li>
+        <li><strong>Command injection</strong> - Unescaped input in exec(), shell_exec(), system() calls</li>
+        <li><strong>LDAP injection</strong> - Unvalidated input in LDAP queries</li>
+        <li><strong>NoSQL injection</strong> - Unsafe MongoDB or Redis query construction</li>
+    </ul>
+
+    <h2>XSS Vulnerability Checks</h2>
+    <p>When focusing on cross-site scripting (<code>/security:audit xss</code>), the audit looks for:</p>
+    <ul>
+        <li><strong>Unescaped Blade output</strong> - Use of {!! !!} without proper sanitization</li>
+        <li><strong>JavaScript injection</strong> - User data embedded in &lt;script> tags</li>
+        <li><strong>DOM-based XSS</strong> - Client-side JavaScript that unsafely handles user input</li>
+        <li><strong>Stored XSS</strong> - Database fields that store HTML without validation</li>
+    </ul>
+
+    <h2>Security Headers Checks</h2>
+    <p>When focusing on HTTP security headers (<code>/security:audit headers</code>), the audit validates:</p>
+    <ul>
+        <li><strong>Security headers configuration</strong> - X-Frame-Options, X-Content-Type-Options, X-XSS-Protection</li>
+        <li><strong>CORS settings</strong> - Proper Access-Control-Allow-Origin configuration</li>
+        <li><strong>CSP policy</strong> - Content Security Policy implementation and strictness</li>
+        <li><strong>HSTS configuration</strong> - HTTP Strict Transport Security for HTTPS enforcement</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Run regularly</strong> - Schedule security audits as part of your CI/CD pipeline</li>
+        <li><strong>Fix critical issues first</strong> - Prioritize vulnerabilities by severity level</li>
+        <li><strong>Keep dependencies updated</strong> - Regularly run <code>composer audit</code> and update packages</li>
+        <li><strong>Test fixes</strong> - Verify security patches don't break functionality</li>
+        <li><strong>Document exceptions</strong> - If you must accept a risk, document why</li>
+        <li><strong>Use security packages</strong> - Install spatie/laravel-csp and enlightn/enlightn for enhanced protection</li>
+    </ol>
+
+    <h2>Common Vulnerabilities Detected</h2>
+    <p>Examples of security issues the audit commonly finds:</p>
+
+    <h3>SQL Injection Example</h3>
+    <pre class="language-php"><code class="language-php">// VULNERABLE - Don't do this
+DB::select("SELECT * FROM users WHERE email = '" . $email . "'");
+
+// SECURE - Use parameter binding
+DB::select("SELECT * FROM users WHERE email = ?", [$email]);</code></pre>
+
+    <h3>XSS Example</h3>
+    <pre class="language-php"><code class="language-php">{{-- VULNERABLE - Don't do this --}}
+{!! $userInput !!}
+
+{{-- SECURE - Escape output --}}
+{{ $userInput }}
+
+{{-- SECURE - Sanitize if HTML needed --}}
+{!! Purifier::clean($userInput) !!}</code></pre>
+
+    <h3>Insecure Configuration Example</h3>
+    <pre class="language-php"><code class="language-php">// VULNERABLE - config/session.php
+'secure' => false,  // Should be true in production
+'http_only' => false,  // Should be true
+'same_site' => null,  // Should be 'lax' or 'strict'
+
+// SECURE
+'secure' => env('SESSION_SECURE_COOKIE', true),
+'http_only' => true,
+'same_site' => 'lax',</code></pre>
+
+    <h2>Integration with Security Tools</h2>
+    <p>The audit integrates with popular Laravel security packages:</p>
+    <ul>
+        <li><strong>spatie/laravel-csp</strong> - Content Security Policy middleware</li>
+        <li><strong>enlightn/enlightn</strong> - Comprehensive security and performance scanner</li>
+        <li><strong>composer audit</strong> - Built-in dependency vulnerability checker</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <strong>laravel-security</strong> specialized agent for deep security analysis.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate security tests</li>
+        <li><a href="{{ '/commands/auth-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:auth:setup</a> - Setup secure authentication</li>
+    </ul>
 </div>

@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:migrate:from-legacy
-description: Migrate from legacy systems
+description: Migrate from legacy systems or upgrade Laravel versions
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,258 @@ back_text: All Commands
         <span class="badge badge-data">Data</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:migrate:from-legacy</h1>
-    <p class="text-xl text-muted-foreground">Migrate from legacy systems</p>
+    <p class="text-xl text-muted-foreground">Migrate from legacy systems or upgrade Laravel versions</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Migrate from legacy systems. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/migrate:from-legacy</code> command helps you migrate from legacy systems, other frameworks, or upgrade Laravel and PHP versions. It analyzes your current state, identifies breaking changes, and performs the necessary updates to modernize your codebase while ensuring compatibility.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:migrate:from-legacy [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:migrate:from-legacy &lt;source&gt; [target]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:migrate:from-legacy</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Upgrade to latest Laravel version
+/laravel-agent:migrate:from-legacy laravel-10
+
+# Specific Laravel version upgrade
+/laravel-agent:migrate:from-legacy laravel-11 laravel-12
+
+# Migrate from other frameworks
+/laravel-agent:migrate:from-legacy symfony
+/laravel-agent:migrate:from-legacy codeigniter
+
+# PHP version upgrade
+/laravel-agent:migrate:from-legacy php-8.1 php-8.3
+
+# Database migration
+/laravel-agent:migrate:from-legacy database mysql postgres</code></pre>
+
+    <h2>Migration Process</h2>
+    <p>The command follows a systematic approach to ensure safe and complete migration:</p>
+
+    <h3>1. Analyze Current State</h3>
+    <p>First, the command analyzes your current environment:</p>
+    <pre class="language-bash"><code class="language-bash">php -v
+php artisan --version
+composer show laravel/framework</code></pre>
+
+    <h3>2. Identify Migration Type</h3>
+    <p>Based on your input, it determines the appropriate migration strategy:</p>
+    <ul>
+        <li><strong>Laravel version upgrade</strong> - Updates framework and dependencies</li>
+        <li><strong>PHP version upgrade</strong> - Adopts new language features and fixes deprecations</li>
+        <li><strong>Framework migration</strong> - Converts from another PHP framework</li>
+        <li><strong>Database migration</strong> - Migrates between database systems</li>
+    </ul>
+
+    <h3>3. Invoke Migration Agent</h3>
+    <p>The specialized migration agent performs the actual migration work:</p>
+    <pre class="language-bash"><code class="language-bash">Perform migration:
+
+Action: &lt;upgrade|migrate-framework|migrate-database&gt;
+From: &lt;source&gt;
+To: &lt;target&gt;
+Focus: &lt;specific areas&gt;</code></pre>
+
+    <h3>4. Report Results</h3>
+    <p>After completion, you receive a comprehensive migration report:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Migration: &lt;Source&gt; → &lt;Target&gt;
+
+### Analysis
+- Current state: ...
+- Breaking changes: ...
+- Estimated effort: ...
+
+### Steps Completed
+- [x] Dependencies updated
+- [x] Config migrated
+- [x] Code modernized
+- [x] Tests passing
+
+### Manual Steps Required
+1. ...
+2. ...
+
+### Validation
+```bash
+vendor/bin/pest
+vendor/bin/phpstan analyse
+```</code></pre>
+
+    <h2>Migration Types</h2>
+
+    <h3>Laravel Version Upgrade</h3>
+    <p>Usage: <code>/laravel-agent:migrate:from-legacy laravel-10</code></p>
+    <p>Upgrades your Laravel application to a newer version with the following automated steps:</p>
+    <ul>
+        <li>Updates <code>composer.json</code> with new version requirements</li>
+        <li>Applies configuration file changes</li>
+        <li>Fixes deprecated methods and APIs</li>
+        <li>Updates service providers and middleware</li>
+        <li>Runs automated fixes using Rector</li>
+        <li>Updates test suites for compatibility</li>
+    </ul>
+
+    <h3>PHP Version Upgrade</h3>
+    <p>Usage: <code>/laravel-agent:migrate:from-legacy php-8.1 php-8.3</code></p>
+    <p>Modernizes your codebase to use newer PHP features:</p>
+    <ul>
+        <li>Updates <code>composer.json</code> PHP version requirement</li>
+        <li>Adopts new language features (enums, attributes, etc.)</li>
+        <li>Fixes deprecated functions and syntax</li>
+        <li>Adds modern type declarations (union types, mixed, etc.)</li>
+        <li>Updates code style to leverage new syntax</li>
+    </ul>
+
+    <h3>Framework Migration</h3>
+    <p>Usage: <code>/laravel-agent:migrate:from-legacy symfony</code></p>
+    <p>Converts applications from other PHP frameworks to Laravel:</p>
+    <ul>
+        <li>Maps framework concepts (routing, middleware, ORM)</li>
+        <li>Converts controllers and request handlers</li>
+        <li>Migrates models/entities to Eloquent</li>
+        <li>Converts views/templates to Blade</li>
+        <li>Migrates services and dependency injection</li>
+        <li>Adapts authentication and authorization</li>
+    </ul>
+
+    <h3>Database Migration</h3>
+    <p>Usage: <code>/laravel-agent:migrate:from-legacy database mysql postgres</code></p>
+    <p>Safely migrates between different database systems:</p>
+    <ul>
+        <li>Analyzes schema differences and compatibility</li>
+        <li>Creates migration scripts with proper data types</li>
+        <li>Handles data type conversions (JSON, arrays, enums)</li>
+        <li>Migrates data safely with validation</li>
+        <li>Updates Eloquent models and queries</li>
+        <li>Tests data integrity after migration</li>
+    </ul>
+
+    <h2>Example: Laravel Version Upgrade</h2>
+    <p>Upgrading from Laravel 10 to Laravel 11:</p>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:migrate:from-legacy laravel-10 laravel-11</code></pre>
+
+    <p>The command will:</p>
+    <ol>
+        <li>Analyze your current Laravel 10 installation</li>
+        <li>Review breaking changes in Laravel 11</li>
+        <li>Update composer dependencies</li>
+        <li>Migrate configuration files</li>
+        <li>Update deprecated method calls</li>
+        <li>Run automated code fixes</li>
+        <li>Execute test suite to verify compatibility</li>
+        <li>Provide a report with any manual steps needed</li>
+    </ol>
+
+    <h2>Example: Framework Migration</h2>
+    <p>Migrating a Symfony application to Laravel:</p>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:migrate:from-legacy symfony</code></pre>
+
+    <p>The migration includes:</p>
+    <ul>
+        <li><strong>Routes</strong>: Converts Symfony routes to Laravel routes</li>
+        <li><strong>Controllers</strong>: Adapts controllers to use Laravel's base controller</li>
+        <li><strong>ORM</strong>: Migrates Doctrine entities to Eloquent models</li>
+        <li><strong>Templates</strong>: Converts Twig templates to Blade</li>
+        <li><strong>Services</strong>: Maps Symfony services to Laravel service providers</li>
+        <li><strong>Forms</strong>: Converts Symfony forms to Laravel validation</li>
+    </ul>
+
+    <h2>Validation and Testing</h2>
+    <p>After migration, the command automatically validates the changes:</p>
+    <pre class="language-bash"><code class="language-bash"># Run test suite
+vendor/bin/pest
+
+# Static analysis
+vendor/bin/phpstan analyse
+
+# Code style check
+vendor/bin/pint --test</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Commit before migrating</strong> - Ensure a clean git state before starting</li>
+        <li><strong>Review breaking changes</strong> - Check upgrade guides for your target version</li>
+        <li><strong>Test thoroughly</strong> - Run your full test suite after migration</li>
+        <li><strong>Update dependencies</strong> - Check third-party packages for compatibility</li>
+        <li><strong>Review manual steps</strong> - Some changes require manual intervention</li>
+        <li><strong>Test in staging first</strong> - Never migrate production directly</li>
+    </ol>
+
+    <h2>Common Issues and Solutions</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Issue</th>
+                    <th class="text-left py-3 px-4 font-medium">Solution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Deprecated method calls</td>
+                    <td class="py-3 px-4">The command automatically updates to current APIs</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Incompatible packages</td>
+                    <td class="py-3 px-4">Reports packages needing manual updates or alternatives</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Configuration changes</td>
+                    <td class="py-3 px-4">Merges new config while preserving custom values</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Breaking API changes</td>
+                    <td class="py-3 px-4">Identifies affected code and suggests fixes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Database schema changes</td>
+                    <td class="py-3 px-4">Creates migration files for required changes</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Output Example</h2>
+    <p>After running the migration command, you'll receive a detailed report:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Migration: Laravel 10 → Laravel 11
+
+### Analysis
+- Current state: Laravel 10.48.0, PHP 8.2
+- Breaking changes: 12 identified
+- Estimated effort: 2-3 hours
+- Compatibility: All packages compatible
+
+### Steps Completed
+- [x] Dependencies updated in composer.json
+- [x] Config files migrated to new structure
+- [x] Deprecated methods fixed (18 occurrences)
+- [x] Service providers updated
+- [x] Tests passing (145/145)
+
+### Manual Steps Required
+1. Review new rate limiting changes in routes/api.php
+2. Update custom middleware to use new signature
+3. Test email sending with updated mail config
+
+### Validation
+All automated tests passed. Run the following for additional checks:
+```bash
+vendor/bin/pest
+vendor/bin/phpstan analyse
+vendor/bin/pint
+```
+
+### Next Steps
+1. Test application functionality in development
+2. Review the Laravel 11 upgrade guide for additional changes
+3. Deploy to staging for integration testing</code></pre>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/refactor.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:refactor</a> - Refactor code after migration</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests for migrated code</li>
+        <li><a href="{{ '/commands/analyze.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:analyze</a> - Analyze code quality after migration</li>
+    </ul>
 </div>

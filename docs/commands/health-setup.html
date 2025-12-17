@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:health:setup
-description: Setup health monitoring
+description: Setup application health monitoring using spatie/laravel-health
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,441 @@ back_text: All Commands
         <span class="badge badge-devops">DevOps</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:health:setup</h1>
-    <p class="text-xl text-muted-foreground">Setup health monitoring</p>
+    <p class="text-xl text-muted-foreground">Setup application health monitoring using spatie/laravel-health</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Setup health monitoring. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/health:setup</code> command configures comprehensive health monitoring for your Laravel application using the spatie/laravel-health package. It automates the installation, configuration, and setup of various health checks to monitor database connectivity, cache availability, Redis, queues, disk space, scheduler status, and more.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:health:setup [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:health:setup [--checks=&lt;db,cache,redis,queue,storage,schedule&gt;]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:health:setup</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Interactive setup with all checks
+/laravel-agent:health:setup
+
+# Setup specific checks
+/laravel-agent:health:setup --checks=db,cache,redis
+
+# Setup with queue and storage monitoring
+/laravel-agent:health:setup --checks=db,queue,storage,schedule</code></pre>
+
+    <h2>Installation Process</h2>
+    <p>The command automates the following steps:</p>
+    <ol>
+        <li><strong>Install Package</strong> - Adds spatie/laravel-health via Composer</li>
+        <li><strong>Publish Configuration</strong> - Publishes config file and migrations</li>
+        <li><strong>Run Migrations</strong> - Creates result storage tables</li>
+        <li><strong>Configure Health Checks</strong> - Registers selected health checks in AppServiceProvider</li>
+        <li><strong>Setup Routes</strong> - Adds dashboard and API endpoints</li>
+        <li><strong>Schedule Checks</strong> - Configures automated health check execution</li>
+    </ol>
+
+    <h2>Available Health Checks</h2>
+    <p>The command can configure the following health checks:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Check</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                    <th class="text-left py-3 px-4 font-medium">Thresholds</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>DatabaseCheck</code></td>
+                    <td class="py-3 px-4">Verifies database connectivity</td>
+                    <td class="py-3 px-4">Connection test</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>CacheCheck</code></td>
+                    <td class="py-3 px-4">Tests cache read/write operations</td>
+                    <td class="py-3 px-4">Read/write test</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>RedisCheck</code></td>
+                    <td class="py-3 px-4">Checks Redis server connection</td>
+                    <td class="py-3 px-4">Ping test</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>QueueCheck</code></td>
+                    <td class="py-3 px-4">Monitors queue job processing</td>
+                    <td class="py-3 px-4">Job processing</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>UsedDiskSpaceCheck</code></td>
+                    <td class="py-3 px-4">Monitors disk space usage</td>
+                    <td class="py-3 px-4">Warn &gt;70%, Fail &gt;90%</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>ScheduleCheck</code></td>
+                    <td class="py-3 px-4">Verifies scheduler is running</td>
+                    <td class="py-3 px-4">Max age 2 minutes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>DebugModeCheck</code></td>
+                    <td class="py-3 px-4">Ensures debug mode is off in production</td>
+                    <td class="py-3 px-4">Production only</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>EnvironmentCheck</code></td>
+                    <td class="py-3 px-4">Validates environment configuration</td>
+                    <td class="py-3 px-4">Expected environment</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>DatabaseSizeCheck</code></td>
+                    <td class="py-3 px-4">Monitors database size</td>
+                    <td class="py-3 px-4">Fail when &gt;5GB</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>DatabaseConnectionCountCheck</code></td>
+                    <td class="py-3 px-4">Tracks database connection count</td>
+                    <td class="py-3 px-4">Warn &gt;50, Fail &gt;100</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>HorizonCheck</code></td>
+                    <td class="py-3 px-4">Monitors Laravel Horizon status</td>
+                    <td class="py-3 px-4">Service running</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>BackupsCheck</code></td>
+                    <td class="py-3 px-4">Verifies backup recency and count</td>
+                    <td class="py-3 px-4">&lt;1 day old, &gt;1 backup</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>OptimizedAppCheck</code></td>
+                    <td class="py-3 px-4">Ensures app is optimized for production</td>
+                    <td class="py-3 px-4">Config/routes cached</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Interactive Prompts</h2>
+    <p>When run without arguments, the command presents interactive prompts:</p>
+
+    <h3>1. Which health checks to enable?</h3>
+    <ul>
+        <li>[x] Database connection</li>
+        <li>[x] Cache availability</li>
+        <li>[x] Redis connection</li>
+        <li>[x] Queue processing</li>
+        <li>[x] Disk space</li>
+        <li>[x] Schedule running</li>
+        <li>[ ] Debug mode (production only)</li>
+        <li>[ ] Environment check</li>
+        <li>[ ] Database size</li>
+        <li>[ ] Horizon status</li>
+        <li>[ ] Backup status</li>
+    </ul>
+
+    <h3>2. How often to run checks?</h3>
+    <ul>
+        <li>Every minute (recommended)</li>
+        <li>Every 5 minutes</li>
+        <li>Every 15 minutes</li>
+    </ul>
+
+    <h3>3. Notification on failure?</h3>
+    <ul>
+        <li>Email</li>
+        <li>Slack</li>
+        <li>Discord</li>
+        <li>None</li>
+    </ul>
+
+    <h3>4. Enable health dashboard?</h3>
+    <ul>
+        <li>Yes (with auth protection)</li>
+        <li>JSON API only</li>
+        <li>No dashboard</li>
+    </ul>
+
+    <h2>Generated Configuration</h2>
+
+    <h3>Health Checks Registration</h3>
+    <p>The command registers health checks in your AppServiceProvider:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// app/Providers/AppServiceProvider.php
+use Spatie\Health\Facades\Health;
+use Spatie\Health\Checks\Checks\BackupsCheck;
+use Spatie\Health\Checks\Checks\CacheCheck;
+use Spatie\Health\Checks\Checks\DatabaseCheck;
+use Spatie\Health\Checks\Checks\DatabaseConnectionCountCheck;
+use Spatie\Health\Checks\Checks\DatabaseSizeCheck;
+use Spatie\Health\Checks\Checks\DebugModeCheck;
+use Spatie\Health\Checks\Checks\EnvironmentCheck;
+use Spatie\Health\Checks\Checks\HorizonCheck;
+use Spatie\Health\Checks\Checks\OptimizedAppCheck;
+use Spatie\Health\Checks\Checks\QueueCheck;
+use Spatie\Health\Checks\Checks\RedisCheck;
+use Spatie\Health\Checks\Checks\ScheduleCheck;
+use Spatie\Health\Checks\Checks\UsedDiskSpaceCheck;
+
+public function boot(): void
+{
+    Health::checks([
+        // Environment checks
+        EnvironmentCheck::new()->expectEnvironment('production'),
+        DebugModeCheck::new(),
+        OptimizedAppCheck::new(),
+
+        // Database checks
+        DatabaseCheck::new(),
+        DatabaseConnectionCountCheck::new()
+            ->warnWhenMoreConnectionsThan(50)
+            ->failWhenMoreConnectionsThan(100),
+        DatabaseSizeCheck::new()
+            ->failWhenSizeAboveGb(errorThresholdGb: 5.0),
+
+        // Cache & Redis
+        CacheCheck::new(),
+        RedisCheck::new(),
+
+        // Queue & Jobs
+        QueueCheck::new(),
+        HorizonCheck::new(), // If using Horizon
+
+        // Scheduler
+        ScheduleCheck::new()
+            ->heartbeatMaxAgeInMinutes(2),
+
+        // Storage
+        UsedDiskSpaceCheck::new()
+            ->warnWhenUsedSpaceIsAbovePercentage(70)
+            ->failWhenUsedSpaceIsAbovePercentage(90),
+
+        // Backups (if using spatie/laravel-backup)
+        BackupsCheck::new()
+            ->locatedAt(storage_path('app/backups'))
+            ->youngestBackShouldHaveBeenMadeInDays(1)
+            ->numberOfBackupsGreaterThan(1),
+    ]);
+}</code></pre>
+
+    <h3>Health Check Routes</h3>
+    <p>Routes are added to your web.php file:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// routes/web.php
+use Spatie\Health\Http\Controllers\HealthCheckResultsController;
+use Spatie\Health\Http\Controllers\HealthCheckJsonResultsController;
+
+// HTML dashboard (protect with auth in production)
+Route::middleware(['auth', 'can:viewHealth'])->group(function () {
+    Route::get('/health', HealthCheckResultsController::class);
+});
+
+// JSON API endpoint (for monitoring services)
+Route::get('/api/health', HealthCheckJsonResultsController::class);
+
+// Simple ping endpoint
+Route::get('/api/ping', fn () => response()->json(['status' => 'ok']));</code></pre>
+
+    <h3>Scheduled Health Checks</h3>
+    <p>The command adds scheduled execution to your Kernel:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// app/Console/Kernel.php
+$schedule->command('health:check')->everyMinute();
+
+// Or run specific checks less frequently
+$schedule->command('health:check --only=DatabaseSizeCheck,UsedDiskSpaceCheck')
+    ->hourly();</code></pre>
+
+    <h2>Custom Health Check Example</h2>
+    <p>You can create custom health checks for your specific needs:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Health\Checks;
+
+use Spatie\Health\Checks\Check;
+use Spatie\Health\Checks\Result;
+
+final class ApiConnectionCheck extends Check
+{
+    protected string $apiUrl;
+
+    public function apiUrl(string $url): self
+    {
+        $this->apiUrl = $url;
+        return $this;
+    }
+
+    public function run(): Result
+    {
+        $result = Result::make();
+
+        try {
+            $response = Http::timeout(5)->get($this->apiUrl . '/health');
+
+            if ($response->successful()) {
+                return $result->ok('API is reachable');
+            }
+
+            return $result->failed("API returned status {$response->status()}");
+        } catch (\Exception $e) {
+            return $result->failed("API unreachable: {$e->getMessage()}");
+        }
+    }
+}
+
+// Register in AppServiceProvider
+Health::checks([
+    ApiConnectionCheck::new()
+        ->name('External API')
+        ->apiUrl('https://api.example.com'),
+]);</code></pre>
+
+    <h2>Configuration File</h2>
+    <p>The command publishes and configures <code>config/health.php</code>:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Spatie\Health\Checks\Checks\BackupsCheck;
+use Spatie\Health\Checks\Checks\CacheCheck;
+use Spatie\Health\Checks\Checks\DatabaseCheck;
+use Spatie\Health\Checks\Checks\DatabaseConnectionCountCheck;
+use Spatie\Health\Checks\Checks\DatabaseSizeCheck;
+use Spatie\Health\Checks\Checks\DebugModeCheck;
+use Spatie\Health\Checks\Checks\EnvironmentCheck;
+use Spatie\Health\Checks\Checks\HorizonCheck;
+use Spatie\Health\Checks\Checks\OptimizedAppCheck;
+use Spatie\Health\Checks\Checks\QueueCheck;
+use Spatie\Health\Checks\Checks\RedisCheck;
+use Spatie\Health\Checks\Checks\ScheduleCheck;
+use Spatie\Health\Checks\Checks\UsedDiskSpaceCheck;
+
+return [
+    'result_stores' => [
+        Spatie\Health\ResultStores\EloquentHealthResultStore::class => [
+            'model' => Spatie\Health\Models\HealthCheckResultHistoryItem::class,
+            'keep_history_for_days' => 7,
+        ],
+    ],
+
+    'notifications' => [
+        'enabled' => true,
+
+        'notifications' => [
+            Spatie\Health\Notifications\CheckFailedNotification::class => ['mail'],
+        ],
+
+        'notifiable' => Spatie\Health\Notifications\Notifiable::class,
+
+        'throttle_notifications_for_minutes' => 60,
+        'throttle_notifications_key' => 'health:notifications:throttle',
+    ],
+
+    'oh_dear_endpoint' => [
+        'enabled' => false,
+        'secret' => env('OH_DEAR_HEALTH_CHECK_SECRET'),
+        'url' => '/oh-dear-health-check-results',
+    ],
+
+    'silence_health_queue_job' => true,
+];</code></pre>
+
+    <h2>Available Commands</h2>
+    <p>After setup, these artisan commands become available:</p>
+    <pre class="language-bash"><code class="language-bash"># Run all configured health checks
+php artisan health:check
+
+# List all configured health checks
+php artisan health:list
+
+# Clear cache and run fresh checks
+php artisan health:check --fresh
+
+# Run only specific checks
+php artisan health:check --only=DatabaseCheck,CacheCheck</code></pre>
+
+    <h2>Accessing Health Status</h2>
+    <p>Once configured, you can access health information through:</p>
+    <ul>
+        <li><strong>HTML Dashboard</strong> - Visit <code>/health</code> for a visual dashboard (requires authentication)</li>
+        <li><strong>JSON API</strong> - Query <code>/api/health</code> for programmatic access</li>
+        <li><strong>Simple Ping</strong> - Use <code>/api/ping</code> for basic uptime monitoring</li>
+        <li><strong>Oh Dear Integration</strong> - Connect to Oh Dear monitoring service (optional)</li>
+    </ul>
+
+    <h2>Notification Setup</h2>
+    <p>The command can configure notifications for failed health checks:</p>
+    <ul>
+        <li><strong>Email</strong> - Uses Laravel's mail configuration</li>
+        <li><strong>Slack</strong> - Requires Slack webhook URL</li>
+        <li><strong>Discord</strong> - Requires Discord webhook URL</li>
+        <li><strong>Throttling</strong> - Prevents notification spam (default: 60 minutes)</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Start with core checks</strong> - Begin with database, cache, and storage checks</li>
+        <li><strong>Run checks frequently</strong> - Every minute is recommended for critical systems</li>
+        <li><strong>Protect the dashboard</strong> - Always use authentication middleware in production</li>
+        <li><strong>Configure thresholds</strong> - Adjust warning/failure levels based on your infrastructure</li>
+        <li><strong>Enable notifications</strong> - Get alerted immediately when checks fail</li>
+        <li><strong>Monitor from outside</strong> - Use external monitoring services to ping your health endpoint</li>
+        <li><strong>Keep history</strong> - Store results for trend analysis (default: 7 days)</li>
+        <li><strong>Test custom checks</strong> - Verify custom health checks work before deploying</li>
+    </ol>
+
+    <h2>Example Output</h2>
+    <p>After successful setup, the command displays:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Health Monitoring Setup Complete
+
+### Package Installed
+- spatie/laravel-health
+
+### Health Checks Configured
+| Check | Status | Threshold |
+|-------|--------|-----------|
+| Database | Enabled | Connection test |
+| Cache | Enabled | Read/write test |
+| Redis | Enabled | Ping test |
+| Queue | Enabled | Job processing |
+| Disk Space | Enabled | Warn &gt;70%, Fail &gt;90% |
+| Schedule | Enabled | Max age 2 minutes |
+
+### Routes Added
+- GET `/health` - HTML dashboard (auth protected)
+- GET `/api/health` - JSON endpoint
+
+### Schedule
+- `health:check` runs every minute
+
+### Commands Available
+```bash
+php artisan health:check         # Run all checks
+php artisan health:list          # List configured checks
+php artisan health:check --fresh # Clear cache and run
+```
+
+### Next Steps
+1. Run `php artisan migrate` for result storage
+2. Visit `/health` to view dashboard
+3. Configure monitoring service to ping `/api/health`
+4. Test alert notifications</code></pre>
+
+    <h2>Monitoring Integration</h2>
+    <p>Popular monitoring services that work with the health endpoint:</p>
+    <ul>
+        <li><strong>Oh Dear</strong> - Native integration with dedicated endpoint</li>
+        <li><strong>UptimeRobot</strong> - Monitor the <code>/api/health</code> JSON endpoint</li>
+        <li><strong>Pingdom</strong> - HTTP check on <code>/api/ping</code></li>
+        <li><strong>New Relic</strong> - Synthetic monitoring of health endpoints</li>
+        <li><strong>Datadog</strong> - Custom integration with JSON endpoint</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/monitor-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:monitor:setup</a> - Setup performance monitoring</li>
+        <li><a href="{{ '/commands/log-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:log:setup</a> - Configure logging</li>
+        <li><a href="{{ '/commands/deploy-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:deploy:setup</a> - Setup deployment automation</li>
+    </ul>
 </div>

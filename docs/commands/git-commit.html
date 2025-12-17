@@ -17,11 +17,245 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Smart commit with security review. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/git:commit</code> command creates Git commits with automatic security review and intelligent message generation. It analyzes your staged changes, checks for security issues, and generates semantic commit messages following best practices.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:git:commit [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:git:commit [--skip-review] [--amend] [message]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:git:commit</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Auto-review and generate message
+/laravel-agent:git:commit
+
+# Use provided message
+/laravel-agent:git:commit "feat: add PDF export functionality"
+
+# Skip security review
+/laravel-agent:git:commit --skip-review
+
+# Amend previous commit
+/laravel-agent:git:commit --amend</code></pre>
+
+    <h2>Process Flow</h2>
+    <p>The command follows a comprehensive workflow to ensure quality and security:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Step</th>
+                    <th class="text-left py-3 px-4 font-medium">Action</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">1</td>
+                    <td class="py-3 px-4">Check Staged Changes</td>
+                    <td class="py-3 px-4">Verify that files are staged for commit</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">2</td>
+                    <td class="py-3 px-4">Security Review</td>
+                    <td class="py-3 px-4">Scan for vulnerabilities, debug statements, and secrets</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">3</td>
+                    <td class="py-3 px-4">Analyze Changes</td>
+                    <td class="py-3 px-4">Categorize changed files and understand scope</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">4</td>
+                    <td class="py-3 px-4">Generate Message</td>
+                    <td class="py-3 px-4">Create semantic commit message based on changes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">5</td>
+                    <td class="py-3 px-4">Present Preview</td>
+                    <td class="py-3 px-4">Show commit details for approval</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">6</td>
+                    <td class="py-3 px-4">Create Commit</td>
+                    <td class="py-3 px-4">Execute git commit with generated message</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Security Review</h2>
+    <p>Unless <code>--skip-review</code> is specified, the command runs <code>/review:staged</code> to check for:</p>
+    <ul>
+        <li><strong>Security vulnerabilities</strong> - SQL injection, XSS, CSRF issues</li>
+        <li><strong>Debug statements</strong> - dd(), dump(), var_dump() calls</li>
+        <li><strong>Hardcoded secrets</strong> - API keys, passwords, tokens</li>
+        <li><strong>Critical quality issues</strong> - Poor error handling, missing validation</li>
+    </ul>
+
+    <p>Example security review output:</p>
+    <pre class="language-bash"><code class="language-bash">## Security Review Results
+
+Status: PASSED / FAILED
+
+Issues:
+- Found dd() statement in UserController.php:42
+- Potential SQL injection in ReportService.php:156
+
+[Continue] [Fix Issues] [Skip Review]</code></pre>
+
+    <h2>Commit Message Generation</h2>
+    <p>The command analyzes your changes and generates appropriate commit messages:</p>
+
+    <h3>Single File Change</h3>
+    <pre class="language-bash"><code class="language-bash">feat(invoice): add PDF export functionality</code></pre>
+
+    <h3>Multiple Files, Same Feature</h3>
+    <pre class="language-bash"><code class="language-bash">feat(invoice): add PDF export functionality
+
+- Add InvoicePdfExporter service with DomPDF
+- Add export endpoint to InvoiceController
+- Add feature tests for PDF generation
+
+Closes #123</code></pre>
+
+    <h3>Multiple Features</h3>
+    <pre class="language-bash"><code class="language-bash">chore: multiple changes
+
+- Update user authentication flow
+- Fix pagination bug in products list
+- Add logging to payment service</code></pre>
+
+    <h2>Commit Preview</h2>
+    <p>Before committing, you'll see a detailed preview:</p>
+    <pre class="language-bash"><code class="language-bash">## Commit Preview
+
+### Staged Files (3)
+- app/Services/InvoiceService.php (+45 -12)
+- app/Http/Controllers/InvoiceController.php (+23 -5)
+- tests/Feature/InvoiceTest.php (+67 -0)
+
+### Generated Message
+```
+feat(invoice): add PDF export functionality
+
+- Add InvoicePdfExporter service with DomPDF
+- Add export endpoint to InvoiceController
+- Add feature tests for PDF generation
+
+Closes #123
+```
+
+### Security: PASSED
+
+[Commit] [Edit Message] [Cancel]</code></pre>
+
+    <h2>Message Templates</h2>
+    <p>The command uses semantic commit conventions:</p>
+
+    <h3>Feature Template</h3>
+    <pre class="language-bash"><code class="language-bash">feat(&lt;scope&gt;): &lt;add|implement&gt; &lt;feature&gt;
+
+- &lt;detail 1&gt;
+- &lt;detail 2&gt;
+
+Closes #&lt;ticket&gt;</code></pre>
+
+    <h3>Bug Fix Template</h3>
+    <pre class="language-bash"><code class="language-bash">fix(&lt;scope&gt;): &lt;correct|resolve|handle&gt; &lt;issue&gt;
+
+&lt;What was wrong&gt;
+&lt;What was fixed&gt;
+
+Fixes #&lt;ticket&gt;</code></pre>
+
+    <h3>Refactor Template</h3>
+    <pre class="language-bash"><code class="language-bash">refactor(&lt;scope&gt;): &lt;extract|simplify|reorganize&gt; &lt;target&gt;
+
+- &lt;change 1&gt;
+- &lt;change 2&gt;
+
+No functional changes.</code></pre>
+
+    <h3>Breaking Change Template</h3>
+    <pre class="language-bash"><code class="language-bash">feat(&lt;scope&gt;)!: &lt;change&gt;
+
+BREAKING CHANGE: &lt;description of breaking change&gt;
+
+Migration: &lt;steps to migrate&gt;</code></pre>
+
+    <h2>Implementation Example</h2>
+    <p>The command creates commits using HEREDOC format for proper message formatting:</p>
+    <pre class="language-bash"><code class="language-bash">git commit -m "$(cat &lt;&lt;'EOF'
+feat(invoice): add PDF export functionality
+
+- Add InvoicePdfExporter service with DomPDF
+- Add export endpoint to InvoiceController
+- Add feature tests for PDF generation
+
+Closes #123
+EOF
+)"</code></pre>
+
+    <h2>Options</h2>
+    <ul>
+        <li><strong>--skip-review</strong> - Skip the security review step (not recommended)</li>
+        <li><strong>--amend</strong> - Amend the previous commit instead of creating a new one</li>
+        <li><strong>[message]</strong> - Use the provided message instead of generating one</li>
+    </ul>
+
+    <h2>Exit Codes</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Code</th>
+                    <th class="text-left py-3 px-4 font-medium">Meaning</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>0</code></td>
+                    <td class="py-3 px-4">Commit successful</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>1</code></td>
+                    <td class="py-3 px-4">Nothing to commit</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>2</code></td>
+                    <td class="py-3 px-4">Review failed (critical issues)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>3</code></td>
+                    <td class="py-3 px-4">User cancelled</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Always run security review</strong> - Only skip review for trivial changes like docs</li>
+        <li><strong>Stage related changes</strong> - Group related changes in a single commit</li>
+        <li><strong>Use semantic conventions</strong> - Follow feat:, fix:, refactor:, etc.</li>
+        <li><strong>Include ticket numbers</strong> - Reference issues with Closes #123 or Fixes #123</li>
+        <li><strong>Review the preview</strong> - Always check the generated message before committing</li>
+        <li><strong>Split large commits</strong> - If suggested, split unrelated changes into separate commits</li>
+    </ol>
+
+    <h2>File Categorization</h2>
+    <p>The command analyzes and categorizes changed files:</p>
+    <ul>
+        <li><strong>Feature files</strong> - Controllers, Models, Services</li>
+        <li><strong>Test files</strong> - Feature tests, unit tests</li>
+        <li><strong>Config files</strong> - Configuration, environment</li>
+        <li><strong>Migration files</strong> - Database migrations</li>
+        <li><strong>View files</strong> - Blade templates, frontend assets</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/review-staged.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:staged</a> - Review staged changes for security issues</li>
+        <li><a href="{{ '/commands/git-push.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:git:push</a> - Smart push with pre-push checks</li>
+        <li><a href="{{ '/commands/test-run.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:run</a> - Run tests before committing</li>
+    </ul>
 </div>

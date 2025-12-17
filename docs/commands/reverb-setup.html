@@ -17,11 +17,297 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Setup Laravel Reverb WebSocket server. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/reverb:setup</code> command configures Laravel Reverb, a first-party WebSocket server for Laravel applications. It handles complete setup including server installation, environment configuration, frontend Echo client setup, and example channel creation for real-time features like live notifications, chat, and presence channels.</p>
 
     <h2>Usage</h2>
     <pre class="language-bash"><code class="language-bash">/laravel-agent:reverb:setup [options]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:reverb:setup</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Full setup with Laravel Echo and frontend integration
+/laravel-agent:reverb:setup
+
+# Minimal setup - server only, no frontend configuration
+/laravel-agent:reverb:setup minimal
+
+# Scaled setup with Redis for horizontal scaling
+/laravel-agent:reverb:setup scaled</code></pre>
+
+    <h2>Setup Options</h2>
+    <p>Choose the setup mode that fits your deployment needs:</p>
+    <ul>
+        <li><strong>Default (Full Setup)</strong> - Installs server, configures environment, sets up Laravel Echo client, and creates example channels</li>
+        <li><strong>Minimal</strong> - Server-only installation without frontend integration, useful for API-only applications</li>
+        <li><strong>Scaled</strong> - Includes Redis configuration for horizontal scaling across multiple Reverb instances</li>
+    </ul>
+
+    <h2>Installation Process</h2>
+    <p>The command performs the following steps:</p>
+
+    <h3>1. Package Installation</h3>
+    <p>Installs Laravel Reverb server and frontend dependencies:</p>
+    <pre class="language-bash"><code class="language-bash">composer require laravel/reverb
+php artisan reverb:install
+npm install --save-dev laravel-echo pusher-js</code></pre>
+
+    <h3>2. Environment Configuration</h3>
+    <p>Configures your <code>.env</code> file with required variables:</p>
+    <pre class="language-bash"><code class="language-bash">BROADCAST_CONNECTION=reverb
+
+# Server Configuration
+REVERB_APP_ID=generated-app-id
+REVERB_APP_KEY=generated-app-key
+REVERB_APP_SECRET=generated-app-secret
+REVERB_HOST=localhost
+REVERB_PORT=8080
+REVERB_SCHEME=http
+
+# Frontend Configuration
+VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"
+VITE_REVERB_HOST="${REVERB_HOST}"
+VITE_REVERB_PORT="${REVERB_PORT}"
+VITE_REVERB_SCHEME="${REVERB_SCHEME}"</code></pre>
+
+    <h3>3. Laravel Echo Setup</h3>
+    <p>Creates and configures the Echo client in <code>resources/js/echo.js</code>:</p>
+    <pre class="language-javascript"><code class="language-javascript">import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+window.Pusher = Pusher;
+
+window.Echo = new Echo({
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: import.meta.env.VITE_REVERB_PORT,
+    wssPort: import.meta.env.VITE_REVERB_PORT,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
+});</code></pre>
+    <p>The command also imports this file in your main <code>resources/js/app.js</code>:</p>
+    <pre class="language-javascript"><code class="language-javascript">import './echo';</code></pre>
+
+    <h3>4. Example Channel Creation</h3>
+    <p>Sets up a sample broadcast event and channel authorization in <code>routes/channels.php</code>:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Illuminate\Support\Facades\Broadcast;
+
+Broadcast::channel('notifications.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});</code></pre>
+
+    <h2>What Gets Created</h2>
+    <p>A complete Reverb setup includes the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Reverb Server</td>
+                    <td class="py-3 px-4"><code>config/reverb.php</code></td>
+                    <td class="py-3 px-4">WebSocket server configuration</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Broadcasting Config</td>
+                    <td class="py-3 px-4"><code>config/broadcasting.php</code></td>
+                    <td class="py-3 px-4">Updated with Reverb connection</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Echo Client</td>
+                    <td class="py-3 px-4"><code>resources/js/echo.js</code></td>
+                    <td class="py-3 px-4">Frontend WebSocket client configuration</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Channel Routes</td>
+                    <td class="py-3 px-4"><code>routes/channels.php</code></td>
+                    <td class="py-3 px-4">Channel authorization logic</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Environment Variables</td>
+                    <td class="py-3 px-4"><code>.env</code></td>
+                    <td class="py-3 px-4">Server and client configuration</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Example Event</td>
+                    <td class="py-3 px-4"><code>app/Events/</code></td>
+                    <td class="py-3 px-4">Sample broadcast event for testing</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Starting the Server</h2>
+    <p>After setup, start the Reverb WebSocket server:</p>
+    <pre class="language-bash"><code class="language-bash"># Start server in foreground
+php artisan reverb:start
+
+# Start with debug output
+php artisan reverb:start --debug
+
+# Start in background (Unix/Linux)
+php artisan reverb:start &</code></pre>
+
+    <h2>Testing Your Setup</h2>
+    <p>Verify your Reverb installation is working correctly:</p>
+
+    <h3>Backend Test</h3>
+    <pre class="language-bash"><code class="language-bash"># Start the server in a separate terminal
+php artisan reverb:start
+
+# Open tinker and broadcast an event
+php artisan tinker
+>>> broadcast(new App\Events\TestEvent('Hello WebSocket!'));</code></pre>
+
+    <h3>Frontend Test</h3>
+    <p>Listen for events in your JavaScript:</p>
+    <pre class="language-javascript"><code class="language-javascript">// In your frontend code
+window.Echo.channel('notifications.1')
+    .listen('TestEvent', (e) => {
+        console.log('Received:', e);
+    });</code></pre>
+
+    <h2>Example Broadcast Event</h2>
+    <p>Create a broadcast event class:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Events;
+
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class TestEvent implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public function __construct(
+        public string $message
+    ) {}
+
+    public function broadcastOn(): array
+    {
+        return [
+            new Channel('notifications.1'),
+        ];
+    }
+}</code></pre>
+
+    <h2>Common Channel Types</h2>
+    <p>Reverb supports three types of channels:</p>
+
+    <h3>Public Channels</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// No authorization required
+new Channel('announcements');</code></pre>
+    <pre class="language-javascript"><code class="language-javascript">// Listen on frontend
+Echo.channel('announcements')
+    .listen('AnnouncementMade', (e) => {
+        console.log(e.announcement);
+    });</code></pre>
+
+    <h3>Private Channels</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Requires user authentication
+new PrivateChannel('orders.' . $orderId);</code></pre>
+    <pre class="language-javascript"><code class="language-javascript">// Listen on frontend (requires auth)
+Echo.private('orders.123')
+    .listen('OrderShipped', (e) => {
+        console.log(e.order);
+    });</code></pre>
+
+    <h3>Presence Channels</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Track who's online
+new PresenceChannel('chat.' . $roomId);</code></pre>
+    <pre class="language-javascript"><code class="language-javascript">// Listen on frontend
+Echo.join('chat.1')
+    .here((users) => {
+        console.log('Currently online:', users);
+    })
+    .joining((user) => {
+        console.log(user.name + ' joined');
+    })
+    .leaving((user) => {
+        console.log(user.name + ' left');
+    });</code></pre>
+
+    <h2>Scaled Setup with Redis</h2>
+    <p>For production deployments with multiple Reverb instances, use Redis scaling:</p>
+    <pre class="language-bash"><code class="language-bash"># Install Redis
+composer require predis/predis
+
+# Configure in config/reverb.php
+'scaling' => [
+    'enabled' => true,
+    'channel' => env('REVERB_SCALING_CHANNEL', 'reverb'),
+],</code></pre>
+
+    <h2>Production Deployment</h2>
+    <p>Best practices for running Reverb in production:</p>
+    <ol>
+        <li><strong>Use SSL/TLS</strong> - Set <code>REVERB_SCHEME=https</code> and configure your reverse proxy</li>
+        <li><strong>Process Manager</strong> - Use Supervisor or systemd to keep Reverb running</li>
+        <li><strong>Enable Scaling</strong> - Use Redis scaling for multiple app instances</li>
+        <li><strong>Monitor Connections</strong> - Track active connections and memory usage</li>
+        <li><strong>Set Connection Limits</strong> - Configure <code>max_connections</code> in reverb.php</li>
+    </ol>
+
+    <h3>Supervisor Configuration</h3>
+    <pre class="language-ini"><code class="language-ini">[program:reverb]
+command=/usr/bin/php /path/to/your/app/artisan reverb:start
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/log/reverb.log</code></pre>
+
+    <h2>Configuration Report</h2>
+    <p>After successful setup, the command provides a comprehensive report:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Reverb Configured
+
+### Server
+Start with: `php artisan reverb:start`
+
+### Environment
+- REVERB_APP_ID: xxx
+- REVERB_APP_KEY: xxx
+- WebSocket URL: ws://localhost:8080
+
+### Client
+Echo configured in resources/js/echo.js
+
+### Test
+```bash
+php artisan reverb:start &
+php artisan tinker
+>>> broadcast(new App\Events\TestEvent('Hello!'))
+```</code></pre>
+
+    <h2>Troubleshooting</h2>
+    <ul>
+        <li><strong>Connection refused</strong> - Ensure Reverb server is running with <code>php artisan reverb:start</code></li>
+        <li><strong>401 Unauthorized</strong> - Check channel authorization in <code>routes/channels.php</code></li>
+        <li><strong>CORS errors</strong> - Configure allowed origins in <code>config/reverb.php</code></li>
+        <li><strong>Messages not received</strong> - Verify <code>VITE_</code> env variables match server config</li>
+        <li><strong>Port conflicts</strong> - Change <code>REVERB_PORT</code> if 8080 is already in use</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/event-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:event:make</a> - Generate broadcast events</li>
+        <li><a href="{{ '/commands/queue-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:queue:setup</a> - Configure queue for async broadcasting</li>
+        <li><a href="{{ '/skills/laravel-broadcasting.html' | relative_url }}" class="text-primary hover:underline">laravel-broadcasting skill</a> - Real-time broadcasting expertise</li>
+    </ul>
 </div>

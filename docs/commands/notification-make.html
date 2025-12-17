@@ -17,11 +17,442 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create multi-channel notification (55+ channels). This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/notification:make</code> command creates Laravel notifications with support for 55+ notification channels. It can generate complete multi-channel notification classes or setup individual channels with all required dependencies, configuration, and routing methods.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:notification:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:notification:make [NotificationName] [--channels=<list>] [--setup=<channel>]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:notification:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create notification with multiple channels
+/laravel-agent:notification:make OrderShipped --channels=mail,telegram
+
+# Setup a channel only (no notification class)
+/laravel-agent:notification:make --setup=telegram
+
+# Create notification with popular channels
+/laravel-agent:notification:make WelcomeUser --channels=mail,discord,twilio
+
+# Create admin alert notification
+/laravel-agent:notification:make AlertAdmin --channels=slack,teams</code></pre>
+
+    <h2>Operating Modes</h2>
+    <p>The command operates in two distinct modes:</p>
+
+    <h3>Mode 1: Setup Channel Only</h3>
+    <p>Use <code>--setup=&lt;channel&gt;</code> to install and configure a notification channel without creating a notification class. This is useful when you want to prepare your application for a specific channel before creating notifications.</p>
+
+    <h3>Mode 2: Create Notification</h3>
+    <p>Provide a notification name to create a complete notification class with support for multiple channels. The command automatically installs required packages, configures routing, and sets up environment variables.</p>
+
+    <h2>Supported Channels</h2>
+    <p>The command supports 55+ notification channels, organized into categories:</p>
+
+    <h3>Built-in Channels (No Package Required)</h3>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Channel</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                    <th class="text-left py-3 px-4 font-medium">Environment Variables</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">mail</td>
+                    <td class="py-3 px-4">Email notifications</td>
+                    <td class="py-3 px-4"><code>MAIL_*</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">database</td>
+                    <td class="py-3 px-4">Store in database</td>
+                    <td class="py-3 px-4">(migration required)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">broadcast</td>
+                    <td class="py-3 px-4">WebSocket notifications</td>
+                    <td class="py-3 px-4"><code>BROADCAST_DRIVER</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">slack</td>
+                    <td class="py-3 px-4">Slack webhooks</td>
+                    <td class="py-3 px-4"><code>SLACK_WEBHOOK_URL</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Push Notifications</h3>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Channel</th>
+                    <th class="text-left py-3 px-4 font-medium">Package</th>
+                    <th class="text-left py-3 px-4 font-medium">Environment Variables</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">telegram</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/telegram</code></td>
+                    <td class="py-3 px-4"><code>TELEGRAM_BOT_TOKEN</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">discord</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/discord</code></td>
+                    <td class="py-3 px-4"><code>DISCORD_WEBHOOK_URL</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">fcm</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/fcm</code></td>
+                    <td class="py-3 px-4"><code>FCM_SERVER_KEY</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">onesignal</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/onesignal</code></td>
+                    <td class="py-3 px-4"><code>ONESIGNAL_APP_ID, ONESIGNAL_REST_API_KEY</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">webpush</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/webpush</code></td>
+                    <td class="py-3 px-4"><code>VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">apn</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/apn</code></td>
+                    <td class="py-3 px-4"><code>APN_KEY_ID, APN_TEAM_ID</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>SMS/Voice</h3>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Channel</th>
+                    <th class="text-left py-3 px-4 font-medium">Package</th>
+                    <th class="text-left py-3 px-4 font-medium">Environment Variables</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">twilio</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/twilio</code></td>
+                    <td class="py-3 px-4"><code>TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">vonage</td>
+                    <td class="py-3 px-4"><code>laravel/vonage-notification-channel</code></td>
+                    <td class="py-3 px-4"><code>VONAGE_KEY, VONAGE_SECRET</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">messagebird</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/messagebird</code></td>
+                    <td class="py-3 px-4"><code>MESSAGEBIRD_ACCESS_KEY</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">plivo</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/plivo</code></td>
+                    <td class="py-3 px-4"><code>PLIVO_AUTH_ID, PLIVO_AUTH_TOKEN</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Messenger/Chat</h3>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Channel</th>
+                    <th class="text-left py-3 px-4 font-medium">Package</th>
+                    <th class="text-left py-3 px-4 font-medium">Environment Variables</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">teams</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/microsoft-teams</code></td>
+                    <td class="py-3 px-4">(webhook per notification)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">googlechat</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/google-chat</code></td>
+                    <td class="py-3 px-4">(webhook per notification)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">rocketchat</td>
+                    <td class="py-3 px-4"><code>laravel-notification-channels/rocket-chat</code></td>
+                    <td class="py-3 px-4"><code>ROCKETCHAT_URL</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Channel Configuration Examples</h2>
+    <p>Here are configuration examples for popular notification channels:</p>
+
+    <h3>Telegram</h3>
+    <p>Environment configuration:</p>
+    <pre class="language-bash"><code class="language-bash">TELEGRAM_BOT_TOKEN=your-bot-token</code></pre>
+    <p>User model routing method:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// In App\Models\User
+public function routeNotificationForTelegram(): ?string
+{
+    return $this->telegram_chat_id;
+}</code></pre>
+
+    <h3>Discord</h3>
+    <p>Environment configuration:</p>
+    <pre class="language-bash"><code class="language-bash">DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...</code></pre>
+
+    <h3>Twilio (SMS)</h3>
+    <p>Environment configuration:</p>
+    <pre class="language-bash"><code class="language-bash">TWILIO_SID=your-account-sid
+TWILIO_TOKEN=your-auth-token
+TWILIO_FROM=+1234567890</code></pre>
+    <p>User model routing method:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// In App\Models\User
+public function routeNotificationForTwilio(): ?string
+{
+    return $this->phone;
+}</code></pre>
+
+    <h3>FCM (Firebase Cloud Messaging)</h3>
+    <p>Environment configuration:</p>
+    <pre class="language-bash"><code class="language-bash">FCM_SERVER_KEY=your-server-key
+FCM_SENDER_ID=your-sender-id</code></pre>
+    <p>User model routing method:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// In App\Models\User
+public function routeNotificationForFcm(): array
+{
+    return $this->fcm_tokens()->pluck('token')->toArray();
+}</code></pre>
+
+    <h3>WebPush</h3>
+    <p>Environment configuration:</p>
+    <pre class="language-bash"><code class="language-bash">VAPID_PUBLIC_KEY=your-public-key
+VAPID_PRIVATE_KEY=your-private-key
+VAPID_SUBJECT=mailto:admin@yoursite.com</code></pre>
+    <p>Generate VAPID keys:</p>
+    <pre class="language-bash"><code class="language-bash">php artisan webpush:vapid</code></pre>
+
+    <h3>OneSignal</h3>
+    <p>Environment configuration:</p>
+    <pre class="language-bash"><code class="language-bash">ONESIGNAL_APP_ID=your-app-id
+ONESIGNAL_REST_API_KEY=your-rest-api-key</code></pre>
+
+    <h3>Vonage (SMS)</h3>
+    <p>Environment configuration:</p>
+    <pre class="language-bash"><code class="language-bash">VONAGE_KEY=your-key
+VONAGE_SECRET=your-secret
+VONAGE_SMS_FROM=YourApp</code></pre>
+
+    <h2>What Gets Created</h2>
+    <p>Depending on the mode, the command creates different components:</p>
+
+    <h3>Setup Mode Output</h3>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Package Installation</td>
+                    <td class="py-3 px-4"><code>composer.json</code></td>
+                    <td class="py-3 px-4">Channel-specific package via Composer</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Configuration</td>
+                    <td class="py-3 px-4"><code>config/</code></td>
+                    <td class="py-3 px-4">Published channel configuration file</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Environment Variables</td>
+                    <td class="py-3 px-4"><code>.env.example</code></td>
+                    <td class="py-3 px-4">Required environment variables added</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Routing Method</td>
+                    <td class="py-3 px-4"><code>app/Models/User.php</code></td>
+                    <td class="py-3 px-4">Channel routing method added</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Migration</td>
+                    <td class="py-3 px-4"><code>database/migrations/</code></td>
+                    <td class="py-3 px-4">User identifier field migration (if needed)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Notification Creation Output</h3>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Notification Class</td>
+                    <td class="py-3 px-4"><code>app/Notifications/</code></td>
+                    <td class="py-3 px-4">Multi-channel notification with via() and channel methods</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Packages</td>
+                    <td class="py-3 px-4"><code>composer.json</code></td>
+                    <td class="py-3 px-4">All required channel packages installed</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Environment Setup</td>
+                    <td class="py-3 px-4"><code>.env.example</code></td>
+                    <td class="py-3 px-4">All required credentials documented</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Queue Configuration</td>
+                    <td class="py-3 px-4">Notification class</td>
+                    <td class="py-3 px-4">Implements ShouldQueue for async delivery</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated Notification Example</h2>
+    <p>Here's an example of a multi-channel notification created by the command:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Notifications;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use NotificationChannels\Telegram\TelegramMessage;
+use NotificationChannels\Discord\DiscordMessage;
+
+class OrderShipped extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(
+        public $order
+    ) {}
+
+    public function via($notifiable): array
+    {
+        return ['mail', 'telegram', 'discord'];
+    }
+
+    public function toMail($notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject('Your Order Has Shipped!')
+            ->line('Order #' . $this->order->id . ' has been shipped.')
+            ->action('Track Order', url('/orders/' . $this->order->id))
+            ->line('Thank you for your purchase!');
+    }
+
+    public function toTelegram($notifiable): TelegramMessage
+    {
+        return TelegramMessage::create()
+            ->content('*Order Shipped*')
+            ->line('Your order #' . $this->order->id . ' has been shipped!')
+            ->button('Track Order', url('/orders/' . $this->order->id));
+    }
+
+    public function toDiscord($notifiable): DiscordMessage
+    {
+        return DiscordMessage::create()
+            ->embed(function ($embed) {
+                $embed->title('Order Shipped')
+                    ->description('Order #' . $this->order->id)
+                    ->url(url('/orders/' . $this->order->id))
+                    ->timestamp(now());
+            });
+    }
+}</code></pre>
+
+    <h2>Interactive Prompts</h2>
+    <p>When run without the <code>--channels</code> flag, the command provides interactive prompts:</p>
+    <ol>
+        <li><strong>Notification name</strong> - Text input for the notification class name</li>
+        <li><strong>Select channels</strong> - Multi-select from available channels (Mail selected by default)</li>
+        <li><strong>Queue notifications?</strong> - Choose between queued (recommended for external channels) or synchronous delivery</li>
+        <li><strong>Add user preferences?</strong> - Optionally create a per-user channel preferences system</li>
+    </ol>
+
+    <h2>Usage Examples</h2>
+    <p>After creating a notification, use it in your application:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Send to a single user
+$user->notify(new OrderShipped($order));
+
+// Send to multiple users
+Notification::send($users, new OrderShipped($order));
+
+// Send to specific channels only
+$user->notify((new OrderShipped($order))->onlyChannels(['mail', 'telegram']));</code></pre>
+
+    <h2>Process Flow</h2>
+    <p>The command follows a systematic process:</p>
+
+    <h3>For Setup Mode</h3>
+    <ol>
+        <li>Install the channel package via Composer</li>
+        <li>Publish channel configuration files</li>
+        <li>Add environment variables to .env.example</li>
+        <li>Add routing method to User model</li>
+        <li>Create migration for user identifier field (if needed)</li>
+    </ol>
+
+    <h3>For Notification Creation</h3>
+    <ol>
+        <li>Parse requested channels from flag or interactive prompt</li>
+        <li>Check for and install required packages for each channel</li>
+        <li>Invoke laravel-queue agent to generate notification class</li>
+        <li>Generate via() method and channel-specific methods (toMail(), toTelegram(), etc.)</li>
+        <li>Add all required environment variables to .env.example</li>
+    </ol>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Use queueing</strong> - Always queue notifications to external services to prevent blocking requests</li>
+        <li><strong>Handle failures gracefully</strong> - Implement proper error handling for channel delivery failures</li>
+        <li><strong>Respect user preferences</strong> - Allow users to control which channels they receive notifications on</li>
+        <li><strong>Test thoroughly</strong> - Test each channel independently before deploying to production</li>
+        <li><strong>Monitor delivery</strong> - Track notification delivery rates and failures</li>
+        <li><strong>Use staging credentials</strong> - Test with staging/sandbox credentials before using production keys</li>
+    </ol>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/queue-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:queue:setup</a> - Setup queue infrastructure for notifications</li>
+        <li><a href="{{ '/commands/model-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:model:make</a> - Create models that can receive notifications</li>
+        <li><a href="{{ '/commands/migration-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:migration:make</a> - Create migrations for channel identifiers</li>
+    </ul>
+
+    <h2>Documentation Resources</h2>
+    <ul>
+        <li><a href="https://laravel.com/docs/notifications" target="_blank" class="text-primary hover:underline">Laravel Notifications Documentation</a></li>
+        <li><a href="https://laravel-notification-channels.com" target="_blank" class="text-primary hover:underline">Laravel Notification Channels</a></li>
+    </ul>
 </div>

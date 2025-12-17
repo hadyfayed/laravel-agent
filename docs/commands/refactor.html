@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:refactor
-description: Refactor for SOLID/DRY compliance
+description: Analyze and refactor code for SOLID/DRY compliance
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,283 @@ back_text: All Commands
         <span class="badge badge-review">Review</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:refactor</h1>
-    <p class="text-xl text-muted-foreground">Refactor for SOLID/DRY compliance</p>
+    <p class="text-xl text-muted-foreground">Analyze and refactor code for SOLID/DRY compliance</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Refactor for SOLID/DRY compliance. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/refactor</code> command invokes the laravel-refactor agent to analyze your code and improve quality by applying SOLID principles (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion) and DRY (Don't Repeat Yourself) best practices. It detects code smells, proposes fixes, implements improvements incrementally, and verifies all tests pass.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:refactor [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:refactor [target]</code></pre>
+
+    <h3>Parameters</h3>
+    <ul>
+        <li><strong>target</strong> - File path, class name, or directory to refactor</li>
+    </ul>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:refactor</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Refactor a specific controller
+/laravel-agent:refactor app/Http/Controllers/OrderController.php
+
+# Refactor by class name
+/laravel-agent:refactor OrderService
+
+# Refactor an entire directory
+/laravel-agent:refactor app/Services/</code></pre>
+
+    <h2>What Gets Analyzed</h2>
+    <p>The refactor agent examines your code for common quality issues:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Code Smell</th>
+                    <th class="text-left py-3 px-4 font-medium">SOLID/DRY Principle</th>
+                    <th class="text-left py-3 px-4 font-medium">Refactoring Applied</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Long methods (>20 lines)</td>
+                    <td class="py-3 px-4">Single Responsibility</td>
+                    <td class="py-3 px-4">Extract smaller methods</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">God classes (>300 lines)</td>
+                    <td class="py-3 px-4">Single Responsibility</td>
+                    <td class="py-3 px-4">Split into focused classes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Duplicate code blocks</td>
+                    <td class="py-3 px-4">DRY (Don't Repeat Yourself)</td>
+                    <td class="py-3 px-4">Extract reusable methods/traits</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Tight coupling</td>
+                    <td class="py-3 px-4">Dependency Inversion</td>
+                    <td class="py-3 px-4">Inject interfaces, use dependency injection</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Complex conditionals</td>
+                    <td class="py-3 px-4">Open/Closed</td>
+                    <td class="py-3 px-4">Strategy pattern or polymorphism</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Multiple responsibilities</td>
+                    <td class="py-3 px-4">Single Responsibility</td>
+                    <td class="py-3 px-4">Separate concerns into services</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Feature envy</td>
+                    <td class="py-3 px-4">Single Responsibility</td>
+                    <td class="py-3 px-4">Move method to appropriate class</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Primitive obsession</td>
+                    <td class="py-3 px-4">Interface Segregation</td>
+                    <td class="py-3 px-4">Create value objects or DTOs</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Refactoring Process</h2>
+    <p>The agent follows a systematic approach to ensure safe, incremental improvements:</p>
+    <ol>
+        <li><strong>Analysis</strong> - Scan target code for SOLID/DRY violations and code smells</li>
+        <li><strong>Proposal</strong> - Present identified issues with suggested fixes</li>
+        <li><strong>Implementation</strong> - Apply refactorings incrementally, one improvement at a time</li>
+        <li><strong>Verification</strong> - Run tests after each change to ensure functionality is preserved</li>
+        <li><strong>Report</strong> - Summarize improvements with before/after metrics</li>
+    </ol>
+
+    <h2>Example Before & After</h2>
+    <p>Before refactoring - controller with multiple responsibilities:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Order;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderConfirmation;
+
+class OrderController extends Controller
+{
+    public function store(Request $request)
+    {
+        // Validation mixed with business logic
+        $validated = $request->validate([
+            'customer_email' => 'required|email',
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        // Calculate total inline
+        $total = 0;
+        foreach ($validated['items'] as $item) {
+            $product = Product::find($item['product_id']);
+            $total += $product->price * $item['quantity'];
+        }
+
+        // Create order
+        $order = Order::create([
+            'customer_email' => $validated['customer_email'],
+            'total' => $total,
+            'status' => 'pending',
+        ]);
+
+        // Create order items inline
+        foreach ($validated['items'] as $item) {
+            $order->items()->create([
+                'product_id' => $item['product_id'],
+                'quantity' => $item['quantity'],
+            ]);
+        }
+
+        // Send email directly in controller
+        Mail::to($order->customer_email)->send(new OrderConfirmation($order));
+
+        return response()->json($order, 201);
+    }
+}</code></pre>
+
+    <p>After refactoring - separated concerns with dependency injection:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreOrderRequest;
+use App\Http\Resources\OrderResource;
+use App\Services\OrderService;
+
+class OrderController extends Controller
+{
+    public function __construct(
+        private OrderService $orderService
+    ) {}
+
+    public function store(StoreOrderRequest $request)
+    {
+        $order = $this->orderService->createOrder(
+            $request->validated()
+        );
+
+        return new OrderResource($order);
+    }
+}
+
+// app/Http/Requests/StoreOrderRequest.php
+class StoreOrderRequest extends FormRequest
+{
+    public function rules(): array
+    {
+        return [
+            'customer_email' => 'required|email',
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ];
+    }
+}
+
+// app/Services/OrderService.php
+class OrderService
+{
+    public function __construct(
+        private OrderCalculator $calculator,
+        private OrderNotifier $notifier
+    ) {}
+
+    public function createOrder(array $data): Order
+    {
+        $total = $this->calculator->calculateTotal($data['items']);
+
+        $order = Order::create([
+            'customer_email' => $data['customer_email'],
+            'total' => $total,
+            'status' => 'pending',
+        ]);
+
+        $this->createOrderItems($order, $data['items']);
+        $this->notifier->sendConfirmation($order);
+
+        return $order->fresh('items');
+    }
+
+    private function createOrderItems(Order $order, array $items): void
+    {
+        foreach ($items as $item) {
+            $order->items()->create([
+                'product_id' => $item['product_id'],
+                'quantity' => $item['quantity'],
+            ]);
+        }
+    }
+}</code></pre>
+
+    <h2>Output Report Format</h2>
+    <p>After refactoring completes, you'll receive a detailed summary:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Refactoring Complete: OrderController
+
+### Issues Fixed
+| Issue | Fix Applied |
+|-------|-------------|
+| God class (150 lines) | Extracted OrderService, OrderCalculator, OrderNotifier |
+| Multiple responsibilities | Separated validation, business logic, notifications |
+| Tight coupling to Mail facade | Injected OrderNotifier dependency |
+| Inline calculations | Extracted OrderCalculator service |
+
+### Improvements
+- Lines: 150 → 45 (70% reduction)
+- Methods: 8 → 2 (focused on HTTP concerns)
+- Cyclomatic complexity: 12 → 4
+- Test coverage: 65% → 92%
+
+### Tests: All passing ✓
+- 24 tests, 89 assertions
+- 0 failures, 0 errors</code></pre>
+
+    <h2>Focus Areas</h2>
+    <p>The agent can focus on specific refactoring concerns by including hints in your command:</p>
+    <ul>
+        <li><strong>general</strong> (default) - All SOLID/DRY principles</li>
+        <li><strong>extract methods</strong> - Break down long methods</li>
+        <li><strong>reduce coupling</strong> - Add dependency injection</li>
+        <li><strong>remove duplication</strong> - DRY principle focus</li>
+        <li><strong>split classes</strong> - Single Responsibility focus</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Commit before refactoring</strong> - Ensure you can rollback if needed</li>
+        <li><strong>Have tests in place</strong> - Refactoring requires test coverage to verify behavior</li>
+        <li><strong>Refactor incrementally</strong> - The agent applies one change at a time for safety</li>
+        <li><strong>Review proposed changes</strong> - Understand each improvement before applying</li>
+        <li><strong>Run full test suite</strong> - Verify all tests pass after refactoring</li>
+    </ol>
+
+    <h2>When to Refactor</h2>
+    <p>Consider refactoring when you notice:</p>
+    <ul>
+        <li>Controllers exceeding 100 lines or methods exceeding 20 lines</li>
+        <li>Copy-pasted code blocks across multiple files</li>
+        <li>Difficulty adding new features without modifying existing code</li>
+        <li>Hard-to-test code due to tight coupling</li>
+        <li>Classes doing too many unrelated things</li>
+        <li>Complex nested conditionals or switch statements</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <strong>laravel-refactor</strong> agent with access to Task, Read, Glob, Grep, Bash, Write, Edit, and MultiEdit tools.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests for refactored code</li>
+        <li><a href="{{ '/commands/code-review.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:code-review</a> - Review code quality without refactoring</li>
+        <li><a href="{{ '/skills/laravel-testing.html' | relative_url }}" class="text-primary hover:underline">laravel-testing skill</a> - Ensure test coverage before refactoring</li>
+    </ul>
 </div>

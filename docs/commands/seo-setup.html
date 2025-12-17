@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:seo:setup
-description: Setup SEO infrastructure
+description: Setup SEO infrastructure with sitemaps, meta tags, and structured data
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,339 @@ back_text: All Commands
         <span class="badge badge-data">Data</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:seo:setup</h1>
-    <p class="text-xl text-muted-foreground">Setup SEO infrastructure</p>
+    <p class="text-xl text-muted-foreground">Setup SEO infrastructure with sitemaps, meta tags, and structured data</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Setup SEO infrastructure. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/seo:setup</code> command configures comprehensive SEO infrastructure for your Laravel application. It installs and configures popular packages for XML sitemap generation, dynamic meta tags, Open Graph support, Twitter Cards, and model-based SEO data management with Filament integration.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:seo:setup [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:seo:setup [--sitemap] [--meta] [--opengraph] [--schema] [--all]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:seo:setup</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Interactive setup with component selection
+/laravel-agent:seo:setup
+
+# Setup just sitemap generation
+/laravel-agent:seo:setup --sitemap
+
+# Setup meta tags with artesaos/seotools
+/laravel-agent:seo:setup --meta
+
+# Setup complete SEO infrastructure
+/laravel-agent:seo:setup --all</code></pre>
+
+    <h2>SEO Components</h2>
+    <p>The command can install and configure three main SEO components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Package</th>
+                    <th class="text-left py-3 px-4 font-medium">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Sitemap Generation</td>
+                    <td class="py-3 px-4"><code>spatie/laravel-sitemap</code></td>
+                    <td class="py-3 px-4">Automatic XML sitemap generation with model support</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Meta Tags</td>
+                    <td class="py-3 px-4"><code>artesaos/seotools</code></td>
+                    <td class="py-3 px-4">Dynamic meta tags, Open Graph, Twitter Cards</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Model-Based SEO</td>
+                    <td class="py-3 px-4"><code>ralphjsmit/laravel-seo</code></td>
+                    <td class="py-3 px-4">Store SEO data per model with Filament integration</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Sitemap Generation Setup</h2>
+    <p>When you select sitemap generation, the command installs <code>spatie/laravel-sitemap</code> and creates a custom artisan command for generating XML sitemaps.</p>
+
+    <h3>Generated Sitemap Command</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Console\Commands;
+
+use App\Models\Post;
+use App\Models\Product;
+use Illuminate\Console\Command;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
+
+final class GenerateSitemapCommand extends Command
+{
+    protected $signature = 'sitemap:generate';
+    protected $description = 'Generate XML sitemap';
+
+    public function handle(): int
+    {
+        $sitemap = Sitemap::create();
+
+        // Static pages
+        $sitemap->add(Url::create('/')->setPriority(1.0));
+        $sitemap->add(Url::create('/about')->setPriority(0.8));
+
+        // Dynamic content
+        Post::published()->each(fn ($post) =>
+            $sitemap->add(Url::create(route('posts.show', $post))
+                ->setLastModificationDate($post->updated_at)
+                ->setPriority(0.9))
+        );
+
+        $sitemap->writeToFile(public_path('sitemap.xml'));
+        $this->info('Sitemap generated!');
+
+        return self::SUCCESS;
+    }
+}</code></pre>
+
+    <h3>Scheduling Sitemap Generation</h3>
+    <p>The command can automatically schedule sitemap generation in your <code>app/Console/Kernel.php</code>:</p>
+    <pre class="language-php"><code class="language-php">$schedule->command('sitemap:generate')->daily();</code></pre>
+
+    <h2>Meta Tags Setup</h2>
+    <p>The meta tags component uses <code>artesaos/seotools</code> to provide dynamic meta tags, Open Graph support, and Twitter Cards.</p>
+
+    <h3>Configuration</h3>
+    <p>The command publishes and configures <code>config/seotools.php</code> with sensible defaults:</p>
+    <pre class="language-php"><code class="language-php">return [
+    'meta' => [
+        'defaults' => [
+            'title' => env('APP_NAME'),
+            'description' => 'Your site description',
+            'keywords' => ['laravel', 'application'],
+            'canonical' => null,
+            'robots' => 'index, follow',
+        ],
+    ],
+    'opengraph' => [
+        'defaults' => [
+            'title' => env('APP_NAME'),
+            'description' => 'Your site description',
+            'type' => 'website',
+            'site_name' => env('APP_NAME'),
+        ],
+    ],
+    'twitter' => [
+        'defaults' => [
+            'card' => 'summary_large_image',
+            'site' => '@yourhandle',
+        ],
+    ],
+];</code></pre>
+
+    <h3>Controller Usage</h3>
+    <p>Use the SEOTools facade in your controllers to set dynamic meta tags:</p>
+    <pre class="language-php"><code class="language-php">use Artesaos\SEOTools\Facades\SEOTools;
+
+public function show(Post $post)
+{
+    SEOTools::setTitle($post->title);
+    SEOTools::setDescription($post->excerpt);
+    SEOTools::opengraph()->setUrl(route('posts.show', $post));
+    SEOTools::opengraph()->addImage($post->featured_image);
+    SEOTools::twitter()->setImage($post->featured_image);
+    SEOTools::jsonLd()->addImage($post->featured_image);
+
+    return view('posts.show', compact('post'));
+}</code></pre>
+
+    <h3>Blade Integration</h3>
+    <pre class="language-blade"><code class="language-blade">&lt;head>
+    {!! SEO::generate() !!}
+&lt;/head></code></pre>
+
+    <h2>Model-Based SEO Setup</h2>
+    <p>The model-based SEO component uses <code>ralphjsmit/laravel-seo</code> to store SEO data directly in your database with a polymorphic relationship. It includes Filament panel integration for easy management.</p>
+
+    <h3>Adding SEO to Models</h3>
+    <p>The command adds the <code>HasSEO</code> trait to your selected models:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
+
+final class Post extends Model
+{
+    use HasSEO;
+}</code></pre>
+
+    <h3>Creating SEO Data in Controllers</h3>
+    <pre class="language-php"><code class="language-php">public function store(Request $request)
+{
+    $post = Post::create($request->validated());
+
+    $post->seo()->update([
+        'title' => $request->seo_title,
+        'description' => $request->seo_description,
+        'image' => $request->seo_image,
+    ]);
+
+    return redirect()->route('posts.show', $post);
+}</code></pre>
+
+    <h3>Blade Component</h3>
+    <pre class="language-blade"><code class="language-blade">&lt;head>
+    &lt;x-seo::meta />
+&lt;/head></code></pre>
+
+    <h3>Filament Integration</h3>
+    <p>The package includes a Filament form component for easy SEO management:</p>
+    <pre class="language-php"><code class="language-php">use RalphJSmit\Laravel\SEO\Support\SEOData;
+use RalphJSmit\Filament\SEO\SEO;
+
+public static function form(Form $form): Form
+{
+    return $form->schema([
+        TextInput::make('title'),
+        RichEditor::make('content'),
+
+        // SEO Section
+        SEO::make(),
+    ]);
+}</code></pre>
+
+    <h2>Interactive Prompts</h2>
+    <p>When run without flags, the command presents interactive prompts:</p>
+
+    <h3>1. Component Selection</h3>
+    <ul>
+        <li>Sitemap (spatie/laravel-sitemap)</li>
+        <li>Meta Tags (artesaos/seotools)</li>
+        <li>Model SEO (ralphjsmit/laravel-seo)</li>
+        <li>All components</li>
+    </ul>
+
+    <h3>2. Sitemap Generation Method</h3>
+    <ul>
+        <li>Crawl-based (automatic URL discovery)</li>
+        <li>Model-based (from Eloquent models)</li>
+        <li>Hybrid (static + dynamic)</li>
+    </ul>
+
+    <h3>3. Schedule Configuration</h3>
+    <ul>
+        <li>Daily (recommended)</li>
+        <li>Hourly</li>
+        <li>Weekly</li>
+        <li>Manual only</li>
+    </ul>
+
+    <h3>4. Model Selection</h3>
+    <p>Select which existing models should have SEO data management.</p>
+
+    <h2>What Gets Created</h2>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Sitemap Command</td>
+                    <td class="py-3 px-4"><code>app/Console/Commands/GenerateSitemapCommand.php</code></td>
+                    <td class="py-3 px-4">Artisan command for sitemap generation</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">SEO Config</td>
+                    <td class="py-3 px-4"><code>config/seotools.php</code></td>
+                    <td class="py-3 px-4">Published configuration for meta tags</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">SEO Migration</td>
+                    <td class="py-3 px-4"><code>database/migrations/create_seo_table.php</code></td>
+                    <td class="py-3 px-4">Database table for model-based SEO</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Model Updates</td>
+                    <td class="py-3 px-4"><code>app/Models/*.php</code></td>
+                    <td class="py-3 px-4">HasSEO trait added to selected models</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Layout Updates</td>
+                    <td class="py-3 px-4"><code>resources/views/layouts/app.blade.php</code></td>
+                    <td class="py-3 px-4">SEO tags integration</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated Commands</h2>
+    <p>After setup, you'll have access to these commands:</p>
+    <pre class="language-bash"><code class="language-bash"># Generate sitemap manually
+php artisan sitemap:generate
+
+# Run migrations for SEO tables
+php artisan migrate</code></pre>
+
+    <h2>Example Output</h2>
+    <p>The command provides a comprehensive summary after completion:</p>
+    <pre class="language-markdown"><code class="language-markdown">## SEO Infrastructure Setup
+
+### Packages Installed
+- spatie/laravel-sitemap
+- artesaos/seotools
+- ralphjsmit/laravel-seo
+
+### Files Created
+- app/Console/Commands/GenerateSitemapCommand.php
+- config/seotools.php (published)
+
+### Files Modified
+- app/Models/Post.php (HasSEO trait)
+- app/Models/Page.php (HasSEO trait)
+- resources/views/layouts/app.blade.php (SEO tags)
+
+### Database
+- Migration: create_seo_table
+
+### Schedule
+- Sitemap: Daily at midnight</code></pre>
+
+    <h2>Next Steps</h2>
+    <p>After running the setup command, follow these steps to complete your SEO configuration:</p>
+    <ol>
+        <li>Run <code>php artisan migrate</code> to create the SEO tables</li>
+        <li>Run <code>php artisan sitemap:generate</code> to create your initial sitemap</li>
+        <li>Add <code>Sitemap: https://yoursite.com/sitemap.xml</code> to your <code>robots.txt</code></li>
+        <li>Submit your sitemap to Google Search Console</li>
+        <li>Configure default SEO values in <code>config/seotools.php</code></li>
+        <li>Customize the sitemap command to include your specific models and routes</li>
+        <li>Add SEO fields to your Filament panels using the SEO component</li>
+    </ol>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Use descriptive titles</strong> - Keep titles under 60 characters for optimal display</li>
+        <li><strong>Write compelling descriptions</strong> - Meta descriptions should be 150-160 characters</li>
+        <li><strong>Generate sitemaps regularly</strong> - Schedule daily generation for frequently updated content</li>
+        <li><strong>Add images to Open Graph</strong> - Use high-quality featured images (1200x630px recommended)</li>
+        <li><strong>Implement structured data</strong> - Use JSON-LD for rich search results</li>
+        <li><strong>Monitor performance</strong> - Use Google Search Console to track SEO metrics</li>
+    </ol>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/model-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:model:make</a> - Create models that can use SEO traits</li>
+        <li><a href="{{ '/commands/filament-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:filament:setup</a> - Setup Filament for SEO management</li>
+    </ul>
 </div>

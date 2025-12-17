@@ -17,11 +17,269 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create reusable domain module with contracts, services, DTOs. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/module:make</code> command generates a complete, reusable domain module under <code>app/Modules/&lt;Name></code> (or <code>Modules/</code> if nwidart/laravel-modules is installed). It creates well-structured modules with contracts, services, DTOs, and tests following domain-driven design principles.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:module:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:module:make &lt;ModuleName> [specification]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:module:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create a basic pricing module
+/laravel-agent:module:make Pricing
+
+# Create a notification module with multiple channels
+/laravel-agent:module:make Notification with email, SMS, and push channels
+
+# Create a payment module with multiple strategies
+/laravel-agent:module:make Payment with Stripe and PayPal strategies
+
+# Create an inventory module with tracking
+/laravel-agent:module:make Inventory with stock tracking and alerts</code></pre>
+
+    <h2>What Gets Created</h2>
+    <p>A complete domain module includes the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Service Contract</td>
+                    <td class="py-3 px-4"><code>app/Modules/&lt;Name>/Contracts/</code></td>
+                    <td class="py-3 px-4">Interface defining the module's public API</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Service Implementation</td>
+                    <td class="py-3 px-4"><code>app/Modules/&lt;Name>/Services/</code></td>
+                    <td class="py-3 px-4">Concrete implementation of the service contract</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">DTOs</td>
+                    <td class="py-3 px-4"><code>app/Modules/&lt;Name>/DTOs/</code></td>
+                    <td class="py-3 px-4">Type-safe data transfer objects</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Repository (optional)</td>
+                    <td class="py-3 px-4"><code>app/Modules/&lt;Name>/Repositories/</code></td>
+                    <td class="py-3 px-4">Data access abstraction layer</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Strategies (optional)</td>
+                    <td class="py-3 px-4"><code>app/Modules/&lt;Name>/Strategies/</code></td>
+                    <td class="py-3 px-4">Interchangeable algorithm implementations</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Service Provider</td>
+                    <td class="py-3 px-4"><code>app/Modules/&lt;Name>/</code></td>
+                    <td class="py-3 px-4">Registers module services and bindings</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Unit Tests</td>
+                    <td class="py-3 px-4"><code>tests/Unit/Modules/&lt;Name>/</code></td>
+                    <td class="py-3 px-4">Pest PHP tests for the module</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Design Patterns</h2>
+    <p>The command will ask which patterns your module should use:</p>
+    <ul>
+        <li><strong>Strategy</strong> - Multiple interchangeable algorithms (e.g., payment gateways, notification channels)</li>
+        <li><strong>Repository</strong> - Data access abstraction for database operations</li>
+        <li><strong>DTO</strong> - Type-safe data transfer objects for input/output</li>
+        <li><strong>None</strong> - Simple service class without additional patterns</li>
+    </ul>
+
+    <h2>Module Structure Example</h2>
+    <p>For <code>/laravel-agent:module:make Payment with Stripe</code> using Strategy pattern:</p>
+    <pre class="language-bash"><code class="language-bash">app/Modules/Payment/
+├── Contracts/
+│   ├── PaymentServiceInterface.php
+│   └── PaymentStrategyInterface.php
+├── Services/
+│   └── PaymentService.php
+├── Strategies/
+│   ├── StripeStrategy.php
+│   └── PayPalStrategy.php
+├── DTOs/
+│   ├── PaymentRequest.php
+│   └── PaymentResult.php
+├── PaymentServiceProvider.php
+└── README.md
+
+tests/Unit/Modules/Payment/
+├── PaymentServiceTest.php
+└── StripeStrategyTest.php</code></pre>
+
+    <h2>Generated Service Contract Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Modules\Payment\Contracts;
+
+use App\Modules\Payment\DTOs\PaymentRequest;
+use App\Modules\Payment\DTOs\PaymentResult;
+
+interface PaymentServiceInterface
+{
+    /**
+     * Process a payment using the configured strategy
+     */
+    public function process(PaymentRequest $request): PaymentResult;
+
+    /**
+     * Refund a payment
+     */
+    public function refund(string $transactionId, float $amount): PaymentResult;
+
+    /**
+     * Get payment status
+     */
+    public function getStatus(string $transactionId): string;
+}</code></pre>
+
+    <h2>Generated Service Implementation Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Modules\Payment\Services;
+
+use App\Modules\Payment\Contracts\PaymentServiceInterface;
+use App\Modules\Payment\Contracts\PaymentStrategyInterface;
+use App\Modules\Payment\DTOs\PaymentRequest;
+use App\Modules\Payment\DTOs\PaymentResult;
+
+class PaymentService implements PaymentServiceInterface
+{
+    public function __construct(
+        private PaymentStrategyInterface $strategy
+    ) {}
+
+    public function process(PaymentRequest $request): PaymentResult
+    {
+        return $this->strategy->charge(
+            $request->amount,
+            $request->currency,
+            $request->token
+        );
+    }
+
+    public function refund(string $transactionId, float $amount): PaymentResult
+    {
+        return $this->strategy->refund($transactionId, $amount);
+    }
+
+    public function getStatus(string $transactionId): string
+    {
+        return $this->strategy->getStatus($transactionId);
+    }
+}</code></pre>
+
+    <h2>Module Registration</h2>
+    <p>After creation, register the module's service provider in <code>config/app.php</code>:</p>
+    <pre class="language-php"><code class="language-php">'providers' => [
+    // ...
+    App\Modules\Payment\PaymentServiceProvider::class,
+],</code></pre>
+
+    <h2>Using Your Module</h2>
+    <p>Inject the module's contract into your controllers or services:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Modules\Payment\Contracts\PaymentServiceInterface;
+use App\Modules\Payment\DTOs\PaymentRequest;
+
+class CheckoutController extends Controller
+{
+    public function __construct(
+        private PaymentServiceInterface $paymentService
+    ) {}
+
+    public function process(Request $request)
+    {
+        $paymentRequest = new PaymentRequest(
+            amount: $request->amount,
+            currency: 'USD',
+            token: $request->payment_token
+        );
+
+        $result = $this->paymentService->process($paymentRequest);
+
+        if ($result->isSuccessful()) {
+            return response()->json([
+                'success' => true,
+                'transaction_id' => $result->transactionId
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'error' => $result->errorMessage
+        ], 422);
+    }
+}</code></pre>
+
+    <h2>Common Use Cases</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Command</th>
+                    <th class="text-left py-3 px-4 font-medium">Patterns</th>
+                    <th class="text-left py-3 px-4 font-medium">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>/module:make Pricing</code></td>
+                    <td class="py-3 px-4">DTO</td>
+                    <td class="py-3 px-4">Pricing calculation module</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>/module:make Payment with Stripe</code></td>
+                    <td class="py-3 px-4">Strategy</td>
+                    <td class="py-3 px-4">Payment with gateway strategies</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>/module:make Inventory</code></td>
+                    <td class="py-3 px-4">Repository</td>
+                    <td class="py-3 px-4">Stock management module</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>/module:make Notification</code></td>
+                    <td class="py-3 px-4">Strategy</td>
+                    <td class="py-3 px-4">Multi-channel notifications</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Keep modules focused</strong> - Each module should have a single, well-defined responsibility</li>
+        <li><strong>Use contracts</strong> - Always program to interfaces for better testability and flexibility</li>
+        <li><strong>Leverage DTOs</strong> - Use data transfer objects for type safety and validation</li>
+        <li><strong>Choose patterns wisely</strong> - Use Strategy for multiple implementations, Repository for data access</li>
+        <li><strong>Write tests</strong> - Generated tests provide a starting point; add edge cases and integration tests</li>
+        <li><strong>Document usage</strong> - Each module includes a README with usage examples</li>
+    </ol>
+
+    <h2>nwidart/laravel-modules Integration</h2>
+    <p>If you have <a href="https://github.com/nwidart/laravel-modules" target="_blank" rel="noopener" class="text-primary hover:underline">nwidart/laravel-modules</a> installed, the command will automatically create modules in the <code>Modules/</code> directory following that package's structure and conventions.</p>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <a href="{{ '/agents/laravel-module-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-module-builder</a> agent.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/service-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:service:make</a> - Generate standalone service classes</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate additional tests</li>
+        <li><a href="{{ '/skills/laravel-architecture.html' | relative_url }}" class="text-primary hover:underline">laravel-architecture skill</a> - Auto-invoked for architectural patterns</li>
+    </ul>
 </div>

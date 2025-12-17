@@ -17,11 +17,174 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Analyze and optimize database queries and schema. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/db:optimize</code> command analyzes your Laravel application's database queries and schema to identify performance bottlenecks and optimization opportunities. It scans for N+1 queries, missing indexes, slow queries, and suggests eager loading strategies to improve database performance.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:db:optimize [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:db:optimize [target]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:db:optimize</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Analyze entire application
+/laravel-agent:db:optimize
+
+# Analyze specific controller
+/laravel-agent:db:optimize OrderController
+
+# Analyze specific table
+/laravel-agent:db:optimize orders</code></pre>
+
+    <h2>What Gets Analyzed</h2>
+    <p>The command performs a comprehensive database optimization analysis:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Analysis Type</th>
+                    <th class="text-left py-3 px-4 font-medium">What It Checks</th>
+                    <th class="text-left py-3 px-4 font-medium">What It Suggests</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">N+1 Queries</td>
+                    <td class="py-3 px-4">Loops that trigger additional queries per iteration</td>
+                    <td class="py-3 px-4">Eager loading with <code>with()</code> or <code>load()</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Missing Indexes</td>
+                    <td class="py-3 px-4">Columns used in WHERE, JOIN, and ORDER BY clauses</td>
+                    <td class="py-3 px-4">Index creation migrations</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Slow Queries</td>
+                    <td class="py-3 px-4">Queries with high execution time or complexity</td>
+                    <td class="py-3 px-4">Query rewriting or caching strategies</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Eager Loading</td>
+                    <td class="py-3 px-4">Relationship access patterns in controllers/models</td>
+                    <td class="py-3 px-4">Optimal eager loading strategies</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Schema Efficiency</td>
+                    <td class="py-3 px-4">Table structure, column types, and constraints</td>
+                    <td class="py-3 px-4">Schema improvements and normalization</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Optimization Process</h2>
+    <p>The command follows a systematic approach to database optimization:</p>
+
+    <ol>
+        <li><strong>Scan for N+1 queries</strong> - Identifies loops and iterations that trigger multiple database queries</li>
+        <li><strong>Check missing indexes</strong> - Analyzes query patterns to find columns that would benefit from indexing</li>
+        <li><strong>Analyze slow queries</strong> - Reviews query complexity and execution time</li>
+        <li><strong>Suggest eager loading</strong> - Recommends optimal relationship loading strategies</li>
+        <li><strong>Review schema efficiency</strong> - Evaluates table structure and suggests improvements</li>
+    </ol>
+
+    <h2>Example: N+1 Query Detection</h2>
+    <p>Before optimization:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Controller with N+1 problem
+public function index()
+{
+    $orders = Order::all();
+
+    foreach ($orders as $order) {
+        echo $order->customer->name; // N+1 query!
+        echo $order->items->count();  // Another N+1!
+    }
+}</code></pre>
+
+    <p>After optimization:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Optimized with eager loading
+public function index()
+{
+    $orders = Order::with(['customer', 'items'])->get();
+
+    foreach ($orders as $order) {
+        echo $order->customer->name; // Uses eager loaded data
+        echo $order->items->count();  // No additional query
+    }
+}</code></pre>
+
+    <h2>Example: Missing Index Detection</h2>
+    <p>Before optimization:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Query without index
+$orders = Order::where('status', 'pending')
+    ->where('user_id', $userId)
+    ->orderBy('created_at', 'desc')
+    ->get();</code></pre>
+
+    <p>Generated migration:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::table('orders', function (Blueprint $table) {
+            // Composite index for common query pattern
+            $table->index(['status', 'user_id', 'created_at']);
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropIndex(['status', 'user_id', 'created_at']);
+        });
+    }
+};</code></pre>
+
+    <h2>Target Scopes</h2>
+    <p>You can scope the optimization analysis to specific parts of your application:</p>
+
+    <ul>
+        <li><strong>Entire Application</strong> - Run without arguments to analyze all controllers, models, and queries</li>
+        <li><strong>Specific Controller</strong> - Pass a controller name to focus on its query patterns</li>
+        <li><strong>Specific Table</strong> - Pass a table name to analyze its schema and related queries</li>
+        <li><strong>Specific Model</strong> - Pass a model name to review its relationships and query usage</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Run regularly</strong> - Make database optimization part of your development workflow</li>
+        <li><strong>Start with N+1 queries</strong> - These often provide the biggest performance wins</li>
+        <li><strong>Test index suggestions</strong> - Not all indexes improve performance; test on production-like data</li>
+        <li><strong>Monitor query counts</strong> - Use Laravel Debugbar or Telescope to verify improvements</li>
+        <li><strong>Consider caching</strong> - Some queries may be better cached than optimized</li>
+        <li><strong>Profile before and after</strong> - Measure actual performance improvements</li>
+    </ol>
+
+    <h2>Performance Impact</h2>
+    <p>Typical optimization results:</p>
+    <ul>
+        <li><strong>N+1 fixes</strong> - Can reduce query count from hundreds to single digits</li>
+        <li><strong>Index additions</strong> - Often improve query speed by 10-100x</li>
+        <li><strong>Eager loading</strong> - Reduces page load time by 50-90% in data-heavy views</li>
+        <li><strong>Schema optimization</strong> - Improves storage efficiency and join performance</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <a href="{{ '/agents/laravel-database.html' | relative_url }}" class="text-primary hover:underline">laravel-database</a> agent.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/db-migration.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:migration</a> - Create database migrations</li>
+        <li><a href="{{ '/commands/model-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:model:make</a> - Generate models with relationships</li>
+        <li><a href="{{ '/skills/laravel-database.html' | relative_url }}" class="text-primary hover:underline">laravel-database skill</a> - Auto-invoked for database operations</li>
+    </ul>
 </div>

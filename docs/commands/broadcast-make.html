@@ -9,7 +9,7 @@ back_text: All Commands
 
 <div class="mb-8">
     <div class="flex items-center gap-3 mb-4">
-        <span class="badge badge-devops">DevOps</span>
+        <span class="badge badge-realtime">Real-time</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:broadcast:make</h1>
     <p class="text-xl text-muted-foreground">Create broadcast event with channel configuration</p>
@@ -17,11 +17,182 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create broadcast event with channel configuration. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/broadcast:make</code> command generates a broadcast event with channel authorization for real-time communication. It creates event classes and configures channel authorization in your Laravel application, supporting public, private, and presence channels.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:broadcast:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:broadcast:make &lt;EventName&gt; [channel-type] [channel-name]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:broadcast:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create a public channel broadcast event
+/laravel-agent:broadcast:make OrderUpdated
+
+# Create a private channel broadcast event
+/laravel-agent:broadcast:make MessageSent private user.{id}
+
+# Create a presence channel broadcast event
+/laravel-agent:broadcast:make UserJoined presence chat.{roomId}</code></pre>
+
+    <h2>What Gets Created</h2>
+    <p>A complete broadcast event includes the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Event Class</td>
+                    <td class="py-3 px-4"><code>app/Events/</code></td>
+                    <td class="py-3 px-4">Broadcast event with ShouldBroadcast interface</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Channel Authorization</td>
+                    <td class="py-3 px-4"><code>routes/channels.php</code></td>
+                    <td class="py-3 px-4">Authorization logic for private/presence channels</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Channel Types</h2>
+    <p>Laravel supports three types of broadcast channels:</p>
+
+    <h3>Public Channels</h3>
+    <p>Anyone can listen to public channels without authentication:</p>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:broadcast:make OrderUpdated</code></pre>
+
+    <h3>Private Channels</h3>
+    <p>Require authorization for users to listen. Use for user-specific data:</p>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:broadcast:make MessageSent private user.{id}</code></pre>
+
+    <h3>Presence Channels</h3>
+    <p>Like private channels but also track who is subscribed. Perfect for chat rooms:</p>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:broadcast:make UserJoined presence chat.{roomId}</code></pre>
+
+    <h2>Generated Event Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Events;
+
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class MessageSent implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public function __construct(
+        public string $message,
+        public int $userId
+    ) {}
+
+    public function broadcastOn(): array
+    {
+        return [
+            new PrivateChannel('user.' . $this->userId),
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'message.sent';
+    }
+}</code></pre>
+
+    <h2>Usage Examples</h2>
+
+    <h3>Broadcasting Events</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Dispatch event to all listeners
+broadcast(new MessageSent($message, $userId));
+
+// Exclude the current user (sender)
+broadcast(new MessageSent($message, $userId))->toOthers();</code></pre>
+
+    <h3>Listening on the Client</h3>
+    <pre class="language-javascript"><code class="language-javascript">// Public channel
+Echo.channel('orders')
+    .listen('.order-updated', (e) => {
+        console.log(e);
+    });
+
+// Private channel
+Echo.private('user.' + userId)
+    .listen('.message-sent', (e) => {
+        console.log(e.message);
+    });
+
+// Presence channel
+Echo.join('chat.' + roomId)
+    .here((users) => {
+        console.log('Users in room:', users);
+    })
+    .joining((user) => {
+        console.log(user.name + ' joined');
+    })
+    .leaving((user) => {
+        console.log(user.name + ' left');
+    })
+    .listen('.user-joined', (e) => {
+        console.log(e);
+    });</code></pre>
+
+    <h2>Channel Authorization</h2>
+    <p>For private and presence channels, authorization is automatically added to <code>routes/channels.php</code>:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Private channel authorization
+Broadcast::channel('user.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
+
+// Presence channel authorization with user data
+Broadcast::channel('chat.{roomId}', function ($user, $roomId) {
+    if ($user->canAccessRoom($roomId)) {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'avatar' => $user->avatar_url,
+        ];
+    }
+});</code></pre>
+
+    <h2>Process Flow</h2>
+    <ol>
+        <li><strong>Parse Arguments</strong> - Extract event name, channel type (public/private/presence), and channel name pattern</li>
+        <li><strong>Invoke Reverb Agent</strong> - Use the Reverb agent to generate the broadcast event and channel configuration</li>
+        <li><strong>Create Event Class</strong> - Generate the event class in <code>app/Events/</code> with the ShouldBroadcast interface</li>
+        <li><strong>Configure Authorization</strong> - Add channel authorization to <code>routes/channels.php</code> for private/presence channels</li>
+        <li><strong>Report Results</strong> - Display created files and usage examples</li>
+    </ol>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Queue events</strong> - Use <code>ShouldBroadcastNow</code> for immediate broadcast or implement <code>ShouldQueue</code> for queued broadcasting</li>
+        <li><strong>Secure private channels</strong> - Always verify user authorization in channel callbacks</li>
+        <li><strong>Minimize payload</strong> - Only broadcast essential data; fetch additional data on the client if needed</li>
+        <li><strong>Use presence channels wisely</strong> - Great for chat/collaboration, but they maintain WebSocket connections per user</li>
+        <li><strong>Test authorization</strong> - Ensure your channel authorization logic prevents unauthorized access</li>
+    </ol>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the Reverb agent for broadcast event creation and channel configuration.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/websocket-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:websocket:setup</a> - Setup Laravel Reverb or Pusher</li>
+        <li><a href="{{ '/commands/event-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:event:make</a> - Create standard events and listeners</li>
+        <li><a href="{{ '/skills/laravel-reverb.html' | relative_url }}" class="text-primary hover:underline">laravel-reverb skill</a> - Auto-invoked for WebSocket operations</li>
+    </ul>
 </div>

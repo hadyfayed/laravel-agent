@@ -17,11 +17,140 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Generate OpenAPI/Swagger API documentation. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/api:docs</code> command generates comprehensive API documentation using Laravel's popular documentation packages. It supports multiple output formats including interactive HTML documentation, OpenAPI specifications, and Postman collections.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:api:docs [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:api:docs [format]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:api:docs</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Generate with Scribe (default)
+/laravel-agent:api:docs
+
+# Generate OpenAPI 3.0 specification
+/laravel-agent:api:docs openapi
+
+# Generate Postman collection
+/laravel-agent:api:docs postman</code></pre>
+
+    <h2>Documentation Packages</h2>
+    <p>The command automatically detects and uses one of two popular Laravel API documentation packages:</p>
+
+    <h3>Scribe (Recommended)</h3>
+    <p>Full-featured, attribute-based documentation with extensive customization options. Scribe reads your code annotations and generates beautiful, interactive documentation.</p>
+
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers\Api\V1;
+
+/**
+ * @group Orders
+ * @authenticated
+ */
+class OrderController
+{
+    /**
+     * List orders
+     *
+     * @queryParam status Filter by status. Example: pending
+     * @response 200 scenario="success" {"data": [...]}
+     */
+    public function index() {}
+}</code></pre>
+
+    <h3>Scramble</h3>
+    <p>Zero-config documentation that auto-generates from your code structure. Scramble analyzes your routes, controllers, and models to create documentation without requiring manual annotations.</p>
+
+    <h2>Process</h2>
+    <p>The command follows these steps to generate documentation:</p>
+
+    <ol>
+        <li><strong>Check Documentation Package</strong> - Detects which documentation package is installed (Scribe or Scramble)</li>
+        <li><strong>Generate Documentation</strong> - Runs the appropriate generation command for the detected package</li>
+        <li><strong>Report Results</strong> - Provides a summary of documented endpoints and any missing documentation</li>
+    </ol>
+
+    <h2>Output Formats</h2>
+    <p>Generated documentation is available in multiple formats:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Format</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">HTML</td>
+                    <td class="py-3 px-4"><code>/docs</code></td>
+                    <td class="py-3 px-4">Interactive web documentation with try-it-out functionality</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">OpenAPI</td>
+                    <td class="py-3 px-4"><code>/docs/openapi.yaml</code></td>
+                    <td class="py-3 px-4">OpenAPI 3.0 specification for client generation</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Postman</td>
+                    <td class="py-3 px-4"><code>/docs/collection.json</code></td>
+                    <td class="py-3 px-4">Postman collection for API testing</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Detection Commands</h2>
+    <p>The agent uses these commands to detect installed documentation packages:</p>
+
+    <pre class="language-bash"><code class="language-bash"># Check for Scribe
+composer show knuckleswtf/scribe 2>/dev/null && echo "SCRIBE=yes" || echo "SCRIBE=no"
+
+# Check for Scramble
+composer show dedoc/scramble 2>/dev/null && echo "SCRAMBLE=yes" || echo "SCRAMBLE=no"</code></pre>
+
+    <h2>Generation Commands</h2>
+    <p>Based on the detected package, the appropriate command is executed:</p>
+
+    <pre class="language-bash"><code class="language-bash"># Scribe - Generate comprehensive documentation
+php artisan scribe:generate
+
+# Scramble - Auto-generates from code
+# Documentation available at /docs/api</code></pre>
+
+    <h2>Example Report</h2>
+    <p>After generation, you'll receive a detailed report like this:</p>
+
+    <pre class="language-markdown"><code class="language-markdown">## API Documentation Generated
+
+### Access
+- HTML: /docs
+- OpenAPI: /docs/openapi.yaml
+- Postman: /docs/collection.json
+
+### Endpoints Documented
+- Auth: 4 endpoints
+- Users: 5 endpoints
+- Orders: 6 endpoints
+
+### Missing Documentation
+- POST /api/v1/webhooks (no description)
+- GET /api/v1/reports (missing response example)</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Document as you code</strong> - Add annotations while creating endpoints, not after</li>
+        <li><strong>Provide examples</strong> - Include realistic request and response examples</li>
+        <li><strong>Group endpoints</strong> - Use @group tags to organize related endpoints</li>
+        <li><strong>Update regularly</strong> - Regenerate docs after API changes</li>
+        <li><strong>Review output</strong> - Check the generated docs for completeness and accuracy</li>
+    </ol>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/api-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:make</a> - Create versioned API resources with documentation</li>
+        <li><a href="{{ '/commands/auth-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:auth:setup</a> - Setup API authentication</li>
+        <li><a href="{{ '/skills/laravel-api.html' | relative_url }}" class="text-primary hover:underline">laravel-api skill</a> - Auto-invoked for API building</li>
+    </ul>
 </div>

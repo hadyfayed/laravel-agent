@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:search:setup
-description: Configure Scout + Meilisearch/Algolia
+description: Configure full-text search with Laravel Scout + Meilisearch/Algolia/Typesense
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,474 @@ back_text: All Commands
         <span class="badge badge-data">Data</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:search:setup</h1>
-    <p class="text-xl text-muted-foreground">Configure Scout + Meilisearch/Algolia</p>
+    <p class="text-xl text-muted-foreground">Configure full-text search with Laravel Scout + Meilisearch/Algolia/Typesense</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Configure Scout + Meilisearch/Algolia. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/search:setup</code> command configures Laravel Scout with your choice of search engine, making your models searchable. It handles package installation, driver configuration, model setup, and data indexing with support for multiple search engines including Meilisearch, Algolia, Typesense, and the database driver.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:search:setup [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:search:setup [--driver=&lt;driver&gt;] [--models=&lt;Model1,Model2&gt;]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:search:setup</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Interactive setup with prompts
+/laravel-agent:search:setup
+
+# Setup with Meilisearch
+/laravel-agent:search:setup --driver=meilisearch
+
+# Setup Algolia with specific models
+/laravel-agent:search:setup --driver=algolia --models=Product,Post
+
+# Setup Typesense
+/laravel-agent:search:setup --driver=typesense
+
+# Setup database driver (simple, no dependencies)
+/laravel-agent:search:setup --driver=database</code></pre>
+
+    <h2>Search Engines</h2>
+    <p>Choose the search engine that best fits your needs:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Engine</th>
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Best For</th>
+                    <th class="text-left py-3 px-4 font-medium">Pros</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Meilisearch</strong></td>
+                    <td class="py-3 px-4">Self-hosted</td>
+                    <td class="py-3 px-4">Most projects</td>
+                    <td class="py-3 px-4">Free, fast, easy to setup, typo-tolerant</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Algolia</strong></td>
+                    <td class="py-3 px-4">Hosted (SaaS)</td>
+                    <td class="py-3 px-4">High-scale apps</td>
+                    <td class="py-3 px-4">Managed, powerful, global CDN</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Typesense</strong></td>
+                    <td class="py-3 px-4">Self-hosted</td>
+                    <td class="py-3 px-4">Open source fans</td>
+                    <td class="py-3 px-4">Free, fast, typo-tolerant</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Database</strong></td>
+                    <td class="py-3 px-4">Built-in</td>
+                    <td class="py-3 px-4">Simple search</td>
+                    <td class="py-3 px-4">No dependencies, basic LIKE queries</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Installation Process</h2>
+    <p>The command handles the complete installation and configuration:</p>
+
+    <h3>1. Install Scout Package</h3>
+    <pre class="language-bash"><code class="language-bash">composer require laravel/scout
+php artisan vendor:publish --provider="Laravel\Scout\ScoutServiceProvider"</code></pre>
+
+    <h3>2. Install Search Driver</h3>
+    <pre class="language-bash"><code class="language-bash"># Meilisearch (recommended - free, self-hosted)
+composer require meilisearch/meilisearch-php
+
+# Algolia (hosted, pay-per-search)
+composer require algolia/algoliasearch-client-php
+
+# Typesense (free, self-hosted)
+composer require typesense/typesense-php
+composer require typesense/laravel-scout-typesense-driver</code></pre>
+
+    <h3>3. Configure Environment Variables</h3>
+    <h3>4. Add Searchable Trait to Models</h3>
+    <h3>5. Import Existing Data</h3>
+
+    <h2>Interactive Prompts</h2>
+    <p>When run without arguments, the command prompts you for configuration:</p>
+
+    <ol>
+        <li><strong>Search engine?</strong>
+            <ul>
+                <li>Meilisearch (recommended - free, self-hosted)</li>
+                <li>Algolia (hosted, pay-per-search)</li>
+                <li>Typesense (free, self-hosted)</li>
+                <li>Database (simple, no dependencies)</li>
+            </ul>
+        </li>
+        <li><strong>Which models to make searchable?</strong> (multi-select from existing models)
+            <ul>
+                <li>[x] Product</li>
+                <li>[x] Post</li>
+                <li>[ ] User</li>
+                <li>[ ] Order</li>
+            </ul>
+        </li>
+        <li><strong>Queue indexing operations?</strong>
+            <ul>
+                <li>Yes (recommended for production)</li>
+                <li>No (immediate, for development)</li>
+            </ul>
+        </li>
+        <li><strong>Generate Docker Compose?</strong> (for Meilisearch/Typesense)
+            <ul>
+                <li>Yes</li>
+                <li>No</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h2>Configuration Files</h2>
+
+    <h3>config/scout.php</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+return [
+    'driver' => env('SCOUT_DRIVER', 'meilisearch'),
+
+    'prefix' => env('SCOUT_PREFIX', ''),
+
+    'queue' => env('SCOUT_QUEUE', true),
+
+    'after_commit' => true,
+
+    'chunk' => [
+        'searchable' => 500,
+        'unsearchable' => 500,
+    ],
+
+    'soft_delete' => true,
+
+    'identify' => env('SCOUT_IDENTIFY', false),
+
+    // Meilisearch Configuration
+    'meilisearch' => [
+        'host' => env('MEILISEARCH_HOST', 'http://localhost:7700'),
+        'key' => env('MEILISEARCH_KEY'),
+        'index-settings' => [
+            'products' => [
+                'filterableAttributes' => ['category_id', 'brand_id', 'status', 'price'],
+                'sortableAttributes' => ['price', 'created_at', 'name'],
+                'searchableAttributes' => ['name', 'description', 'sku'],
+            ],
+            'posts' => [
+                'filterableAttributes' => ['category_id', 'status', 'author_id'],
+                'sortableAttributes' => ['published_at', 'title'],
+                'searchableAttributes' => ['title', 'content', 'excerpt'],
+            ],
+        ],
+    ],
+
+    // Algolia Configuration
+    'algolia' => [
+        'id' => env('ALGOLIA_APP_ID', ''),
+        'secret' => env('ALGOLIA_SECRET', ''),
+    ],
+
+    // Typesense Configuration
+    'typesense' => [
+        'api_key' => env('TYPESENSE_API_KEY', ''),
+        'nodes' => [
+            [
+                'host' => env('TYPESENSE_HOST', 'localhost'),
+                'port' => env('TYPESENSE_PORT', '8108'),
+                'protocol' => env('TYPESENSE_PROTOCOL', 'http'),
+            ],
+        ],
+        'nearest_node' => [
+            'host' => env('TYPESENSE_HOST', 'localhost'),
+            'port' => env('TYPESENSE_PORT', '8108'),
+            'protocol' => env('TYPESENSE_PROTOCOL', 'http'),
+        ],
+        'connection_timeout_seconds' => 2,
+        'healthcheck_interval_seconds' => 30,
+        'num_retries' => 3,
+        'retry_interval_seconds' => 1,
+    ],
+];</code></pre>
+
+    <h3>Environment Variables</h3>
+    <pre class="language-env"><code class="language-env"># Scout
+SCOUT_DRIVER=meilisearch
+SCOUT_QUEUE=true
+SCOUT_PREFIX=prod_
+
+# Meilisearch
+MEILISEARCH_HOST=http://localhost:7700
+MEILISEARCH_KEY=your-master-key
+
+# OR Algolia
+ALGOLIA_APP_ID=your-app-id
+ALGOLIA_SECRET=your-admin-api-key
+
+# OR Typesense
+TYPESENSE_API_KEY=your-api-key
+TYPESENSE_HOST=localhost
+TYPESENSE_PORT=8108</code></pre>
+
+    <h2>Searchable Model Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
+
+final class Product extends Model
+{
+    use Searchable;
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'sku' => $this->sku,
+            'price' => $this->price_cents / 100,
+            'category_id' => $this->category_id,
+            'brand_id' => $this->brand_id,
+            'status' => $this->status,
+            'created_at' => $this->created_at->timestamp,
+        ];
+    }
+
+    /**
+     * Get the name of the index.
+     */
+    public function searchableAs(): string
+    {
+        return 'products';
+    }
+
+    /**
+     * Determine if the model should be searchable.
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * Modify the query used for Scout search.
+     */
+    public function makeSearchableUsing($query)
+    {
+        return $query->with(['category', 'brand']);
+    }
+}</code></pre>
+
+    <h2>Search Controller Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use Illuminate\Http\Request;
+
+final class SearchController extends Controller
+{
+    public function search(Request $request)
+    {
+        $request->validate([
+            'q' => 'required|string|min:2|max:100',
+            'category' => 'nullable|integer',
+            'min_price' => 'nullable|numeric|min:0',
+            'max_price' => 'nullable|numeric|min:0',
+            'sort' => 'nullable|in:relevance,price_asc,price_desc,newest',
+        ]);
+
+        $query = Product::search($request->input('q'));
+
+        // Meilisearch filters
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->integer('category'));
+        }
+
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->float('min_price'));
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->float('max_price'));
+        }
+
+        // Sorting
+        match ($request->input('sort')) {
+            'price_asc' => $query->orderBy('price', 'asc'),
+            'price_desc' => $query->orderBy('price', 'desc'),
+            'newest' => $query->orderBy('created_at', 'desc'),
+            default => null, // relevance (default)
+        };
+
+        return $query->paginate(20);
+    }
+
+    /**
+     * Instant search for autocomplete.
+     */
+    public function instant(Request $request)
+    {
+        $request->validate([
+            'q' => 'required|string|min:1|max:50',
+        ]);
+
+        $results = Product::search($request->input('q'))
+            ->take(5)
+            ->get()
+            ->map(fn ($product) => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'url' => route('products.show', $product),
+                'image' => $product->thumbnail_url,
+            ]);
+
+        return response()->json(['results' => $results]);
+    }
+}</code></pre>
+
+    <h2>Docker Compose Setup</h2>
+    <p>For self-hosted engines like Meilisearch, the command can generate a Docker Compose file:</p>
+    <pre class="language-yaml"><code class="language-yaml"># docker-compose.yml
+services:
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch-data:/meili_data
+    environment:
+      - MEILI_MASTER_KEY=your-master-key
+      - MEILI_ENV=development
+
+volumes:
+  meilisearch-data:</code></pre>
+
+    <h2>Scout Commands</h2>
+    <pre class="language-bash"><code class="language-bash"># Import all records
+php artisan scout:import "App\Models\Product"
+
+# Import with fresh index
+php artisan scout:flush "App\Models\Product"
+php artisan scout:import "App\Models\Product"
+
+# Sync index settings (Meilisearch)
+php artisan scout:sync-index-settings
+
+# Queue all models for indexing
+php artisan scout:import "App\Models\Product" --chunk=500</code></pre>
+
+    <h2>Usage Examples</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Basic search
+$products = Product::search('laptop')->get();
+
+// With filters (Meilisearch/Algolia)
+$products = Product::search('laptop')
+    ->where('category_id', 5)
+    ->where('price', '<=', 1000)
+    ->get();
+
+// With pagination
+$products = Product::search('laptop')->paginate(20);
+
+// Get total count
+$count = Product::search('laptop')->count();
+
+// Search specific columns
+$products = Product::search('gaming')
+    ->within('name')
+    ->get();</code></pre>
+
+    <h2>Command Output</h2>
+    <p>After running the command, you'll receive a comprehensive summary:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Search Setup Complete
+
+### Packages Installed
+- laravel/scout
+- meilisearch/meilisearch-php
+
+### Driver: Meilisearch
+
+### Models Configured
+| Model | Index | Searchable Fields |
+|-------|-------|-------------------|
+| Product | products | name, description, sku |
+| Post | posts | title, content, excerpt |
+
+### Environment Variables
+```env
+SCOUT_DRIVER=meilisearch
+MEILISEARCH_HOST=http://localhost:7700
+MEILISEARCH_KEY=
+```
+
+### Files Created
+- docker-compose.yml (Meilisearch service)
+- app/Http/Controllers/SearchController.php
+
+### Commands to Run
+```bash
+# Start Meilisearch
+docker-compose up -d meilisearch
+
+# Import existing data
+php artisan scout:import "App\Models\Product"
+php artisan scout:import "App\Models\Post"
+
+# Sync index settings
+php artisan scout:sync-index-settings
+```
+
+### Search Usage
+```php
+// Basic search
+Product::search('laptop')->get();
+
+// With filters
+Product::search('laptop')
+    ->where('category_id', 5)
+    ->where('price', '<=', 1000)
+    ->get();
+```
+
+### Next Steps
+1. Start Meilisearch with `docker-compose up -d`
+2. Add MEILISEARCH_KEY to .env
+3. Import existing records
+4. Test search at /search?q=test</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Choose the right driver</strong> - Meilisearch for most use cases, Algolia for high-scale</li>
+        <li><strong>Configure index settings</strong> - Define filterable and sortable attributes upfront</li>
+        <li><strong>Queue indexing</strong> - Use <code>SCOUT_QUEUE=true</code> for production to avoid blocking requests</li>
+        <li><strong>Selective indexing</strong> - Use <code>shouldBeSearchable()</code> to only index relevant records</li>
+        <li><strong>Optimize searchable data</strong> - Only include fields needed for search in <code>toSearchableArray()</code></li>
+        <li><strong>Monitor search performance</strong> - Track search queries and optimize based on usage patterns</li>
+        <li><strong>Test thoroughly</strong> - Verify search results, filters, and sorting work as expected</li>
+    </ol>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/model-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:model:make</a> - Create searchable models</li>
+        <li><a href="{{ '/commands/api-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:make</a> - Create search API endpoints</li>
+        <li><a href="https://laravel.com/docs/scout" class="text-primary hover:underline">Laravel Scout Documentation</a></li>
+        <li><a href="https://www.meilisearch.com/docs" class="text-primary hover:underline">Meilisearch Documentation</a></li>
+    </ul>
 </div>

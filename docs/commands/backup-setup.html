@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:backup:setup
-description: Configure automated backups
+description: Configure automated backups using spatie/laravel-backup
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,339 @@ back_text: All Commands
         <span class="badge badge-devops">DevOps</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:backup:setup</h1>
-    <p class="text-xl text-muted-foreground">Configure automated backups</p>
+    <p class="text-xl text-muted-foreground">Configure automated backups using spatie/laravel-backup</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Configure automated backups. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/backup:setup</code> command configures a comprehensive backup solution using the popular spatie/laravel-backup package. It handles package installation, configuration, notification setup, scheduling, and health monitoring for your Laravel application's database and files.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:backup:setup [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:backup:setup [--destination=&lt;local|s3|gcs|dropbox&gt;] [--notify=&lt;mail|slack|discord&gt;]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:backup:setup</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Interactive setup with prompts
+/laravel-agent:backup:setup
+
+# Setup with S3 destination
+/laravel-agent:backup:setup --destination=s3
+
+# Setup with S3 and Slack notifications
+/laravel-agent:backup:setup --destination=s3 --notify=slack
+
+# Setup with local storage and email notifications
+/laravel-agent:backup:setup --destination=local --notify=mail</code></pre>
+
+    <h2>What Gets Configured</h2>
+    <p>A complete backup setup includes the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Package</td>
+                    <td class="py-3 px-4"><code>composer.json</code></td>
+                    <td class="py-3 px-4">spatie/laravel-backup installed via Composer</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Configuration</td>
+                    <td class="py-3 px-4"><code>config/backup.php</code></td>
+                    <td class="py-3 px-4">Backup sources, destinations, and cleanup settings</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Filesystem Disk</td>
+                    <td class="py-3 px-4"><code>config/filesystems.php</code></td>
+                    <td class="py-3 px-4">S3/GCS/Dropbox disk configuration if needed</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Schedule</td>
+                    <td class="py-3 px-4"><code>app/Console/Kernel.php</code> or <code>bootstrap/app.php</code></td>
+                    <td class="py-3 px-4">Automated backup, cleanup, and monitoring tasks</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Environment</td>
+                    <td class="py-3 px-4"><code>.env</code></td>
+                    <td class="py-3 px-4">Backup credentials and notification settings</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Health Checks</td>
+                    <td class="py-3 px-4"><code>config/backup.php</code></td>
+                    <td class="py-3 px-4">Maximum age and storage monitoring</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Interactive Setup</h2>
+    <p>When run without arguments, the command prompts you for configuration choices:</p>
+
+    <h3>1. Backup Destination</h3>
+    <ul>
+        <li><strong>Local storage</strong> - Store backups in the app's storage directory</li>
+        <li><strong>Amazon S3</strong> - Use AWS S3 for remote backup storage</li>
+        <li><strong>Google Cloud Storage</strong> - Use GCS buckets for backups</li>
+        <li><strong>Dropbox</strong> - Store backups in Dropbox</li>
+        <li><strong>SFTP</strong> - Upload backups to an SFTP server</li>
+    </ul>
+
+    <h3>2. What to Backup</h3>
+    <ul>
+        <li><strong>Full</strong> - Both database and files (recommended)</li>
+        <li><strong>Database only</strong> - Faster, smaller backups for DB changes</li>
+        <li><strong>Files only</strong> - Application files without database</li>
+    </ul>
+
+    <h3>3. Notification Channel</h3>
+    <ul>
+        <li><strong>Email</strong> - Send notifications via Laravel's mail system</li>
+        <li><strong>Slack</strong> - Post backup status to Slack channel</li>
+        <li><strong>Discord</strong> - Send notifications to Discord webhook</li>
+        <li><strong>None</strong> - Skip notifications (not recommended for production)</li>
+    </ul>
+
+    <h3>4. Backup Schedule</h3>
+    <ul>
+        <li><strong>Daily</strong> - Recommended for most applications (1:30 AM)</li>
+        <li><strong>Every 6 hours</strong> - For frequently changing data</li>
+        <li><strong>Weekly</strong> - For rarely changing applications</li>
+        <li><strong>Custom</strong> - Define your own cron schedule</li>
+    </ul>
+
+    <h3>5. Retention Policy</h3>
+    <ul>
+        <li><strong>Standard</strong> - 7 daily, 4 weekly, 4 monthly backups</li>
+        <li><strong>Minimal</strong> - 3 daily, 2 weekly backups (saves storage)</li>
+        <li><strong>Extended</strong> - 14 daily, 8 weekly, 12 monthly backups</li>
+    </ul>
+
+    <h2>Configuration Details</h2>
+
+    <h3>Backup Sources</h3>
+    <p>The configuration specifies what to include and exclude from backups:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+return [
+    'backup' => [
+        'source' => [
+            'files' => [
+                'include' => [
+                    base_path(),
+                ],
+                'exclude' => [
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('logs'),
+                    storage_path('framework'),
+                    base_path('.git'),
+                ],
+            ],
+            'databases' => [
+                'mysql',
+            ],
+        ],
+    ],
+];</code></pre>
+
+    <h3>Backup Destinations</h3>
+    <p>Configure where backups should be stored. For S3, add a disk in <code>config/filesystems.php</code>:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// config/filesystems.php
+'disks' => [
+    's3-backup' => [
+        'driver' => 's3',
+        'key' => env('AWS_BACKUP_ACCESS_KEY_ID'),
+        'secret' => env('AWS_BACKUP_SECRET_ACCESS_KEY'),
+        'region' => env('AWS_BACKUP_DEFAULT_REGION', 'us-east-1'),
+        'bucket' => env('AWS_BACKUP_BUCKET'),
+        'url' => env('AWS_BACKUP_URL'),
+        'endpoint' => env('AWS_BACKUP_ENDPOINT'),
+    ],
+];</code></pre>
+
+    <h3>Notification Configuration</h3>
+    <p>Configure multiple notification channels for different backup events:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+'notifications' => [
+    'notifications' => [
+        \Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification::class => ['mail', 'slack'],
+        \Spatie\Backup\Notifications\Notifications\BackupWasSuccessfulNotification::class => ['mail'],
+        \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFoundNotification::class => ['mail', 'slack'],
+    ],
+
+    'slack' => [
+        'webhook_url' => env('BACKUP_SLACK_WEBHOOK_URL', ''),
+    ],
+
+    'discord' => [
+        'webhook_url' => env('BACKUP_DISCORD_WEBHOOK_URL', ''),
+    ],
+];</code></pre>
+
+    <h3>Health Monitoring</h3>
+    <p>Automatic checks ensure backups are fresh and not consuming too much storage:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+'monitor_backups' => [
+    [
+        'name' => env('APP_NAME', 'laravel-backup'),
+        'disks' => ['local', 's3-backup'],
+        'health_checks' => [
+            \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
+            \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
+        ],
+    ],
+];</code></pre>
+
+    <h3>Cleanup Strategy</h3>
+    <p>Configure automatic cleanup to manage storage efficiently:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+'cleanup' => [
+    'strategy' => \Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy::class,
+
+    'default_strategy' => [
+        'keep_all_backups_for_days' => 7,
+        'keep_daily_backups_for_days' => 16,
+        'keep_weekly_backups_for_weeks' => 8,
+        'keep_monthly_backups_for_months' => 4,
+        'keep_yearly_backups_for_years' => 2,
+        'delete_oldest_backups_when_using_more_megabytes_than' => 5000,
+    ],
+];</code></pre>
+
+    <h2>Environment Variables</h2>
+    <p>The command adds these variables to your <code>.env</code> file:</p>
+    <pre class="language-bash"><code class="language-bash"># Backup configuration
+BACKUP_ARCHIVE_PASSWORD=your-secure-password
+BACKUP_NOTIFICATION_EMAIL=admin@yoursite.com
+
+# Slack notifications (optional)
+BACKUP_SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+
+# Discord notifications (optional)
+BACKUP_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+
+# S3 Backup destination (if using S3)
+AWS_BACKUP_ACCESS_KEY_ID=your-access-key
+AWS_BACKUP_SECRET_ACCESS_KEY=your-secret-key
+AWS_BACKUP_DEFAULT_REGION=us-east-1
+AWS_BACKUP_BUCKET=your-backup-bucket</code></pre>
+
+    <h2>Scheduled Tasks</h2>
+    <p>The command adds these scheduled tasks to your application:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// app/Console/Kernel.php or bootstrap/app.php
+$schedule->command('backup:clean')->daily()->at('01:00');
+$schedule->command('backup:run')->daily()->at('01:30');
+$schedule->command('backup:monitor')->daily()->at('03:00');
+
+// Or for database-only backups (faster)
+$schedule->command('backup:run --only-db')->daily()->at('01:30');</code></pre>
+
+    <h2>Available Commands</h2>
+    <p>After setup, these Artisan commands become available:</p>
+
+    <pre class="language-bash"><code class="language-bash"># Run full backup (database + files)
+php artisan backup:run
+
+# Database only backup (faster)
+php artisan backup:run --only-db
+
+# Files only backup
+php artisan backup:run --only-files
+
+# List all backups
+php artisan backup:list
+
+# Check backup health
+php artisan backup:monitor
+
+# Clean old backups according to retention policy
+php artisan backup:clean</code></pre>
+
+    <h2>Example Output</h2>
+    <p>After successful configuration, you'll see a summary like this:</p>
+    <pre class="language-bash"><code class="language-bash">## Backup Configuration Complete
+
+### Package Installed
+- spatie/laravel-backup
+
+### Configuration
+- **Destination**: S3 (your-backup-bucket)
+- **Content**: Full (database + files)
+- **Schedule**: Daily at 01:30
+- **Notifications**: Slack
+
+### Environment Variables Added
+BACKUP_ARCHIVE_PASSWORD=
+BACKUP_SLACK_WEBHOOK_URL=
+AWS_BACKUP_BUCKET=
+AWS_BACKUP_ACCESS_KEY_ID=
+AWS_BACKUP_SECRET_ACCESS_KEY=
+
+### Commands Available
+php artisan backup:run          # Run backup now
+php artisan backup:run --only-db  # Database only
+php artisan backup:list         # List all backups
+php artisan backup:monitor      # Check health
+php artisan backup:clean        # Clean old backups
+
+### Schedule Added
+- backup:clean - Daily at 01:00
+- backup:run - Daily at 01:30
+- backup:monitor - Daily at 03:00
+
+### Next Steps
+1. Add credentials to .env
+2. Run `php artisan backup:run` to test
+3. Verify backup in destination
+4. Test restore procedure</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Use remote storage</strong> - Store backups off-site (S3, GCS) to protect against server failure</li>
+        <li><strong>Enable encryption</strong> - Set BACKUP_ARCHIVE_PASSWORD to encrypt backup archives</li>
+        <li><strong>Monitor health</strong> - Always enable notifications to catch backup failures</li>
+        <li><strong>Test restores</strong> - Regularly test restoration to verify backup integrity</li>
+        <li><strong>Exclude temporary files</strong> - Don't backup logs, cache, or vendor directories</li>
+        <li><strong>Use database-only for frequent backups</strong> - Run <code>backup:run --only-db</code> every few hours if needed</li>
+        <li><strong>Monitor storage costs</strong> - Adjust retention policy based on your budget and needs</li>
+        <li><strong>Set up monitoring alerts</strong> - Use Laravel Horizon or other tools to ensure cron is running</li>
+    </ol>
+
+    <h2>Backup Security</h2>
+    <p>The setup includes several security features:</p>
+    <ul>
+        <li><strong>Password protection</strong> - Archives are encrypted with BACKUP_ARCHIVE_PASSWORD</li>
+        <li><strong>Secure credentials</strong> - Cloud storage keys are stored in .env, never committed to git</li>
+        <li><strong>Excluded sensitive data</strong> - Logs and temporary files are automatically excluded</li>
+        <li><strong>Access control</strong> - Use IAM roles with minimal required permissions for cloud storage</li>
+    </ul>
+
+    <h2>Troubleshooting</h2>
+    <ul>
+        <li><strong>Backup too large</strong> - Use <code>--only-db</code> flag or adjust exclusions in config</li>
+        <li><strong>Timeout errors</strong> - Increase PHP max_execution_time or split into DB/files backups</li>
+        <li><strong>S3 permission errors</strong> - Ensure IAM user has PutObject, GetObject, ListBucket permissions</li>
+        <li><strong>Notifications not sending</strong> - Verify webhook URLs and mail configuration</li>
+        <li><strong>Backups not running</strong> - Ensure cron is properly configured and running</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/deploy-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:deploy:setup</a> - Setup deployment automation</li>
+        <li><a href="{{ '/commands/monitoring-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:monitoring:setup</a> - Setup application monitoring</li>
+        <li><a href="{{ '/commands/health-check.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:health:check</a> - Check application health</li>
+        <li><a href="https://spatie.be/docs/laravel-backup/" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">Spatie Laravel Backup Documentation</a></li>
+    </ul>
 </div>

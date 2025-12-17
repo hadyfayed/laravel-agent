@@ -17,11 +17,133 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Review staged changes before commit. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/review:staged</code> command performs a quick, focused review of staged changes before committing. It runs security and quality checks only on changed code, making it ideal for pre-commit hooks and CI integration.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:review:staged [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:review:staged [--fail-on=level]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:review:staged</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Review staged changes with default settings
+/laravel-agent:review:staged
+
+# Fail only on critical issues
+/laravel-agent:review:staged --fail-on=critical
+
+# Fail on warnings and above
+/laravel-agent:review:staged --fail-on=warning</code></pre>
+
+    <h2>Review Process</h2>
+    <p>The command performs a systematic review in the following steps:</p>
+
+    <h3>1. Get Staged Changes</h3>
+    <p>First, it identifies all staged PHP and Blade files:</p>
+    <pre class="language-bash"><code class="language-bash"># List staged files
+git diff --cached --name-only | grep -E '\.(php|blade\.php)$'
+
+# Get staged diff
+git diff --cached</code></pre>
+
+    <h3>2. Quick Security Scan</h3>
+    <p>Focuses on high-confidence security issues that commonly appear in Laravel code:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Issue</th>
+                    <th class="text-left py-3 px-4 font-medium">Confidence</th>
+                    <th class="text-left py-3 px-4 font-medium">Pattern</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">SQL Injection</td>
+                    <td class="py-3 px-4">95%</td>
+                    <td class="py-3 px-4"><code>DB::raw()*$, whereRaw()*$, selectRaw()*$</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">XSS</td>
+                    <td class="py-3 px-4">95%</td>
+                    <td class="py-3 px-4"><code>{!! *$ !!}</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Mass Assignment</td>
+                    <td class="py-3 px-4">90%</td>
+                    <td class="py-3 px-4"><code>->create($request->all()), ->fill($request->all())</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Hardcoded Secrets</td>
+                    <td class="py-3 px-4">95%</td>
+                    <td class="py-3 px-4"><code>'(password|secret|key|token)' => 'value'</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>3. Quick Quality Scan</h3>
+    <p>Checks for common code quality issues:</p>
+    <ul>
+        <li><strong>Long methods</strong> - Methods exceeding recommended line counts (85% confidence)</li>
+        <li><strong>Debug statements</strong> - Left-in debugging code like <code>dd()</code>, <code>dump()</code>, <code>var_dump()</code>, <code>print_r()</code> (95% confidence)</li>
+    </ul>
+
+    <h2>Example Output</h2>
+    <p>The command generates a comprehensive review report:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Pre-Commit Review
+
+### Staged Files
+- app/Http/Controllers/UserController.php (+45, -12)
+- app/Services/OrderService.php (+23, -5)
+
+### Issues Found
+| Severity | Issue | File | Line |
+|----------|-------|------|------|
+| Critical | Debug statement (dd) | OrderService.php | 45 |
+| Warning | Long method (35 lines) | UserController.php | 23 |
+
+### Verdict
+[ ] **PASS** - Safe to commit
+[x] **FAIL** - Fix issues before committing</code></pre>
+
+    <h2>Exit Codes</h2>
+    <p>For CI/Hook integration, the command uses standard exit codes:</p>
+    <ul>
+        <li><code>0</code> - No issues or only suggestions</li>
+        <li><code>1</code> - Warnings found (if <code>--fail-on=warning</code>)</li>
+        <li><code>2</code> - Critical issues found</li>
+    </ul>
+
+    <h2>Git Hook Integration</h2>
+    <p>Use this command in a pre-commit hook to automatically review changes before every commit:</p>
+    <pre class="language-bash"><code class="language-bash">#!/bin/bash
+# .git/hooks/pre-commit
+claude /review:staged --fail-on=critical
+exit $?</code></pre>
+
+    <h2>Options</h2>
+    <ul>
+        <li><strong>--fail-on=level</strong> - Set the failure threshold:
+            <ul>
+                <li><code>critical</code> - Only fail on critical security issues (default)</li>
+                <li><code>warning</code> - Fail on warnings and critical issues</li>
+                <li><code>suggestion</code> - Fail on any findings</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Run before every commit</strong> - Integrate into your pre-commit hook for automatic checks</li>
+        <li><strong>Use appropriate fail levels</strong> - Start with <code>--fail-on=critical</code> and tighten as team matures</li>
+        <li><strong>Review findings carefully</strong> - High confidence doesn't mean 100% accuracy; verify each issue</li>
+        <li><strong>Fix before committing</strong> - Don't commit code with known security issues</li>
+        <li><strong>Combine with other tools</strong> - Use alongside linters and static analysis tools for comprehensive coverage</li>
+    </ol>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/review-code.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:code</a> - Comprehensive codebase review</li>
+        <li><a href="{{ '/commands/security-check.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:security:check</a> - Deep security audit</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests for changes</li>
+    </ul>
 </div>

@@ -17,11 +17,152 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>View current pattern usage (max 5 patterns per project). This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/patterns</code> command displays the current design pattern usage in your Laravel project. It provides a comprehensive overview of which patterns are being used, where they're located, and how many slots remain available (projects are limited to a maximum of 5 patterns to maintain architectural consistency).</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:patterns [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:patterns</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:patterns</code></pre>
+    <pre class="language-bash"><code class="language-bash"># View current pattern usage
+/laravel-agent:patterns</code></pre>
+
+    <h2>What Gets Analyzed</h2>
+    <p>The command scans your codebase to detect the following design patterns:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Pattern</th>
+                    <th class="text-left py-3 px-4 font-medium">Detection Method</th>
+                    <th class="text-left py-3 px-4 font-medium">Typical Location</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Repository</td>
+                    <td class="py-3 px-4">Files matching <code>*Repository.php</code></td>
+                    <td class="py-3 px-4"><code>app/Repositories/</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Action</td>
+                    <td class="py-3 px-4">Files matching <code>*Action.php</code> in Actions directory</td>
+                    <td class="py-3 px-4"><code>app/Actions/</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Service</td>
+                    <td class="py-3 px-4">Files matching <code>*Service.php</code> in Services directory</td>
+                    <td class="py-3 px-4"><code>app/Services/</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">DTO</td>
+                    <td class="py-3 px-4">Readonly classes ending with <code>Data</code></td>
+                    <td class="py-3 px-4"><code>app/Data/</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Strategy</td>
+                    <td class="py-3 px-4">Classes implementing <code>*Strategy</code> interfaces</td>
+                    <td class="py-3 px-4"><code>app/Strategies/</code></td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Observer</td>
+                    <td class="py-3 px-4">Files in Events directory</td>
+                    <td class="py-3 px-4"><code>app/Events/</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>How It Works</h2>
+    <p>The command executes a three-step process to generate the pattern usage report:</p>
+
+    <h3>1. Read Pattern Registry</h3>
+    <p>First, it checks for an existing pattern registry file that tracks officially registered patterns:</p>
+    <pre class="language-bash"><code class="language-bash">cat .ai/patterns/registry.json 2>/dev/null || echo '{"patterns": [], "limit": 5}'</code></pre>
+
+    <h3>2. Scan Codebase</h3>
+    <p>Next, it performs automated detection of patterns throughout your application code:</p>
+    <pre class="language-bash"><code class="language-bash"># Count Repository pattern implementations
+find app -name "*Repository.php" 2>/dev/null | wc -l
+
+# Count Action pattern implementations
+find app/Actions -name "*Action.php" 2>/dev/null | wc -l
+
+# Count Service pattern implementations
+find app/Services -name "*Service.php" 2>/dev/null | wc -l
+
+# Count DTO pattern implementations (readonly Data classes)
+grep -r "readonly class.*Data" app/ --include="*.php" -l 2>/dev/null | wc -l
+
+# Count Strategy pattern implementations
+grep -r "implements.*Strategy" app/ --include="*.php" -l 2>/dev/null | wc -l
+
+# Count Observer pattern implementations (Events)
+find app/Events -name "*.php" 2>/dev/null | wc -l</code></pre>
+
+    <h3>3. Generate Report</h3>
+    <p>Finally, it compiles the results into a comprehensive report showing:</p>
+    <ul>
+        <li>Current pattern usage count (X out of 5 maximum)</li>
+        <li>A table listing each detected pattern with counts and locations</li>
+        <li>Number of available pattern slots remaining</li>
+        <li>List of all available patterns you can implement</li>
+    </ul>
+
+    <h2>Example Output</h2>
+    <p>A typical pattern report looks like this:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Pattern Registry
+
+### Usage: 3/5 patterns
+
+| Pattern    | Count | Location              |
+|------------|-------|-----------------------|
+| Repository | 8     | app/Repositories/     |
+| Action     | 12    | app/Actions/          |
+| DTO        | 15    | app/Data/             |
+
+### Available Slots: 2
+
+### Available Patterns
+Repository, DTO, Strategy, Action, Factory, Pipeline, Observer, QueryObject, Presenter, Builder</code></pre>
+
+    <h2>Pattern Limit Rationale</h2>
+    <p>The 5-pattern limit is an architectural guardrail designed to:</p>
+    <ol>
+        <li><strong>Prevent over-engineering</strong> - Too many patterns increase complexity without proportional benefit</li>
+        <li><strong>Encourage consistency</strong> - A focused set of patterns is easier for teams to learn and apply correctly</li>
+        <li><strong>Maintain readability</strong> - Fewer patterns mean less cognitive load when navigating the codebase</li>
+        <li><strong>Promote pragmatism</strong> - Forces thoughtful selection of patterns that truly add value</li>
+    </ol>
+
+    <h2>Available Design Patterns</h2>
+    <p>The Laravel Agent supports these design patterns:</p>
+    <ul>
+        <li><strong>Repository</strong> - Data access abstraction layer</li>
+        <li><strong>DTO (Data Transfer Object)</strong> - Type-safe data structures using readonly classes</li>
+        <li><strong>Strategy</strong> - Interchangeable algorithms or behaviors</li>
+        <li><strong>Action</strong> - Single-purpose, focused business logic classes</li>
+        <li><strong>Factory</strong> - Object creation abstraction</li>
+        <li><strong>Pipeline</strong> - Sequential processing of data through stages</li>
+        <li><strong>Observer</strong> - Event-driven communication between objects</li>
+        <li><strong>QueryObject</strong> - Encapsulated complex database queries</li>
+        <li><strong>Presenter</strong> - View-specific data formatting</li>
+        <li><strong>Builder</strong> - Step-by-step object construction</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Choose patterns wisely</strong> - Only adopt patterns that solve real problems in your codebase</li>
+        <li><strong>Run regularly</strong> - Check pattern usage before adding new patterns to avoid exceeding the limit</li>
+        <li><strong>Document decisions</strong> - Keep the pattern registry updated to track intentional architectural choices</li>
+        <li><strong>Consolidate when possible</strong> - If approaching the limit, consider whether some patterns can be merged or eliminated</li>
+        <li><strong>Follow conventions</strong> - Use consistent naming and directory structures for each pattern</li>
+    </ol>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/repository-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:repository:make</a> - Create repository pattern classes</li>
+        <li><a href="{{ '/commands/action-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:action:make</a> - Create action pattern classes</li>
+        <li><a href="{{ '/commands/dto-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:dto:make</a> - Create data transfer objects</li>
+    </ul>
 </div>

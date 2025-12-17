@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:webhook:make
-description: Create webhook handlers
+description: Create webhook handlers for external services (Stripe, GitHub, etc.)
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,482 @@ back_text: All Commands
         <span class="badge badge-data">Data</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:webhook:make</h1>
-    <p class="text-xl text-muted-foreground">Create webhook handlers</p>
+    <p class="text-xl text-muted-foreground">Create webhook handlers for external services (Stripe, GitHub, etc.)</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create webhook handlers. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/webhook:make</code> command generates secure webhook handlers for processing incoming webhooks from external services. It creates controllers with signature verification, event handlers for specific webhook events, middleware for security, and all necessary routing configuration.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:webhook:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:webhook:make &lt;ServiceName&gt; [--events=&lt;event1,event2&gt;]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:webhook:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create a Stripe webhook handler with default events
+/laravel-agent:webhook:make Stripe
+
+# Create a GitHub webhook handler with specific events
+/laravel-agent:webhook:make GitHub --events=push,pull_request
+
+# Create a Paddle webhook handler
+/laravel-agent:webhook:make Paddle
+
+# Create a custom webhook handler
+/laravel-agent:webhook:make Custom</code></pre>
+
+    <h2>Supported Services</h2>
+    <p>The command includes pre-configured templates for popular webhook providers:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Service</th>
+                    <th class="text-left py-3 px-4 font-medium">Verification</th>
+                    <th class="text-left py-3 px-4 font-medium">Common Events</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Stripe</td>
+                    <td class="py-3 px-4">Signature</td>
+                    <td class="py-3 px-4">payment_intent.succeeded, customer.subscription.*, invoice.*</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Paddle</td>
+                    <td class="py-3 px-4">Signature</td>
+                    <td class="py-3 px-4">subscription.created, payment.completed</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">GitHub</td>
+                    <td class="py-3 px-4">Signature</td>
+                    <td class="py-3 px-4">push, pull_request, issues</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">GitLab</td>
+                    <td class="py-3 px-4">Token</td>
+                    <td class="py-3 px-4">push, merge_request</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Twilio</td>
+                    <td class="py-3 px-4">Signature</td>
+                    <td class="py-3 px-4">message.received</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">SendGrid</td>
+                    <td class="py-3 px-4">Signature</td>
+                    <td class="py-3 px-4">email.delivered, email.bounced</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Custom</td>
+                    <td class="py-3 px-4">Configurable</td>
+                    <td class="py-3 px-4">User-defined</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>What Gets Created</h2>
+    <p>A complete webhook handler includes the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Webhook Controller</td>
+                    <td class="py-3 px-4"><code>app/Http/Controllers/Webhooks/</code></td>
+                    <td class="py-3 px-4">Receives and routes webhook events</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Signature Middleware</td>
+                    <td class="py-3 px-4"><code>app/Http/Middleware/</code></td>
+                    <td class="py-3 px-4">Verifies webhook authenticity</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Event Handlers</td>
+                    <td class="py-3 px-4"><code>app/Webhooks/{Service}/</code></td>
+                    <td class="py-3 px-4">Processes specific webhook events</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel Event</td>
+                    <td class="py-3 px-4"><code>app/Events/</code></td>
+                    <td class="py-3 px-4">For logging and auditing webhooks</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Webhook Routes</td>
+                    <td class="py-3 px-4"><code>routes/webhooks.php</code></td>
+                    <td class="py-3 px-4">Routes with CSRF exemption</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Example Output Structure</h2>
+    <p>For <code>/laravel-agent:webhook:make Stripe</code>:</p>
+    <pre class="language-bash"><code class="language-bash">app/
+├── Http/
+│   ├── Controllers/Webhooks/
+│   │   └── StripeWebhookController.php
+│   └── Middleware/
+│       └── VerifyStripeSignature.php
+├── Webhooks/Stripe/
+│   ├── PaymentIntentSucceededHandler.php
+│   ├── CustomerSubscriptionCreatedHandler.php
+│   ├── CustomerSubscriptionDeletedHandler.php
+│   ├── CustomerSubscriptionUpdatedHandler.php
+│   ├── InvoicePaidHandler.php
+│   └── InvoicePaymentFailedHandler.php
+├── Events/
+│   └── StripeWebhookReceived.php
+└── routes/
+    └── webhooks.php</code></pre>
+
+    <h2>Generated Webhook Controller</h2>
+    <p>Example of a generated Stripe webhook controller:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Webhooks;
+
+use App\Http\Controllers\Controller;
+use App\Events\StripeWebhookReceived;
+use App\Webhooks\Stripe\PaymentIntentSucceededHandler;
+use App\Webhooks\Stripe\CustomerSubscriptionCreatedHandler;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
+
+final class StripeWebhookController extends Controller
+{
+    private array $handlers = [
+        'payment_intent.succeeded' => PaymentIntentSucceededHandler::class,
+        'customer.subscription.created' => CustomerSubscriptionCreatedHandler::class,
+        'customer.subscription.deleted' => CustomerSubscriptionDeletedHandler::class,
+        'invoice.paid' => InvoicePaidHandler::class,
+    ];
+
+    public function __invoke(Request $request): Response
+    {
+        $payload = $request->all();
+        $eventType = $payload['type'] ?? null;
+
+        Log::info('Stripe webhook received', [
+            'type' => $eventType,
+            'id' => $payload['id'] ?? null,
+        ]);
+
+        // Dispatch event for logging/auditing
+        event(new StripeWebhookReceived($eventType, $payload));
+
+        // Handle the event
+        if (isset($this->handlers[$eventType])) {
+            try {
+                $handler = app($this->handlers[$eventType]);
+                $handler->handle($payload);
+            } catch (\Exception $e) {
+                Log::error('Stripe webhook handler failed', [
+                    'type' => $eventType,
+                    'error' => $e->getMessage(),
+                ]);
+
+                // Return 500 for unexpected errors to trigger retry
+                if ($this->shouldRetry($e)) {
+                    return response('', 500);
+                }
+            }
+        }
+
+        return response('', 200);
+    }
+
+    private function shouldRetry(\Exception $e): bool
+    {
+        // Retry on transient errors (database, network)
+        return $e instanceof \Illuminate\Database\QueryException
+            || $e instanceof \Illuminate\Http\Client\ConnectionException;
+    }
+}</code></pre>
+
+    <h2>Signature Verification Middleware</h2>
+    <p>Example Stripe signature verification middleware:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Stripe\Webhook;
+use Stripe\Exception\SignatureVerificationException;
+
+final class VerifyStripeSignature
+{
+    public function handle(Request $request, Closure $next): Response
+    {
+        $signature = $request->header('Stripe-Signature');
+        $secret = config('services.stripe.webhook_secret');
+
+        if (!$signature || !$secret) {
+            abort(401, 'Missing signature or secret');
+        }
+
+        try {
+            Webhook::constructEvent(
+                $request->getContent(),
+                $signature,
+                $secret
+            );
+        } catch (SignatureVerificationException $e) {
+            abort(401, 'Invalid signature');
+        }
+
+        return $next($request);
+    }
+}</code></pre>
+
+    <h2>Event Handler Example</h2>
+    <p>Example handler for processing successful payments:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Webhooks\Stripe;
+
+use App\Models\Order;
+use App\Models\Payment;
+use Illuminate\Support\Facades\Log;
+
+final class PaymentIntentSucceededHandler
+{
+    public function handle(array $payload): void
+    {
+        $paymentIntent = $payload['data']['object'];
+        $orderId = $paymentIntent['metadata']['order_id'] ?? null;
+
+        if (!$orderId) {
+            Log::warning('Payment intent without order_id', [
+                'payment_intent_id' => $paymentIntent['id'],
+            ]);
+            return;
+        }
+
+        $order = Order::find($orderId);
+
+        if (!$order) {
+            Log::error('Order not found for payment intent', [
+                'order_id' => $orderId,
+                'payment_intent_id' => $paymentIntent['id'],
+            ]);
+            return;
+        }
+
+        // Record payment
+        $payment = Payment::create([
+            'order_id' => $order->id,
+            'stripe_payment_intent_id' => $paymentIntent['id'],
+            'amount_cents' => $paymentIntent['amount'],
+            'currency' => $paymentIntent['currency'],
+            'status' => 'succeeded',
+        ]);
+
+        // Update order status
+        $order->update([
+            'payment_status' => 'paid',
+            'paid_at' => now(),
+        ]);
+
+        // Dispatch follow-up events
+        event(new \App\Events\OrderPaid($order));
+
+        Log::info('Payment processed successfully', [
+            'order_id' => $order->id,
+            'payment_id' => $payment->id,
+        ]);
+    }
+}</code></pre>
+
+    <h2>GitHub Webhook Example</h2>
+    <p>Example GitHub webhook controller with event handling:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Webhooks;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
+final class GitHubWebhookController extends Controller
+{
+    public function __invoke(Request $request): Response
+    {
+        $event = $request->header('X-GitHub-Event');
+        $payload = $request->all();
+
+        match ($event) {
+            'push' => $this->handlePush($payload),
+            'pull_request' => $this->handlePullRequest($payload),
+            'issues' => $this->handleIssues($payload),
+            default => null,
+        };
+
+        return response('', 200);
+    }
+
+    private function handlePush(array $payload): void
+    {
+        $ref = $payload['ref'];
+        $commits = $payload['commits'] ?? [];
+        $repository = $payload['repository']['full_name'];
+
+        // Trigger deployment, notify team, etc.
+    }
+
+    private function handlePullRequest(array $payload): void
+    {
+        $action = $payload['action'];
+        $pr = $payload['pull_request'];
+
+        // Handle opened, closed, merged, etc.
+    }
+
+    private function handleIssues(array $payload): void
+    {
+        $action = $payload['action'];
+        $issue = $payload['issue'];
+
+        // Handle opened, closed, labeled, etc.
+    }
+}</code></pre>
+
+    <h2>GitHub Signature Verification</h2>
+    <p>Example GitHub signature verification middleware:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+final class VerifyGitHubSignature
+{
+    public function handle(Request $request, Closure $next): Response
+    {
+        $signature = $request->header('X-Hub-Signature-256');
+        $secret = config('services.github.webhook_secret');
+
+        if (!$signature || !$secret) {
+            abort(401);
+        }
+
+        $expectedSignature = 'sha256=' . hash_hmac(
+            'sha256',
+            $request->getContent(),
+            $secret
+        );
+
+        if (!hash_equals($expectedSignature, $signature)) {
+            abort(401, 'Invalid signature');
+        }
+
+        return $next($request);
+    }
+}</code></pre>
+
+    <h2>Routes Configuration</h2>
+    <p>Webhook routes with signature verification middleware:</p>
+    <pre class="language-php"><code class="language-php">// routes/webhooks.php
+use App\Http\Controllers\Webhooks\StripeWebhookController;
+use App\Http\Controllers\Webhooks\GitHubWebhookController;
+use App\Http\Middleware\VerifyStripeSignature;
+use App\Http\Middleware\VerifyGitHubSignature;
+
+Route::post('/webhooks/stripe', StripeWebhookController::class)
+    ->middleware(VerifyStripeSignature::class)
+    ->name('webhooks.stripe');
+
+Route::post('/webhooks/github', GitHubWebhookController::class)
+    ->middleware(VerifyGitHubSignature::class)
+    ->name('webhooks.github');</code></pre>
+
+    <p>CSRF exemption configuration:</p>
+    <pre class="language-php"><code class="language-php">// bootstrap/app.php
+-&gt;withMiddleware(function (Middleware $middleware) {
+    $middleware->validateCsrfTokens(except: [
+        'webhooks/*',
+    ]);
+})</code></pre>
+
+    <h2>Environment Variables</h2>
+    <p>Required environment configuration for webhook secrets:</p>
+    <pre class="language-bash"><code class="language-bash"># Stripe
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# GitHub
+GITHUB_WEBHOOK_SECRET=your-secret
+
+# Paddle
+PADDLE_WEBHOOK_SECRET=pdl_...</code></pre>
+
+    <h2>Options</h2>
+    <p>Interactive prompts guide you through the setup process:</p>
+    <ul>
+        <li><strong>Service Selection</strong> - Choose from Stripe, Paddle, GitHub, GitLab, Twilio, SendGrid, or Custom</li>
+        <li><strong>Event Selection</strong> - Select which webhook events to handle (based on service)</li>
+        <li><strong>Signature Verification</strong> - Enable or disable signature verification (recommended: Yes)</li>
+        <li><strong>Event Dispatching</strong> - Fire Laravel events for each webhook for logging/auditing</li>
+    </ul>
+
+    <h2>Testing Webhooks</h2>
+    <p>Test your webhook handlers locally:</p>
+    <pre class="language-bash"><code class="language-bash"># Stripe CLI for local testing
+stripe listen --forward-to localhost:8000/webhooks/stripe
+
+# Trigger test event
+stripe trigger payment_intent.succeeded
+
+# GitHub CLI for testing
+gh webhook forward --repo=owner/repo --events=push --url=http://localhost:8000/webhooks/github</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Always verify signatures</strong> - Protect against unauthorized webhook requests</li>
+        <li><strong>Use idempotent handlers</strong> - Handle duplicate webhook deliveries gracefully</li>
+        <li><strong>Return 200 quickly</strong> - Process webhooks asynchronously in queued jobs for long operations</li>
+        <li><strong>Log everything</strong> - Maintain detailed logs for debugging webhook issues</li>
+        <li><strong>Handle retries properly</strong> - Return 500 for transient errors, 200 for handled errors</li>
+        <li><strong>Test webhook secrets</strong> - Verify environment variables are set correctly before going live</li>
+        <li><strong>Monitor webhook endpoints</strong> - Track success rates and error patterns</li>
+    </ol>
+
+    <h2>Next Steps</h2>
+    <p>After generating webhook handlers:</p>
+    <ol>
+        <li>Add webhook secret to your <code>.env</code> file</li>
+        <li>Configure the webhook URL in the service's dashboard (e.g., <code>https://yoursite.com/webhooks/stripe</code>)</li>
+        <li>Test using the service's CLI or testing tools</li>
+        <li>Monitor application logs for incoming webhook events</li>
+        <li>Implement additional event handlers as needed</li>
+    </ol>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/event-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:event:make</a> - Create custom Laravel events</li>
+        <li><a href="{{ '/commands/middleware-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:middleware:make</a> - Generate middleware</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate webhook tests</li>
+    </ul>
 </div>

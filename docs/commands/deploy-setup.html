@@ -17,11 +17,321 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Configure deployment (Forge, Vapor, Docker). This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/deploy:setup</code> command is an interactive wizard that configures deployment for your Laravel application. It supports multiple deployment platforms including Laravel Forge, Laravel Vapor, Docker, AWS Lambda with Bref, and traditional server deployments. The wizard guides you through platform selection, environment configuration, and service requirements.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:deploy:setup [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:deploy:setup [platform]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:deploy:setup</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Interactive wizard - prompts for all options
+/laravel-agent:deploy:setup
+
+# Laravel Forge setup for traditional VPS
+/laravel-agent:deploy:setup forge
+
+# Laravel Vapor serverless deployment
+/laravel-agent:deploy:setup vapor
+
+# Docker containerization
+/laravel-agent:deploy:setup docker
+
+# AWS Lambda with Bref
+/laravel-agent:deploy:setup bref</code></pre>
+
+    <h2>Supported Platforms</h2>
+    <p>The command supports the following deployment platforms:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Platform</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Case</th>
+                    <th class="text-left py-3 px-4 font-medium">Key Features</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Forge</strong></td>
+                    <td class="py-3 px-4">Traditional VPS deployment</td>
+                    <td class="py-3 px-4">DigitalOcean, AWS EC2, managed servers</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Vapor</strong></td>
+                    <td class="py-3 px-4">Serverless on AWS Lambda</td>
+                    <td class="py-3 px-4">Managed by Laravel, auto-scaling</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Docker</strong></td>
+                    <td class="py-3 px-4">Containerized deployment</td>
+                    <td class="py-3 px-4">ECS, Kubernetes, Docker Swarm</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Bref</strong></td>
+                    <td class="py-3 px-4">Serverless on AWS Lambda</td>
+                    <td class="py-3 px-4">Self-managed, full control</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Traditional</strong></td>
+                    <td class="py-3 px-4">Custom server deployment</td>
+                    <td class="py-3 px-4">Custom scripts, manual setup</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Interactive Wizard Flow</h2>
+    <p>When running without arguments, the wizard walks you through the following steps:</p>
+
+    <h3>1. Environment Check</h3>
+    <p>The wizard first checks your project for existing deployment configurations:</p>
+    <pre class="language-bash"><code class="language-bash"># Checks for:
+- Laravel Vapor Core package
+- Bref Laravel Bridge package
+- Existing Dockerfile
+- Existing vapor.yml configuration</code></pre>
+
+    <h3>2. Platform Selection</h3>
+    <p>Choose your deployment platform based on your infrastructure needs:</p>
+    <pre class="language-bash"><code class="language-bash">Which deployment platform do you want to use?
+- Forge: Traditional VPS deployment (DigitalOcean, AWS EC2, etc.)
+- Vapor: Serverless on AWS Lambda (managed by Laravel)
+- Docker: Containerized deployment (ECS, Kubernetes, etc.)
+- Bref: Serverless on AWS Lambda (self-managed)
+- Traditional: Custom server deployment scripts</code></pre>
+
+    <h3>3. Environment Configuration</h3>
+    <p>Select which environments to configure:</p>
+    <pre class="language-bash"><code class="language-bash">Which environment are you configuring?
+- Production
+- Staging
+- Both</code></pre>
+
+    <h3>4. Services Selection</h3>
+    <p>Specify which services your application requires:</p>
+    <pre class="language-bash"><code class="language-bash">What services does your app need?
+- [ ] MySQL/PostgreSQL database
+- [ ] Redis cache
+- [ ] Queue workers
+- [ ] Scheduled tasks
+- [ ] WebSockets (Pusher/Soketi)
+- [ ] File storage (S3)</code></pre>
+
+    <h2>Platform-Specific Configurations</h2>
+
+    <h3>Laravel Forge Setup</h3>
+    <p>When configuring for Laravel Forge, the command:</p>
+    <ul>
+        <li>Creates deployment script with zero-downtime deployment</li>
+        <li>Configures Supervisor for Laravel Horizon queue workers</li>
+        <li>Sets up SSL with Let's Encrypt automatic renewal</li>
+        <li>Configures Nginx optimization for Laravel</li>
+    </ul>
+
+    <h3>Laravel Vapor Setup</h3>
+    <p>For serverless deployment with Laravel Vapor:</p>
+    <ul>
+        <li>Creates <code>vapor.yml</code> configuration file</li>
+        <li>Installs <code>laravel/vapor-core</code> if not present</li>
+        <li>Configures database, cache, and storage services</li>
+        <li>Sets up queue workers with SQS</li>
+    </ul>
+
+    <pre class="language-yaml"><code class="language-yaml"># Example vapor.yml structure
+id: 12345
+name: my-app
+environments:
+  production:
+    memory: 1024
+    database: my-database
+    cache: my-cache
+    storage: my-bucket
+    queue: my-queue</code></pre>
+
+    <h3>Docker Setup</h3>
+    <p>For containerized deployments:</p>
+    <ul>
+        <li>Creates production-ready <code>Dockerfile</code></li>
+        <li>Creates <code>docker-compose.yml</code> for local development</li>
+        <li>Configures Nginx and PHP-FPM containers</li>
+        <li>Sets up multi-stage builds for optimization</li>
+    </ul>
+
+    <pre class="language-dockerfile"><code class="language-dockerfile"># Example Dockerfile structure
+FROM php:8.2-fpm
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    git curl zip unzip
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy application
+COPY . /var/www/html
+WORKDIR /var/www/html
+
+# Install dependencies and optimize
+RUN composer install --no-dev --optimize-autoloader
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache</code></pre>
+
+    <h3>Bref (AWS Lambda) Setup</h3>
+    <p>For self-managed serverless deployment:</p>
+    <ul>
+        <li>Creates <code>serverless.yml</code> configuration</li>
+        <li>Installs <code>bref/laravel-bridge</code> if not present</li>
+        <li>Configures Lambda functions for web and queue workers</li>
+        <li>Sets up SQS for queue processing</li>
+    </ul>
+
+    <h2>Generated Files</h2>
+    <p>Depending on the platform selected, the wizard creates or modifies:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">File</th>
+                    <th class="text-left py-3 px-4 font-medium">Platform</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>Dockerfile</code></td>
+                    <td class="py-3 px-4">Docker</td>
+                    <td class="py-3 px-4">Container image definition</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>docker-compose.yml</code></td>
+                    <td class="py-3 px-4">Docker</td>
+                    <td class="py-3 px-4">Multi-container orchestration</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>vapor.yml</code></td>
+                    <td class="py-3 px-4">Vapor</td>
+                    <td class="py-3 px-4">Laravel Vapor configuration</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>serverless.yml</code></td>
+                    <td class="py-3 px-4">Bref</td>
+                    <td class="py-3 px-4">Serverless Framework config</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>deploy.sh</code></td>
+                    <td class="py-3 px-4">Traditional</td>
+                    <td class="py-3 px-4">Deployment shell script</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>.env.example</code></td>
+                    <td class="py-3 px-4">All</td>
+                    <td class="py-3 px-4">Updated with deployment variables</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Required Environment Variables</h2>
+    <p>After configuration, the wizard lists the secrets you need to set on your deployment platform:</p>
+    <pre class="language-bash"><code class="language-bash"># Core Laravel secrets
+APP_KEY=                    # Generate with: php artisan key:generate
+DB_PASSWORD=               # Database password
+REDIS_PASSWORD=            # Redis password (if using Redis)
+
+# AWS credentials (for S3/Vapor/Bref)
+AWS_ACCESS_KEY_ID=         # AWS access key
+AWS_SECRET_ACCESS_KEY=     # AWS secret key
+AWS_DEFAULT_REGION=        # AWS region (e.g., us-east-1)
+
+# Third-party services
+PUSHER_APP_KEY=            # If using WebSockets
+MAIL_PASSWORD=             # Email service password</code></pre>
+
+    <h2>Deployment Commands</h2>
+    <p>The wizard provides platform-specific deployment commands:</p>
+
+    <h3>Forge Deployment</h3>
+    <pre class="language-bash"><code class="language-bash"># Push to repository and Forge auto-deploys
+git push origin main
+
+# Or manually deploy via Forge dashboard</code></pre>
+
+    <h3>Vapor Deployment</h3>
+    <pre class="language-bash"><code class="language-bash"># Deploy to production
+vapor deploy production
+
+# Deploy to staging
+vapor deploy staging</code></pre>
+
+    <h3>Docker Deployment</h3>
+    <pre class="language-bash"><code class="language-bash"># Build and push image
+docker build -t my-app:latest .
+docker push my-registry/my-app:latest
+
+# Deploy to ECS/Kubernetes
+kubectl apply -f k8s/deployment.yaml</code></pre>
+
+    <h3>Bref Deployment</h3>
+    <pre class="language-bash"><code class="language-bash"># Deploy using Serverless Framework
+serverless deploy --stage production</code></pre>
+
+    <h2>Post-Deployment Checklist</h2>
+    <p>The wizard provides a checklist of next steps after configuration:</p>
+    <ol>
+        <li><strong>Set environment variables</strong> on your deployment platform</li>
+        <li><strong>Configure SSL certificate</strong> (Let's Encrypt for Forge, automatic for Vapor)</li>
+        <li><strong>Set up monitoring</strong> (Laravel Telescope, New Relic, Datadog)</li>
+        <li><strong>Configure backups</strong> for database and file storage</li>
+        <li><strong>Run initial deployment</strong> using the provided commands</li>
+        <li><strong>Verify application health</strong> by checking endpoints</li>
+        <li><strong>Configure DNS</strong> to point to your deployment</li>
+    </ol>
+
+    <h2>Example Output</h2>
+    <p>When you run the command, you'll see output similar to:</p>
+    <pre class="language-bash"><code class="language-bash">## Deployment Configured: Laravel Vapor
+
+### Files Created/Modified
+✓ vapor.yml
+✓ .env.example (updated)
+
+### Required Secrets
+- APP_KEY
+- DB_PASSWORD
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+
+### Deploy Command
+vapor deploy production
+
+### Next Steps
+1. Set environment variables in Vapor dashboard
+2. Configure SSL certificate (automatic)
+3. Set up monitoring with Laravel Telescope
+4. Configure database backups</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Start with staging</strong> - Always test deployments in a staging environment first</li>
+        <li><strong>Use environment variables</strong> - Never commit secrets to version control</li>
+        <li><strong>Enable zero-downtime deployments</strong> - Configure health checks and rolling updates</li>
+        <li><strong>Set up monitoring</strong> - Use application performance monitoring from day one</li>
+        <li><strong>Automate backups</strong> - Configure daily database and storage backups</li>
+        <li><strong>Use CI/CD pipelines</strong> - Automate testing and deployment with GitHub Actions or GitLab CI</li>
+    </ol>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <a href="{{ '/agents/laravel-deploy.html' | relative_url }}" class="text-primary hover:underline">laravel-deploy</a> agent.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/docker-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:docker:make</a> - Create Docker configuration</li>
+        <li><a href="{{ '/commands/env-check.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:env:check</a> - Verify environment configuration</li>
+        <li><a href="{{ '/skills/laravel-devops.html' | relative_url }}" class="text-primary hover:underline">laravel-devops skill</a> - Auto-invoked for deployment tasks</li>
+    </ul>
 </div>

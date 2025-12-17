@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:git:release
-description: Create release with changelog
+description: Create release with automatic changelog generation
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,365 @@ back_text: All Commands
         <span class="badge badge-review">Review</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:git:release</h1>
-    <p class="text-xl text-muted-foreground">Create release with changelog</p>
+    <p class="text-xl text-muted-foreground">Create release with automatic changelog generation</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create release with changelog. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/git:release</code> command creates a new release with automatic changelog generation from conventional commits. It handles version bumping, changelog creation, file updates, git tagging, and GitHub release creation following semantic versioning and the Keep a Changelog format.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:git:release [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:git:release &lt;version|major|minor|patch&gt; [--dry-run] [--no-tag]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:git:release</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Bump patch version (1.0.0 → 1.0.1)
+/laravel-agent:git:release patch
+
+# Bump minor version (1.0.0 → 1.1.0)
+/laravel-agent:git:release minor
+
+# Bump major version (1.0.0 → 2.0.0)
+/laravel-agent:git:release major
+
+# Set specific version
+/laravel-agent:git:release 2.0.0
+
+# Preview without creating
+/laravel-agent:git:release minor --dry-run
+
+# Create release without git tag
+/laravel-agent:git:release patch --no-tag
+
+# Pre-release versions
+/laravel-agent:git:release 1.1.0-beta.1
+/laravel-agent:git:release 1.1.0-rc.1
+/laravel-agent:git:release 1.1.0-alpha.1</code></pre>
+
+    <h2>Version Bump Options</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Option</th>
+                    <th class="text-left py-3 px-4 font-medium">Example</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>patch</code></td>
+                    <td class="py-3 px-4">1.0.0 → 1.0.1</td>
+                    <td class="py-3 px-4">Bug fixes and patches</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>minor</code></td>
+                    <td class="py-3 px-4">1.0.0 → 1.1.0</td>
+                    <td class="py-3 px-4">New features (backwards-compatible)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>major</code></td>
+                    <td class="py-3 px-4">1.0.0 → 2.0.0</td>
+                    <td class="py-3 px-4">Breaking changes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>x.y.z</code></td>
+                    <td class="py-3 px-4">1.0.0 → 2.5.3</td>
+                    <td class="py-3 px-4">Specific version number</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Release Process</h2>
+    <p>The command follows these steps to create a complete release:</p>
+
+    <h3>1. Determine Current Version</h3>
+    <p>The command identifies the current version from git tags or composer.json:</p>
+    <pre class="language-bash"><code class="language-bash"># From git tags
+current=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+
+# Or from composer.json
+current=$(jq -r '.version // "0.0.0"' composer.json)</code></pre>
+
+    <h3>2. Calculate New Version</h3>
+    <p>Based on the bump type, the new version is calculated:</p>
+    <pre class="language-bash"><code class="language-bash"># Parse current version
+IFS='.' read -r major minor patch &lt;&lt;&lt; "${current#v}"
+
+case "$bump" in
+    major) new="$((major + 1)).0.0" ;;
+    minor) new="$major.$((minor + 1)).0" ;;
+    patch) new="$major.$minor.$((patch + 1))" ;;
+    *) new="$bump" ;; # Specific version
+esac</code></pre>
+
+    <h3>3. Gather Commits Since Last Release</h3>
+    <p>All commits since the last release are collected:</p>
+    <pre class="language-bash"><code class="language-bash"># Get commits since last tag
+if [ -n "$current" ]; then
+    commits=$(git log $current..HEAD --pretty=format:"%s|%h|%an" --no-merges)
+else
+    commits=$(git log --pretty=format:"%s|%h|%an" --no-merges)
+fi</code></pre>
+
+    <h3>4. Generate Changelog</h3>
+    <p>Conventional commits are parsed and categorized into a structured changelog:</p>
+    <pre class="language-markdown"><code class="language-markdown"># Changelog
+
+## [1.1.0] - 2024-01-15
+
+### Features
+- **invoice:** Add PDF export functionality (#123) - @developer
+- **auth:** Add two-factor authentication (#124) - @developer
+
+### Bug Fixes
+- **dashboard:** Fix chart rendering on mobile (#125) - @developer
+- **api:** Handle null response from payment gateway (#126) - @developer
+
+### Performance
+- **queries:** Add database indexes for user lookups (#127) - @developer
+
+### Breaking Changes
+- **api:** Response format changed to JSON:API (#128)
+  - Migration guide: docs/api-v2.md
+
+### Other Changes
+- **deps:** Update Laravel to 11.x
+- **ci:** Add GitHub Actions workflow
+- **docs:** Update API documentation
+
+### Contributors
+- @developer1 (5 commits)
+- @developer2 (3 commits)</code></pre>
+
+    <h3>5. Update Version Files</h3>
+    <p>Version numbers are updated in relevant project files:</p>
+    <pre class="language-bash"><code class="language-bash"># Update composer.json
+jq ".version = \"$new\"" composer.json > tmp.json && mv tmp.json composer.json
+
+# Update package.json (if exists)
+if [ -f package.json ]; then
+    jq ".version = \"$new\"" package.json > tmp.json && mv tmp.json package.json
+fi
+
+# Update config/app.php version constant (if used)
+sed -i "s/'version' => '.*'/'version' => '$new'/" config/app.php 2>/dev/null || true</code></pre>
+
+    <h3>6. Create Release Commit</h3>
+    <p>A release commit is created with the changelog summary:</p>
+    <pre class="language-bash"><code class="language-bash">git add -A
+git commit -m "chore(release): $new
+
+$(cat CHANGELOG.md | head -50)
+"</code></pre>
+
+    <h3>7. Create Git Tag</h3>
+    <p>An annotated tag is created with release highlights:</p>
+    <pre class="language-bash"><code class="language-bash"># Create annotated tag
+git tag -a "v$new" -m "Release v$new
+
+## Highlights
+&lt;Top 3 changes&gt;
+
+## Full Changelog
+See CHANGELOG.md
+"</code></pre>
+
+    <h3>8. Push Release</h3>
+    <p>The release is pushed to the remote repository and GitHub:</p>
+    <pre class="language-bash"><code class="language-bash"># Push commits and tags
+git push origin main --follow-tags
+
+# Create GitHub release
+gh release create "v$new" \
+    --title "v$new" \
+    --notes-file CHANGELOG.md</code></pre>
+
+    <h2>Example Output</h2>
+    <p>After running the command, you'll see a summary like this:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Release Created
+
+**Version:** v1.1.0
+**Date:** 2024-01-15
+
+### Summary
+- Features: 2
+- Bug Fixes: 2
+- Breaking Changes: 1
+
+### Highlights
+1. PDF export for invoices
+2. Two-factor authentication
+3. Performance improvements
+
+### Files Updated
+- CHANGELOG.md
+- composer.json
+- package.json
+
+### Commands Run
+```bash
+git add -A
+git commit -m "chore(release): 1.1.0"
+git tag -a v1.1.0
+git push origin main --follow-tags
+gh release create v1.1.0
+```
+
+### Next Steps
+1. Verify release on GitHub
+2. Deploy to production
+3. Announce release</code></pre>
+
+    <h2>Changelog Format (Keep a Changelog)</h2>
+    <p>The generated changelog follows the <a href="https://keepachangelog.com/en/1.0.0/" target="_blank" rel="noopener" class="text-primary hover:underline">Keep a Changelog</a> format:</p>
+    <pre class="language-markdown"><code class="language-markdown"># Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+## [1.1.0] - 2024-01-15
+
+### Added
+- PDF export for invoices (#123)
+- Two-factor authentication (#124)
+
+### Fixed
+- Dashboard chart rendering on mobile (#125)
+
+### Security
+- Update dependencies to patch CVE-2024-XXXX
+
+## [1.0.0] - 2024-01-01
+
+### Added
+- Initial release</code></pre>
+
+    <h2>Semantic Versioning Rules</h2>
+    <p>The command follows <a href="https://semver.org/spec/v2.0.0.html" target="_blank" rel="noopener" class="text-primary hover:underline">Semantic Versioning 2.0.0</a> guidelines:</p>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Change Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Version Bump</th>
+                    <th class="text-left py-3 px-4 font-medium">When</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Breaking change</td>
+                    <td class="py-3 px-4">Major</td>
+                    <td class="py-3 px-4">API incompatible changes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">New feature</td>
+                    <td class="py-3 px-4">Minor</td>
+                    <td class="py-3 px-4">Backwards-compatible additions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Bug fix</td>
+                    <td class="py-3 px-4">Patch</td>
+                    <td class="py-3 px-4">Backwards-compatible fixes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Deprecation</td>
+                    <td class="py-3 px-4">Minor</td>
+                    <td class="py-3 px-4">Feature deprecated (still works)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Security fix</td>
+                    <td class="py-3 px-4">Patch</td>
+                    <td class="py-3 px-4">Security vulnerability fixed</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Conventional Commits</h2>
+    <p>The changelog generation parses conventional commit messages. Use these prefixes in your commits:</p>
+    <ul>
+        <li><code>feat:</code> - New features (appears in "Features" section)</li>
+        <li><code>fix:</code> - Bug fixes (appears in "Bug Fixes" section)</li>
+        <li><code>perf:</code> - Performance improvements (appears in "Performance" section)</li>
+        <li><code>docs:</code> - Documentation changes (appears in "Other Changes")</li>
+        <li><code>style:</code> - Code style changes (appears in "Other Changes")</li>
+        <li><code>refactor:</code> - Code refactoring (appears in "Other Changes")</li>
+        <li><code>test:</code> - Test additions or updates (appears in "Other Changes")</li>
+        <li><code>chore:</code> - Maintenance tasks (appears in "Other Changes")</li>
+        <li><code>BREAKING CHANGE:</code> - Breaking changes (appears in "Breaking Changes")</li>
+    </ul>
+
+    <h2>Command Options</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Option</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--dry-run</code></td>
+                    <td class="py-3 px-4">Preview the release without creating it. Shows what would be changed.</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--no-tag</code></td>
+                    <td class="py-3 px-4">Create release commit without creating a git tag.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Files Updated</h2>
+    <p>The command updates or creates these files:</p>
+    <ul>
+        <li><code>CHANGELOG.md</code> - Changelog with release history</li>
+        <li><code>composer.json</code> - Version field updated</li>
+        <li><code>package.json</code> - Version field updated (if exists)</li>
+        <li><code>config/app.php</code> - Version constant updated (if exists)</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Use conventional commits</strong> - Always follow the conventional commit format for accurate changelog generation</li>
+        <li><strong>Review with --dry-run</strong> - Preview changes before creating the release</li>
+        <li><strong>Keep unreleased changes</strong> - Maintain an [Unreleased] section in CHANGELOG.md for work in progress</li>
+        <li><strong>Document breaking changes</strong> - Include migration guides for major version bumps</li>
+        <li><strong>Test before release</strong> - Ensure all tests pass before creating a release</li>
+        <li><strong>Follow semver strictly</strong> - Be consistent with semantic versioning rules</li>
+        <li><strong>Verify GitHub release</strong> - Check that the GitHub release was created successfully</li>
+    </ol>
+
+    <h2>Pre-release Versions</h2>
+    <p>For alpha, beta, and release candidate versions, use the following format:</p>
+    <pre class="language-bash"><code class="language-bash"># Beta releases
+/laravel-agent:git:release 1.1.0-beta.1
+/laravel-agent:git:release 1.1.0-beta.2
+
+# Release candidates
+/laravel-agent:git:release 1.1.0-rc.1
+/laravel-agent:git:release 1.1.0-rc.2
+
+# Alpha releases
+/laravel-agent:git:release 1.1.0-alpha.1</code></pre>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="https://keepachangelog.com/en/1.0.0/" target="_blank" rel="noopener" class="text-primary hover:underline">Keep a Changelog</a> - Changelog format specification</li>
+        <li><a href="https://semver.org/spec/v2.0.0.html" target="_blank" rel="noopener" class="text-primary hover:underline">Semantic Versioning</a> - Version numbering specification</li>
+        <li><a href="https://www.conventionalcommits.org/" target="_blank" rel="noopener" class="text-primary hover:underline">Conventional Commits</a> - Commit message specification</li>
+    </ul>
 </div>

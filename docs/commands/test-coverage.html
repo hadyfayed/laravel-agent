@@ -17,11 +17,126 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Run tests with coverage report and analysis. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/test:coverage</code> command runs your test suite and generates a comprehensive coverage report. It checks for required coverage drivers (Xdebug or PCOV), runs tests with coverage analysis, and provides detailed insights into which parts of your codebase need more test coverage.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:test:coverage [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:test:coverage [min-coverage] [format]</code></pre>
+
+    <h3>Arguments</h3>
+    <ul>
+        <li><strong>min-coverage</strong> (optional) - Minimum coverage percentage required (default: 80)</li>
+        <li><strong>format</strong> (optional) - Output format: text or html (default: text)</li>
+    </ul>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:test:coverage</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Run with default 80% minimum coverage
+/laravel-agent:test:coverage
+
+# Require 90% coverage
+/laravel-agent:test:coverage 90
+
+# Generate HTML coverage report
+/laravel-agent:test:coverage 80 html</code></pre>
+
+    <h2>How It Works</h2>
+    <p>The command follows a systematic process to generate coverage reports:</p>
+
+    <h3>1. Check Requirements</h3>
+    <p>First, it verifies that a coverage driver is installed:</p>
+    <pre class="language-bash"><code class="language-bash">php -m | grep xdebug && echo "XDEBUG=yes" || echo "XDEBUG=no"
+php -m | grep pcov && echo "PCOV=yes" || echo "PCOV=no"</code></pre>
+
+    <h3>2. Run Tests with Coverage</h3>
+    <p>Executes tests with coverage enabled using your test framework:</p>
+    <pre class="language-bash"><code class="language-bash"># For Pest PHP
+vendor/bin/pest --coverage --min=80
+
+# For PHPUnit
+vendor/bin/phpunit --coverage-text --coverage-html=coverage</code></pre>
+
+    <h3>3. Generate Report</h3>
+    <p>Provides a detailed analysis of test coverage:</p>
+    <pre class="language-markdown"><code class="language-markdown">## Coverage Report
+
+### Summary
+- Lines: 85.3%
+- Functions: 92.1%
+- Classes: 88.0%
+
+### Uncovered Files
+| File | Coverage |
+|------|----------|
+| app/Services/PaymentService.php | 45% |
+| app/Actions/ProcessOrder.php | 62% |
+
+### Recommendations
+1. Add tests for PaymentService::refund()
+2. Cover edge cases in ProcessOrder</code></pre>
+
+    <h2>Coverage Drivers</h2>
+    <p>Two main drivers are available for PHP code coverage:</p>
+
+    <h3>PCOV (Recommended)</h3>
+    <p>PCOV is faster than Xdebug when you only need coverage data (not debugging):</p>
+    <pre class="language-bash"><code class="language-bash">composer require --dev pcov/clobber</code></pre>
+    <p>PCOV is lightweight and specifically designed for code coverage, making it the preferred choice for CI/CD pipelines and local development when debugging isn't needed.</p>
+
+    <h3>Xdebug</h3>
+    <p>Xdebug provides full debugging capabilities plus coverage:</p>
+    <pre class="language-ini"><code class="language-ini">xdebug.mode=coverage</code></pre>
+    <p>Use Xdebug when you need both debugging and coverage features. Note that it's slower than PCOV but offers more comprehensive development tools.</p>
+
+    <h2>Coverage Metrics Explained</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Metric</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                    <th class="text-left py-3 px-4 font-medium">Good Target</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Lines</td>
+                    <td class="py-3 px-4">Percentage of code lines executed by tests</td>
+                    <td class="py-3 px-4">80-90%</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Functions</td>
+                    <td class="py-3 px-4">Percentage of functions/methods called by tests</td>
+                    <td class="py-3 px-4">85-95%</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Classes</td>
+                    <td class="py-3 px-4">Percentage of classes with at least one test</td>
+                    <td class="py-3 px-4">85-95%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Set realistic targets</strong> - 80% is a good baseline; 100% is often impractical</li>
+        <li><strong>Focus on critical paths</strong> - Prioritize business logic over boilerplate</li>
+        <li><strong>Use HTML reports</strong> - Visual reports help identify specific uncovered lines</li>
+        <li><strong>Run in CI/CD</strong> - Enforce minimum coverage in your deployment pipeline</li>
+        <li><strong>Track trends</strong> - Monitor coverage over time, not just absolute numbers</li>
+    </ol>
+
+    <h2>HTML Report Output</h2>
+    <p>When generating HTML reports, files are created in the <code>coverage/</code> directory:</p>
+    <pre class="language-bash"><code class="language-bash">coverage/
+├── index.html           # Main coverage dashboard
+├── dashboard.html       # Coverage metrics overview
+└── [namespace folders]  # Per-file coverage details</code></pre>
+    <p>Open <code>coverage/index.html</code> in your browser to explore line-by-line coverage with color-coded indicators.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate new tests to improve coverage</li>
+        <li><a href="{{ '/commands/test-run.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:run</a> - Run tests without coverage</li>
+        <li><a href="{{ '/skills/laravel-testing.html' | relative_url }}" class="text-primary hover:underline">laravel-testing skill</a> - Auto-invoked for test writing</li>
+    </ul>
 </div>

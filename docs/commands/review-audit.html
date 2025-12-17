@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:review:audit
-description: Full codebase audit
+description: Full codebase security and quality audit
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,332 @@ back_text: All Commands
         <span class="badge badge-review">Review</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:review:audit</h1>
-    <p class="text-xl text-muted-foreground">Full codebase audit</p>
+    <p class="text-xl text-muted-foreground">Full codebase security and quality audit</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Full codebase audit. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/review:audit</code> command performs a comprehensive security and quality audit of your entire Laravel codebase. It analyzes authentication, authorization, input validation, code quality metrics, SOLID principles, test coverage, and generates a detailed audit report with actionable recommendations.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:review:audit [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:review:audit [target-path] [--focus=area]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:review:audit</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Full codebase audit
+/laravel-agent:review:audit
+
+# Audit HTTP layer only
+/laravel-agent:review:audit app/Http
+
+# Security-focused audit
+/laravel-agent:review:audit --focus=security
+
+# Quality audit of services
+/laravel-agent:review:audit app/Services --focus=quality</code></pre>
+
+    <h2>Focus Areas</h2>
+    <p>You can target specific areas of your audit:</p>
+    <ul>
+        <li><strong>all</strong> - Complete audit covering security, quality, performance, and testing (default)</li>
+        <li><strong>security</strong> - OWASP Top 10 focused audit (authentication, authorization, injection, XSS)</li>
+        <li><strong>quality</strong> - SOLID/DRY/complexity focused audit (code smells, coupling, cohesion)</li>
+        <li><strong>performance</strong> - Performance analysis (N+1 queries, caching opportunities, indexing)</li>
+        <li><strong>testing</strong> - Test coverage and quality assessment</li>
+    </ul>
+
+    <h2>Audit Process</h2>
+    <p>The audit follows a systematic approach:</p>
+
+    <h3>1. Scope Analysis</h3>
+    <p>First, the command identifies the files and components to audit:</p>
+    <pre class="language-bash"><code class="language-bash"># Count files to audit
+find app/ -name "*.php" | wc -l
+
+# Identify high-priority targets
+ls -la app/Http/Controllers/
+ls -la app/Services/
+ls -la app/Models/</code></pre>
+
+    <h3>2. Parallel Domain Audits</h3>
+    <p>The command launches domain-specific audits in parallel for efficiency:</p>
+    <pre class="language-bash"><code class="language-bash">┌──────────────┬──────────────┬──────────────┬──────────────┐
+│ Controllers  │  Services    │   Models     │   Configs    │
+│ Audit        │  Audit       │   Audit      │   Audit      │
+└──────────────┴──────────────┴──────────────┴──────────────┘</code></pre>
+
+    <h3>3. Security Audit Checklist</h3>
+    <p>Comprehensive security checks across multiple categories:</p>
+
+    <h4>Authentication</h4>
+    <ul>
+        <li>Auth middleware on protected routes</li>
+        <li>Password hashing (bcrypt/argon2)</li>
+        <li>Session security settings</li>
+        <li>Remember me token security</li>
+    </ul>
+
+    <h4>Authorization</h4>
+    <ul>
+        <li>Policies for all models</li>
+        <li>Gate definitions</li>
+        <li>Role/permission checks</li>
+        <li>Resource ownership validation</li>
+    </ul>
+
+    <h4>Input Validation</h4>
+    <ul>
+        <li>Form Request usage</li>
+        <li>File upload validation</li>
+        <li>API request validation</li>
+        <li>Query parameter sanitization</li>
+    </ul>
+
+    <h4>Output Encoding</h4>
+    <ul>
+        <li>Blade escaping ({{ }} vs {!! !!})</li>
+        <li>JSON response encoding</li>
+        <li>Header injection prevention</li>
+    </ul>
+
+    <h4>Database Security</h4>
+    <ul>
+        <li>Parameterized queries</li>
+        <li>Eloquent usage (not raw SQL)</li>
+        <li>Mass assignment protection</li>
+        <li>Sensitive data encryption</li>
+    </ul>
+
+    <h4>Configuration</h4>
+    <ul>
+        <li>Debug mode off in production</li>
+        <li>APP_KEY set and secure</li>
+        <li>HTTPS enforcement</li>
+        <li>CORS configuration</li>
+        <li>Security headers</li>
+    </ul>
+
+    <h3>4. Quality Metrics</h3>
+    <p>Code quality is measured against industry-standard thresholds:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Metric</th>
+                    <th class="text-left py-3 px-4 font-medium">Threshold</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Method Lines</td>
+                    <td class="py-3 px-4">≤ 20 lines</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Class Lines</td>
+                    <td class="py-3 px-4">≤ 200 lines</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Cyclomatic Complexity</td>
+                    <td class="py-3 px-4">≤ 10 per method</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Dependencies</td>
+                    <td class="py-3 px-4">≤ 5 constructor params</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Test Coverage</td>
+                    <td class="py-3 px-4">≥ 80%</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">DRY Violations</td>
+                    <td class="py-3 px-4">0 (3+ duplicates)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Generated Audit Report</h2>
+    <p>The command generates a comprehensive markdown report with the following structure:</p>
+
+    <h3>Executive Summary</h3>
+    <p>High-level overview with scores and issue counts:</p>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Area</th>
+                    <th class="text-left py-3 px-4 font-medium">Score</th>
+                    <th class="text-left py-3 px-4 font-medium">Issues</th>
+                    <th class="text-left py-3 px-4 font-medium">Recommendation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Security</td>
+                    <td class="py-3 px-4">85/100</td>
+                    <td class="py-3 px-4">3</td>
+                    <td class="py-3 px-4">Address auth gaps</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Quality</td>
+                    <td class="py-3 px-4">78/100</td>
+                    <td class="py-3 px-4">7</td>
+                    <td class="py-3 px-4">Reduce complexity</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel</td>
+                    <td class="py-3 px-4">92/100</td>
+                    <td class="py-3 px-4">2</td>
+                    <td class="py-3 px-4">Minor improvements</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Testing</td>
+                    <td class="py-3 px-4">65/100</td>
+                    <td class="py-3 px-4">5</td>
+                    <td class="py-3 px-4">Increase coverage</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Overall</strong></td>
+                    <td class="py-3 px-4"><strong>80/100</strong></td>
+                    <td class="py-3 px-4"><strong>17</strong></td>
+                    <td class="py-3 px-4"><strong>See details</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Security Findings</h3>
+    <p>Categorized by severity (Critical, High, Medium, Low):</p>
+    <pre class="language-markdown"><code class="language-markdown">### Critical (0)
+No critical security issues found.
+
+### High (2)
+1. **Missing CSRF protection** - `routes/api.php:45`
+2. **Raw query with user input** - `app/Services/ReportService.php:78`
+
+### Medium (1)
+1. **Debug mode enabled in config** - `config/app.php`</code></pre>
+
+    <h3>Quality Findings</h3>
+    <p>Analysis of code complexity, SOLID violations, and DRY violations:</p>
+    <pre class="language-markdown"><code class="language-markdown">### High Complexity Methods
+| File | Method | Complexity | Recommendation |
+|------|--------|------------|----------------|
+| OrderService.php | processOrder | 15 | Extract to smaller methods |
+
+### SOLID Violations
+| File | Violation | Recommendation |
+|------|-----------|----------------|
+| UserController.php | SRP | Extract validation to FormRequest |
+
+### DRY Violations
+| Pattern | Occurrences | Files |
+|---------|-------------|-------|
+| Date formatting | 5 | Various |</code></pre>
+
+    <h3>Testing Gaps</h3>
+    <p>Identifies missing tests and coverage by directory:</p>
+    <pre class="language-markdown"><code class="language-markdown">### Missing Tests
+| File | Methods Without Tests |
+|------|----------------------|
+| PaymentService.php | processRefund, validateCard |
+
+### Coverage by Directory
+| Directory | Coverage |
+|-----------|----------|
+| app/Http/Controllers | 75% |
+| app/Services | 60% |
+| app/Models | 90% |</code></pre>
+
+    <h3>Recommendations</h3>
+    <p>Prioritized action items:</p>
+    <ul>
+        <li><strong>Immediate Actions</strong> - Critical fixes that should be addressed immediately</li>
+        <li><strong>Short-term Improvements</strong> - Important enhancements to schedule within weeks</li>
+        <li><strong>Long-term Enhancements</strong> - Strategic improvements for future planning</li>
+    </ul>
+
+    <h2>Output Options</h2>
+    <p>The audit report can be generated in multiple formats:</p>
+    <pre class="language-bash"><code class="language-bash"># Generate markdown report
+/laravel-agent:review:audit > audit-report.md
+
+# Generate JSON for CI integration
+/laravel-agent:review:audit --format=json > audit-report.json
+
+# Generate only score for CI pipeline
+/laravel-agent:review:audit --score-only
+# Output: 80</code></pre>
+
+    <h2>Sample Report Structure</h2>
+    <p>Example of a complete audit report:</p>
+    <pre class="language-markdown"><code class="language-markdown"># Laravel Codebase Audit Report
+
+**Generated:** 2025-12-17 14:30:00
+**Scope:** app/
+**Files Audited:** 145
+
+## Executive Summary
+
+| Area | Score | Issues | Recommendation |
+|------|-------|--------|----------------|
+| Security | 85/100 | 3 | Address auth gaps |
+| Quality | 78/100 | 7 | Reduce complexity |
+| Laravel | 92/100 | 2 | Minor improvements |
+| Testing | 65/100 | 5 | Increase coverage |
+| **Overall** | **80/100** | **17** | **See details** |
+
+## Recommendations
+
+### Immediate Actions
+1. Fix raw SQL query in ReportService
+2. Add CSRF middleware to API routes
+3. Disable debug mode
+
+### Short-term Improvements
+1. Refactor high-complexity methods
+2. Add missing tests for PaymentService
+3. Extract duplicate date formatting
+
+### Long-term Enhancements
+1. Implement event-driven architecture
+2. Add circuit breakers for external services
+3. Implement caching strategy</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Run regularly</strong> - Schedule audits before major releases or quarterly</li>
+        <li><strong>Address critical issues immediately</strong> - Security findings should be prioritized</li>
+        <li><strong>Track improvements</strong> - Compare audit scores over time to measure progress</li>
+        <li><strong>Integrate with CI/CD</strong> - Use JSON output to fail builds on low scores</li>
+        <li><strong>Focus incrementally</strong> - Use --focus flag to tackle specific areas</li>
+    </ol>
+
+    <h2>CI/CD Integration</h2>
+    <p>Example GitHub Actions workflow:</p>
+    <pre class="language-yaml"><code class="language-yaml">name: Code Audit
+
+on: [pull_request]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Audit
+        run: /laravel-agent:review:audit --score-only
+      - name: Check Score
+        run: |
+          SCORE=$(/laravel-agent:review:audit --score-only)
+          if [ $SCORE -lt 70 ]; then
+            echo "Audit score too low: $SCORE"
+            exit 1
+          fi</code></pre>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/review-security.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:security</a> - Security-focused review</li>
+        <li><a href="{{ '/commands/review-quality.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:quality</a> - Code quality review</li>
+        <li><a href="{{ '/commands/test-coverage.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:coverage</a> - Generate test coverage report</li>
+    </ul>
 </div>

@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:import:make
-description: Create CSV/Excel importers
+description: Create robust CSV/Excel importers with validation, chunking, and error handling
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,588 @@ back_text: All Commands
         <span class="badge badge-data">Data</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:import:make</h1>
-    <p class="text-xl text-muted-foreground">Create CSV/Excel importers</p>
+    <p class="text-xl text-muted-foreground">Create robust CSV/Excel importers with validation, chunking, and error handling</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create CSV/Excel importers. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/import:make</code> command generates production-ready CSV/Excel importers with comprehensive features including validation, chunking for large files, error handling, and progress tracking. It supports both <strong>Maatwebsite Excel</strong> (full-featured, Laravel-specific) and <strong>Spatie Simple Excel</strong> (lightweight, streaming) packages.</p>
+
+    <p>This command creates a complete import system with:</p>
+    <ul>
+        <li><strong>Row-by-row validation</strong> with custom error messages</li>
+        <li><strong>Chunked processing</strong> for memory-efficient handling of large files</li>
+        <li><strong>Batch inserts</strong> for improved database performance</li>
+        <li><strong>Error tracking</strong> with detailed failure reporting</li>
+        <li><strong>Queued imports</strong> for background processing of massive files</li>
+        <li><strong>Upsert support</strong> for update-or-create behavior</li>
+        <li><strong>Upload UI</strong> with template downloads and error display</li>
+    </ul>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:import:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:import:make &lt;ImporterName&gt; [--model=&lt;Model&gt;] [--package=&lt;maatwebsite|spatie&gt;]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:import:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create a product importer with validation
+/laravel-agent:import:make ProductImport --model=Product
+
+# Create a lightweight user importer using Spatie
+/laravel-agent:import:make UserImport --package=spatie
+
+# Create an order importer with queued processing
+/laravel-agent:import:make OrderImport --model=Order</code></pre>
+
+    <h2>Supported File Formats</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Format</th>
+                    <th class="text-left py-3 px-4 font-medium">Extension</th>
+                    <th class="text-left py-3 px-4 font-medium">Maatwebsite</th>
+                    <th class="text-left py-3 px-4 font-medium">Spatie</th>
+                    <th class="text-left py-3 px-4 font-medium">Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">CSV</td>
+                    <td class="py-3 px-4"><code>.csv</code></td>
+                    <td class="py-3 px-4">✅</td>
+                    <td class="py-3 px-4">✅</td>
+                    <td class="py-3 px-4">Best for large files, universal support</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Excel 2007+</td>
+                    <td class="py-3 px-4"><code>.xlsx</code></td>
+                    <td class="py-3 px-4">✅</td>
+                    <td class="py-3 px-4">✅</td>
+                    <td class="py-3 px-4">Modern Excel format, multiple sheets</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Excel Legacy</td>
+                    <td class="py-3 px-4"><code>.xls</code></td>
+                    <td class="py-3 px-4">✅</td>
+                    <td class="py-3 px-4">❌</td>
+                    <td class="py-3 px-4">Older format, limited support</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>What Gets Created</h2>
+    <p>A complete importer system includes the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Import Class</td>
+                    <td class="py-3 px-4"><code>app/Imports/</code></td>
+                    <td class="py-3 px-4">Core import logic with validation and row processing</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Controller</td>
+                    <td class="py-3 px-4"><code>app/Http/Controllers/</code></td>
+                    <td class="py-3 px-4">Handles file uploads and triggers import</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Form Request</td>
+                    <td class="py-3 px-4"><code>app/Http/Requests/</code></td>
+                    <td class="py-3 px-4">Validates file uploads (size, type, permissions)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Upload View</td>
+                    <td class="py-3 px-4"><code>resources/views/</code></td>
+                    <td class="py-3 px-4">User interface with file picker and error display</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Queue Job</td>
+                    <td class="py-3 px-4"><code>app/Jobs/</code></td>
+                    <td class="py-3 px-4">Background processing for large files (optional)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Package Comparison</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Feature</th>
+                    <th class="text-left py-3 px-4 font-medium">Maatwebsite Excel</th>
+                    <th class="text-left py-3 px-4 font-medium">Spatie Simple Excel</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel Integration</td>
+                    <td class="py-3 px-4">✅ Deep integration</td>
+                    <td class="py-3 px-4">⚠️ Manual setup</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Built-in Validation</td>
+                    <td class="py-3 px-4">✅ Yes</td>
+                    <td class="py-3 px-4">❌ Manual</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Queue Support</td>
+                    <td class="py-3 px-4">✅ Built-in</td>
+                    <td class="py-3 px-4">⚠️ Manual</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Memory Usage</td>
+                    <td class="py-3 px-4">⚠️ Higher</td>
+                    <td class="py-3 px-4">✅ Lower (streaming)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Learning Curve</td>
+                    <td class="py-3 px-4">⚠️ Moderate</td>
+                    <td class="py-3 px-4">✅ Simple</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Best For</td>
+                    <td class="py-3 px-4">Complex imports, full features</td>
+                    <td class="py-3 px-4">Simple imports, large files</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Example Output Structure</h2>
+    <p>For <code>/laravel-agent:import:make ProductImport --model=Product</code>:</p>
+    <pre class="language-bash"><code class="language-bash">app/
+├── Imports/
+│   └── ProductImport.php
+├── Http/
+│   ├── Controllers/
+│   │   └── ProductImportController.php
+│   └── Requests/
+│       └── ProductImportRequest.php
+└── Jobs/
+    └── ProcessProductImport.php
+resources/views/
+└── products/
+    └── import.blade.php
+routes/
+└── web.php (updated)</code></pre>
+
+    <h2>Generated Import Class (Maatwebsite)</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Imports;
+
+use App\Models\Product;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+
+final class ProductImport implements
+    ToModel,
+    WithHeadingRow,
+    WithValidation,
+    SkipsOnFailure,
+    WithBatchInserts,
+    WithChunkReading
+{
+    use SkipsFailures;
+
+    public function model(array $row): ?Product
+    {
+        return new Product([
+            'name' => $row['name'],
+            'sku' => $row['sku'],
+            'description' => $row['description'] ?? null,
+            'price_cents' => (int) ($row['price'] * 100),
+            'stock' => (int) $row['stock'],
+            'category_id' => $this->findCategoryId($row['category']),
+        ]);
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'sku' => ['required', 'string', 'unique:products,sku'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'category' => ['required', 'string'],
+        ];
+    }
+
+    public function customValidationMessages(): array
+    {
+        return [
+            'sku.unique' => 'SKU :input already exists.',
+        ];
+    }
+
+    public function batchSize(): int
+    {
+        return 1000;
+    }
+
+    public function chunkSize(): int
+    {
+        return 1000;
+    }
+
+    private function findCategoryId(string $categoryName): ?int
+    {
+        return \App\Models\Category::firstWhere('name', $categoryName)?->id;
+    }
+}</code></pre>
+
+    <h2>Generated Controller Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Imports\ProductImport;
+use App\Http\Requests\ProductImportRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+
+final class ProductImportController extends Controller
+{
+    public function create(): View
+    {
+        return view('products.import');
+    }
+
+    public function store(ProductImportRequest $request): RedirectResponse
+    {
+        $import = new ProductImport();
+
+        Excel::import($import, $request->file('file'));
+
+        $failures = $import->failures();
+
+        if ($failures->isNotEmpty()) {
+            return back()
+                ->with('warning', "Imported with {$failures->count()} errors.")
+                ->with('failures', $failures);
+        }
+
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'Products imported successfully.');
+    }
+
+    /**
+     * Queued import for large files.
+     */
+    public function storeQueued(ProductImportRequest $request): RedirectResponse
+    {
+        $import = new ProductQueuedImport(auth()->id());
+
+        Excel::queueImport($import, $request->file('file'));
+
+        return redirect()
+            ->route('products.index')
+            ->with('info', 'Import started. You will be notified when complete.');
+    }
+}</code></pre>
+
+    <h2>Validation Patterns</h2>
+    <p>The importer includes comprehensive validation rules:</p>
+
+    <h3>Basic Validation</h3>
+    <pre class="language-php"><code class="language-php">public function rules(): array
+{
+    return [
+        'name' => ['required', 'string', 'max:255'],
+        'sku' => ['required', 'string', 'unique:products,sku'],
+        'email' => ['required', 'email', 'unique:users,email'],
+        'price' => ['required', 'numeric', 'min:0'],
+        'stock' => ['required', 'integer', 'min:0'],
+        'status' => ['required', 'in:active,inactive'],
+        'published_at' => ['nullable', 'date'],
+    ];
+}</code></pre>
+
+    <h3>Custom Error Messages</h3>
+    <pre class="language-php"><code class="language-php">public function customValidationMessages(): array
+{
+    return [
+        'sku.unique' => 'SKU :input already exists in the database.',
+        'email.unique' => 'Email :input is already registered.',
+        'price.min' => 'Price must be at least 0.',
+    ];
+}</code></pre>
+
+    <h3>Conditional Validation</h3>
+    <pre class="language-php"><code class="language-php">public function rules(): array
+{
+    return [
+        'type' => ['required', 'in:physical,digital'],
+        'weight' => [
+            'required_if:type,physical',
+            'nullable',
+            'numeric',
+            'min:0',
+        ],
+        'download_url' => [
+            'required_if:type,digital',
+            'nullable',
+            'url',
+        ],
+    ];
+}</code></pre>
+
+    <h2>Large File Handling</h2>
+    <p>For files with thousands of rows, use queued imports for background processing:</p>
+
+    <h3>Queued Import Class</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Imports;
+
+use App\Models\Product;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldQueue as ShouldQueueContract;
+use Illuminate\Bus\Queueable;
+
+final class ProductQueuedImport implements
+    ToModel,
+    WithHeadingRow,
+    WithChunkReading,
+    ShouldQueue,
+    ShouldQueueContract
+{
+    use Queueable;
+
+    public function __construct(
+        public readonly int $userId,
+    ) {}
+
+    public function model(array $row): ?Product
+    {
+        return new Product([
+            'name' => $row['name'],
+            'sku' => $row['sku'],
+            'price_cents' => (int) ($row['price'] * 100),
+            'created_by_id' => $this->userId,
+        ]);
+    }
+
+    public function chunkSize(): int
+    {
+        return 500; // Process 500 rows at a time
+    }
+}</code></pre>
+
+    <h3>Memory-Efficient Chunking (Spatie)</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Spatie\SimpleExcel\SimpleExcelReader;
+
+SimpleExcelReader::create($filePath)
+    ->useDelimiter(',')
+    ->getRows()
+    ->chunk(1000)
+    ->each(function ($chunk) {
+        $data = $chunk->map(fn ($row) => [
+            'name' => $row['name'],
+            'sku' => $row['sku'],
+            'price_cents' => (int) ($row['price'] * 100),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ])->toArray();
+
+        Product::insert($data); // Bulk insert
+    });</code></pre>
+
+    <h2>Upsert Support (Update or Create)</h2>
+    <p>Use the <code>WithUpserts</code> concern to update existing records:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+declare(strict_types=1);
+
+namespace App\Imports;
+
+use App\Models\Product;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithUpserts;
+
+final class ProductUpsertImport implements ToModel, WithHeadingRow, WithUpserts
+{
+    public function model(array $row): ?Product
+    {
+        return new Product([
+            'sku' => $row['sku'],
+            'name' => $row['name'],
+            'price_cents' => (int) ($row['price'] * 100),
+            'stock' => (int) $row['stock'],
+        ]);
+    }
+
+    public function uniqueBy(): string
+    {
+        return 'sku'; // Update existing records by SKU
+    }
+}</code></pre>
+
+    <h2>Error Handling</h2>
+    <p>The importer tracks validation failures and allows partial imports:</p>
+
+    <h3>Displaying Errors in View</h3>
+    <pre class="language-blade"><code class="language-blade">@if(session('failures'))
+    &lt;div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded"&gt;
+        &lt;h3 class="font-bold"&gt;Import Errors&lt;/h3&gt;
+        &lt;ul class="list-disc pl-5 mt-2"&gt;
+            @foreach(session('failures') as $failure)
+                &lt;li&gt;
+                    Row {{ $failure->row() }}:
+                    {{ implode(', ', $failure->errors()) }}
+                &lt;/li&gt;
+            @endforeach
+        &lt;/ul&gt;
+    &lt;/div&gt;
+@endif</code></pre>
+
+    <h3>Custom Error Handling</h3>
+    <pre class="language-php"><code class="language-php">use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\SkipsErrors;
+
+final class ProductImport implements SkipsOnError
+{
+    use SkipsErrors;
+
+    public function onError(\Throwable $e)
+    {
+        // Log the error
+        \Log::error('Import error: ' . $e->getMessage());
+
+        // Notify admin
+        \Notification::route('mail', 'admin@example.com')
+            ->notify(new ImportErrorNotification($e));
+    }
+}</code></pre>
+
+    <h2>Progress Tracking</h2>
+    <p>Track import progress for user feedback:</p>
+    <pre class="language-php"><code class="language-php">use Maatwebsite\Excel\Concerns\WithProgressBar;
+
+final class ProductImport implements WithProgressBar
+{
+    // Progress bar automatically shown in console
+}</code></pre>
+
+    <h2>Expected CSV Format</h2>
+    <p>For a Product importer, the CSV should have headers matching the validation rules:</p>
+    <pre class="language-csv"><code class="language-csv">name,sku,description,price,stock,category
+"Widget Pro","WGT-001","Premium widget",29.99,100,"Electronics"
+"Gadget Max","GDG-002","Advanced gadget",49.99,50,"Electronics"
+"Tool Set","TLS-003","Complete tool set",79.99,25,"Tools"</code></pre>
+
+    <h2>Interactive Prompts</h2>
+    <p>When run without arguments, the command prompts for:</p>
+    <ol>
+        <li><strong>Import name</strong> - The class name (e.g., ProductImport)</li>
+        <li><strong>Target model</strong> - Select from existing models or specify new</li>
+        <li><strong>Package preference</strong> - Maatwebsite Excel or Spatie Simple Excel</li>
+        <li><strong>Import behavior</strong> - Create only, Upsert, or Replace all</li>
+        <li><strong>File types to support</strong> - CSV, XLSX, XLS</li>
+        <li><strong>Large file support</strong> - Enable queued processing for massive files</li>
+    </ol>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Always validate input</strong> - Never trust uploaded data; use comprehensive validation rules</li>
+        <li><strong>Use chunking for large files</strong> - Process in batches to avoid memory exhaustion</li>
+        <li><strong>Queue large imports</strong> - Don't block user requests; use background jobs for files with 1000+ rows</li>
+        <li><strong>Provide template downloads</strong> - Give users a sample CSV with correct headers and format</li>
+        <li><strong>Skip on failure</strong> - Allow partial imports instead of failing completely on first error</li>
+        <li><strong>Log import activity</strong> - Track who imported what and when for audit trails</li>
+        <li><strong>Set file size limits</strong> - Prevent abuse with reasonable upload size restrictions (e.g., 10MB)</li>
+        <li><strong>Use batch inserts</strong> - Improve performance with <code>WithBatchInserts</code> concern</li>
+        <li><strong>Handle relationships carefully</strong> - Resolve foreign keys before creating records</li>
+        <li><strong>Test with real data</strong> - Use actual customer data (anonymized) to catch edge cases</li>
+    </ol>
+
+    <h2>Performance Considerations</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">File Size</th>
+                    <th class="text-left py-3 px-4 font-medium">Rows</th>
+                    <th class="text-left py-3 px-4 font-medium">Recommended Approach</th>
+                    <th class="text-left py-3 px-4 font-medium">Chunk Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">&lt; 1 MB</td>
+                    <td class="py-3 px-4">&lt; 1,000</td>
+                    <td class="py-3 px-4">Synchronous import</td>
+                    <td class="py-3 px-4">No chunking needed</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">1-5 MB</td>
+                    <td class="py-3 px-4">1,000-5,000</td>
+                    <td class="py-3 px-4">Synchronous with chunking</td>
+                    <td class="py-3 px-4">1,000 rows</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">5-20 MB</td>
+                    <td class="py-3 px-4">5,000-20,000</td>
+                    <td class="py-3 px-4">Queued import</td>
+                    <td class="py-3 px-4">500-1,000 rows</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">&gt; 20 MB</td>
+                    <td class="py-3 px-4">&gt; 20,000</td>
+                    <td class="py-3 px-4">Queued with streaming</td>
+                    <td class="py-3 px-4">500 rows</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Routes Added</h2>
+    <p>The command automatically adds routes to <code>routes/web.php</code>:</p>
+    <pre class="language-php"><code class="language-php">use App\Http\Controllers\ProductImportController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/products/import', [ProductImportController::class, 'create'])
+        ->name('products.import.create');
+
+    Route::post('/products/import', [ProductImportController::class, 'store'])
+        ->name('products.import.store');
+
+    Route::get('/products/import/template', [ProductImportController::class, 'template'])
+        ->name('products.import.template');
+});</code></pre>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/export-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:export:make</a> - Create data exporters</li>
+        <li><a href="{{ '/commands/validator-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:validator:make</a> - Generate custom validators</li>
+        <li><a href="{{ '/commands/job-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:job:make</a> - Create queue jobs</li>
+    </ul>
 </div>

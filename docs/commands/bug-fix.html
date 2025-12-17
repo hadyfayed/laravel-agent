@@ -17,11 +17,288 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>AI-powered bug analysis and fix suggestions. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/bug:fix</code> command provides intelligent error analysis for Laravel applications. It examines error messages, parses stack traces, identifies root causes, and suggests actionable fixes with multiple solution options. The AI analyzes your codebase context to provide tailored recommendations specific to your application architecture.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:bug:fix [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:bug:fix [error-source]</code></pre>
+
+    <h2>Error Sources</h2>
+    <p>You can provide errors from multiple sources:</p>
+    <ul>
+        <li><strong>Latest from logs</strong> - Automatically reads from <code>storage/logs/laravel.log</code></li>
+        <li><strong>Direct error message</strong> - Paste the error text directly</li>
+        <li><strong>Specific log file</strong> - Provide path to any log file</li>
+        <li><strong>Exception type</strong> - Search for specific exception classes</li>
+        <li><strong>Telescope</strong> - Extract from Laravel Telescope exceptions</li>
+    </ul>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:bug:fix</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Analyze latest error from logs
+/laravel-agent:bug:fix
+
+# Analyze specific error message
+/laravel-agent:bug:fix "Class 'App\Services\PaymentService' not found"
+
+# Analyze from specific log file
+/laravel-agent:bug:fix storage/logs/laravel.log
+
+# Find specific exception type
+/laravel-agent:bug:fix --exception=QueryException
+
+# Analyze validation errors
+/laravel-agent:bug:fix "The email field is required"</code></pre>
+
+    <h2>Common Error Patterns</h2>
+    <p>The command recognizes and provides specialized analysis for these common Laravel error patterns:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Error Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Common Causes</th>
+                    <th class="text-left py-3 px-4 font-medium">Typical Solutions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>QueryException</strong></td>
+                    <td class="py-3 px-4">Missing columns, foreign key constraints, duplicate entries, SQL syntax errors</td>
+                    <td class="py-3 px-4">Add migrations, fix constraints, check unique indexes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Class Not Found</strong></td>
+                    <td class="py-3 px-4">Missing imports, autoload issues, namespace mismatches</td>
+                    <td class="py-3 px-4">Add use statements, run composer dump-autoload, fix namespaces</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Method Not Found</strong></td>
+                    <td class="py-3 px-4">Typos in method names, missing traits, wrong model relationships</td>
+                    <td class="py-3 px-4">Fix method names, add traits, correct relationship definitions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Validation Errors</strong></td>
+                    <td class="py-3 px-4">Missing validation rules, custom rule issues, Request class problems</td>
+                    <td class="py-3 px-4">Add rules, fix custom validators, update Form Requests</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Authentication Issues</strong></td>
+                    <td class="py-3 px-4">Guard configuration, middleware order, session problems</td>
+                    <td class="py-3 px-4">Configure guards, reorder middleware, check session driver</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>How Analysis Works</h2>
+    <p>The bug analysis process follows these steps:</p>
+
+    <ol>
+        <li><strong>Gather Error Context</strong> - Extracts error messages from logs, Telescope, or provided text</li>
+        <li><strong>Parse Stack Trace</strong> - Identifies the call chain leading to the error</li>
+        <li><strong>Identify Root Cause</strong> - Determines the underlying issue, not just the symptom</li>
+        <li><strong>Find Related Code</strong> - Locates relevant files and examines surrounding context</li>
+        <li><strong>Check Common Patterns</strong> - Matches against known Laravel error patterns</li>
+        <li><strong>Generate Solutions</strong> - Provides multiple fix options with code examples</li>
+        <li><strong>Suggest Prevention</strong> - Recommends tests and practices to avoid recurrence</li>
+    </ol>
+
+    <h2>Example Analysis Output</h2>
+    <p>When analyzing a database error, you'll receive structured output like this:</p>
+
+    <pre class="language-markdown"><code class="language-markdown">## Bug Analysis: QueryException
+
+### Error
+```
+Illuminate\Database\QueryException: SQLSTATE[42S22]: Column not found:
+1054 Unknown column 'users.tenant_id' in 'where clause'
+```
+
+### Root Cause
+The `tenant_id` column is referenced in a query scope but doesn't exist
+in the users table. This typically occurs when:
+- A migration was not run
+- The scope was added without a corresponding schema change
+- A column was renamed but the scope wasn't updated
+
+### Stack Trace
+| # | File | Line | Method |
+|---|------|------|--------|
+| 1 | app/Models/User.php | 45 | scopeForTenant |
+| 2 | app/Services/UserService.php | 23 | getUsers |
+| 3 | app/Http/Controllers/UserController.php | 15 | index |
+
+### Solution
+
+**Recommended Fix: Add the missing column**
+
+1. Create a migration:
+```bash
+php artisan make:migration add_tenant_id_to_users_table
+```
+
+2. Add the column:
+```php
+&lt;?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreignId('tenant_id')->nullable()->after('id');
+            $table->foreign('tenant_id')->references('id')->on('tenants');
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['tenant_id']);
+            $table->dropColumn('tenant_id');
+        });
+    }
+};
+```
+
+3. Run the migration:
+```bash
+php artisan migrate
+```
+
+**Alternative Fix: Update the scope if column shouldn't exist**
+
+If you're using a different column for tenant relationships:
+
+```php
+// app/Models/User.php
+
+// Before
+public function scopeForTenant($query, $tenantId)
+{
+    return $query->where('tenant_id', $tenantId);
+}
+
+// After (if using different column)
+public function scopeForTenant($query, $tenantId)
+{
+    return $query->where('organization_id', $tenantId);
+}
+```
+
+### Prevention
+- Add a test for the tenant scope
+- Run `php artisan migrate` before deploying to production
+- Use CI/CD pipelines to catch missing migrations
+- Consider adding a model test:
+
+```php
+test('users can be filtered by tenant', function () {
+    $tenant = Tenant::factory()->create();
+    $user = User::factory()->create(['tenant_id' => $tenant->id]);
+
+    $users = User::forTenant($tenant->id)->get();
+
+    expect($users)->toContain($user);
+});
+```
+
+### Files to Review
+- app/Models/User.php (line 45)
+- database/migrations/xxxx_add_tenant_id_to_users_table.php (create)
+- tests/Unit/Models/UserTest.php (add test)</code></pre>
+
+    <h2>Interactive Mode</h2>
+    <p>When run without arguments, the command enters interactive mode and prompts you for:</p>
+
+    <ol>
+        <li><strong>Error source</strong> - Choose from latest logs, paste error, specify file, or use Telescope</li>
+        <li><strong>Error type</strong> - Categorize as database, class/method, validation, authentication, or other</li>
+        <li><strong>Apply fix automatically</strong> - Option to create migrations or edit files directly</li>
+    </ol>
+
+    <h2>Example Scenarios</h2>
+
+    <h3>Scenario 1: Missing Class Import</h3>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:bug:fix "Class 'Carbon' not found"</code></pre>
+    <p><strong>Analysis Output:</strong></p>
+    <pre class="language-markdown"><code class="language-markdown">### Root Cause
+Carbon class is used without importing it at the top of the file.
+
+### Solution
+Add the import statement:
+```php
+use Carbon\Carbon;
+```
+
+Or use the global namespace:
+```php
+\Carbon\Carbon::now()
+```</code></pre>
+
+    <h3>Scenario 2: Foreign Key Constraint</h3>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:bug:fix --exception=QueryException</code></pre>
+    <p><strong>Analysis Output:</strong></p>
+    <pre class="language-markdown"><code class="language-markdown">### Root Cause
+Attempting to delete a parent record that has dependent child records.
+
+### Solution
+Either:
+1. Delete child records first
+2. Add `onDelete('cascade')` to the foreign key
+3. Set foreign key to `onDelete('set null')` and make column nullable</code></pre>
+
+    <h3>Scenario 3: Method Not Found</h3>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:bug:fix "Call to undefined method getFullNameAttribute"</code></pre>
+    <p><strong>Analysis Output:</strong></p>
+    <pre class="language-markdown"><code class="language-markdown">### Root Cause
+Accessor method name doesn't follow Laravel naming convention.
+
+### Solution
+Change from:
+```php
+public function getFullNameAttribute()
+```
+
+To (for Laravel 9+):
+```php
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
+protected function fullName(): Attribute
+{
+    return Attribute::make(
+        get: fn () => "{$this->first_name} {$this->last_name}"
+    );
+}
+```</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Preserve stack traces</strong> - Include full error output for better analysis</li>
+        <li><strong>Review before applying</strong> - Understand the suggested fix before accepting automatic changes</li>
+        <li><strong>Add tests</strong> - Implement the prevention tests suggested in the analysis</li>
+        <li><strong>Check multiple environments</strong> - Verify fixes work in development, staging, and production</li>
+        <li><strong>Update documentation</strong> - Document non-obvious fixes for your team</li>
+        <li><strong>Use version control</strong> - Commit working state before applying fixes</li>
+    </ol>
+
+    <h2>Tips for Better Analysis</h2>
+    <ul>
+        <li>Include the <strong>full error message</strong> with file paths and line numbers</li>
+        <li>Provide <strong>context</strong> about what you were trying to do when the error occurred</li>
+        <li>Mention any <strong>recent changes</strong> that might be related</li>
+        <li>Specify your <strong>Laravel version</strong> for version-specific solutions</li>
+        <li>Include <strong>relevant configuration</strong> (database, queue, cache drivers)</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests to prevent regressions</li>
+        <li><a href="{{ '/commands/code-review.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:code:review</a> - Review code for potential issues</li>
+        <li><a href="{{ '/commands/db-optimize.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:optimize</a> - Fix database performance issues</li>
+    </ul>
 </div>

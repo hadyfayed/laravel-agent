@@ -17,11 +17,229 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create Livewire component with form, table, or modal. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/livewire:make</code> command generates reactive Livewire components for the TALL stack (Tailwind, Alpine, Laravel, Livewire). It creates complete components with PHP classes and Blade views, supporting various component types including full CRUD interfaces, data tables, forms, modals, and search functionality.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:livewire:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:livewire:make [Name] [type]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:livewire:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create a full CRUD component (default)
+/laravel-agent:livewire:make Orders
+
+# Create a data table with search, sort, and pagination
+/laravel-agent:livewire:make Products table
+
+# Create a form component with validation
+/laravel-agent:livewire:make Contact form
+
+# Create a modal dialog component
+/laravel-agent:livewire:make DeleteConfirm modal
+
+# Create a real-time search component
+/laravel-agent:livewire:make ProductSearch search</code></pre>
+
+    <h2>Component Types</h2>
+    <p>The command supports several component types, each optimized for different use cases:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                    <th class="text-left py-3 px-4 font-medium">Features</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>crud</code></td>
+                    <td class="py-3 px-4">Full CRUD interface (default)</td>
+                    <td class="py-3 px-4">Index, create, edit, delete operations</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>table</code></td>
+                    <td class="py-3 px-4">Data table with filters</td>
+                    <td class="py-3 px-4">Search, sort, pagination, bulk actions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>form</code></td>
+                    <td class="py-3 px-4">Form with validation</td>
+                    <td class="py-3 px-4">Real-time validation, file uploads</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>modal</code></td>
+                    <td class="py-3 px-4">Modal dialog</td>
+                    <td class="py-3 px-4">Show/hide functionality, backdrop</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>search</code></td>
+                    <td class="py-3 px-4">Real-time search</td>
+                    <td class="py-3 px-4">Live filtering, debouncing</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>What Gets Created</h2>
+    <p>A Livewire component includes the following files:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">PHP Class</td>
+                    <td class="py-3 px-4"><code>app/Livewire/</code></td>
+                    <td class="py-3 px-4">Component logic, properties, and methods</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Blade View</td>
+                    <td class="py-3 px-4"><code>resources/views/livewire/</code></td>
+                    <td class="py-3 px-4">Component template with Tailwind CSS</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Validation Rules</td>
+                    <td class="py-3 px-4">Inline in PHP class</td>
+                    <td class="py-3 px-4">Real-time validation rules</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Available Features</h2>
+    <p>Customize your component by specifying features in the command description:</p>
+    <ul>
+        <li><strong>search</strong> - Add real-time search functionality</li>
+        <li><strong>sort</strong> - Enable column sorting</li>
+        <li><strong>pagination</strong> - Add pagination controls</li>
+        <li><strong>validation</strong> - Include real-time validation</li>
+        <li><strong>file-upload</strong> - Support file uploads with preview</li>
+    </ul>
+
+    <h2>Example Output Structure</h2>
+    <p>For <code>/laravel-agent:livewire:make Products table</code>:</p>
+    <pre class="language-bash"><code class="language-bash">app/
+└── Livewire/
+    └── Products.php
+resources/
+└── views/
+    └── livewire/
+        └── products.blade.php</code></pre>
+
+    <h2>Generated Component Example</h2>
+    <p>Example of a generated table component:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Livewire;
+
+use Livewire\Component;
+use Livewire\WithPagination;
+use App\Models\Product;
+
+class Products extends Component
+{
+    use WithPagination;
+
+    public $search = '';
+    public $sortField = 'name';
+    public $sortDirection = 'asc';
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+
+        $this->sortField = $field;
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function render()
+    {
+        $products = Product::query()
+            ->when($this->search, function ($query) {
+                $query->where('name', 'like', '%' . $this->search . '%');
+            })
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(10);
+
+        return view('livewire.products', [
+            'products' => $products,
+        ]);
+    }
+}</code></pre>
+
+    <h2>Generated Blade View Example</h2>
+    <pre class="language-html"><code class="language-html">&lt;div&gt;
+    &lt;div class="mb-4"&gt;
+        &lt;input
+            type="text"
+            wire:model.live="search"
+            placeholder="Search products..."
+            class="w-full px-4 py-2 border rounded"
+        &gt;
+    &lt;/div&gt;
+
+    &lt;table class="min-w-full divide-y divide-gray-200"&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th wire:click="sortBy('name')" class="cursor-pointer"&gt;
+                    Name
+                &lt;/th&gt;
+                &lt;th wire:click="sortBy('price')" class="cursor-pointer"&gt;
+                    Price
+                &lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            @foreach($products as $product)
+                &lt;tr&gt;
+                    &lt;td&gt;{{ $product-&gt;name }}&lt;/td&gt;
+                    &lt;td&gt;{{ $product-&gt;price }}&lt;/td&gt;
+                &lt;/tr&gt;
+            @endforeach
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    {{ $products-&gt;links() }}
+&lt;/div&gt;</code></pre>
+
+    <h2>Process Details</h2>
+    <p>The command uses the Task tool with subagent type <code>laravel-livewire</code> to generate components. The task specification includes:</p>
+    <pre class="language-bash"><code class="language-bash">Create Livewire component:
+
+Name: &lt;name&gt;
+Type: &lt;type&gt;
+Features: [search, sort, pagination, validation, file-upload]</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Component naming</strong> - Use PascalCase for component names (Products, not products)</li>
+        <li><strong>Keep components focused</strong> - Each component should have a single responsibility</li>
+        <li><strong>Use Alpine.js sparingly</strong> - Livewire handles most interactivity; use Alpine for UI-only interactions</li>
+        <li><strong>Optimize performance</strong> - Use lazy loading and debouncing for real-time features</li>
+        <li><strong>Follow Tailwind conventions</strong> - Use utility classes consistently</li>
+    </ol>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <a href="{{ '/agents/laravel-livewire.html' | relative_url }}" class="text-primary hover:underline">laravel-livewire</a> agent.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/frontend-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:frontend:setup</a> - Setup TALL stack</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate component tests</li>
+        <li><a href="{{ '/skills/laravel-livewire.html' | relative_url }}" class="text-primary hover:underline">laravel-livewire skill</a> - Auto-invoked for Livewire development</li>
+    </ul>
 </div>

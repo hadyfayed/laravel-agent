@@ -17,11 +17,329 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create a service class or action with proper patterns. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/service:make</code> command generates service classes or single-purpose actions following Laravel best practices. It supports native actions with a single <code>execute()</code> method, or can integrate with the <a href="https://laravelactions.com/" class="text-primary hover:underline" target="_blank">Laravel Actions</a> package to create actions that run as controllers, jobs, listeners, or commands.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:service:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:service:make &lt;Name&gt; [type] [specification]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:service:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create a service class with multiple methods
+/laravel-agent:service:make OrderProcessor
+
+# Create a native action with single execute() method
+/laravel-agent:service:make SendWelcomeEmail action
+
+# Create Laravel Actions that can run as controller and job
+/laravel-agent:service:make CreateOrder action:controller,job
+
+# Create with specification
+/laravel-agent:service:make ProcessPayment with Stripe integration</code></pre>
+
+    <h2>Service Types</h2>
+    <p>Choose the right type for your use case:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Case</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>service</code></td>
+                    <td class="py-3 px-4">Service class with multiple methods (default)</td>
+                    <td class="py-3 px-4">Complex business logic with multiple operations</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>action</code></td>
+                    <td class="py-3 px-4">Native action with single <code>execute()</code> method</td>
+                    <td class="py-3 px-4">Single-purpose operation, simple and focused</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>action:controller</code></td>
+                    <td class="py-3 px-4">Laravel Actions running as controller</td>
+                    <td class="py-3 px-4">HTTP request handling with action pattern</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>action:job</code></td>
+                    <td class="py-3 px-4">Laravel Actions running as queued job</td>
+                    <td class="py-3 px-4">Background processing, async operations</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>action:listener</code></td>
+                    <td class="py-3 px-4">Laravel Actions running as event listener</td>
+                    <td class="py-3 px-4">Event-driven responses</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>action:command</code></td>
+                    <td class="py-3 px-4">Laravel Actions running as artisan command</td>
+                    <td class="py-3 px-4">CLI operations and scheduled tasks</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>action:all</code></td>
+                    <td class="py-3 px-4">Laravel Actions with all contexts</td>
+                    <td class="py-3 px-4">Maximum flexibility across all contexts</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>What Gets Created</h2>
+    <p>Depending on the type, the command creates:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Components</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>service</code></td>
+                    <td class="py-3 px-4"><code>app/Services/</code></td>
+                    <td class="py-3 px-4">Service class, interface, tests</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>action</code></td>
+                    <td class="py-3 px-4"><code>app/Actions/{Domain}/</code></td>
+                    <td class="py-3 px-4">Native action class with execute(), tests</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>action:*</code></td>
+                    <td class="py-3 px-4"><code>app/Actions/{Domain}/</code></td>
+                    <td class="py-3 px-4">Laravel Actions class with traits, tests</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Domain Organization</h2>
+    <p>The command prompts you to organize services and actions by domain:</p>
+    <ul>
+        <li><strong>Orders</strong> - Order processing, fulfillment logic</li>
+        <li><strong>Users</strong> - User management, authentication</li>
+        <li><strong>Products</strong> - Product catalog, inventory</li>
+        <li><strong>Payments</strong> - Payment processing, refunds</li>
+        <li><strong>Notifications</strong> - Email, SMS, push notifications</li>
+        <li><strong>Custom</strong> - Any domain-specific to your application</li>
+    </ul>
+
+    <h2>Generated Service Example</h2>
+    <p>For <code>/laravel-agent:service:make OrderProcessor</code>:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Services;
+
+class OrderProcessorService
+{
+    public function processOrder(array $orderData): array
+    {
+        // Validate order data
+        $this->validateOrder($orderData);
+
+        // Calculate totals
+        $totals = $this->calculateTotals($orderData);
+
+        // Process payment
+        $payment = $this->processPayment($totals);
+
+        // Create order record
+        return $this->createOrder($orderData, $payment);
+    }
+
+    protected function validateOrder(array $data): void
+    {
+        // Validation logic
+    }
+
+    protected function calculateTotals(array $data): array
+    {
+        // Calculation logic
+    }
+
+    protected function processPayment(array $totals): array
+    {
+        // Payment processing
+    }
+
+    protected function createOrder(array $data, array $payment): array
+    {
+        // Order creation
+    }
+}</code></pre>
+
+    <h2>Generated Native Action Example</h2>
+    <p>For <code>/laravel-agent:service:make SendWelcomeEmail action</code>:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Actions\Notifications;
+
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+
+class SendWelcomeEmailAction
+{
+    public function execute(User $user): void
+    {
+        Mail::to($user->email)->send(
+            new WelcomeEmail($user)
+        );
+    }
+}</code></pre>
+
+    <h2>Generated Laravel Actions Example</h2>
+    <p>For <code>/laravel-agent:service:make CreateOrder action:controller,job</code>:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Actions\Orders;
+
+use App\Models\Order;
+use Lorisleiva\Actions\Concerns\AsAction;
+
+class CreateOrder
+{
+    use AsAction;
+
+    public function handle(array $orderData): Order
+    {
+        // Create order logic
+        return Order::create($orderData);
+    }
+
+    // As Controller
+    public function asController(StoreOrderRequest $request)
+    {
+        $order = $this->handle($request->validated());
+
+        return new OrderResource($order);
+    }
+
+    // As Job
+    public function jobQueue(): string
+    {
+        return 'orders';
+    }
+
+    public function jobRetryAfter(): int
+    {
+        return 60;
+    }
+}</code></pre>
+
+    <h2>Usage Patterns</h2>
+    <p>How to use the generated services and actions:</p>
+
+    <h3>Service Class Usage</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Dependency injection
+public function __construct(
+    private OrderProcessorService $orderProcessor
+) {}
+
+// Direct usage
+$result = $this->orderProcessor->processOrder($orderData);
+
+// Via container
+$result = app(OrderProcessorService::class)->processOrder($orderData);</code></pre>
+
+    <h3>Native Action Usage</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Dependency injection
+public function __construct(
+    private SendWelcomeEmailAction $sendWelcomeEmail
+) {}
+
+// Execute the action
+$this->sendWelcomeEmail->execute($user);
+
+// Via container
+app(SendWelcomeEmailAction::class)->execute($user);</code></pre>
+
+    <h3>Laravel Actions Usage</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Direct call
+$order = CreateOrder::run($orderData);
+
+// Dispatch as job
+CreateOrder::dispatch($orderData);
+
+// Run as controller (auto-routed)
+Route::post('/orders', CreateOrder::class);
+
+// Listen to events
+Event::listen(OrderCreated::class, CreateOrder::class);</code></pre>
+
+    <h2>Laravel Actions Integration</h2>
+    <p>The command detects if <code>lorisleiva/laravel-actions</code> is installed by running:</p>
+    <pre class="language-bash"><code class="language-bash">composer show lorisleiva/laravel-actions</code></pre>
+    <p>If detected, you can use <code>action:*</code> types to leverage Laravel Actions traits:</p>
+    <ul>
+        <li><code>AsController</code> - Handle HTTP requests</li>
+        <li><code>AsJob</code> - Run as queued job</li>
+        <li><code>AsListener</code> - Listen to events</li>
+        <li><code>AsCommand</code> - Run as artisan command</li>
+    </ul>
+
+    <h2>Testing Generated Code</h2>
+    <p>The command generates corresponding test files with basic test coverage:</p>
+    <pre class="language-bash"><code class="language-bash"># Run tests for specific service/action
+vendor/bin/pest --filter=OrderProcessor
+vendor/bin/pest --filter=SendWelcomeEmail
+vendor/bin/pest --filter=CreateOrder</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Single Responsibility</strong> - Each service/action should do one thing well</li>
+        <li><strong>Use Actions for Single Operations</strong> - Prefer actions over services for focused tasks</li>
+        <li><strong>Domain Organization</strong> - Group related actions by domain (Orders, Users, etc.)</li>
+        <li><strong>Service for Coordination</strong> - Use services when orchestrating multiple actions</li>
+        <li><strong>Dependency Injection</strong> - Always inject dependencies in constructor</li>
+        <li><strong>Type Hints</strong> - Use strict typing for parameters and return values</li>
+        <li><strong>Test Coverage</strong> - Write tests for all public methods</li>
+    </ol>
+
+    <h2>When to Use Each Type</h2>
+
+    <h3>Use Service Classes When:</h3>
+    <ul>
+        <li>You need multiple related methods</li>
+        <li>Coordinating multiple actions or operations</li>
+        <li>Complex business logic with internal state</li>
+        <li>Need to share private helper methods</li>
+    </ul>
+
+    <h3>Use Native Actions When:</h3>
+    <ul>
+        <li>Single, focused operation</li>
+        <li>Simple input/output transformation</li>
+        <li>No need for Laravel Actions features</li>
+        <li>Want lightweight, straightforward code</li>
+    </ul>
+
+    <h3>Use Laravel Actions When:</h3>
+    <ul>
+        <li>Same logic needs to run in multiple contexts</li>
+        <li>Want to dispatch as job, handle as controller, etc.</li>
+        <li>Need built-in validation and authorization</li>
+        <li>Want to reduce boilerplate code</li>
+    </ul>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <a href="{{ '/agents/laravel-service-builder.html' | relative_url }}" class="text-primary hover:underline">laravel-service-builder</a> agent.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests for services/actions</li>
+        <li><a href="{{ '/commands/crud-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:crud:make</a> - Generate CRUD with services</li>
+        <li><a href="{{ '/skills/laravel-services.html' | relative_url }}" class="text-primary hover:underline">laravel-services skill</a> - Auto-invoked for service patterns</li>
+    </ul>
 </div>

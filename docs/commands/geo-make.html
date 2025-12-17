@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:geo:make
-description: Create geolocation features
+description: Create geolocation features with Google Maps integration
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,436 @@ back_text: All Commands
         <span class="badge badge-data">Data</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:geo:make</h1>
-    <p class="text-xl text-muted-foreground">Create geolocation features</p>
+    <p class="text-xl text-muted-foreground">Create geolocation features with Google Maps integration</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create geolocation features. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/geo:make</code> command generates location-based features using <strong>spatie/geocoder</strong> for Google Maps geocoding. It creates a complete geolocation system including geocoding services, location models with spatial queries, and controllers for store locators, delivery zones, and nearby searches.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:geo:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:geo:make [feature name]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:geo:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create a store locator feature
+/laravel-agent:geo:make StoreLocator
+
+# Create delivery zones with geofencing
+/laravel-agent:geo:make DeliveryZones
+
+# Create address autocomplete
+/laravel-agent:geo:make AddressAutocomplete
+
+# Create nearby search functionality
+/laravel-agent:geo:make NearbySearch</code></pre>
+
+    <h2>What Gets Created</h2>
+    <p>A complete geolocation feature includes the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Geocoding Service</td>
+                    <td class="py-3 px-4"><code>app/Services/GeocodingService.php</code></td>
+                    <td class="py-3 px-4">Service for address geocoding and reverse geocoding</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Location Model</td>
+                    <td class="py-3 px-4"><code>app/Models/Location.php</code></td>
+                    <td class="py-3 px-4">Model with spatial queries and distance calculations</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Feature Controller</td>
+                    <td class="py-3 px-4"><code>app/Http/Controllers/</code></td>
+                    <td class="py-3 px-4">Controller for the specific geolocation feature</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Migration</td>
+                    <td class="py-3 px-4"><code>database/migrations/</code></td>
+                    <td class="py-3 px-4">Database schema with spatial indexes</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Configuration</td>
+                    <td class="py-3 px-4"><code>config/geocoder.php</code></td>
+                    <td class="py-3 px-4">Geocoder configuration file</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Package Installation</h2>
+    <p>The command automatically installs and configures the required package:</p>
+    <pre class="language-bash"><code class="language-bash"># Install spatie/geocoder
+composer require spatie/geocoder
+
+# Publish configuration
+php artisan vendor:publish --provider="Spatie\Geocoder\GeocoderServiceProvider" --tag="config"</code></pre>
+
+    <h2>Environment Setup</h2>
+    <p>You'll need to configure your Google Maps API key:</p>
+    <pre class="language-bash"><code class="language-bash"># Add to .env
+GOOGLE_MAPS_GEOCODING_API_KEY=your-api-key</code></pre>
+
+    <h2>Generated Files Structure</h2>
+    <p>For <code>/laravel-agent:geo:make StoreLocator</code>:</p>
+    <pre class="language-bash"><code class="language-bash">app/
+├── Services/
+│   └── GeocodingService.php
+├── Models/
+│   └── Location.php (or Store.php)
+├── Http/
+│   └── Controllers/
+│       └── StoreLocatorController.php
+config/
+└── geocoder.php
+database/migrations/
+└── xxxx_create_locations_table.php</code></pre>
+
+    <h2>Geocoding Service</h2>
+    <p>The generated service provides comprehensive geocoding functionality:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Services;
+
+use Spatie\Geocoder\Geocoder;
+
+final class GeocodingService
+{
+    public function __construct(
+        private readonly Geocoder $geocoder,
+    ) {}
+
+    /**
+     * Get coordinates from address.
+     *
+     * @return array{lat: float, lng: float, accuracy: string, formatted_address: string}|null
+     */
+    public function geocode(string $address): ?array
+    {
+        $result = $this->geocoder->getCoordinatesForAddress($address);
+
+        if ($result['lat'] === 0 && $result['lng'] === 0) {
+            return null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get address from coordinates.
+     *
+     * @return array{address: string, street_number: string, route: string, city: string, state: string, country: string, postal_code: string}|null
+     */
+    public function reverseGeocode(float $lat, float $lng): ?array
+    {
+        $results = $this->geocoder->getAddressForCoordinates($lat, $lng);
+
+        if (empty($results)) {
+            return null;
+        }
+
+        return $this->parseAddressComponents($results);
+    }
+
+    /**
+     * Get multiple results for ambiguous address.
+     */
+    public function geocodeMultiple(string $address): array
+    {
+        return $this->geocoder->getAllCoordinatesForAddress($address);
+    }
+
+    /**
+     * Calculate distance between two points in kilometers.
+     */
+    public function calculateDistance(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earthRadius = 6371; // km
+
+        $latDiff = deg2rad($lat2 - $lat1);
+        $lngDiff = deg2rad($lng2 - $lng1);
+
+        $a = sin($latDiff / 2) * sin($latDiff / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($lngDiff / 2) * sin($lngDiff / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
+    }
+}</code></pre>
+
+    <h2>Location Model with Spatial Queries</h2>
+    <p>The model includes powerful location-based query scopes:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use App\Services\GeocodingService;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+
+final class Location extends Model
+{
+    protected $guarded = ['id'];
+
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+    ];
+
+    /**
+     * Geocode address before saving.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (Location $location) {
+            if ($location->isDirty('address') && !$location->latitude) {
+                $geocoder = app(GeocodingService::class);
+                $result = $geocoder->geocode($location->address);
+
+                if ($result) {
+                    $location->latitude = $result['lat'];
+                    $location->longitude = $result['lng'];
+                    $location->formatted_address = $result['formatted_address'];
+                }
+            }
+        });
+    }
+
+    /**
+     * Find locations within radius (km).
+     */
+    public function scopeWithinRadius(Builder $query, float $lat, float $lng, float $radiusKm): Builder
+    {
+        // Haversine formula
+        return $query->selectRaw("
+            *, (
+                6371 * acos(
+                    cos(radians(?)) * cos(radians(latitude)) *
+                    cos(radians(longitude) - radians(?)) +
+                    sin(radians(?)) * sin(radians(latitude))
+                )
+            ) AS distance
+        ", [$lat, $lng, $lat])
+        ->having('distance', '<=', $radiusKm)
+        ->orderBy('distance');
+    }
+
+    /**
+     * Find nearest location.
+     */
+    public function scopeNearest(Builder $query, float $lat, float $lng, int $limit = 10): Builder
+    {
+        return $query->selectRaw("
+            *, (
+                6371 * acos(
+                    cos(radians(?)) * cos(radians(latitude)) *
+                    cos(radians(longitude) - radians(?)) +
+                    sin(radians(?)) * sin(radians(latitude))
+                )
+            ) AS distance
+        ", [$lat, $lng, $lat])
+        ->orderBy('distance')
+        ->limit($limit);
+    }
+
+    /**
+     * Get distance to another location.
+     */
+    public function distanceTo(Location $other): float
+    {
+        return app(GeocodingService::class)->calculateDistance(
+            $this->latitude,
+            $this->longitude,
+            $other->latitude,
+            $other->longitude
+        );
+    }
+}</code></pre>
+
+    <h2>Store Locator Controller Example</h2>
+    <p>Example controller for a store locator feature:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Store;
+use App\Services\GeocodingService;
+use Illuminate\Http\Request;
+
+final class StoreLocatorController extends Controller
+{
+    public function __construct(
+        private readonly GeocodingService $geocoder,
+    ) {}
+
+    public function index(Request $request)
+    {
+        $stores = Store::query()
+            ->when($request->filled(['lat', 'lng']), function ($query) use ($request) {
+                $query->withinRadius(
+                    $request->float('lat'),
+                    $request->float('lng'),
+                    $request->float('radius', 50) // Default 50km
+                );
+            })
+            ->when($request->filled('address'), function ($query) use ($request) {
+                $coords = $this->geocoder->geocode($request->input('address'));
+                if ($coords) {
+                    $query->withinRadius($coords['lat'], $coords['lng'], 50);
+                }
+            })
+            ->paginate(20);
+
+        return view('stores.locator', compact('stores'));
+    }
+
+    public function nearest(Request $request)
+    {
+        $request->validate([
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
+        ]);
+
+        $stores = Store::nearest(
+            $request->float('lat'),
+            $request->float('lng'),
+            5
+        )->get();
+
+        return response()->json([
+            'data' => $stores->map(fn ($store) => [
+                'id' => $store->id,
+                'name' => $store->name,
+                'address' => $store->formatted_address,
+                'distance_km' => round($store->distance, 2),
+                'lat' => $store->latitude,
+                'lng' => $store->longitude,
+            ]),
+        ]);
+    }
+}</code></pre>
+
+    <h2>Database Migration</h2>
+    <p>The migration includes spatial indexes for efficient proximity queries:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('locations', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->text('address');
+            $table->string('formatted_address')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->string('city')->nullable();
+            $table->string('state', 10)->nullable();
+            $table->string('postal_code', 20)->nullable();
+            $table->string('country', 2)->nullable();
+            $table->timestamps();
+
+            // Spatial index for fast proximity queries
+            $table->index(['latitude', 'longitude']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('locations');
+    }
+};</code></pre>
+
+    <h2>Available Methods</h2>
+    <p>After generation, you can use these methods in your application:</p>
+    <pre class="language-php"><code class="language-php">// Geocode address to coordinates
+$coords = $geocoder->geocode('123 Main St, City, Country');
+// Returns: ['lat' => 40.7128, 'lng' => -74.0060, 'accuracy' => 'ROOFTOP', 'formatted_address' => '...']
+
+// Reverse geocode coordinates to address
+$address = $geocoder->reverseGeocode(40.7128, -74.0060);
+// Returns: ['address' => '...', 'city' => 'New York', 'state' => 'NY', ...]
+
+// Get multiple results for ambiguous addresses
+$results = $geocoder->geocodeMultiple('Springfield');
+
+// Find locations within radius
+$stores = Store::withinRadius($lat, $lng, 10)->get(); // 10km radius
+
+// Find nearest locations
+$stores = Store::nearest($lat, $lng, 5)->get(); // 5 closest stores
+
+// Calculate distance between locations
+$distance = $location1->distanceTo($location2); // Returns distance in km</code></pre>
+
+    <h2>Configuration</h2>
+    <p>The generated configuration file:</p>
+    <pre class="language-php"><code class="language-php">// config/geocoder.php
+return [
+    'key' => env('GOOGLE_MAPS_GEOCODING_API_KEY'),
+    'language' => 'en',
+    'region' => 'us',
+];</code></pre>
+
+    <h2>Common Use Cases</h2>
+    <ul>
+        <li><strong>Store Locator</strong> - Find nearest stores based on user location</li>
+        <li><strong>Delivery Zones</strong> - Validate addresses within service areas</li>
+        <li><strong>Address Autocomplete</strong> - Provide address suggestions as users type</li>
+        <li><strong>Geofencing</strong> - Create virtual boundaries and trigger actions</li>
+        <li><strong>Distance Calculation</strong> - Calculate delivery distances and fees</li>
+        <li><strong>Map Integration</strong> - Display locations on interactive maps</li>
+        <li><strong>Location-Based Search</strong> - Filter results by proximity</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Cache geocoding results</strong> - Google Maps API has rate limits and costs</li>
+        <li><strong>Validate coordinates</strong> - Always check latitude (-90 to 90) and longitude (-180 to 180) ranges</li>
+        <li><strong>Use spatial indexes</strong> - Index latitude and longitude columns for performance</li>
+        <li><strong>Handle errors gracefully</strong> - Geocoding can fail for invalid or ambiguous addresses</li>
+        <li><strong>Batch geocoding</strong> - When geocoding multiple addresses, batch requests when possible</li>
+        <li><strong>Store formatted addresses</strong> - Save the formatted address returned by Google</li>
+        <li><strong>Consider alternative providers</strong> - Have fallback geocoding providers for redundancy</li>
+    </ol>
+
+    <h2>Setup Steps</h2>
+    <ol>
+        <li>Get Google Maps API key from <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">Google Cloud Console</a></li>
+        <li>Enable Geocoding API in Google Cloud Console</li>
+        <li>Add <code>GOOGLE_MAPS_GEOCODING_API_KEY</code> to your <code>.env</code> file</li>
+        <li>Run <code>php artisan migrate</code> to create the locations table</li>
+        <li>Test geocoding with a sample address</li>
+    </ol>
+
+    <h2>Spatial Query Performance</h2>
+    <p>The Haversine formula used in the query scopes is accurate and works well for most use cases. For extremely high-performance requirements with millions of locations, consider:</p>
+    <ul>
+        <li>Using MySQL spatial data types (POINT, GEOMETRY)</li>
+        <li>Implementing bounding box pre-filtering</li>
+        <li>Using dedicated geospatial databases (PostGIS, MongoDB with geospatial indexes)</li>
+        <li>Caching nearby results with Redis</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/api-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:make</a> - Create API endpoints for geolocation features</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate tests for geocoding features</li>
+        <li><a href="https://github.com/spatie/geocoder" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">Spatie Geocoder Documentation</a> - Official package documentation</li>
+    </ul>
 </div>

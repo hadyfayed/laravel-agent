@@ -17,11 +17,222 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create feature flag with Laravel Pennant. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/feature-flag:make</code> command generates feature flag classes using Laravel Pennant. It supports multiple resolution strategies including simple boolean flags, A/B testing variants, percentage-based rollouts, user segments, and subscription-based features.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:feature-flag:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:feature-flag:make [feature name] [type] [specification]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:feature-flag:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create a simple boolean feature flag
+/laravel-agent:feature-flag:make NewDashboard
+
+# Create an A/B test with variants
+/laravel-agent:feature-flag:make PricingVariant ab-test
+
+# Create a user segment-based flag
+/laravel-agent:feature-flag:make BetaFeatures segment beta-users
+
+# Create a gradual percentage rollout
+/laravel-agent:feature-flag:make GradualRollout percentage 25</code></pre>
+
+    <h2>Feature Flag Types</h2>
+    <p>The command supports the following feature flag types:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Case</th>
+                    <th class="text-left py-3 px-4 font-medium">Resolution Logic</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>boolean</code></td>
+                    <td class="py-3 px-4">Simple on/off toggle</td>
+                    <td class="py-3 px-4">Always returns true or false (default)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>ab-test</code></td>
+                    <td class="py-3 px-4">A/B/C testing with multiple variants</td>
+                    <td class="py-3 px-4">Randomly assigns users to variants</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>percentage</code></td>
+                    <td class="py-3 px-4">Gradual feature rollout</td>
+                    <td class="py-3 px-4">Enables for specified percentage of users</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>segment</code></td>
+                    <td class="py-3 px-4">User or team-based access</td>
+                    <td class="py-3 px-4">Checks if user belongs to segment</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>subscription</code></td>
+                    <td class="py-3 px-4">Plan-based features</td>
+                    <td class="py-3 px-4">Enables based on subscription tier</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>What Gets Created</h2>
+    <p>The command generates a feature flag class at:</p>
+    <ul>
+        <li><code>app/Features/[FeatureName].php</code> - Feature flag class with resolution logic</li>
+    </ul>
+
+    <h2>Generated Feature Flag Example</h2>
+    <p>For a simple boolean feature flag:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Features;
+
+use Illuminate\Support\Lottery;
+
+class NewDashboard
+{
+    /**
+     * Resolve the feature's initial value.
+     */
+    public function resolve(User $user): bool
+    {
+        return true; // or false, or conditional logic
+    }
+}</code></pre>
+
+    <h2>Usage Examples</h2>
+    <p>Once generated, you can use feature flags in multiple ways:</p>
+
+    <h3>In Controllers</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Laravel\Pennant\Feature;
+use App\Features\NewDashboard;
+
+// Check if feature is active
+if (Feature::active(NewDashboard::class)) {
+    // Show new dashboard
+}
+
+// Check if feature is inactive
+if (Feature::inactive(NewDashboard::class)) {
+    // Show old dashboard
+}</code></pre>
+
+    <h3>In Blade Templates</h3>
+    <pre class="language-php"><code class="language-php">@feature(App\Features\NewDashboard::class)
+    &lt;!-- New dashboard content --&gt;
+@else
+    &lt;!-- Old dashboard content --&gt;
+@endfeature</code></pre>
+
+    <h3>In Middleware</h3>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+Route::get('/dashboard', function () {
+    // Dashboard logic
+})->middleware('feature:'.NewDashboard::class);</code></pre>
+
+    <h2>Feature Flag Management</h2>
+    <p>Manage feature flags programmatically:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Laravel\Pennant\Feature;
+use App\Features\NewDashboard;
+
+// Activate for everyone
+Feature::activateForEveryone(NewDashboard::class);
+
+// Deactivate for everyone
+Feature::deactivateForEveryone(NewDashboard::class);
+
+// Activate for specific user
+Feature::for($user)->activate(NewDashboard::class);
+
+// Deactivate for specific user
+Feature::for($user)->deactivate(NewDashboard::class);
+
+// Check current value for user
+$isActive = Feature::for($user)->value(NewDashboard::class);</code></pre>
+
+    <h2>Testing Feature Flags</h2>
+    <p>Test your feature flags with Pest or PHPUnit:</p>
+    <pre class="language-bash"><code class="language-bash"># Run feature flag tests
+vendor/bin/pest --filter=NewDashboard</code></pre>
+
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Laravel\Pennant\Feature;
+use App\Features\NewDashboard;
+
+test('new dashboard is shown when feature is active', function () {
+    Feature::activate(NewDashboard::class);
+
+    $response = $this->get('/dashboard');
+
+    $response->assertSee('New Dashboard');
+});
+
+test('old dashboard is shown when feature is inactive', function () {
+    Feature::deactivate(NewDashboard::class);
+
+    $response = $this->get('/dashboard');
+
+    $response->assertSee('Old Dashboard');
+});</code></pre>
+
+    <h2>Common Use Cases</h2>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Command</th>
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Resolution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>/feature-flag:make NewUI</code></td>
+                    <td class="py-3 px-4">boolean</td>
+                    <td class="py-3 px-4">Always true/false</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>/feature-flag:make PricingPage ab-test</code></td>
+                    <td class="py-3 px-4">A/B</td>
+                    <td class="py-3 px-4">Random variant assignment</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>/feature-flag:make NewCheckout percentage 10</code></td>
+                    <td class="py-3 px-4">Percentage</td>
+                    <td class="py-3 px-4">10% of users</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>/feature-flag:make ProFeatures subscription pro</code></td>
+                    <td class="py-3 px-4">Subscription</td>
+                    <td class="py-3 px-4">Pro plan users only</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Start with boolean flags</strong> - Use simple on/off flags for initial feature development</li>
+        <li><strong>Use percentage rollouts</strong> - Gradually roll out features to monitor performance and user feedback</li>
+        <li><strong>Clean up old flags</strong> - Remove feature flags once features are fully released</li>
+        <li><strong>Test both states</strong> - Always test both enabled and disabled states of feature flags</li>
+        <li><strong>Document flag purpose</strong> - Add comments explaining what each feature flag controls</li>
+    </ol>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <strong>Pennant agent</strong> to generate feature flag classes with appropriate resolution logic.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="https://laravel.com/docs/pennant" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">Laravel Pennant Documentation</a></li>
+    </ul>
 </div>

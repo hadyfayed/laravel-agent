@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:auth:setup
-description: Setup authentication and authorization
+description: Setup authentication and authorization for your Laravel app
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,419 @@ back_text: All Commands
         <span class="badge badge-security">Security</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:auth:setup</h1>
-    <p class="text-xl text-muted-foreground">Setup authentication and authorization</p>
+    <p class="text-xl text-muted-foreground">Setup authentication and authorization for your Laravel app</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Setup authentication and authorization. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/auth:setup</code> command is an interactive wizard that helps you configure authentication and authorization for your Laravel application. It supports multiple authentication strategies including session-based, API tokens, OAuth2, and social login, along with robust authorization systems like roles and permissions.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:auth:setup [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:auth:setup [preset]</code></pre>
 
-    <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:auth:setup</code></pre>
+    <h2>Quick Presets</h2>
+    <p>You can skip the interactive wizard by specifying a preset:</p>
+    <pre class="language-bash"><code class="language-bash"># Interactive wizard (recommended)
+/laravel-agent:auth:setup
+
+# API-only with Sanctum tokens
+/laravel-agent:auth:setup api
+
+# Single Page Application with Sanctum
+/laravel-agent:auth:setup spa
+
+# OAuth2 server with Passport
+/laravel-agent:auth:setup oauth
+
+# Social login with Socialite
+/laravel-agent:auth:setup social
+
+# Full setup with all authentication options
+/laravel-agent:auth:setup full</code></pre>
+
+    <h2>Authentication Types</h2>
+    <p>The wizard will guide you through selecting the right authentication type for your application:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Package</th>
+                    <th class="text-left py-3 px-4 font-medium">Best For</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Web</strong></td>
+                    <td class="py-3 px-4">Laravel Breeze/Fortify</td>
+                    <td class="py-3 px-4">Traditional session-based web applications</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>API</strong></td>
+                    <td class="py-3 px-4">Laravel Sanctum</td>
+                    <td class="py-3 px-4">Token-based authentication for mobile apps and APIs</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>SPA</strong></td>
+                    <td class="py-3 px-4">Laravel Sanctum</td>
+                    <td class="py-3 px-4">Single Page Applications with CSRF protection</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>OAuth2</strong></td>
+                    <td class="py-3 px-4">Laravel Passport</td>
+                    <td class="py-3 px-4">Full OAuth2 server with client credentials, password, and authorization code grants</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Authorization Systems</h2>
+    <p>Choose how to handle roles and permissions:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">System</th>
+                    <th class="text-left py-3 px-4 font-medium">Package</th>
+                    <th class="text-left py-3 px-4 font-medium">Features</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Laratrust</strong></td>
+                    <td class="py-3 px-4">santigarcor/laratrust</td>
+                    <td class="py-3 px-4">Teams + Roles + Permissions (complex multi-tenancy)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Spatie Permission</strong></td>
+                    <td class="py-3 px-4">spatie/laravel-permission</td>
+                    <td class="py-3 px-4">Roles + Permissions (simple and elegant)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>Policies Only</strong></td>
+                    <td class="py-3 px-4">Laravel built-in</td>
+                    <td class="py-3 px-4">Resource-based authorization without roles</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>What Gets Configured</h2>
+    <p>The command will automatically set up the following components based on your selections:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Composer Packages</td>
+                    <td class="py-3 px-4">Installs and configures required authentication packages</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Controllers</td>
+                    <td class="py-3 px-4">Generates authentication controllers (login, logout, register)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Routes</td>
+                    <td class="py-3 px-4">Adds authentication routes to your application</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Migrations</td>
+                    <td class="py-3 px-4">Creates database tables for roles, permissions, and social providers</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Seeders</td>
+                    <td class="py-3 px-4">Generates seeders for default roles and permissions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Configuration</td>
+                    <td class="py-3 px-4">Configures CORS, session settings, and API keys</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Setup Process</h2>
+    <p>The command follows a systematic process to configure your authentication:</p>
+
+    <h3>1. Package Detection</h3>
+    <p>First, the wizard checks which authentication packages are already installed:</p>
+    <pre class="language-bash"><code class="language-bash"># Checks for existing packages
+laravel/sanctum
+laravel/passport
+laravel/fortify
+santigarcor/laratrust
+spatie/laravel-permission
+socialiteproviders/manager</code></pre>
+
+    <h3>2. Authentication Type Selection</h3>
+    <p>Choose the authentication strategy that fits your application:</p>
+    <ul>
+        <li><strong>Web</strong> - Session-based authentication using Breeze or Fortify</li>
+        <li><strong>API</strong> - Token-based authentication using Sanctum</li>
+        <li><strong>OAuth2</strong> - Full OAuth2 server implementation using Passport</li>
+        <li><strong>SPA</strong> - Single Page Application with Sanctum and CSRF protection</li>
+    </ul>
+
+    <h3>3. Authorization System Selection</h3>
+    <p>Select how you want to handle permissions:</p>
+    <ul>
+        <li><strong>Laratrust</strong> - For complex apps requiring teams, roles, and permissions</li>
+        <li><strong>Spatie Permission</strong> - For simpler role and permission management</li>
+        <li><strong>Policies Only</strong> - Use Laravel's built-in authorization without packages</li>
+    </ul>
+
+    <h3>4. Social Login Configuration</h3>
+    <p>Optionally enable social authentication providers:</p>
+    <ul>
+        <li>Google OAuth</li>
+        <li>GitHub OAuth</li>
+        <li>Apple Sign In</li>
+        <li>Facebook Login</li>
+        <li>Twitter OAuth</li>
+    </ul>
+
+    <h3>5. Two-Factor Authentication</h3>
+    <p>Enable 2FA for enhanced security using Laravel Fortify's built-in support.</p>
+
+    <h3>6. Installation & Configuration</h3>
+    <p>The wizard invokes the <code>laravel-auth</code> subagent to perform the actual setup:</p>
+    <pre class="language-bash"><code class="language-bash"># Example invocation
+Action: setup
+AuthType: api
+Authorization: spatie
+SocialProviders: [google, github]
+Enable2FA: yes</code></pre>
+
+    <h2>Preset Examples</h2>
+
+    <h3>API Setup (/auth:setup api)</h3>
+    <p>Perfect for mobile apps and API-only applications:</p>
+    <ul>
+        <li>Installs Laravel Sanctum</li>
+        <li>Configures token authentication</li>
+        <li>Creates API authentication controller</li>
+        <li>Adds authentication routes: <code>/api/login</code>, <code>/api/logout</code>, <code>/api/register</code></li>
+        <li>Sets up token-based middleware</li>
+    </ul>
+
+    <h3>SPA Setup (/auth:setup spa)</h3>
+    <p>Ideal for Vue, React, or Angular single-page applications:</p>
+    <ul>
+        <li>Installs Sanctum with CSRF protection</li>
+        <li>Configures cookie-based sessions</li>
+        <li>Sets up proper CORS configuration</li>
+        <li>Enables stateful API authentication</li>
+        <li>Configures SPA domain settings in <code>sanctum.php</code></li>
+    </ul>
+
+    <h3>OAuth2 Setup (/auth:setup oauth)</h3>
+    <p>Full OAuth2 server for third-party integrations:</p>
+    <ul>
+        <li>Installs Laravel Passport</li>
+        <li>Configures client credentials grant</li>
+        <li>Sets up password grant</li>
+        <li>Enables authorization code grant</li>
+        <li>Creates OAuth clients table</li>
+        <li>Generates encryption keys</li>
+    </ul>
+
+    <h3>Social Setup (/auth:setup social)</h3>
+    <p>Add social login to your application:</p>
+    <ul>
+        <li>Installs Socialite and provider packages</li>
+        <li>Creates social authentication controller</li>
+        <li>Adds database migration for provider fields</li>
+        <li>Configures redirect URLs</li>
+        <li>Sets up provider-specific settings</li>
+    </ul>
+
+    <h2>Post-Setup Steps</h2>
+    <p>After the wizard completes, you'll receive a detailed report with next steps:</p>
+
+    <h3>Sample Output</h3>
+    <pre class="language-markdown"><code class="language-markdown">## Authentication Configured
+
+### Type
+API (Laravel Sanctum)
+
+### Packages Installed/Configured
+- [x] laravel/sanctum
+- [x] spatie/laravel-permission
+- [x] socialiteproviders/manager
+
+### Routes Added
+- POST /api/login
+- POST /api/logout
+- POST /api/register
+- GET /auth/google
+- GET /auth/google/callback
+- GET /auth/github
+- GET /auth/github/callback
+
+### Roles Created
+- super-admin
+- admin
+- user
+
+### Next Steps
+1. Configure .env with API keys:
+   - GOOGLE_CLIENT_ID=
+   - GOOGLE_CLIENT_SECRET=
+   - GITHUB_CLIENT_ID=
+   - GITHUB_CLIENT_SECRET=
+2. Run migrations: `php artisan migrate`
+3. Seed permissions: `php artisan db:seed --class=RolesAndPermissionsSeeder`
+4. Test authentication endpoints</code></pre>
+
+    <h3>Environment Configuration</h3>
+    <p>Update your <code>.env</code> file with the required credentials:</p>
+    <pre class="language-bash"><code class="language-bash"># Sanctum Configuration
+SANCTUM_STATEFUL_DOMAINS=localhost:3000,127.0.0.1:3000
+
+# Social Login Providers
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URL=http://localhost/auth/google/callback
+
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+GITHUB_REDIRECT_URL=http://localhost/auth/github/callback</code></pre>
+
+    <h3>Database Migration</h3>
+    <p>Run migrations to create the necessary tables:</p>
+    <pre class="language-bash"><code class="language-bash">php artisan migrate</code></pre>
+
+    <h3>Seed Roles and Permissions</h3>
+    <p>Populate your database with default roles and permissions:</p>
+    <pre class="language-bash"><code class="language-bash">php artisan db:seed --class=RolesAndPermissionsSeeder</code></pre>
+
+    <h2>Example: API Authentication Controller</h2>
+    <p>Sample controller generated for API authentication:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+
+class AuthController extends Controller
+{
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            'device_name' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+
+        return response()->json([
+            'token' => $user->createToken($request->device_name)->plainTextToken,
+            'user' => $user,
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Logged out successfully']);
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'device_name' => 'required',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json([
+            'token' => $user->createToken($request->device_name)->plainTextToken,
+            'user' => $user,
+        ], 201);
+    }
+
+    public function user(Request $request)
+    {
+        return response()->json($request->user());
+    }
+}</code></pre>
+
+    <h2>Default Roles & Permissions</h2>
+    <p>The command creates a standard role hierarchy:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Role</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                    <th class="text-left py-3 px-4 font-medium">Default Permissions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>super-admin</strong></td>
+                    <td class="py-3 px-4">Full system access</td>
+                    <td class="py-3 px-4">All permissions (*)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>admin</strong></td>
+                    <td class="py-3 px-4">Administrative access</td>
+                    <td class="py-3 px-4">manage-users, view-reports, edit-content</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><strong>user</strong></td>
+                    <td class="py-3 px-4">Standard user access</td>
+                    <td class="py-3 px-4">view-content, edit-own-profile</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Use Sanctum for SPAs</strong> - It provides CSRF protection and cookie-based authentication</li>
+        <li><strong>Enable rate limiting</strong> - Protect login endpoints from brute force attacks</li>
+        <li><strong>Store API keys securely</strong> - Never commit credentials to version control</li>
+        <li><strong>Use HTTPS in production</strong> - Essential for secure token transmission</li>
+        <li><strong>Implement 2FA</strong> - Add an extra layer of security for sensitive applications</li>
+        <li><strong>Follow principle of least privilege</strong> - Grant minimum permissions necessary</li>
+    </ol>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <strong>laravel-auth</strong> subagent to perform the authentication setup.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/api-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:make</a> - Create authenticated API resources</li>
+        <li><a href="{{ '/commands/policy-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:policy:make</a> - Generate authorization policies</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate authentication tests</li>
+    </ul>
 </div>

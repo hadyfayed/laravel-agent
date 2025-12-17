@@ -17,11 +17,217 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create AI-powered feature using Prism PHP. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/ai:make</code> command generates AI-powered Laravel features using Prism PHP. It creates complete AI services with support for conversational AI, embeddings, tool calling, structured output, and MCP server integration. Choose from multiple AI providers including OpenAI, Anthropic, and Ollama.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:ai:make [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:ai:make [Name] [type]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:ai:make</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create a conversational AI service (default)
+/laravel-agent:ai:make ChatBot
+
+# Create semantic search/recommendations with embeddings
+/laravel-agent:ai:make ProductRecommender embeddings
+
+# Create AI with tool calling capabilities
+/laravel-agent:ai:make OrderAssistant tools
+
+# Create AI with structured JSON output
+/laravel-agent:ai:make ContentModerator structured</code></pre>
+
+    <h2>AI Feature Types</h2>
+    <p>The command supports multiple AI feature types, each optimized for specific use cases:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Type</th>
+                    <th class="text-left py-3 px-4 font-medium">Use Case</th>
+                    <th class="text-left py-3 px-4 font-medium">Features</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>chat</code></td>
+                    <td class="py-3 px-4">Conversational AI (default)</td>
+                    <td class="py-3 px-4">Streaming responses, conversation history, context management</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>embeddings</code></td>
+                    <td class="py-3 px-4">Semantic search & recommendations</td>
+                    <td class="py-3 px-4">Vector embeddings, similarity search, content clustering</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>tools</code></td>
+                    <td class="py-3 px-4">AI with function/tool calling</td>
+                    <td class="py-3 px-4">External API integration, database queries, action execution</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>structured</code></td>
+                    <td class="py-3 px-4">Structured JSON output</td>
+                    <td class="py-3 px-4">Schema validation, typed responses, data extraction</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>mcp</code></td>
+                    <td class="py-3 px-4">MCP server tools</td>
+                    <td class="py-3 px-4">Model Context Protocol integration, server-side tools</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>What Gets Created</h2>
+    <p>The command generates a complete AI feature with the following components:</p>
+
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Component</th>
+                    <th class="text-left py-3 px-4 font-medium">Location</th>
+                    <th class="text-left py-3 px-4 font-medium">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">AI Service</td>
+                    <td class="py-3 px-4"><code>app/Services/AI/</code></td>
+                    <td class="py-3 px-4">Main AI service class with Prism integration</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Configuration</td>
+                    <td class="py-3 px-4"><code>config/ai.php</code></td>
+                    <td class="py-3 px-4">AI provider settings, models, and credentials</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Controller</td>
+                    <td class="py-3 px-4"><code>app/Http/Controllers/</code></td>
+                    <td class="py-3 px-4">HTTP endpoints for AI interactions</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Routes</td>
+                    <td class="py-3 px-4"><code>routes/web.php</code></td>
+                    <td class="py-3 px-4">API routes for AI service</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">View</td>
+                    <td class="py-3 px-4"><code>resources/views/ai/</code></td>
+                    <td class="py-3 px-4">Frontend interface with streaming support</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Tests</td>
+                    <td class="py-3 px-4"><code>tests/Feature/</code></td>
+                    <td class="py-3 px-4">Pest PHP tests for AI functionality</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>AI Providers</h2>
+    <p>Choose from multiple AI providers based on your needs:</p>
+    <ul>
+        <li><strong>OpenAI</strong> - GPT-4, GPT-3.5 models with function calling and vision</li>
+        <li><strong>Anthropic</strong> - Claude models with extended context and tool use</li>
+        <li><strong>Ollama</strong> - Local models for privacy and cost savings</li>
+    </ul>
+
+    <h2>Available Features</h2>
+    <p>Customize your AI service with these features:</p>
+    <ul>
+        <li><strong>streaming</strong> - Real-time response streaming for better UX</li>
+        <li><strong>history</strong> - Conversation history and context management</li>
+        <li><strong>tools</strong> - Function/tool calling for dynamic capabilities</li>
+    </ul>
+
+    <h2>Example Output Structure</h2>
+    <p>For <code>/laravel-agent:ai:make ChatBot chat</code>:</p>
+    <pre class="language-bash"><code class="language-bash">app/
+├── Services/AI/
+│   └── ChatBotService.php
+├── Http/Controllers/
+│   └── ChatBotController.php
+config/
+└── ai.php
+resources/views/ai/
+└── chatbot.blade.php
+routes/
+└── web.php
+tests/Feature/
+└── ChatBotTest.php</code></pre>
+
+    <h2>Generated Service Example</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Services\AI;
+
+use EchoLabs\Prism\Prism;
+use EchoLabs\Prism\ValueObjects\Messages\UserMessage;
+
+class ChatBotService
+{
+    public function chat(string $message, array $history = []): string
+    {
+        $prism = Prism::text()
+            ->using('anthropic', 'claude-3-5-sonnet-20241022')
+            ->withSystemPrompt('You are a helpful AI assistant.')
+            ->withMessages(array_merge($history, [
+                new UserMessage($message)
+            ]));
+
+        return $prism->generate()->text;
+    }
+
+    public function chatWithStreaming(string $message, array $history = [])
+    {
+        return Prism::text()
+            ->using('anthropic', 'claude-3-5-sonnet-20241022')
+            ->withSystemPrompt('You are a helpful AI assistant.')
+            ->withMessages(array_merge($history, [
+                new UserMessage($message)
+            ]))
+            ->stream();
+    }
+}</code></pre>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Start with chat type</strong> - Use the default chat type for most conversational use cases</li>
+        <li><strong>Enable streaming</strong> - Provide better UX with real-time response streaming</li>
+        <li><strong>Manage context</strong> - Store and manage conversation history for coherent interactions</li>
+        <li><strong>Use tools wisely</strong> - Add tool calling when AI needs to perform actions or query data</li>
+        <li><strong>Test thoroughly</strong> - AI responses vary; test edge cases and failure scenarios</li>
+        <li><strong>Monitor costs</strong> - Track API usage and implement rate limiting for production</li>
+    </ol>
+
+    <h2>Configuration</h2>
+    <p>The generated <code>config/ai.php</code> includes provider credentials and settings:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+return [
+    'providers' => [
+        'openai' => [
+            'api_key' => env('OPENAI_API_KEY'),
+            'default_model' => 'gpt-4-turbo-preview',
+        ],
+        'anthropic' => [
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'default_model' => 'claude-3-5-sonnet-20241022',
+        ],
+        'ollama' => [
+            'url' => env('OLLAMA_URL', 'http://localhost:11434'),
+            'default_model' => 'llama2',
+        ],
+    ],
+];</code></pre>
+
+    <h2>Related Agent</h2>
+    <p>This command uses the <a href="{{ '/agents/laravel-ai.html' | relative_url }}" class="text-primary hover:underline">laravel-ai</a> agent.</p>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/api-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:api:make</a> - Create API endpoints for your AI service</li>
+        <li><a href="{{ '/commands/test-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:make</a> - Generate additional AI tests</li>
+        <li><a href="{{ '/skills/laravel-ai.html' | relative_url }}" class="text-primary hover:underline">laravel-ai skill</a> - Auto-invoked for AI feature building</li>
+    </ul>
 </div>

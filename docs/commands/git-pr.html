@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /laravel-agent:git:pr
-description: Create pull request
+description: Create pull request with auto-generated description and review
 nav_active: Commands
 back_url: /commands.html
 back_text: All Commands
@@ -12,16 +12,348 @@ back_text: All Commands
         <span class="badge badge-review">Review</span>
     </div>
     <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:git:pr</h1>
-    <p class="text-xl text-muted-foreground">Create pull request</p>
+    <p class="text-xl text-muted-foreground">Create pull request with auto-generated description and review</p>
 </div>
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>Create pull request. This command is part of the Laravel Agent plugin for Claude Code.</p>
+    <p>The <code>/git:pr</code> command creates a pull request with an automatically generated description based on your commits and code changes. It includes an optional code review step to ensure quality before submission, and automatically handles branch validation, commit analysis, and PR creation with proper formatting.</p>
 
     <h2>Usage</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:git:pr [options]</code></pre>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:git:pr [--base=branch] [--draft] [--no-review]</code></pre>
 
     <h2>Examples</h2>
-    <pre class="language-bash"><code class="language-bash">/laravel-agent:git:pr</code></pre>
+    <pre class="language-bash"><code class="language-bash"># Create PR to develop (default)
+/laravel-agent:git:pr
+
+# Create PR to main branch
+/laravel-agent:git:pr --base=main
+
+# Create a draft PR
+/laravel-agent:git:pr --draft
+
+# Create PR without code review
+/laravel-agent:git:pr --no-review</code></pre>
+
+    <h2>Options</h2>
+    <ul>
+        <li><strong>--base=branch</strong> - Specify the target branch (default: develop)</li>
+        <li><strong>--draft</strong> - Create the PR as a draft</li>
+        <li><strong>--no-review</strong> - Skip the automated code review step</li>
+    </ul>
+
+    <h2>Process Flow</h2>
+    <p>The command follows a structured process to ensure high-quality pull requests:</p>
+
+    <h3>1. Validate Branch State</h3>
+    <p>Before creating a PR, the command validates your current branch state:</p>
+    <ul>
+        <li>Ensures you're not on main or develop branches</li>
+        <li>Checks for uncommitted changes (must be clean)</li>
+        <li>Identifies unpushed commits</li>
+        <li>Verifies branch is ready for PR creation</li>
+    </ul>
+
+    <pre class="language-bash"><code class="language-bash"># Check current branch
+current_branch=$(git branch --show-current)
+
+# Ensure not on main/develop
+if [[ "$current_branch" == "main" || "$current_branch" == "develop" ]]; then
+    echo "Cannot create PR from $current_branch"
+    exit 1
+fi
+
+# Check for unpushed commits
+unpushed=$(git log @{u}.. --oneline 2>/dev/null)
+
+# Check for uncommitted changes
+if [ -n "$(git status --porcelain)" ]; then
+    echo "Uncommitted changes detected. Commit or stash first."
+    exit 1
+fi</code></pre>
+
+    <h3>2. Gather Commit History</h3>
+    <p>The command analyzes all commits since your branch diverged from the base branch:</p>
+
+    <pre class="language-bash"><code class="language-bash"># Get base branch (default: develop)
+base_branch=${BASE:-develop}
+
+# Get all commits since branching
+git log $base_branch..HEAD --oneline
+
+# Get detailed changes
+git log $base_branch..HEAD --pretty=format:"- %s" --no-merges</code></pre>
+
+    <h3>3. Run Code Review</h3>
+    <p>Unless <code>--no-review</code> is specified, the command runs an automated code review:</p>
+
+    <pre class="language-bash"><code class="language-bash">/review:pr $current_branch
+
+# Results used for PR description</code></pre>
+
+    <h3>4. Generate PR Description</h3>
+    <p>A comprehensive PR description is automatically generated including:</p>
+    <ul>
+        <li>Summary of changes from commit messages and branch name</li>
+        <li>List of all commits with proper formatting</li>
+        <li>Files changed with statistics</li>
+        <li>Code review results (security, quality, tests)</li>
+        <li>Testing instructions and checklist</li>
+        <li>Related issues and tickets</li>
+    </ul>
+
+    <h3>5. Create and Configure PR</h3>
+    <p>The command creates the PR and applies additional configuration:</p>
+
+    <pre class="language-bash"><code class="language-bash"># Push branch if needed
+if [ -n "$(git log @{u}.. --oneline 2>/dev/null)" ]; then
+    git push -u origin $current_branch
+fi
+
+# Create PR
+gh pr create \
+    --base "$base_branch" \
+    --title "<generated title>" \
+    --body "$(cat pr-description.md)" \
+    ${DRAFT:+--draft}</code></pre>
+
+    <h3>6. Post-Create Actions</h3>
+    <p>After PR creation, the command adds metadata:</p>
+
+    <pre class="language-bash"><code class="language-bash"># Add reviewers (from CODEOWNERS or config)
+gh pr edit --add-reviewer <reviewers>
+
+# Add labels based on changes
+gh pr edit --add-label "feature" # or "bug", "refactor", etc.
+
+# Link to project board if configured
+gh pr edit --add-project "Sprint Board"</code></pre>
+
+    <h2>Generated PR Description Format</h2>
+    <p>The command generates a comprehensive PR description following this structure:</p>
+
+    <pre class="language-markdown"><code class="language-markdown">## Summary
+
+<Generated from commit messages and branch name>
+
+### What does this PR do?
+- <Feature/fix description>
+
+### Why is this change needed?
+- <Business context if available from commits>
+
+## Changes
+
+<From git log>
+
+- feat(invoice): add PDF export service
+- feat(invoice): add export endpoint
+- test(invoice): add PDF generation tests
+
+## Files Changed
+
+<From git diff --stat>
+
+| File | Changes |
+|------|---------|
+| app/Services/InvoiceService.php | +45 -12 |
+| app/Http/Controllers/InvoiceController.php | +23 -5 |
+| tests/Feature/InvoiceTest.php | +67 -0 |
+
+## Code Review
+
+### Security
+- Status: PASSED
+- Issues: None
+
+### Quality
+- Status: 2 suggestions
+- Suggestions:
+  - Consider adding index to `invoices.user_id`
+  - Extract PDF configuration to config file
+
+### Tests
+- Coverage: 85%
+- New tests: 3
+
+## Testing
+
+### How to test
+1. <Generated steps based on changes>
+2. <Or manual steps if complex>
+
+### Checklist
+- [ ] Tests pass locally
+- [ ] Manual testing completed
+- [ ] Documentation updated (if needed)
+
+## Screenshots
+
+<If view files changed, prompt for screenshots>
+
+## Related
+
+- Closes #<ticket if found in commits>
+- Related to #<other tickets></code></pre>
+
+    <h2>PR Templates</h2>
+    <p>The command uses different templates based on the type of changes:</p>
+
+    <h3>Feature PR Template</h3>
+    <pre class="language-markdown"><code class="language-markdown">## Feature: <Name>
+
+### What
+<Description>
+
+### Why
+<Business value>
+
+### How
+<Technical approach></code></pre>
+
+    <h3>Bug Fix PR Template</h3>
+    <pre class="language-markdown"><code class="language-markdown">## Bug Fix: <Issue>
+
+### Problem
+<What was broken>
+
+### Root Cause
+<Why it was broken>
+
+### Solution
+<How it's fixed>
+
+### Verification
+<How to verify fix></code></pre>
+
+    <h3>Hotfix PR Template</h3>
+    <pre class="language-markdown"><code class="language-markdown">## HOTFIX: <Critical Issue>
+
+### Severity
+CRITICAL / HIGH
+
+### Impact
+<What's affected>
+
+### Fix
+<What's being done>
+
+### Rollback Plan
+<If fix fails></code></pre>
+
+    <h2>Example Output</h2>
+    <p>After successful PR creation, you'll receive a summary:</p>
+
+    <pre class="language-markdown"><code class="language-markdown">## Pull Request Created
+
+**URL:** https://github.com/org/repo/pull/123
+
+**Title:** feat(invoice): add PDF export functionality
+
+**Base:** develop ← feature/invoice-pdf-export
+
+**Review Status:**
+- Security: PASSED
+- Quality: 2 suggestions (non-blocking)
+- Tests: PASSED
+
+**Next Steps:**
+1. Address review suggestions (optional)
+2. Wait for CI checks
+3. Request team review
+4. Merge when approved</code></pre>
+
+    <h2>Example PR Creation Flow</h2>
+    <p>Here's a complete example of creating a feature PR:</p>
+
+    <pre class="language-bash"><code class="language-bash"># 1. You've been working on a feature branch
+git checkout -b feature/invoice-pdf-export
+
+# 2. Made several commits
+git commit -m "feat(invoice): add PDF export service"
+git commit -m "feat(invoice): add export endpoint"
+git commit -m "test(invoice): add PDF generation tests"
+
+# 3. Create PR with automated review
+/laravel-agent:git:pr
+
+# Command will:
+# - Validate your branch is ready
+# - Analyze all 3 commits
+# - Run code review on changes
+# - Generate comprehensive PR description
+# - Push branch if needed
+# - Create PR on GitHub
+# - Add reviewers and labels
+# - Return PR URL</code></pre>
+
+    <h2>Integration with Code Review</h2>
+    <p>By default, the command integrates with the <code>/review:pr</code> command to provide:</p>
+    <ul>
+        <li><strong>Security Analysis</strong> - Checks for common vulnerabilities</li>
+        <li><strong>Code Quality</strong> - Identifies potential improvements</li>
+        <li><strong>Test Coverage</strong> - Verifies adequate testing</li>
+        <li><strong>Best Practices</strong> - Ensures Laravel conventions</li>
+    </ul>
+    <p>These results are automatically included in the PR description to help reviewers.</p>
+
+    <h2>Best Practices</h2>
+    <ol>
+        <li><strong>Write clear commit messages</strong> - They're used to generate the PR description</li>
+        <li><strong>Follow conventional commits</strong> - Use prefixes like feat:, fix:, refactor:</li>
+        <li><strong>Keep PRs focused</strong> - One feature or fix per PR</li>
+        <li><strong>Run review before creating</strong> - Don't skip the review step</li>
+        <li><strong>Add screenshots</strong> - Include them when UI changes are made</li>
+        <li><strong>Link related issues</strong> - Reference ticket numbers in commits</li>
+        <li><strong>Test locally first</strong> - Ensure tests pass before creating PR</li>
+        <li><strong>Use draft PRs</strong> - For work-in-progress that needs early feedback</li>
+    </ol>
+
+    <h2>Common Scenarios</h2>
+
+    <h3>Creating a Feature PR</h3>
+    <pre class="language-bash"><code class="language-bash"># Create PR with full review to develop
+/laravel-agent:git:pr</code></pre>
+
+    <h3>Creating a Hotfix PR</h3>
+    <pre class="language-bash"><code class="language-bash"># Create urgent PR directly to main
+/laravel-agent:git:pr --base=main</code></pre>
+
+    <h3>Creating a WIP PR</h3>
+    <pre class="language-bash"><code class="language-bash"># Create draft PR for early feedback
+/laravel-agent:git:pr --draft</code></pre>
+
+    <h3>Quick PR Without Review</h3>
+    <pre class="language-bash"><code class="language-bash"># Skip review for minor changes
+/laravel-agent:git:pr --no-review</code></pre>
+
+    <h2>Requirements</h2>
+    <ul>
+        <li><strong>GitHub CLI</strong> - The <code>gh</code> command must be installed and authenticated</li>
+        <li><strong>Git Repository</strong> - Must be in a git repository with a remote</li>
+        <li><strong>Clean Working Tree</strong> - All changes must be committed</li>
+        <li><strong>Feature Branch</strong> - Cannot create PR from main or develop</li>
+    </ul>
+
+    <h2>Troubleshooting</h2>
+
+    <h3>Cannot create PR from main/develop</h3>
+    <p>You must be on a feature branch. Create a new branch first:</p>
+    <pre class="language-bash"><code class="language-bash">git checkout -b feature/my-feature</code></pre>
+
+    <h3>Uncommitted changes detected</h3>
+    <p>Commit or stash your changes before creating a PR:</p>
+    <pre class="language-bash"><code class="language-bash">git add .
+git commit -m "feat: your changes"</code></pre>
+
+    <h3>GitHub CLI not authenticated</h3>
+    <p>Authenticate with GitHub CLI:</p>
+    <pre class="language-bash"><code class="language-bash">gh auth login</code></pre>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><a href="{{ '/commands/review-pr.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:pr</a> - Run code review on PR</li>
+        <li><a href="{{ '/commands/git-commit.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:git:commit</a> - Create semantic commits</li>
+        <li><a href="{{ '/commands/test-run.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:run</a> - Run tests before PR</li>
+    </ul>
 </div>
