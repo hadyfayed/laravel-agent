@@ -2,7 +2,50 @@
 
 All notable changes to Laravel Agent will be documented in this file.
 
-## [Unreleased]
+## [1.2.0] - 2025-12-18
+
+### Added
+
+#### Big O Complexity Detection
+- **Skills**: `laravel-database` and `laravel-performance` now detect O(n²) patterns
+- **Agents**: `laravel-database`, `laravel-performance`, and `laravel-review` detect Big O issues
+- **Commands**: `/db:optimize` now includes Big O analysis in optimization reports
+- **Triggers**: "Big O", "O(n)", "complexity", "nested loop", "quadratic"
+- **Patterns Detected**:
+  - O(n²) nested loops → Use relationships or `groupBy()`
+  - O(n²) `contains()` in loop → Use `flip()->has()`
+  - O(n) in-loop queries → Use batch operations
+  - O(n×m) `filter()` in loop → Use `groupBy()`
+
+#### Documentation Improvements
+- Bidirectional sync between commands and documentation (38 enriched docs)
+- All 23 agent documentation pages now include guardrails
+- All skill documentation pages enriched with Common Pitfalls sections
+- Comprehensive code examples in all documentation
+
+#### New Skills (3)
+- **laravel-horizon** - Queue monitoring and management (triggers: "horizon", "queue dashboard", "failed jobs")
+- **laravel-sanctum** - API token authentication (triggers: "sanctum", "api token", "spa auth")
+- **laravel-socialite** - Social authentication (triggers: "socialite", "oauth", "social login")
+
+#### Enhanced Hooks
+- Real hook scripts in `hooks/scripts/` directory
+- `pre-commit.sh` - Comprehensive pre-commit with syntax, Pint, PHPStan, security
+- `post-edit.sh` - Auto-format PHP files, update IDE helper
+- `security-scan.sh` - Detect secrets, API keys, passwords, debug functions
+- `migration-safety.sh` - Warn about destructive operations
+- `blade-lint.sh` - Validate CSRF, XSS prevention
+- `test-runner.sh` - Run related tests on file changes
+- `env-check.sh` - Validate .env files, block secret commits
+
+### Changed
+- All skills now include Big O complexity detection alongside N+1 detection
+- Performance checklist includes Big O optimization guidance
+- Review agent includes Big O in code quality checks with 90% confidence scoring
+
+---
+
+## [1.1.0] - 2025-12-16
 
 ### Added
 

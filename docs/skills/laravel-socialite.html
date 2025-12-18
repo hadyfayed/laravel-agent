@@ -1,0 +1,196 @@
+---
+layout: page
+title: laravel-socialite
+description: Implement OAuth social authentication with multiple providers
+nav_active: Skills
+back_url: /skills.html
+back_text: All Skills
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-bold">laravel-socialite</h1>
+            <p class="text-muted-foreground">Auto-invoked skill</p>
+        </div>
+    </div>
+    <p class="text-xl text-muted-foreground">Implement OAuth social authentication with multiple providers</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Trigger Keywords</h2>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
+    <div class="flex flex-wrap gap-2 not-prose mb-6">
+        <span class="trigger-tag">socialite</span>
+        <span class="trigger-tag">oauth</span>
+        <span class="trigger-tag">social login</span>
+        <span class="trigger-tag">google login</span>
+        <span class="trigger-tag">github login</span>
+        <span class="trigger-tag">facebook login</span>
+        <span class="trigger-tag">sign in with</span>
+    </div>
+
+    <h2>Overview</h2>
+    <p>The <strong>laravel-socialite</strong> skill provides expertise for social authentication using OAuth. It covers setup for Google, GitHub, Facebook, and 100+ other providers through community packages.</p>
+
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>OAuth Setup</strong> - Configure social providers</li>
+        <li><strong>User Creation</strong> - Create/link users from OAuth data</li>
+        <li><strong>Account Linking</strong> - Link multiple social accounts</li>
+        <li><strong>Scopes</strong> - Request additional permissions</li>
+        <li><strong>Community Providers</strong> - Apple, Discord, Microsoft, etc.</li>
+    </ul>
+
+    <h2>Quick Start</h2>
+    <pre class="language-bash"><code class="language-bash"># Install Socialite
+composer require laravel/socialite</code></pre>
+
+    <h2>Configuration</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// config/services.php
+return [
+    'github' => [
+        'client_id' => env('GITHUB_CLIENT_ID'),
+        'client_secret' => env('GITHUB_CLIENT_SECRET'),
+        'redirect' => env('GITHUB_REDIRECT_URI'),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+];</code></pre>
+
+    <h2>Routes</h2>
+    <pre class="language-php"><code class="language-php">Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect']);
+Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback']);</code></pre>
+
+    <h2>Controller</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Laravel\Socialite\Facades\Socialite;
+
+class SocialiteController extends Controller
+{
+    public function redirect(string $provider)
+    {
+        return Socialite::driver($provider)->redirect();
+    }
+
+    public function callback(string $provider)
+    {
+        $socialUser = Socialite::driver($provider)->user();
+
+        $user = User::updateOrCreate(
+            ['provider' => $provider, 'provider_id' => $socialUser->getId()],
+            [
+                'name' => $socialUser->getName(),
+                'email' => $socialUser->getEmail(),
+                'avatar' => $socialUser->getAvatar(),
+            ]
+        );
+
+        Auth::login($user);
+
+        return redirect('/dashboard');
+    }
+}</code></pre>
+
+    <h2>Requesting Scopes</h2>
+    <pre class="language-php"><code class="language-php">return Socialite::driver('github')
+    ->scopes(['read:user', 'public_repo'])
+    ->redirect();
+
+return Socialite::driver('google')
+    ->with(['hd' => 'example.com']) // Restrict to domain
+    ->redirect();</code></pre>
+
+    <h2>Stateless (API)</h2>
+    <pre class="language-php"><code class="language-php">// For API/token-based flows
+$user = Socialite::driver('github')->stateless()->user();</code></pre>
+
+    <h2>Supported Providers</h2>
+    <div class="overflow-x-auto not-prose">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Built-in</th>
+                    <th class="text-left py-3 px-4 font-medium">Community</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Google, GitHub, Facebook</td>
+                    <td class="py-3 px-4">Apple, Discord, Spotify</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Twitter, LinkedIn, GitLab</td>
+                    <td class="py-3 px-4">Microsoft, Twitch, Slack</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Bitbucket, Slack</td>
+                    <td class="py-3 px-4">And 100+ more</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Community Providers</h2>
+    <pre class="language-bash"><code class="language-bash"># Install community provider
+composer require socialiteproviders/discord</code></pre>
+
+    <pre class="language-php"><code class="language-php">// EventServiceProvider
+protected $listen = [
+    \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+        \SocialiteProviders\Discord\DiscordExtendSocialite::class.'@handle',
+    ],
+];</code></pre>
+
+    <h2>Testing</h2>
+    <pre class="language-php"><code class="language-php">use Laravel\Socialite\Facades\Socialite;
+use Mockery;
+
+it('authenticates with github', function () {
+    $socialiteUser = Mockery::mock(\Laravel\Socialite\Two\User::class);
+    $socialiteUser->shouldReceive('getId')->andReturn('12345');
+    $socialiteUser->shouldReceive('getName')->andReturn('John Doe');
+    $socialiteUser->shouldReceive('getEmail')->andReturn('john@example.com');
+
+    Socialite::shouldReceive('driver->user')->andReturn($socialiteUser);
+
+    $this->get('/auth/github/callback')
+        ->assertRedirect('/dashboard');
+});</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Wrong redirect URI</strong> - Must exactly match provider settings</li>
+        <li><strong>Missing provider validation</strong> - Validate provider name</li>
+        <li><strong>Email conflicts</strong> - Handle existing users with same email</li>
+        <li><strong>Missing email</strong> - Some providers don't return email</li>
+        <li><strong>HTTPS required</strong> - Production must use HTTPS</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Validate provider names to prevent errors</li>
+        <li>Handle OAuth exceptions gracefully</li>
+        <li>Allow linking multiple social accounts</li>
+        <li>Store and encrypt access tokens</li>
+        <li>Handle missing email addresses</li>
+        <li>Use HTTPS for redirect URIs</li>
+        <li>Log social authentication events</li>
+    </ul>
+
+    <h2>Related Skills</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-auth.html' | relative_url }}" class="text-primary hover:underline">laravel-auth</a> - Authentication and authorization</li>
+        <li><a href="{{ '/skills/laravel-sanctum.html' | relative_url }}" class="text-primary hover:underline">laravel-sanctum</a> - API token authentication</li>
+    </ul>
+</div>

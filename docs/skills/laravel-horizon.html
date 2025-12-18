@@ -1,0 +1,160 @@
+---
+layout: page
+title: laravel-horizon
+description: Monitor and manage Redis queues with dashboard and metrics
+nav_active: Skills
+back_url: /skills.html
+back_text: All Skills
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-bold">laravel-horizon</h1>
+            <p class="text-muted-foreground">Auto-invoked skill</p>
+        </div>
+    </div>
+    <p class="text-xl text-muted-foreground">Monitor and manage Redis queues with dashboard and metrics</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Trigger Keywords</h2>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
+    <div class="flex flex-wrap gap-2 not-prose mb-6">
+        <span class="trigger-tag">horizon</span>
+        <span class="trigger-tag">queue dashboard</span>
+        <span class="trigger-tag">failed jobs</span>
+        <span class="trigger-tag">queue metrics</span>
+        <span class="trigger-tag">worker status</span>
+        <span class="trigger-tag">redis queue</span>
+    </div>
+
+    <h2>Overview</h2>
+    <p>The <strong>laravel-horizon</strong> skill provides expertise for Redis queue monitoring and management using Laravel Horizon. It covers dashboard setup, worker configuration, metrics, notifications, and failed job management.</p>
+
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Dashboard Setup</strong> - Install and configure Horizon dashboard</li>
+        <li><strong>Worker Configuration</strong> - Multi-queue and auto-scaling workers</li>
+        <li><strong>Metrics & Monitoring</strong> - Queue throughput and wait times</li>
+        <li><strong>Notifications</strong> - Slack/email alerts for failures</li>
+        <li><strong>Job Tags</strong> - Organize and filter jobs</li>
+        <li><strong>Failed Jobs</strong> - Retry and manage failed jobs</li>
+    </ul>
+
+    <h2>Quick Start</h2>
+    <pre class="language-bash"><code class="language-bash"># Install Horizon
+composer require laravel/horizon
+php artisan horizon:install
+php artisan migrate
+
+# Run Horizon
+php artisan horizon</code></pre>
+
+    <h2>Worker Configuration</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// config/horizon.php
+'environments' => [
+    'production' => [
+        'supervisor-high' => [
+            'connection' => 'redis',
+            'queue' => ['high'],
+            'balance' => 'simple',
+            'maxProcesses' => 5,
+            'tries' => 3,
+        ],
+        'supervisor-default' => [
+            'connection' => 'redis',
+            'queue' => ['default'],
+            'balance' => 'auto',
+            'maxProcesses' => 10,
+            'minProcesses' => 1,
+        ],
+        'supervisor-low' => [
+            'connection' => 'redis',
+            'queue' => ['low'],
+            'balance' => 'simple',
+            'maxProcesses' => 3,
+        ],
+    ],
+],</code></pre>
+
+    <h2>Authorization</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// app/Providers/HorizonServiceProvider.php
+protected function gate(): void
+{
+    Gate::define('viewHorizon', function ($user) {
+        return in_array($user->email, [
+            'admin@example.com',
+        ]);
+    });
+}</code></pre>
+
+    <h2>Notifications</h2>
+    <pre class="language-php"><code class="language-php">// Send alerts on long wait times
+Horizon::routeSlackNotificationsTo(
+    env('SLACK_WEBHOOK_URL'),
+    '#horizon-alerts'
+);
+
+Horizon::routeLongWaitTimeNotificationsTo(
+    env('SLACK_WEBHOOK_URL'),
+    60 // seconds
+);</code></pre>
+
+    <h2>Job Tags</h2>
+    <pre class="language-php"><code class="language-php">final class ProcessOrder implements ShouldQueue
+{
+    public function tags(): array
+    {
+        return [
+            'order',
+            'order:'.$this->order->id,
+            'user:'.$this->order->user_id,
+        ];
+    }
+}</code></pre>
+
+    <h2>Supervisor Configuration</h2>
+    <pre class="language-ini"><code class="language-ini">[program:horizon]
+process_name=%(program_name)s
+command=php /var/www/html/artisan horizon
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/www/html/storage/logs/horizon.log
+stopwaitsecs=3600</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Not using Supervisor</strong> - Horizon needs a process manager</li>
+        <li><strong>Forgetting to terminate on deploy</strong> - Run <code>php artisan horizon:terminate</code></li>
+        <li><strong>Missing authorization gate</strong> - Dashboard is public without it</li>
+        <li><strong>Wrong Redis configuration</strong> - Ensure <code>QUEUE_CONNECTION=redis</code></li>
+        <li><strong>Not monitoring wait times</strong> - Set up Slack notifications</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Use Supervisor for process management</li>
+        <li>Configure auto-scaling for production</li>
+        <li>Set up Slack/email notifications</li>
+        <li>Monitor queue wait times</li>
+        <li>Tag jobs for filtering</li>
+        <li>Terminate Horizon on deploy</li>
+        <li>Set appropriate memory limits</li>
+    </ul>
+
+    <h2>Related Skills</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-queue.html' | relative_url }}" class="text-primary hover:underline">laravel-queue</a> - Queue and job implementation</li>
+        <li><a href="{{ '/skills/laravel-deploy.html' | relative_url }}" class="text-primary hover:underline">laravel-deploy</a> - Production deployment</li>
+    </ul>
+</div>

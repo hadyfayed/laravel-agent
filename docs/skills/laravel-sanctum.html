@@ -1,0 +1,154 @@
+---
+layout: page
+title: laravel-sanctum
+description: Implement API token and SPA authentication
+nav_active: Skills
+back_url: /skills.html
+back_text: All Skills
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-bold">laravel-sanctum</h1>
+            <p class="text-muted-foreground">Auto-invoked skill</p>
+        </div>
+    </div>
+    <p class="text-xl text-muted-foreground">Implement API token and SPA authentication</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Trigger Keywords</h2>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
+    <div class="flex flex-wrap gap-2 not-prose mb-6">
+        <span class="trigger-tag">sanctum</span>
+        <span class="trigger-tag">api token</span>
+        <span class="trigger-tag">spa auth</span>
+        <span class="trigger-tag">bearer token</span>
+        <span class="trigger-tag">personal access token</span>
+        <span class="trigger-tag">mobile auth</span>
+    </div>
+
+    <h2>Overview</h2>
+    <p>The <strong>laravel-sanctum</strong> skill provides expertise for lightweight API authentication. It covers API token generation, SPA authentication, token abilities/scopes, and mobile app authentication.</p>
+
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>API Tokens</strong> - Personal access token generation</li>
+        <li><strong>SPA Authentication</strong> - Session-based auth for SPAs</li>
+        <li><strong>Token Abilities</strong> - Scope-based permissions</li>
+        <li><strong>Mobile Auth</strong> - Token auth for mobile apps</li>
+        <li><strong>Token Management</strong> - Revoke and refresh tokens</li>
+    </ul>
+
+    <h2>Quick Start</h2>
+    <pre class="language-bash"><code class="language-bash"># Install Sanctum
+composer require laravel/sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+php artisan migrate</code></pre>
+
+    <h2>User Model Setup</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Laravel\Sanctum\HasApiTokens;
+
+class User extends Authenticatable
+{
+    use HasApiTokens;
+}</code></pre>
+
+    <h2>Issuing Tokens</h2>
+    <pre class="language-php"><code class="language-php">// Create token with abilities
+$token = $user->createToken(
+    'api-token',
+    ['posts:read', 'posts:write']
+);
+
+return response()->json([
+    'token' => $token->plainTextToken,
+]);</code></pre>
+
+    <h2>Protecting Routes</h2>
+    <pre class="language-php"><code class="language-php">Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+});</code></pre>
+
+    <h2>Token Abilities</h2>
+    <pre class="language-php"><code class="language-php">// Check ability
+if ($request->user()->tokenCan('posts:write')) {
+    // Can write posts
+}
+
+// Middleware
+Route::middleware(['auth:sanctum', 'abilities:posts:read'])->get('/posts');
+
+// Create with abilities
+$token = $user->createToken('admin', ['*']); // All abilities</code></pre>
+
+    <h2>SPA Configuration</h2>
+    <pre class="language-php"><code class="language-php">// config/sanctum.php
+'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS',
+    'localhost,localhost:3000,127.0.0.1'
+)),
+
+// config/cors.php
+'supports_credentials' => true,</code></pre>
+
+    <pre class="language-javascript"><code class="language-javascript">// Frontend SPA
+await axios.get('/sanctum/csrf-cookie');
+await axios.post('/login', credentials);
+// Now authenticated via session</code></pre>
+
+    <h2>Revoking Tokens</h2>
+    <pre class="language-php"><code class="language-php">// Revoke current token
+$request->user()->currentAccessToken()->delete();
+
+// Revoke all tokens
+$user->tokens()->delete();
+
+// Revoke specific token
+$user->tokens()->where('id', $tokenId)->delete();</code></pre>
+
+    <h2>Testing</h2>
+    <pre class="language-php"><code class="language-php">use Laravel\Sanctum\Sanctum;
+
+it('authenticates with token', function () {
+    $user = User::factory()->create();
+
+    Sanctum::actingAs($user, ['posts:read']);
+
+    $response = $this->getJson('/api/posts');
+
+    $response->assertOk();
+});</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Missing HasApiTokens trait</strong> - Add to User model</li>
+        <li><strong>CORS issues with SPA</strong> - Set <code>supports_credentials => true</code></li>
+        <li><strong>Storing plain text token</strong> - Only available at creation time</li>
+        <li><strong>Not checking abilities</strong> - Always validate token permissions</li>
+        <li><strong>Missing CSRF cookie</strong> - SPA must request it first</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Use abilities to scope token permissions</li>
+        <li>Set token expiration for security</li>
+        <li>Revoke tokens on password change</li>
+        <li>Use device names to identify tokens</li>
+        <li>Rate limit authentication endpoints</li>
+        <li>Use HTTPS in production</li>
+    </ul>
+
+    <h2>Related Skills</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-auth.html' | relative_url }}" class="text-primary hover:underline">laravel-auth</a> - Authentication and authorization</li>
+        <li><a href="{{ '/skills/laravel-api.html' | relative_url }}" class="text-primary hover:underline">laravel-api</a> - API development</li>
+    </ul>
+</div>
