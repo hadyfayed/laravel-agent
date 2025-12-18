@@ -30,10 +30,10 @@ and synthesize their findings into actionable, confidence-scored reports.
 ├───────────────┤ ├───────────────┤ ├───────────────┤ ├───────────────┤
 │ • SQL Inject. │ │ • SOLID       │ │ • Facades     │ │ • Coverage    │
 │ • XSS         │ │ • DRY         │ │ • Eloquent    │ │ • Edge cases  │
-│ • Mass Assign │ │ • Complexity  │ │ • Events      │ │ • Assertions  │
-│ • Auth/Authz  │ │ • Coupling    │ │ • Resources   │ │ • Isolation   │
-│ • CSRF        │ │ • Naming      │ │ • Middleware  │ │ • Factories   │
-│ • File upload │ │ • Dead code   │ │ • Validation  │ │ • Mocking     │
+│ • Mass Assign │ │ • Complexity  │ │ • N+1 Queries │ │ • Assertions  │
+│ • Auth/Authz  │ │ • Coupling    │ │ • Big O       │ │ • Isolation   │
+│ • CSRF        │ │ • Naming      │ │ • Events      │ │ • Factories   │
+│ • File upload │ │ • Dead code   │ │ • Middleware  │ │ • Mocking     │
 └───────────────┘ └───────────────┘ └───────────────┘ └───────────────┘
         │               │               │               │
         └───────────────┴───────────────┴───────────────┘
@@ -95,6 +95,7 @@ Use Task tool with subagent_type="general-purpose" to run quality review:
 Use Task tool with subagent_type="general-purpose" to run Laravel best practices review:
 - Check facade vs injection usage
 - Check Eloquent best practices (N+1, relationships)
+- Check Big O complexity issues (nested loops, contains() in loops, in-loop queries)
 - Check event/listener patterns
 - Check resource/transformer usage
 - Check middleware usage
@@ -257,6 +258,49 @@ foreach (Order::all() as $order) {
 
 // SOLUTION
 Order::with('customer')->get();
+```
+
+### Big O Complexity Issues
+```php
+// PROBLEM - Flag with 90% confidence (O(n²) nested loops)
+$users = User::all();
+$orders = Order::all();
+foreach ($users as $user) {
+    foreach ($orders as $order) {
+        if ($order->user_id === $user->id) {
+            // Process - runs n×m times!
+        }
+    }
+}
+
+// SOLUTION: Use relationships or groupBy
+$users = User::with('orders')->get();
+// Or: $ordersByUser = Order::all()->groupBy('user_id');
+
+// PROBLEM - Flag with 90% confidence (contains() in loop)
+$existingEmails = User::pluck('email');
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->contains($userData['email'])) {
+        User::create($userData);
+    }
+}
+
+// SOLUTION: Use flip() for O(1) lookups
+$existingEmails = User::pluck('email')->flip();
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->has($userData['email'])) {
+        User::create($userData);
+    }
+}
+
+// PROBLEM - Flag with 85% confidence (in-loop queries)
+foreach ($orderIds as $orderId) {
+    $order = Order::find($orderId); // Query per iteration!
+    $order->update(['status' => 'processed']);
+}
+
+// SOLUTION: Batch operations
+Order::whereIn('id', $orderIds)->update(['status' => 'processed']);
 ```
 
 ### Facade vs Injection
@@ -437,6 +481,8 @@ Consider eager loading the `customer` relationship.
 - **ALWAYS** provide actionable fix suggestions
 - **ALWAYS** include code examples for fixes
 - **ALWAYS** cite specific file and line numbers
+- **DETECT** Big O complexity issues (nested loops, contains() in loops)
+- **FLAG** O(n²) patterns with 90% confidence
 
 # INTEGRATION
 

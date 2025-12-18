@@ -30,6 +30,10 @@ back_text: All Skills
         <span class="trigger-tag">pulse</span>
         <span class="trigger-tag">performance</span>
         <span class="trigger-tag">memory</span>
+        <span class="trigger-tag">Big O</span>
+        <span class="trigger-tag">O(n)</span>
+        <span class="trigger-tag">complexity</span>
+        <span class="trigger-tag">nested loop</span>
     </div>
 
     <h2>Overview</h2>
@@ -39,6 +43,7 @@ back_text: All Skills
     <ul>
         <li><strong>Caching Strategies</strong> - Data, query, and full-page caching</li>
         <li><strong>Query Optimization</strong> - N+1 fixes, indexing, eager loading</li>
+        <li><strong>Big O Fixes</strong> - Detect O(n²) patterns and fix with O(1) lookups</li>
         <li><strong>Memory Management</strong> - Chunking, lazy collections, memory limits</li>
         <li><strong>Laravel Pulse</strong> - Real-time performance monitoring</li>
         <li><strong>Profiling</strong> - Identifying bottlenecks with tools</li>
@@ -173,6 +178,38 @@ DB::enableQueryLog();
 $posts = Post::where('status', 'published')->get();
 dd(DB::getQueryLog());</code></pre>
 
+    <h2>Big O Complexity Fixes</h2>
+    <p>Big O complexity issues cause exponential slowdowns as data grows.</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// BAD: O(n²) - Nested loops
+foreach ($users as $user) {
+    foreach ($orders as $order) {
+        if ($order->user_id === $user->id) {
+            // Process - runs n×m times!
+        }
+    }
+}
+
+// GOOD: O(n) - Use relationships or keyBy
+$users = User::with('orders')->get();
+// Or: $ordersByUser = $orders->groupBy('user_id');
+
+// BAD: O(n²) - contains() in loop
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->contains($userData['email'])) {
+        User::create($userData);
+    }
+}
+
+// GOOD: O(n) - Use flip() for O(1) lookup
+$existingEmails = User::pluck('email')->flip();
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->has($userData['email'])) {
+        User::create($userData);
+    }
+}</code></pre>
+
     <h2>Laravel Pulse Setup</h2>
     <pre class="language-bash"><code class="language-bash"># Install Pulse
 composer require laravel/pulse
@@ -234,6 +271,10 @@ public function boot()
                     <td class="py-3 px-4">Eager load, indexes, select specific columns</td>
                 </tr>
                 <tr class="border-b border-border">
+                    <td class="py-3 px-4">Big O</td>
+                    <td class="py-3 px-4">Avoid nested loops, use keyBy/groupBy for O(1) lookups</td>
+                </tr>
+                <tr class="border-b border-border">
                     <td class="py-3 px-4">Caching</td>
                     <td class="py-3 px-4">Redis for sessions, cache, and queues</td>
                 </tr>
@@ -255,6 +296,8 @@ public function boot()
         <li><strong>Cache stampede</strong> - Use atomic locks for expensive operations</li>
         <li><strong>Over-eager loading</strong> - Only load relationships you need</li>
         <li><strong>Missing indexes</strong> - Add indexes for WHERE, ORDER BY columns</li>
+        <li><strong>O(n²) nested loops</strong> - Use groupBy() or keyBy() for O(1) lookups</li>
+        <li><strong>contains() in loops</strong> - Use flip()->has() instead for O(1) lookups</li>
     </ul>
 
     <h2>Profiling Tools</h2>

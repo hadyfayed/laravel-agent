@@ -27,6 +27,10 @@ back_text: All Skills
         <span class="trigger-tag">migration</span>
         <span class="trigger-tag">query</span>
         <span class="trigger-tag">N+1</span>
+        <span class="trigger-tag">Big O</span>
+        <span class="trigger-tag">O(n)</span>
+        <span class="trigger-tag">complexity</span>
+        <span class="trigger-tag">nested loop</span>
         <span class="trigger-tag">eloquent</span>
         <span class="trigger-tag">index</span>
         <span class="trigger-tag">database</span>
@@ -39,6 +43,7 @@ back_text: All Skills
     <ul>
         <li><strong>Schema Design</strong> - Proper column types, indexes, foreign keys</li>
         <li><strong>N+1 Detection</strong> - Identify and fix eager loading issues</li>
+        <li><strong>Big O Fixes</strong> - Detect O(n²) patterns and fix with O(1) lookups</li>
         <li><strong>Query Optimization</strong> - Efficient queries with proper indexing</li>
         <li><strong>Migrations</strong> - Safe, reversible database changes</li>
         <li><strong>Eloquent Patterns</strong> - Scopes, accessors, relationships</li>
@@ -78,6 +83,83 @@ $posts = Post::with(['author', 'comments.user'])->get();
 $posts = Post::with(['comments' => function ($query) {
     $query->where('approved', true)->latest()->limit(5);
 }])->get();</code></pre>
+
+    <h2>Big O Complexity Issues</h2>
+    <p>Big O complexity issues cause exponential slowdowns as data grows. Detect and fix O(n²) patterns.</p>
+    <pre class="language-php"><code class="language-php">// BAD: O(n²) - Nested loops comparing all items
+$users = User::all();
+$orders = Order::all();
+foreach ($users as $user) {
+    foreach ($orders as $order) {
+        if ($order->user_id === $user->id) {
+            // Process - runs n×m times!
+        }
+    }
+}
+
+// GOOD: O(n) - Eager load relationships
+$users = User::with('orders')->get();
+foreach ($users as $user) {
+    foreach ($user->orders as $order) {
+        // Process - each order accessed once
+    }
+}
+
+// GOOD: O(n) - Use groupBy for O(1) lookups
+$ordersByUser = Order::all()->groupBy('user_id');
+foreach ($users as $user) {
+    $userOrders = $ordersByUser->get($user->id, collect());
+}
+
+// BAD: O(n²) - contains() is O(n), called n times
+$existingEmails = User::pluck('email');
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->contains($userData['email'])) {
+        User::create($userData);
+    }
+}
+
+// GOOD: O(n) - flip() for O(1) has() lookups
+$existingEmails = User::pluck('email')->flip();
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->has($userData['email'])) {
+        User::create($userData);
+    }
+}</code></pre>
+
+    <div class="overflow-x-auto not-prose mb-6">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4 font-medium">Pattern</th>
+                    <th class="text-left py-3 px-4 font-medium">Bad</th>
+                    <th class="text-left py-3 px-4 font-medium">Good</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Nested loops</td>
+                    <td class="py-3 px-4">O(n²)</td>
+                    <td class="py-3 px-4">Eager load / keyBy → O(n)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">In-loop queries</td>
+                    <td class="py-3 px-4">O(n) queries</td>
+                    <td class="py-3 px-4">Batch query → O(1) queries</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">contains() in loop</td>
+                    <td class="py-3 px-4">O(n²)</td>
+                    <td class="py-3 px-4">flip()/has() → O(n)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">filter() in loop</td>
+                    <td class="py-3 px-4">O(n×m)</td>
+                    <td class="py-3 px-4">groupBy() → O(n+m)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <h2>Index Strategies</h2>
     <div class="overflow-x-auto not-prose">

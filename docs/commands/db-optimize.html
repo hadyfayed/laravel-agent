@@ -17,7 +17,7 @@ back_text: All Commands
 
 <div class="prose prose-neutral dark:prose-invert max-w-none">
     <h2>Overview</h2>
-    <p>The <code>/db:optimize</code> command analyzes your Laravel application's database queries and schema to identify performance bottlenecks and optimization opportunities. It scans for N+1 queries, missing indexes, slow queries, and suggests eager loading strategies to improve database performance.</p>
+    <p>The <code>/db:optimize</code> command analyzes your Laravel application's database queries and schema to identify performance bottlenecks and optimization opportunities. It scans for N+1 queries, <strong>Big O complexity issues</strong>, missing indexes, slow queries, and suggests eager loading strategies to improve database performance.</p>
 
     <h2>Usage</h2>
     <pre class="language-bash"><code class="language-bash">/laravel-agent:db:optimize [target]</code></pre>
@@ -51,6 +51,11 @@ back_text: All Commands
                     <td class="py-3 px-4">Eager loading with <code>with()</code> or <code>load()</code></td>
                 </tr>
                 <tr class="border-b border-border">
+                    <td class="py-3 px-4">Big O Issues</td>
+                    <td class="py-3 px-4">Nested loops O(n²), <code>contains()</code> in loops, in-loop queries</td>
+                    <td class="py-3 px-4"><code>groupBy()</code>, <code>keyBy()</code>, <code>flip()->has()</code> for O(1) lookups</td>
+                </tr>
+                <tr class="border-b border-border">
                     <td class="py-3 px-4">Missing Indexes</td>
                     <td class="py-3 px-4">Columns used in WHERE, JOIN, and ORDER BY clauses</td>
                     <td class="py-3 px-4">Index creation migrations</td>
@@ -79,6 +84,7 @@ back_text: All Commands
 
     <ol>
         <li><strong>Scan for N+1 queries</strong> - Identifies loops and iterations that trigger multiple database queries</li>
+        <li><strong>Detect Big O complexity issues</strong> - Finds O(n²) patterns like nested loops and inefficient lookups</li>
         <li><strong>Check missing indexes</strong> - Analyzes query patterns to find columns that would benefit from indexing</li>
         <li><strong>Analyze slow queries</strong> - Reviews query complexity and execution time</li>
         <li><strong>Suggest eager loading</strong> - Recommends optimal relationship loading strategies</li>
@@ -111,6 +117,55 @@ public function index()
     foreach ($orders as $order) {
         echo $order->customer->name; // Uses eager loaded data
         echo $order->items->count();  // No additional query
+    }
+}</code></pre>
+
+    <h2>Example: Big O Complexity Detection</h2>
+    <p>Before optimization (O(n²)):</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// O(n²) - Nested loop comparing all items
+$users = User::all();
+$orders = Order::all();
+
+foreach ($users as $user) {
+    foreach ($orders as $order) {
+        if ($order->user_id === $user->id) {
+            // Process - runs n×m times!
+        }
+    }
+}
+
+// O(n²) - contains() is O(n), called n times
+$existingEmails = User::pluck('email');
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->contains($userData['email'])) {
+        User::create($userData);
+    }
+}</code></pre>
+
+    <p>After optimization (O(n)):</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// O(n) - Eager load relationships
+$users = User::with('orders')->get();
+foreach ($users as $user) {
+    foreach ($user->orders as $order) {
+        // Process - each order accessed once
+    }
+}
+
+// Or: O(n) - Use groupBy for O(1) lookups
+$ordersByUser = Order::all()->groupBy('user_id');
+foreach ($users as $user) {
+    $userOrders = $ordersByUser->get($user->id, collect());
+}
+
+// O(n) - Use flip() for O(1) has() lookups
+$existingEmails = User::pluck('email')->flip();
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->has($userData['email'])) {
+        User::create($userData);
     }
 }</code></pre>
 
@@ -173,6 +228,7 @@ return new class extends Migration
     <p>Typical optimization results:</p>
     <ul>
         <li><strong>N+1 fixes</strong> - Can reduce query count from hundreds to single digits</li>
+        <li><strong>Big O fixes</strong> - Convert O(n²) to O(n), massive improvements for large datasets</li>
         <li><strong>Index additions</strong> - Often improve query speed by 10-100x</li>
         <li><strong>Eager loading</strong> - Reduces page load time by 50-90% in data-heavy views</li>
         <li><strong>Schema optimization</strong> - Improves storage efficiency and join performance</li>

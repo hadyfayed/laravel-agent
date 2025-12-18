@@ -188,6 +188,73 @@ foreach ($posts as $post) {
 $posts = Post::with('author:id,name')->get();
 ```
 
+### Big O Complexity Fixes
+
+Detect and fix O(n²) patterns that cause exponential slowdowns.
+
+```php
+// BAD: O(n²) - Nested loops comparing all items
+$users = User::all();
+$orders = Order::all();
+foreach ($users as $user) {
+    foreach ($orders as $order) {
+        if ($order->user_id === $user->id) {
+            // Process - runs n×m times!
+        }
+    }
+}
+
+// GOOD: O(n) - Eager load relationships
+$users = User::with('orders')->get();
+foreach ($users as $user) {
+    foreach ($user->orders as $order) {
+        // Process - each order accessed once
+    }
+}
+
+// GOOD: O(n) - Use groupBy for O(1) lookups
+$ordersByUser = Order::all()->groupBy('user_id');
+foreach ($users as $user) {
+    $userOrders = $ordersByUser->get($user->id, collect());
+}
+
+// BAD: O(n²) - contains() is O(n), called n times
+$existingEmails = User::pluck('email');
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->contains($userData['email'])) {
+        User::create($userData);
+    }
+}
+
+// GOOD: O(n) - flip() for O(1) has() lookups
+$existingEmails = User::pluck('email')->flip();
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->has($userData['email'])) {
+        User::create($userData);
+    }
+}
+
+// BETTER: Use database upsert
+User::upsert($newUsers, ['email'], ['name', 'updated_at']);
+
+// BAD: O(n) queries - Query inside loop
+foreach ($orderIds as $orderId) {
+    $order = Order::find($orderId);
+    $order->update(['status' => 'processed']);
+}
+
+// GOOD: O(1) queries - Batch update
+Order::whereIn('id', $orderIds)->update(['status' => 'processed']);
+```
+
+### Big O Complexity Reference
+| Pattern | Bad | Good | Improvement |
+|---------|-----|------|-------------|
+| Nested loops | O(n²) | Eager load/keyBy | O(n) |
+| In-loop queries | O(n) queries | Batch query | O(1) queries |
+| contains() in loop | O(n²) | flip()/has() | O(n) |
+| filter() in loop | O(n×m) | groupBy() | O(n+m) |
+
 ### Chunking Large Datasets
 ```php
 User::chunk(1000, function ($users) {
@@ -641,3 +708,6 @@ php artisan dev:security:unprotected-routes --fail-on-issues
 - **NEVER** mass-assign tenant IDs
 - **PREFER** incremental upgrades (10 → 11 → 12)
 - **TEST** on staging before production
+- **DETECT** Big O complexity issues (nested loops, contains() in loops)
+- **FIX** O(n²) patterns with keyBy(), groupBy(), flip() for O(1) lookups
+- **PREFER** batch operations over in-loop queries

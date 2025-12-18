@@ -1,10 +1,10 @@
 ---
 name: laravel-database
 description: >
-  Optimize database operations, create migrations, fix N+1 queries, and design schemas.
+  Optimize database operations, create migrations, fix N+1 queries, Big O complexity issues, and design schemas.
   Use when the user mentions database issues, needs migrations, or wants query optimization.
-  Triggers: "migration", "database", "query", "N+1", "index", "schema", "relationship",
-  "eloquent", "slow query", "optimize database".
+  Triggers: "migration", "database", "query", "N+1", "Big O", "O(n)", "complexity", "index", "schema", "relationship",
+  "eloquent", "slow query", "optimize database", "nested loop", "quadratic".
 allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
 ---
 
@@ -16,6 +16,7 @@ Optimize database operations, design schemas, and fix performance issues.
 
 - Creating or modifying migrations
 - Fixing N+1 query problems
+- Fixing Big O complexity issues (O(n²), nested loops)
 - Optimizing slow queries
 - Designing database schemas
 - Adding indexes
@@ -108,6 +109,174 @@ public function boot(): void
 {
     Model::preventLazyLoading(!app()->isProduction());
 }
+```
+
+## Fixing Big O Complexity Issues
+
+Big O complexity issues cause exponential slowdowns as data grows. Common patterns that introduce O(n²) or worse complexity.
+
+### Problem: Nested Collection Loops (O(n²))
+```php
+// BAD: O(n²) - Nested loops comparing all items
+$users = User::all();
+$orders = Order::all();
+
+foreach ($users as $user) {
+    foreach ($orders as $order) {
+        if ($order->user_id === $user->id) {
+            // Process - runs n×m times!
+        }
+    }
+}
+```
+
+### Solution: Use Relationships or Indexing
+```php
+// GOOD: O(n) - Eager load relationships
+$users = User::with('orders')->get();
+
+foreach ($users as $user) {
+    foreach ($user->orders as $order) {
+        // Process - each order accessed once
+    }
+}
+
+// GOOD: O(n) - Use keyBy for O(1) lookups
+$orders = Order::all()->groupBy('user_id');
+
+foreach ($users as $user) {
+    $userOrders = $orders->get($user->id, collect());
+    // O(1) lookup instead of O(n) search
+}
+```
+
+### Problem: In-Loop Queries (O(n) queries)
+```php
+// BAD: O(n) queries - Query inside loop
+$orderIds = [1, 2, 3, /* ... 1000 more */];
+
+foreach ($orderIds as $orderId) {
+    $order = Order::find($orderId); // Query per iteration!
+    $order->update(['status' => 'processed']);
+}
+```
+
+### Solution: Batch Operations
+```php
+// GOOD: O(1) queries - Single batch update
+Order::whereIn('id', $orderIds)
+    ->update(['status' => 'processed']);
+
+// GOOD: O(1) queries - Load all at once
+$orders = Order::whereIn('id', $orderIds)->get()->keyBy('id');
+
+foreach ($orderIds as $orderId) {
+    $order = $orders->get($orderId);
+    // Process with in-memory data
+}
+```
+
+### Problem: Collection Search in Loop (O(n²))
+```php
+// BAD: O(n²) - contains() is O(n), called n times
+$existingEmails = User::pluck('email');
+
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->contains($userData['email'])) {
+        User::create($userData);
+    }
+}
+```
+
+### Solution: Use Hash-Based Lookups
+```php
+// GOOD: O(n) - Convert to hashmap for O(1) lookups
+$existingEmails = User::pluck('email')->flip(); // O(1) lookup
+
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->has($userData['email'])) {
+        User::create($userData);
+    }
+}
+
+// BETTER: Use database upsert
+User::upsert($newUsers, ['email'], ['name', 'updated_at']);
+```
+
+### Problem: Repeated Array Filtering (O(n²))
+```php
+// BAD: O(n²) - filter() is O(n), called for each category
+$products = Product::all();
+$categories = Category::all();
+
+foreach ($categories as $category) {
+    $categoryProducts = $products->filter(fn($p) =>
+        $p->category_id === $category->id
+    ); // O(n) filter × m categories = O(n×m)
+}
+```
+
+### Solution: Pre-group the Data
+```php
+// GOOD: O(n+m) - Group once, access O(1)
+$productsByCategory = Product::all()->groupBy('category_id');
+
+foreach ($categories as $category) {
+    $categoryProducts = $productsByCategory->get($category->id, collect());
+}
+```
+
+### Problem: String Building in Loop (O(n²))
+```php
+// BAD: O(n²) - String concatenation creates new string each time
+$html = '';
+foreach ($items as $item) {
+    $html .= "<li>{$item->name}</li>"; // O(n) copy each time
+}
+```
+
+### Solution: Use Array Join or StringBuilder
+```php
+// GOOD: O(n) - Build array, join once
+$parts = [];
+foreach ($items as $item) {
+    $parts[] = "<li>{$item->name}</li>";
+}
+$html = implode('', $parts);
+
+// BETTER: Use collection
+$html = $items->map(fn($item) => "<li>{$item->name}</li>")->implode('');
+```
+
+### Big O Complexity Reference
+
+| Operation | Bad Pattern | Good Pattern | Improvement |
+|-----------|-------------|--------------|-------------|
+| Nested loops | O(n²) | Eager load/keyBy | O(n) |
+| In-loop queries | O(n) queries | Batch query | O(1) queries |
+| contains() in loop | O(n²) | flip()/has() | O(n) |
+| filter() in loop | O(n×m) | groupBy() | O(n+m) |
+| String concat | O(n²) | implode() | O(n) |
+| array_search in loop | O(n²) | array_flip | O(n) |
+
+### Detecting Big O Issues
+```php
+// Add to AppServiceProvider for development
+use Illuminate\Support\Facades\DB;
+
+DB::listen(function ($query) {
+    static $queryCount = 0;
+    $queryCount++;
+
+    if ($queryCount > 100) {
+        Log::warning("High query count: {$queryCount}", [
+            'sql' => $query->sql,
+        ]);
+    }
+});
+
+// Use Laravel Debugbar
+// composer require barryvdh/laravel-debugbar --dev
 ```
 
 ## Query Optimization
@@ -205,11 +374,14 @@ DB::transaction(function () {
 ## Common Pitfalls
 
 1. **N+1 Queries** - Always eager load relationships
-2. **Missing Indexes** - Add indexes for WHERE and ORDER BY
-3. **SELECT *** - Only select needed columns
-4. **No Chunking** - Use chunk() for large datasets
-5. **No Foreign Keys** - Always use constraints
-6. **No Transactions** - Wrap related operations
+2. **Big O Issues** - Avoid nested loops, use keyBy/groupBy for O(1) lookups
+3. **Missing Indexes** - Add indexes for WHERE and ORDER BY
+4. **SELECT *** - Only select needed columns
+5. **No Chunking** - Use chunk() for large datasets
+6. **In-Loop Queries** - Batch queries outside loops
+7. **contains() in Loops** - Use flip()->has() for O(1) lookups
+8. **No Foreign Keys** - Always use constraints
+9. **No Transactions** - Wrap related operations
 
 ## Package Integration
 

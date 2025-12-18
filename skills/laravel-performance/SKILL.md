@@ -2,9 +2,9 @@
 name: laravel-performance
 description: >
   Optimize Laravel application performance including caching, query optimization,
-  and scaling. Use when the user mentions slow performance, needs optimization,
+  Big O complexity fixes, and scaling. Use when the user mentions slow performance, needs optimization,
   or wants to improve speed. Triggers: "performance", "slow", "optimize", "speed",
-  "cache", "fast", "scaling", "bottleneck", "memory", "N+1".
+  "cache", "fast", "scaling", "bottleneck", "memory", "N+1", "Big O", "O(n)", "complexity", "nested loop", "quadratic".
 allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
 ---
 
@@ -81,6 +81,44 @@ $products = Cache::remember('products:featured', 3600, function () {
 });
 ```
 
+### 5. Fix Big O Complexity Issues
+
+Big O complexity issues cause exponential slowdowns as data grows. Identify and fix O(n²) patterns.
+
+```php
+// BAD: O(n²) - Nested loops
+foreach ($users as $user) {
+    foreach ($orders as $order) {
+        if ($order->user_id === $user->id) {
+            // Process - runs n×m times!
+        }
+    }
+}
+
+// GOOD: O(n) - Use relationships or keyBy
+$users = User::with('orders')->get();
+// Or index for O(1) lookup
+$ordersByUser = $orders->groupBy('user_id');
+foreach ($users as $user) {
+    $userOrders = $ordersByUser->get($user->id, collect());
+}
+
+// BAD: O(n²) - contains() in loop
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->contains($userData['email'])) {
+        User::create($userData);
+    }
+}
+
+// GOOD: O(n) - Use flip() for O(1) lookup
+$existingEmails = User::pluck('email')->flip();
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->has($userData['email'])) {
+        User::create($userData);
+    }
+}
+```
+
 ## Redis Configuration
 
 ```env
@@ -102,6 +140,7 @@ php artisan octane:start --workers=4
 | Area | Action |
 |------|--------|
 | Queries | Add indexes, eager load, select specific columns |
+| Big O | Avoid nested loops, use keyBy/groupBy for O(1) lookups |
 | Caching | Redis for cache/sessions, cache expensive queries |
 | Assets | CDN, minification, compression |
 | PHP | OPcache, JIT (PHP 8.1+) |
@@ -284,6 +323,36 @@ final class ProductResource extends JsonResource
    php artisan route:cache
    ```
 
+7. **Big O Complexity Issues** - Exponential slowdowns
+   ```php
+   // Bad - O(n²) nested loops
+   foreach ($users as $user) {
+       foreach ($orders as $order) {
+           if ($order->user_id === $user->id) { /* ... */ }
+       }
+   }
+
+   // Good - O(n) with indexed lookups
+   $ordersByUser = $orders->groupBy('user_id');
+   foreach ($users as $user) {
+       $userOrders = $ordersByUser->get($user->id, collect());
+   }
+   ```
+
+8. **contains() in Loops** - Hidden O(n²)
+   ```php
+   // Bad - contains() is O(n), called n times = O(n²)
+   foreach ($items as $item) {
+       if ($collection->contains($item->id)) { /* ... */ }
+   }
+
+   // Good - flip() once, has() is O(1)
+   $lookup = $collection->pluck('id')->flip();
+   foreach ($items as $item) {
+       if ($lookup->has($item->id)) { /* ... */ }
+   }
+   ```
+
 ## Best Practices
 
 - Profile before optimizing
@@ -294,6 +363,8 @@ final class ProductResource extends JsonResource
 - Use database indexes strategically
 - Prevent lazy loading in development
 - Use Pulse for production insights
+- Avoid O(n²) patterns - use keyBy/groupBy for O(1) lookups
+- Use flip()->has() instead of contains() in loops
 
 ## Related Commands
 

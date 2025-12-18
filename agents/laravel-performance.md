@@ -124,6 +124,76 @@ foreach ($posts as $post) {
 Model::preventLazyLoading(!app()->isProduction());
 ```
 
+### Big O Complexity Detection
+
+Detect and fix O(n²) patterns that cause exponential slowdowns as data grows.
+
+```php
+// BAD: O(n²) - Nested loops comparing all items
+$users = User::all();
+$orders = Order::all();
+foreach ($users as $user) {
+    foreach ($orders as $order) {
+        if ($order->user_id === $user->id) {
+            // Process - runs n×m times!
+        }
+    }
+}
+
+// GOOD: O(n) - Eager load relationships
+$users = User::with('orders')->get();
+foreach ($users as $user) {
+    foreach ($user->orders as $order) {
+        // Process - each order accessed once
+    }
+}
+
+// GOOD: O(n) - Use groupBy for O(1) lookups
+$ordersByUser = Order::all()->groupBy('user_id');
+foreach ($users as $user) {
+    $userOrders = $ordersByUser->get($user->id, collect());
+}
+
+// BAD: O(n²) - contains() is O(n), called n times
+$existingEmails = User::pluck('email');
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->contains($userData['email'])) {
+        User::create($userData);
+    }
+}
+
+// GOOD: O(n) - flip() for O(1) has() lookups
+$existingEmails = User::pluck('email')->flip();
+foreach ($newUsers as $userData) {
+    if (!$existingEmails->has($userData['email'])) {
+        User::create($userData);
+    }
+}
+
+// BAD: O(n×m) - filter() in loop
+$products = Product::all();
+foreach ($categories as $category) {
+    $categoryProducts = $products->filter(fn($p) =>
+        $p->category_id === $category->id
+    ); // O(n) filter × m categories
+}
+
+// GOOD: O(n+m) - Pre-group the data
+$productsByCategory = Product::all()->groupBy('category_id');
+foreach ($categories as $category) {
+    $categoryProducts = $productsByCategory->get($category->id, collect());
+}
+```
+
+### Big O Complexity Reference
+| Pattern | Bad | Good | Improvement |
+|---------|-----|------|-------------|
+| Nested loops | O(n²) | Eager load/keyBy | O(n) |
+| In-loop queries | O(n) queries | Batch query | O(1) queries |
+| contains() in loop | O(n²) | flip()/has() | O(n) |
+| filter() in loop | O(n×m) | groupBy() | O(n+m) |
+| String concat loop | O(n²) | implode() | O(n) |
+
 ## Index Optimization
 
 ```php
@@ -600,3 +670,6 @@ php artisan optimize
 - **NEVER** disable security for performance
 - **PREFER** fixing root cause over adding cache layers
 - **PROFILE** before optimizing - avoid premature optimization
+- **DETECT** Big O complexity issues (nested loops, contains() in loops)
+- **FIX** O(n²) patterns with keyBy(), groupBy(), flip() for O(1) lookups
+- **PREFER** batch operations over in-loop queries
