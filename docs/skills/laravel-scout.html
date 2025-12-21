@@ -1,0 +1,170 @@
+---
+layout: page
+title: laravel-scout
+description: Full-text search with Algolia, Meilisearch, or Typesense
+nav_active: Skills
+back_url: /skills.html
+back_text: All Skills
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-bold">laravel-scout</h1>
+            <p class="text-muted-foreground">Auto-invoked skill</p>
+        </div>
+    </div>
+    <p class="text-xl text-muted-foreground">Full-text search with Algolia, Meilisearch, or Typesense</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Trigger Keywords</h2>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
+    <div class="flex flex-wrap gap-2 not-prose mb-6">
+        <span class="trigger-tag">scout</span>
+        <span class="trigger-tag">search</span>
+        <span class="trigger-tag">algolia</span>
+        <span class="trigger-tag">meilisearch</span>
+        <span class="trigger-tag">typesense</span>
+        <span class="trigger-tag">full-text search</span>
+    </div>
+
+    <h2>Overview</h2>
+    <p>The <strong>laravel-scout</strong> skill provides expertise for implementing full-text search in Laravel using Scout with various drivers including Algolia, Meilisearch, Typesense, and the database driver.</p>
+
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Search Setup</strong> - Install and configure Scout with your preferred driver</li>
+        <li><strong>Model Configuration</strong> - Make models searchable with custom indexes</li>
+        <li><strong>Advanced Search</strong> - Filters, facets, and custom ranking</li>
+        <li><strong>Bulk Operations</strong> - Import and flush indexes</li>
+        <li><strong>Queue Integration</strong> - Background indexing</li>
+    </ul>
+
+    <h2>Quick Start</h2>
+    <pre class="language-bash"><code class="language-bash"># Install Scout
+composer require laravel/scout
+
+# Install Meilisearch driver
+composer require meilisearch/meilisearch-php
+
+# Publish config
+php artisan vendor:publish --provider="Laravel\Scout\ScoutServiceProvider"
+
+# Start Meilisearch (Docker)
+docker run -d -p 7700:7700 getmeili/meilisearch:latest</code></pre>
+
+    <h2>Model Setup</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
+
+final class Product extends Model
+{
+    use Searchable;
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'category' => $this->category->name,
+            'price' => $this->price,
+            'in_stock' => $this->in_stock,
+        ];
+    }
+
+    public function searchableAs(): string
+    {
+        return 'products_index';
+    }
+
+    // Only index published products
+    public function shouldBeSearchable(): bool
+    {
+        return $this->is_published;
+    }
+}</code></pre>
+
+    <h2>Searching</h2>
+    <pre class="language-php"><code class="language-php">// Basic search
+$products = Product::search('laptop')->get();
+
+// With pagination
+$products = Product::search('laptop')->paginate(15);
+
+// With filters (Meilisearch)
+$products = Product::search('laptop')
+    ->where('in_stock', true)
+    ->where('price', '<=', 1000)
+    ->get();
+
+// With custom options
+$products = Product::search('laptop', function ($meilisearch, $query, $options) {
+    $options['filter'] = ['category = "electronics"'];
+    $options['sort'] = ['price:asc'];
+    return $meilisearch->search($query, $options);
+})->get();</code></pre>
+
+    <h2>Configuration</h2>
+    <pre class="language-php"><code class="language-php">// config/scout.php
+return [
+    'driver' => env('SCOUT_DRIVER', 'meilisearch'),
+
+    'meilisearch' => [
+        'host' => env('MEILISEARCH_HOST', 'http://127.0.0.1:7700'),
+        'key' => env('MEILISEARCH_KEY'),
+        'index-settings' => [
+            Product::class => [
+                'filterableAttributes' => ['category', 'in_stock', 'price'],
+                'sortableAttributes' => ['price', 'created_at'],
+                'searchableAttributes' => ['name', 'description'],
+            ],
+        ],
+    ],
+
+    'queue' => true, // Queue indexing operations
+];</code></pre>
+
+    <h2>Indexing Operations</h2>
+    <pre class="language-bash"><code class="language-bash"># Import all records
+php artisan scout:import "App\Models\Product"
+
+# Flush all records
+php artisan scout:flush "App\Models\Product"
+
+# Sync index settings
+php artisan scout:sync-index-settings</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Not queuing indexing</strong> - Set <code>queue => true</code> for better performance</li>
+        <li><strong>Missing filterable attributes</strong> - Configure before using <code>where()</code></li>
+        <li><strong>Indexing large datasets</strong> - Use <code>scout:import</code> with chunking</li>
+        <li><strong>Not handling search errors</strong> - Wrap in try-catch for external services</li>
+        <li><strong>Indexing sensitive data</strong> - Only include searchable fields</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Queue indexing operations in production</li>
+        <li>Only index fields needed for search</li>
+        <li>Use <code>shouldBeSearchable()</code> to filter indexed records</li>
+        <li>Configure sortable/filterable attributes upfront</li>
+        <li>Monitor index size and search performance</li>
+        <li>Use separate indexes per environment</li>
+    </ul>
+
+    <h2>Related Skills</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-database.html' | relative_url }}" class="text-primary hover:underline">laravel-database</a> - Database optimization</li>
+        <li><a href="{{ '/skills/laravel-performance.html' | relative_url }}" class="text-primary hover:underline">laravel-performance</a> - Performance optimization</li>
+    </ul>
+</div>

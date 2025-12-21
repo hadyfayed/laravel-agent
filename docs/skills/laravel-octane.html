@@ -1,0 +1,191 @@
+---
+layout: page
+title: laravel-octane
+description: High-performance with Swoole, RoadRunner, or FrankenPHP
+nav_active: Skills
+back_url: /skills.html
+back_text: All Skills
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-bold">laravel-octane</h1>
+            <p class="text-muted-foreground">Auto-invoked skill</p>
+        </div>
+    </div>
+    <p class="text-xl text-muted-foreground">High-performance with Swoole, RoadRunner, or FrankenPHP</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Trigger Keywords</h2>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
+    <div class="flex flex-wrap gap-2 not-prose mb-6">
+        <span class="trigger-tag">octane</span>
+        <span class="trigger-tag">swoole</span>
+        <span class="trigger-tag">roadrunner</span>
+        <span class="trigger-tag">frankenphp</span>
+        <span class="trigger-tag">high performance</span>
+        <span class="trigger-tag">concurrent</span>
+    </div>
+
+    <h2>Overview</h2>
+    <p>The <strong>laravel-octane</strong> skill provides expertise for supercharging Laravel applications using Octane with Swoole, RoadRunner, or FrankenPHP for dramatically improved performance through application server persistence.</p>
+
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Server Setup</strong> - Install and configure Octane with your preferred server</li>
+        <li><strong>Concurrent Tasks</strong> - Run tasks in parallel</li>
+        <li><strong>Caching</strong> - In-memory caching and tables</li>
+        <li><strong>WebSockets</strong> - Real-time with Swoole WebSockets</li>
+        <li><strong>Best Practices</strong> - Avoiding memory leaks and state issues</li>
+    </ul>
+
+    <h2>Quick Start</h2>
+    <pre class="language-bash"><code class="language-bash"># Install Octane
+composer require laravel/octane
+
+# Install with Swoole
+php artisan octane:install --server=swoole
+
+# Or with RoadRunner
+php artisan octane:install --server=roadrunner
+
+# Or with FrankenPHP
+php artisan octane:install --server=frankenphp
+
+# Start server
+php artisan octane:start</code></pre>
+
+    <h2>Configuration</h2>
+    <pre class="language-php"><code class="language-php">// config/octane.php
+return [
+    'server' => env('OCTANE_SERVER', 'swoole'),
+
+    'swoole' => [
+        'options' => [
+            'worker_num' => env('OCTANE_WORKERS', 4),
+            'task_worker_num' => env('OCTANE_TASK_WORKERS', 6),
+            'max_request' => 500, // Restart worker after N requests
+        ],
+    ],
+
+    'watch' => ['app', 'routes', 'config'],
+    'garbage' => 50, // Clean up after N requests
+];</code></pre>
+
+    <h2>Concurrent Tasks</h2>
+    <pre class="language-php"><code class="language-php">use Laravel\Octane\Facades\Octane;
+
+// Run tasks concurrently
+[$users, $products, $orders] = Octane::concurrently([
+    fn () => User::all(),
+    fn () => Product::all(),
+    fn () => Order::recent()->get(),
+]);
+
+// With timeout
+$results = Octane::concurrently([
+    fn () => $this->fetchFromApi(),
+    fn () => $this->fetchFromDatabase(),
+], 5000); // 5 second timeout</code></pre>
+
+    <h2>Swoole Tables (In-Memory)</h2>
+    <pre class="language-php"><code class="language-php">// Define table in config/octane.php
+'tables' => [
+    'cache' => [
+        'columns' => [
+            ['name' => 'value', 'type' => Octane::TABLE_COLUMN_STRING, 'size' => 1000],
+        ],
+        'rows' => 1000,
+    ],
+],
+
+// Use in application
+use Laravel\Octane\Facades\Octane;
+
+Octane::table('cache')->set('key', ['value' => 'data']);
+$row = Octane::table('cache')->get('key');</code></pre>
+
+    <h2>Avoiding Memory Leaks</h2>
+    <pre class="language-php"><code class="language-php">// BAD: Static properties persist between requests
+class BadService
+{
+    public static array $cache = []; // Will grow forever!
+}
+
+// GOOD: Use request-scoped instances
+class GoodService
+{
+    private array $cache = [];
+
+    public function __construct()
+    {
+        $this->cache = []; // Fresh per request when resolved
+    }
+}
+
+// GOOD: Flush after resolving
+$this->app->resolving(SomeService::class, function ($service) {
+    $service->flush();
+});</code></pre>
+
+    <h2>Listeners</h2>
+    <pre class="language-php"><code class="language-php">// app/Providers/AppServiceProvider.php
+use Laravel\Octane\Events\RequestReceived;
+use Laravel\Octane\Events\RequestTerminated;
+
+public function boot(): void
+{
+    Octane::on(RequestReceived::class, function ($event) {
+        // Prepare for new request
+    });
+
+    Octane::on(RequestTerminated::class, function ($event) {
+        // Clean up after request
+    });
+}</code></pre>
+
+    <h2>Production Deployment</h2>
+    <pre class="language-bash"><code class="language-bash"># Supervisor configuration
+[program:octane]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/html/artisan octane:start --server=swoole --host=0.0.0.0 --port=8000
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/www/html/storage/logs/octane.log
+
+# Reload workers (zero-downtime)
+php artisan octane:reload</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Static properties</strong> - Persist between requests, causing memory leaks</li>
+        <li><strong>Singleton bindings</strong> - May hold stale state</li>
+        <li><strong>Global state</strong> - Avoid global variables</li>
+        <li><strong>File uploads</strong> - Ensure temp files are cleaned</li>
+        <li><strong>Database connections</strong> - May need pooling with Swoole</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Use <code>--watch</code> in development for auto-reload</li>
+        <li>Set <code>max_request</code> to recycle workers periodically</li>
+        <li>Avoid static properties that accumulate data</li>
+        <li>Use <code>octane:reload</code> for zero-downtime deploys</li>
+        <li>Test thoroughly for memory leaks before production</li>
+        <li>Monitor memory usage per worker</li>
+    </ul>
+
+    <h2>Related Skills</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-performance.html' | relative_url }}" class="text-primary hover:underline">laravel-performance</a> - Performance optimization</li>
+        <li><a href="{{ '/skills/laravel-deploy.html' | relative_url }}" class="text-primary hover:underline">laravel-deploy</a> - Deployment strategies</li>
+        <li><a href="{{ '/skills/laravel-websocket.html' | relative_url }}" class="text-primary hover:underline">laravel-websocket</a> - Real-time features</li>
+    </ul>
+</div>

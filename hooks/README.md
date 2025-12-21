@@ -25,6 +25,8 @@ Pre-configured hooks for Laravel development with Claude Code.
 | `blade-lint.sh` | PostToolUse | Checks Blade templates for issues |
 | `migration-safety.sh` | PostToolUse | Warns about dangerous migrations |
 | `test-runner.sh` | PostToolUse | Runs related tests on file changes |
+| `scout-indexing.sh` | PostToolUse | Validates Scout searchable models |
+| `cashier-webhook.sh` | PostToolUse | Validates Cashier/Stripe webhooks |
 
 ## Pre-Commit Checks
 

@@ -6,7 +6,7 @@
 
 > AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.
 
-A Claude Code plugin with **23 specialized agents**, **42 commands**, **12 auto-invoked skills**, and **7 quality hooks** covering the entire Laravel development lifecycle.
+A Claude Code plugin with **29 specialized agents**, **47 commands**, **21 auto-invoked skills**, and **9 quality hooks** covering the entire Laravel development lifecycle.
 
 **[View Documentation](https://hadyfayed.github.io/laravel-agent/)**
 
@@ -15,7 +15,7 @@ A Claude Code plugin with **23 specialized agents**, **42 commands**, **12 auto-
 - **Single Plugin Install** - One command installs everything
 - **23 Specialized Agents** - Architecture, features, APIs, testing, security, deployment, performance, packages, and more
 - **42 Commands** - Direct access to all capabilities
-- **12 Auto-Invoked Skills** - Claude automatically applies Laravel expertise based on context
+- **13 Auto-Invoked Skills** - Claude automatically applies Laravel expertise based on context
 - **Pre-configured Hooks** - Laravel linting and auto-formatting on file changes
 - **MCP Extension** - Complements Laravel Boost with testing, queue, and performance tools
 - **SOLID/DRY Enforcement** - Every generated code follows best practices
@@ -33,7 +33,7 @@ A Claude Code plugin with **23 specialized agents**, **42 commands**, **12 auto-
 /plugin install laravel-agent@hadyfayed-laravel-agent
 ```
 
-That's it! All 23 agents, 42 commands, and 12 skills are now available.
+That's it! All 29 agents, 47 commands, and 21 skills are now available.
 
 ## Available Commands
 
@@ -49,6 +49,7 @@ That's it! All 23 agents, 42 commands, and 12 skills are now available.
 | `/laravel-agent:feature:make` | Create complete feature (CRUD, views, API, tests) |
 | `/laravel-agent:module:make` | Create reusable domain module |
 | `/laravel-agent:service:make` | Create service or action |
+| `/laravel-agent:scaffold:app` | Full app scaffolding from natural language description |
 
 ### API
 | Command | Description |
@@ -108,6 +109,8 @@ That's it! All 23 agents, 42 commands, and 12 skills are now available.
 | `/laravel-agent:backup:setup` | Configure automated backups (spatie/laravel-backup) |
 | `/laravel-agent:health:setup` | Setup health monitoring (spatie/laravel-health) |
 | `/laravel-agent:search:setup` | Configure Scout + Meilisearch/Algolia/Typesense |
+| `/laravel-agent:telescope:setup` | Setup Laravel Telescope for debugging |
+| `/laravel-agent:pulse:setup` | Setup Laravel Pulse for production monitoring |
 
 ### Data & Integration
 | Command | Description |
@@ -115,6 +118,7 @@ That's it! All 23 agents, 42 commands, and 12 skills are now available.
 | `/laravel-agent:dto:make` | Create Data Transfer Objects (spatie/laravel-data) |
 | `/laravel-agent:webhook:make` | Create webhook handlers (Stripe, GitHub, etc.) |
 | `/laravel-agent:import:make` | Create CSV/Excel importers |
+| `/laravel-agent:upgrade:laravel` | Automated Laravel version upgrades |
 
 ### Code Review & Git
 | Command | Description |
@@ -122,6 +126,7 @@ That's it! All 23 agents, 42 commands, and 12 skills are now available.
 | `/laravel-agent:review:staged` | Review staged changes |
 | `/laravel-agent:review:pr` | Review pull request |
 | `/laravel-agent:review:audit` | Full code audit |
+| `/laravel-agent:analyze:codebase` | Full codebase health report |
 | `/laravel-agent:refactor` | Refactor code for SOLID/DRY |
 | `/laravel-agent:git:commit` | Create conventional commit |
 | `/laravel-agent:git:pr` | Create pull request |
@@ -199,6 +204,12 @@ The architect will:
 | `laravel-git` | Git workflow automation |
 | `laravel-package` | Laravel package development |
 | `laravel-performance` | Performance optimization specialist |
+| `laravel-scout` | Full-text search with Scout |
+| `laravel-cashier` | Subscription billing with Stripe/Paddle |
+| `laravel-passport` | Full OAuth2 server implementation |
+| `laravel-octane` | High-performance with Swoole/RoadRunner |
+| `laravel-nova` | Laravel Nova admin panels |
+| `laravel-inertia` | Inertia.js SPAs with Vue/React |
 
 ## Skills (Auto-Invoked)
 
@@ -212,12 +223,21 @@ Skills are automatically activated based on context - no commands needed.
 | `laravel-testing` | "test", "pest", "coverage" | Writing Pest tests |
 | `laravel-auth` | "auth", "permission", "role" | Authentication & authorization |
 | `laravel-livewire` | "livewire", "reactive", "component" | Livewire 3 components |
+| `laravel-inertia` | "inertia", "vue spa", "react spa" | Inertia.js SPAs with Vue/React |
 | `laravel-filament` | "filament", "admin panel" | Admin panel development |
+| `laravel-nova` | "nova", "nova resource", "admin dashboard" | Laravel Nova admin panels |
 | `laravel-performance` | "slow", "optimize", "cache" | Performance optimization |
 | `laravel-security` | "security", "vulnerability", "XSS" | Security audits & fixes |
 | `laravel-deploy` | "deploy", "production", "server" | Deployment & hosting |
 | `laravel-queue` | "queue", "job", "notification" | Background jobs & notifications |
 | `laravel-websocket` | "websocket", "real-time", "Reverb" | Real-time features |
+| `laravel-horizon` | "horizon", "queue dashboard", "failed jobs" | Redis queue monitoring |
+| `laravel-sanctum` | "sanctum", "api token", "spa auth" | API token & SPA authentication |
+| `laravel-socialite` | "socialite", "oauth", "social login" | OAuth social authentication |
+| `laravel-passport` | "passport", "oauth2 server" | Full OAuth2 server |
+| `laravel-scout` | "scout", "search", "algolia", "meilisearch" | Full-text search |
+| `laravel-cashier` | "cashier", "stripe", "subscription" | Subscription billing |
+| `laravel-octane` | "octane", "swoole", "roadrunner" | High-performance servers |
 
 ## Architecture Decision Matrix
 
@@ -272,6 +292,8 @@ Pre-configured hooks for Laravel code quality:
 | `blade-lint.sh` | Validate CSRF, XSS, directives |
 | `test-runner.sh` | Run related tests on changes |
 | `env-check.sh` | Block .env commits, validate examples |
+| `scout-indexing.sh` | Validate Scout searchable models |
+| `cashier-webhook.sh` | Validate Cashier/Stripe webhooks |
 
 See `hooks/README.md` for installation instructions.
 

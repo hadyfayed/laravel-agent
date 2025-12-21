@@ -1,0 +1,79 @@
+---
+layout: page
+title: /laravel-agent:telescope:setup
+description: Setup Laravel Telescope for debugging
+nav_active: Commands
+back_url: /commands.html
+back_text: All Commands
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="badge badge-devops">DevOps</span>
+    </div>
+    <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:telescope:setup</h1>
+    <p class="text-xl text-muted-foreground">Setup Laravel Telescope for debugging</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Overview</h2>
+    <p>Setup Laravel Telescope for elegant debugging with request inspection, exceptions, logs, database queries, jobs, mail, notifications, and cache operations.</p>
+
+    <h2>Usage</h2>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:telescope:setup [--local-only] [--with-pruning]</code></pre>
+
+    <h2>Examples</h2>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:telescope:setup                    # Full setup
+/laravel-agent:telescope:setup --local-only       # Only enable in local environment
+/laravel-agent:telescope:setup --with-pruning     # Add scheduled pruning</code></pre>
+
+    <h2>What Gets Configured</h2>
+    <ul>
+        <li><strong>Request Watcher</strong> - HTTP requests with headers, payload, response</li>
+        <li><strong>Exception Watcher</strong> - All exceptions with stack traces</li>
+        <li><strong>Query Watcher</strong> - Database queries with bindings and time</li>
+        <li><strong>Model Watcher</strong> - Eloquent model events</li>
+        <li><strong>Job Watcher</strong> - Queued job execution and failures</li>
+        <li><strong>Mail Watcher</strong> - Sent emails with preview</li>
+        <li><strong>Notification Watcher</strong> - All notifications</li>
+        <li><strong>Cache Watcher</strong> - Cache operations</li>
+        <li><strong>Log Watcher</strong> - Log entries</li>
+    </ul>
+
+    <h2>Installation</h2>
+    <pre class="language-bash"><code class="language-bash"># Install Telescope
+composer require laravel/telescope
+
+# Publish assets
+php artisan telescope:install
+php artisan migrate</code></pre>
+
+    <h2>Authorization</h2>
+    <pre class="language-php"><code class="language-php">// TelescopeServiceProvider
+protected function gate(): void
+{
+    Gate::define('viewTelescope', function ($user) {
+        return $user->isAdmin();
+    });
+}</code></pre>
+
+    <h2>Commands</h2>
+    <pre class="language-bash"><code class="language-bash"># Clear all entries
+php artisan telescope:clear
+
+# Prune old entries
+php artisan telescope:prune --hours=48
+
+# Publish assets (after updates)
+php artisan telescope:publish</code></pre>
+
+    <h2>Environment</h2>
+    <pre class="language-text"><code>TELESCOPE_ENABLED=true
+TELESCOPE_PATH=telescope</code></pre>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/pulse-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:pulse:setup</a> - Production monitoring</li>
+        <li><a href="{{ '/commands/db-optimize.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:optimize</a> - Query optimization</li>
+    </ul>
+</div>

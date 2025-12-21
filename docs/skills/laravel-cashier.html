@@ -1,0 +1,184 @@
+---
+layout: page
+title: laravel-cashier
+description: Subscription billing with Stripe or Paddle
+nav_active: Skills
+back_url: /skills.html
+back_text: All Skills
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-bold">laravel-cashier</h1>
+            <p class="text-muted-foreground">Auto-invoked skill</p>
+        </div>
+    </div>
+    <p class="text-xl text-muted-foreground">Subscription billing with Stripe or Paddle</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Trigger Keywords</h2>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
+    <div class="flex flex-wrap gap-2 not-prose mb-6">
+        <span class="trigger-tag">cashier</span>
+        <span class="trigger-tag">stripe</span>
+        <span class="trigger-tag">subscription</span>
+        <span class="trigger-tag">billing</span>
+        <span class="trigger-tag">payment</span>
+        <span class="trigger-tag">paddle</span>
+    </div>
+
+    <h2>Overview</h2>
+    <p>The <strong>laravel-cashier</strong> skill provides expertise for implementing subscription billing in Laravel using Cashier with Stripe or Paddle, including subscriptions, trials, invoices, and webhooks.</p>
+
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Subscription Management</strong> - Create, update, cancel subscriptions</li>
+        <li><strong>Payment Methods</strong> - Add, update, remove payment methods</li>
+        <li><strong>Invoicing</strong> - Generate and email invoices</li>
+        <li><strong>Webhooks</strong> - Handle Stripe/Paddle webhooks</li>
+        <li><strong>Checkout</strong> - Stripe Checkout integration</li>
+        <li><strong>Metered Billing</strong> - Usage-based pricing</li>
+    </ul>
+
+    <h2>Quick Start</h2>
+    <pre class="language-bash"><code class="language-bash"># Install Cashier for Stripe
+composer require laravel/cashier
+
+# Publish migrations
+php artisan vendor:publish --tag="cashier-migrations"
+php artisan migrate
+
+# Add to .env
+STRIPE_KEY=pk_test_xxx
+STRIPE_SECRET=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx</code></pre>
+
+    <h2>Model Setup</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Cashier\Billable;
+
+final class User extends Authenticatable
+{
+    use Billable;
+}</code></pre>
+
+    <h2>Creating Subscriptions</h2>
+    <pre class="language-php"><code class="language-php">// Create subscription
+$user->newSubscription('default', 'price_monthly')
+    ->create($paymentMethod);
+
+// With trial
+$user->newSubscription('default', 'price_monthly')
+    ->trialDays(14)
+    ->create($paymentMethod);
+
+// With coupon
+$user->newSubscription('default', 'price_monthly')
+    ->withCoupon('SAVE20')
+    ->create($paymentMethod);
+
+// Multiple plans
+$user->newSubscription('default', ['price_monthly', 'price_addon'])
+    ->create($paymentMethod);</code></pre>
+
+    <h2>Managing Subscriptions</h2>
+    <pre class="language-php"><code class="language-php">// Check subscription status
+if ($user->subscribed('default')) {
+    // User has active subscription
+}
+
+if ($user->subscription('default')?->onTrial()) {
+    // User is on trial
+}
+
+if ($user->subscription('default')?->canceled()) {
+    // Subscription was canceled
+}
+
+// Swap plans
+$user->subscription('default')->swap('price_yearly');
+
+// Cancel
+$user->subscription('default')->cancel();
+
+// Cancel immediately
+$user->subscription('default')->cancelNow();
+
+// Resume
+$user->subscription('default')->resume();</code></pre>
+
+    <h2>Checkout Integration</h2>
+    <pre class="language-php"><code class="language-php">// Controller
+public function checkout(Request $request)
+{
+    return $request->user()
+        ->newSubscription('default', 'price_monthly')
+        ->checkout([
+            'success_url' => route('dashboard'),
+            'cancel_url' => route('pricing'),
+        ]);
+}
+
+// Blade
+&lt;form action="{{ route('checkout') }}" method="POST">
+    @csrf
+    &lt;button type="submit">Subscribe&lt;/button>
+&lt;/form></code></pre>
+
+    <h2>Webhooks</h2>
+    <pre class="language-php"><code class="language-php">// routes/web.php
+Route::post('/stripe/webhook', [WebhookController::class, 'handleWebhook']);
+
+// Custom webhook handler
+namespace App\Http\Controllers;
+
+use Laravel\Cashier\Http\Controllers\WebhookController as CashierController;
+
+class WebhookController extends CashierController
+{
+    protected function handleCustomerSubscriptionCreated(array $payload)
+    {
+        // Handle new subscription
+        parent::handleCustomerSubscriptionCreated($payload);
+    }
+
+    protected function handleInvoicePaymentFailed(array $payload)
+    {
+        // Notify user of failed payment
+    }
+}</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Missing webhook endpoint</strong> - Configure in Stripe Dashboard</li>
+        <li><strong>Not validating webhook signatures</strong> - Set <code>STRIPE_WEBHOOK_SECRET</code></li>
+        <li><strong>Forgetting CSRF exception</strong> - Exclude webhook route from CSRF</li>
+        <li><strong>Not handling failed payments</strong> - Implement retry logic</li>
+        <li><strong>Testing with live keys</strong> - Always use test keys in development</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Use Stripe Checkout for PCI compliance</li>
+        <li>Handle all relevant webhook events</li>
+        <li>Implement grace periods for failed payments</li>
+        <li>Test with Stripe CLI locally</li>
+        <li>Use price IDs, not hardcoded amounts</li>
+        <li>Queue webhook processing for reliability</li>
+    </ul>
+
+    <h2>Related Skills</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-auth.html' | relative_url }}" class="text-primary hover:underline">laravel-auth</a> - Authentication</li>
+        <li><a href="{{ '/skills/laravel-queue.html' | relative_url }}" class="text-primary hover:underline">laravel-queue</a> - Queue processing</li>
+    </ul>
+</div>

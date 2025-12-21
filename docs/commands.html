@@ -1,7 +1,7 @@
 ---
 layout: list
 title: Commands
-description: 42 commands for Laravel development with Claude Code
+description: 47 commands for Laravel development with Claude Code
 nav_active: Commands
 ---
 
@@ -17,22 +17,22 @@ nav_active: Commands
 <div class="max-w-5xl mx-auto px-6 lg:px-8 py-8">
     <div class="mb-8">
         <h1 class="text-3xl font-bold mb-2">Commands</h1>
-        <p class="text-muted-foreground">42 commands for Laravel development with Claude Code</p>
+        <p class="text-muted-foreground">47 commands for Laravel development with Claude Code</p>
     </div>
 
     <div class="flex flex-wrap gap-2 mb-8" id="filters">
-        <button data-filter="all" class="filter-btn active px-4 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground">All (42)</button>
+        <button data-filter="all" class="filter-btn active px-4 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground">All (47)</button>
         <button data-filter="core" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Core (2)</button>
-        <button data-filter="builder" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Builders (3)</button>
+        <button data-filter="builder" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Builders (4)</button>
         <button data-filter="api" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">API (2)</button>
         <button data-filter="testing" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Testing (2)</button>
         <button data-filter="database" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Database (2)</button>
         <button data-filter="frontend" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Frontend (2)</button>
         <button data-filter="security" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Security (2)</button>
-        <button data-filter="devops" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">DevOps (9)</button>
+        <button data-filter="devops" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">DevOps (11)</button>
         <button data-filter="ai" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">AI (4)</button>
-        <button data-filter="data" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Data (7)</button>
-        <button data-filter="review" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Review (7)</button>
+        <button data-filter="data" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Data (8)</button>
+        <button data-filter="review" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground hover:bg-accent">Review (8)</button>
     </div>
 
     <!-- Empty State -->
@@ -82,6 +82,13 @@ nav_active: Commands
                 <span class="badge badge-builder">Builder</span>
             </div>
             <p class="text-sm text-muted-foreground">Create a service class or action with proper patterns</p>
+        </a>
+        <a href="{{ 'commands/scaffold-app.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="builder" data-name="scaffold:app">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:scaffold:app</code>
+                <span class="badge badge-builder">Builder</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Full app scaffolding from natural language description</p>
         </a>
 
         <!-- API -->
@@ -228,6 +235,20 @@ nav_active: Commands
             </div>
             <p class="text-sm text-muted-foreground">Create multi-channel notification (55+ channels)</p>
         </a>
+        <a href="{{ 'commands/telescope-setup.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="telescope:setup">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:telescope:setup</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Setup Laravel Telescope for debugging</p>
+        </a>
+        <a href="{{ 'commands/pulse-setup.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="devops" data-name="pulse:setup">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:pulse:setup</code>
+                <span class="badge badge-devops">DevOps</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Setup Laravel Pulse for production monitoring</p>
+        </a>
 
         <!-- AI -->
         <a href="{{ 'commands/ai-make.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="ai" data-name="ai:make">
@@ -309,6 +330,13 @@ nav_active: Commands
             </div>
             <p class="text-sm text-muted-foreground">Migrate from legacy systems</p>
         </a>
+        <a href="{{ 'commands/upgrade-laravel.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="data" data-name="upgrade:laravel">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:upgrade:laravel</code>
+                <span class="badge badge-data">Data</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Automated Laravel version upgrades</p>
+        </a>
 
         <!-- Review -->
         <a href="{{ 'commands/review-staged.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="review:staged">
@@ -331,6 +359,13 @@ nav_active: Commands
                 <span class="badge badge-review">Review</span>
             </div>
             <p class="text-sm text-muted-foreground">Full codebase audit</p>
+        </a>
+        <a href="{{ 'commands/analyze-codebase.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="analyze:codebase">
+            <div class="flex items-start justify-between mb-3">
+                <code class="text-sm font-mono text-primary">/laravel-agent:analyze:codebase</code>
+                <span class="badge badge-review">Review</span>
+            </div>
+            <p class="text-sm text-muted-foreground">Full codebase health report</p>
         </a>
         <a href="{{ 'commands/refactor.html' | relative_url }}" class="command-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-category="review" data-name="refactor">
             <div class="flex items-start justify-between mb-3">

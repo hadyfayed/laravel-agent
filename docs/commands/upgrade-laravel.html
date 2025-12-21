@@ -1,0 +1,149 @@
+---
+layout: page
+title: /laravel-agent:upgrade:laravel
+description: Automated Laravel version upgrades
+nav_active: Commands
+back_url: /commands.html
+back_text: All Commands
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="badge badge-data">Data</span>
+    </div>
+    <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:upgrade:laravel</h1>
+    <p class="text-xl text-muted-foreground">Automated Laravel version upgrades</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Overview</h2>
+    <p>Safely upgrade your Laravel application to a newer version with automated compatibility checks, code migrations, and testing.</p>
+
+    <h2>Usage</h2>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:upgrade:laravel [target-version]</code></pre>
+
+    <h2>Examples</h2>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:upgrade:laravel 11           # Upgrade to Laravel 11
+/laravel-agent:upgrade:laravel 11.x         # Upgrade to latest Laravel 11.x
+/laravel-agent:upgrade:laravel latest       # Upgrade to latest version
+/laravel-agent:upgrade:laravel --check-only # Only check compatibility
+/laravel-agent:upgrade:laravel --dry-run    # Show changes without applying</code></pre>
+
+    <h2>Supported Upgrade Paths</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4">From</th>
+                    <th class="text-left py-3 px-4">To</th>
+                    <th class="text-left py-3 px-4">Complexity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel 10.x</td>
+                    <td class="py-3 px-4">Laravel 11.x</td>
+                    <td class="py-3 px-4">Medium</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel 9.x</td>
+                    <td class="py-3 px-4">Laravel 10.x</td>
+                    <td class="py-3 px-4">Medium</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel 8.x</td>
+                    <td class="py-3 px-4">Laravel 9.x</td>
+                    <td class="py-3 px-4">Medium</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Laravel 7.x</td>
+                    <td class="py-3 px-4">Laravel 8.x</td>
+                    <td class="py-3 px-4">High</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Upgrade Process</h2>
+    <ol>
+        <li><strong>Pre-Upgrade Assessment</strong> - Check PHP version, dependencies, git status</li>
+        <li><strong>Dependency Analysis</strong> - Identify package compatibility</li>
+        <li><strong>Breaking Changes Detection</strong> - Find affected files</li>
+        <li><strong>Backup Creation</strong> - Create backup branch and database backup</li>
+        <li><strong>Upgrade Execution</strong> - Update composer.json, migrate config</li>
+        <li><strong>Code Migrations</strong> - Apply automatic code changes</li>
+        <li><strong>Verification</strong> - Run tests, clear caches</li>
+    </ol>
+
+    <h2>Laravel 10 → 11 Changes</h2>
+    <ul>
+        <li><code>app/Http/Kernel.php</code> → <code>bootstrap/app.php</code></li>
+        <li><code>app/Console/Kernel.php</code> → <code>routes/console.php</code></li>
+        <li><code>app/Exceptions/Handler.php</code> → <code>bootstrap/app.php</code></li>
+        <li>Middleware registration changes</li>
+        <li>Service provider changes</li>
+    </ul>
+
+    <h2>Options</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4">Option</th>
+                    <th class="text-left py-3 px-4">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--check-only</code></td>
+                    <td class="py-3 px-4">Only check compatibility, don't upgrade</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--dry-run</code></td>
+                    <td class="py-3 px-4">Show changes without applying</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--no-backup</code></td>
+                    <td class="py-3 px-4">Skip backup creation</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--force</code></td>
+                    <td class="py-3 px-4">Proceed even with warnings</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--step</code></td>
+                    <td class="py-3 px-4">Upgrade one minor version at a time</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Rollback</h2>
+    <p>If the upgrade fails:</p>
+    <pre class="language-bash"><code class="language-bash"># Restore composer.lock
+cp composer.lock.backup composer.lock
+composer install
+
+# Or use git
+git checkout pre-upgrade-backup
+
+# Clear caches
+php artisan optimize:clear</code></pre>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Always backup before upgrading</li>
+        <li>Upgrade in staging before production</li>
+        <li>Run full test suite before and after</li>
+        <li>Review the official upgrade guide</li>
+        <li>Upgrade dependencies first if possible</li>
+        <li>Keep git history clean with atomic commits</li>
+    </ul>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/migrate-from-legacy.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:migrate:from-legacy</a> - Major version migrations</li>
+        <li><a href="{{ '/commands/analyze-codebase.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:analyze:codebase</a> - Pre-upgrade health check</li>
+        <li><a href="{{ '/commands/test-coverage.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:coverage</a> - Verify test coverage</li>
+    </ul>
+</div>

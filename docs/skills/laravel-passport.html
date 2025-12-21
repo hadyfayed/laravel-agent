@@ -1,0 +1,354 @@
+---
+layout: page
+title: laravel-passport
+description: Implement full OAuth2 server with all grant types
+nav_active: Skills
+back_url: /skills.html
+back_text: All Skills
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-bold">laravel-passport</h1>
+            <p class="text-muted-foreground">Auto-invoked skill</p>
+        </div>
+    </div>
+    <p class="text-xl text-muted-foreground">Implement full OAuth2 server with all grant types</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Trigger Keywords</h2>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
+    <div class="flex flex-wrap gap-2 not-prose mb-6">
+        <span class="trigger-tag">passport</span>
+        <span class="trigger-tag">oauth2 server</span>
+        <span class="trigger-tag">authorization code</span>
+        <span class="trigger-tag">client credentials</span>
+        <span class="trigger-tag">access token</span>
+        <span class="trigger-tag">refresh token</span>
+        <span class="trigger-tag">oauth provider</span>
+    </div>
+
+    <h2>Overview</h2>
+    <p>The <strong>laravel-passport</strong> skill provides expertise for building a complete OAuth2 authorization server. It covers all OAuth2 grant types, token scopes, client management, and third-party API access.</p>
+
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>OAuth2 Grant Types</strong> - Authorization Code, Client Credentials, PKCE</li>
+        <li><strong>Token Management</strong> - Access tokens, refresh tokens, revocation</li>
+        <li><strong>Client Management</strong> - Create and manage OAuth clients</li>
+        <li><strong>Token Scopes</strong> - Fine-grained permission control</li>
+        <li><strong>Personal Access Tokens</strong> - User-generated API tokens</li>
+        <li><strong>Third-Party Access</strong> - Allow external apps to access your API</li>
+    </ul>
+
+    <h2>When to Use</h2>
+    <p>Use <strong>Passport</strong> when:</p>
+    <ul>
+        <li>Building an OAuth2 authorization server</li>
+        <li>Third-party applications need to access your API</li>
+        <li>Need all OAuth2 grant types</li>
+        <li>Require refresh tokens with rotation</li>
+    </ul>
+
+    <p>Use <strong>Sanctum</strong> instead when:</p>
+    <ul>
+        <li>Building first-party SPAs or mobile apps</li>
+        <li>Simple token authentication is sufficient</li>
+        <li>Don't need OAuth2 complexity</li>
+    </ul>
+
+    <h2>Quick Start</h2>
+    <pre class="language-bash"><code class="language-bash">composer require laravel/passport
+php artisan migrate
+php artisan passport:install</code></pre>
+
+    <h2>User Model Setup</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Laravel\Passport\HasApiTokens;
+
+class User extends Authenticatable
+{
+    use HasApiTokens;
+}</code></pre>
+
+    <h2>Configure Auth Guard</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// config/auth.php
+return [
+    'guards' => [
+        'api' => [
+            'driver' => 'passport', // Changed from 'token'
+            'provider' => 'users',
+        ],
+    ],
+];</code></pre>
+
+    <h2>Authorization Code Grant</h2>
+    <p>Most secure option for third-party web applications.</p>
+
+    <h3>Create Client</h3>
+    <pre class="language-bash"><code class="language-bash">php artisan passport:client</code></pre>
+
+    <h3>Authorization Request</h3>
+    <pre class="language-http"><code class="language-http">GET /oauth/authorize?client_id=1
+    &redirect_uri=https://client-app.com/callback
+    &response_type=code
+    &scope=read-posts write-posts
+    &state=random_state_string</code></pre>
+
+    <h3>Exchange Code for Token</h3>
+    <pre class="language-http"><code class="language-http">POST /oauth/token
+Content-Type: application/json
+
+{
+    "grant_type": "authorization_code",
+    "client_id": "1",
+    "client_secret": "abc123...",
+    "redirect_uri": "https://client-app.com/callback",
+    "code": "def456..."
+}</code></pre>
+
+    <h2>Client Credentials Grant</h2>
+    <p>For machine-to-machine communication without user context.</p>
+
+    <pre class="language-bash"><code class="language-bash"># Create machine client
+php artisan passport:client --client</code></pre>
+
+    <pre class="language-http"><code class="language-http">POST /oauth/token
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "2",
+    "client_secret": "xyz789...",
+    "scope": "read-data"
+}</code></pre>
+
+    <pre class="language-php"><code class="language-php">// Protect routes with client middleware
+Route::middleware(['client'])->group(function () {
+    Route::get('/api/stats', [StatsController::class, 'index']);
+});</code></pre>
+
+    <h2>Authorization Code with PKCE</h2>
+    <p>Recommended for SPAs and mobile apps (no client secret needed).</p>
+
+    <pre class="language-javascript"><code class="language-javascript">// Generate code_verifier and code_challenge
+const codeVerifier = generateRandomString(128);
+const codeChallenge = await sha256(codeVerifier);
+
+// Authorization request with PKCE
+GET /oauth/authorize?client_id=5
+    &redirect_uri=https://app.com/callback
+    &response_type=code
+    &scope=read-posts
+    &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+    &code_challenge_method=S256</code></pre>
+
+    <pre class="language-http"><code class="language-http">POST /oauth/token
+
+{
+    "grant_type": "authorization_code",
+    "client_id": "5",
+    "redirect_uri": "https://app.com/callback",
+    "code": "def456...",
+    "code_verifier": "original_verifier"
+}</code></pre>
+
+    <h2>Token Scopes</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// app/Providers/AuthServiceProvider.php
+use Laravel\Passport\Passport;
+
+public function boot(): void
+{
+    Passport::tokensCan([
+        'read-posts' => 'Read posts',
+        'write-posts' => 'Create and edit posts',
+        'delete-posts' => 'Delete posts',
+        'admin' => 'Full administrative access',
+    ]);
+
+    Passport::setDefaultScope(['read-posts']);
+}</code></pre>
+
+    <h2>Check Scopes in Controllers</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+public function store(Request $request)
+{
+    if (! $request->user()->tokenCan('write-posts')) {
+        return response()->json(['error' => 'Insufficient permissions'], 403);
+    }
+
+    return Post::create($request->validated());
+}</code></pre>
+
+    <h2>Scope Middleware</h2>
+    <pre class="language-php"><code class="language-php">// Require any of these scopes
+Route::middleware(['auth:api', 'scopes:write-posts,admin'])->group(function () {
+    Route::post('/posts', [PostController::class, 'store']);
+});
+
+// Require all scopes
+Route::middleware(['auth:api', 'scope:write-posts,admin'])->group(function () {
+    Route::delete('/posts/{post}', [PostController::class, 'destroy']);
+});</code></pre>
+
+    <h2>Personal Access Tokens</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// Create token via code
+$token = $user->createToken(
+    'My API Token',
+    ['read-posts', 'write-posts']
+);
+
+return response()->json([
+    'token' => $token->accessToken,
+]);</code></pre>
+
+    <h2>Token Lifetimes</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+// app/Providers/AuthServiceProvider.php
+public function boot(): void
+{
+    // Access tokens expire in 15 days
+    Passport::tokensExpireIn(now()->addDays(15));
+
+    // Refresh tokens expire in 30 days
+    Passport::refreshTokensExpireIn(now()->addDays(30));
+
+    // Personal access tokens expire in 6 months
+    Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+
+    // Prune revoked tokens
+    Passport::pruneRevokedTokens();
+}</code></pre>
+
+    <h2>Revoking Tokens</h2>
+    <pre class="language-php"><code class="language-php">// Revoke current access token
+$request->user()->token()->revoke();
+
+// Revoke all user tokens
+$user->tokens->each->revoke();
+
+// Revoke specific token
+$token = $user->tokens()->find($tokenId);
+$token->revoke();</code></pre>
+
+    <h2>Refresh Tokens</h2>
+    <pre class="language-javascript"><code class="language-javascript">async function refreshAccessToken(refreshToken) {
+    const response = await fetch('/oauth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken,
+            client_id: clientId,
+            client_secret: clientSecret,
+        }),
+    });
+
+    const data = await response.json();
+    return {
+        accessToken: data.access_token,
+        refreshToken: data.refresh_token,
+    };
+}</code></pre>
+
+    <h2>Testing OAuth Flows</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Laravel\Passport\Passport;
+
+it('allows access with correct scope', function () {
+    $user = User::factory()->create();
+
+    Passport::actingAs($user, ['write-posts']);
+
+    $response = $this->postJson('/api/posts', [
+        'title' => 'Test Post',
+        'body' => 'Content',
+    ]);
+
+    $response->assertCreated();
+});
+
+it('denies access without required scope', function () {
+    $user = User::factory()->create();
+
+    Passport::actingAs($user, ['read-posts']);
+
+    $response = $this->postJson('/api/posts', [
+        'title' => 'Test Post',
+    ]);
+
+    $response->assertForbidden();
+});</code></pre>
+
+    <h2>Common Pitfalls</h2>
+    <ul>
+        <li><strong>Not running passport:install</strong> - Must run after migration to generate keys</li>
+        <li><strong>Wrong auth guard</strong> - Must use <code>'driver' => 'passport'</code> not <code>'token'</code></li>
+        <li><strong>Missing HasApiTokens trait</strong> - Use <code>Laravel\Passport\HasApiTokens</code></li>
+        <li><strong>Exposing client secrets</strong> - Never expose in frontend, use PKCE instead</li>
+        <li><strong>No token lifetimes</strong> - Always configure expiration in production</li>
+        <li><strong>Password grant for third-party</strong> - Only for first-party apps (deprecated)</li>
+        <li><strong>Not validating redirect URIs</strong> - Whitelist exact URIs to prevent token theft</li>
+        <li><strong>Forgetting to revoke on security events</strong> - Revoke on password change</li>
+        <li><strong>Not using HTTPS in production</strong> - OAuth2 requires HTTPS</li>
+        <li><strong>Not pruning revoked tokens</strong> - Schedule <code>passport:purge</code> daily</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Use Authorization Code + PKCE for SPAs and mobile apps</li>
+        <li>Use Client Credentials for machine-to-machine</li>
+        <li>Never use Password Grant for third-party apps</li>
+        <li>Always use HTTPS in production</li>
+        <li>Set reasonable token lifetimes</li>
+        <li>Implement token refresh logic</li>
+        <li>Revoke tokens on security events (password change)</li>
+        <li>Whitelist exact redirect URIs per client</li>
+        <li>Use scopes to limit token permissions</li>
+        <li>Prune revoked tokens regularly</li>
+        <li>Rate limit token endpoints</li>
+        <li>Store refresh tokens securely</li>
+        <li>Never expose client secrets in frontend</li>
+    </ul>
+
+    <h2>Related Commands</h2>
+    <pre class="language-bash"><code class="language-bash"># Install Passport
+php artisan passport:install
+
+# Create OAuth client
+php artisan passport:client
+
+# Create password grant client
+php artisan passport:client --password
+
+# Create client credentials client
+php artisan passport:client --client
+
+# Purge revoked/expired tokens
+php artisan passport:purge
+
+# Generate encryption keys
+php artisan passport:keys</code></pre>
+
+    <h2>Related Skills</h2>
+    <ul>
+        <li><a href="{{ '/skills/laravel-sanctum.html' | relative_url }}" class="text-primary hover:underline">laravel-sanctum</a> - Lightweight API authentication</li>
+        <li><a href="{{ '/skills/laravel-api.html' | relative_url }}" class="text-primary hover:underline">laravel-api</a> - Building REST APIs</li>
+        <li><a href="{{ '/skills/laravel-auth.html' | relative_url }}" class="text-primary hover:underline">laravel-auth</a> - Authentication and authorization</li>
+        <li><a href="{{ '/skills/laravel-security.html' | relative_url }}" class="text-primary hover:underline">laravel-security</a> - Security best practices</li>
+    </ul>
+</div>

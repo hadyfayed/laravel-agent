@@ -1,0 +1,153 @@
+---
+layout: page
+title: /laravel-agent:analyze:codebase
+description: Full codebase health report
+nav_active: Commands
+back_url: /commands.html
+back_text: All Commands
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="badge badge-review">Review</span>
+    </div>
+    <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:analyze:codebase</h1>
+    <p class="text-xl text-muted-foreground">Full codebase health report</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Overview</h2>
+    <p>Generate a comprehensive health report analyzing code quality, architecture, security, performance, and maintainability of your Laravel codebase.</p>
+
+    <h2>Usage</h2>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:analyze:codebase [path] [--focus=area]</code></pre>
+
+    <h2>Examples</h2>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:analyze:codebase                      # Full codebase analysis
+/laravel-agent:analyze:codebase app/                 # Analyze app directory only
+/laravel-agent:analyze:codebase --focus=security     # Security-focused analysis
+/laravel-agent:analyze:codebase --focus=performance  # Performance analysis
+/laravel-agent:analyze:codebase --output=json        # JSON output for CI</code></pre>
+
+    <h2>Analysis Areas</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4">Area</th>
+                    <th class="text-left py-3 px-4">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>all</code></td>
+                    <td class="py-3 px-4">Complete analysis (default)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>architecture</code></td>
+                    <td class="py-3 px-4">Project structure, patterns, dependencies</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>quality</code></td>
+                    <td class="py-3 px-4">Code quality, SOLID, DRY, complexity</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>security</code></td>
+                    <td class="py-3 px-4">OWASP vulnerabilities, auth, encryption</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>performance</code></td>
+                    <td class="py-3 px-4">N+1, caching, indexing, queries</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>testing</code></td>
+                    <td class="py-3 px-4">Coverage, quality, missing tests</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>dependencies</code></td>
+                    <td class="py-3 px-4">Package health, updates, conflicts</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>laravel</code></td>
+                    <td class="py-3 px-4">Laravel best practices compliance</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Report Output</h2>
+    <p>The report includes:</p>
+    <ul>
+        <li><strong>Overall Health Score</strong> - 0-100 with letter grade</li>
+        <li><strong>Area Scores</strong> - Individual scores per category</li>
+        <li><strong>Top Priorities</strong> - Critical issues to address first</li>
+        <li><strong>Detailed Findings</strong> - File-level issues with fixes</li>
+        <li><strong>Recommendations</strong> - Short-term and long-term improvements</li>
+    </ul>
+
+    <h2>Quality Metrics</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4">Metric</th>
+                    <th class="text-left py-3 px-4">Threshold</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Method Lines</td>
+                    <td class="py-3 px-4">≤ 20 lines</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Class Lines</td>
+                    <td class="py-3 px-4">≤ 200 lines</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Cyclomatic Complexity</td>
+                    <td class="py-3 px-4">≤ 10 per method</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Dependencies</td>
+                    <td class="py-3 px-4">≤ 5 constructor params</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Test Coverage</td>
+                    <td class="py-3 px-4">≥ 80%</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">DRY Violations</td>
+                    <td class="py-3 px-4">0 (3+ duplicates)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>CI/CD Integration</h2>
+    <pre class="language-yaml"><code class="language-yaml"># .github/workflows/health-check.yml
+name: Codebase Health
+on: [push, pull_request]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Analysis
+        run: /analyze:codebase --output=json > report.json
+      - name: Check Score
+        run: |
+          SCORE=$(/analyze:codebase --score-only)
+          if [ $SCORE -lt 70 ]; then
+            echo "Health score $SCORE is below threshold"
+            exit 1
+          fi</code></pre>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/review-audit.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:review:audit</a> - Security-focused audit</li>
+        <li><a href="{{ '/commands/db-optimize.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:optimize</a> - Database optimization</li>
+        <li><a href="{{ '/commands/test-coverage.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:test:coverage</a> - Test coverage report</li>
+        <li><a href="{{ '/commands/refactor.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:refactor</a> - Code refactoring</li>
+    </ul>
+</div>

@@ -1,0 +1,505 @@
+---
+layout: page
+title: laravel-inertia
+description: Build SPAs with Laravel and Inertia.js using Vue or React
+nav_active: Skills
+back_url: /skills.html
+back_text: All Skills
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-[var(--radius)] bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-bold">laravel-inertia</h1>
+            <p class="text-muted-foreground">Auto-invoked skill</p>
+        </div>
+    </div>
+    <p class="text-xl text-muted-foreground">Build SPAs with Laravel and Inertia.js using Vue or React</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Trigger Keywords</h2>
+    <p>This skill automatically activates when Claude detects these keywords:</p>
+    <div class="flex flex-wrap gap-2 not-prose mb-6">
+        <span class="trigger-tag">inertia</span>
+        <span class="trigger-tag">inertia.js</span>
+        <span class="trigger-tag">vue spa</span>
+        <span class="trigger-tag">react spa</span>
+        <span class="trigger-tag">single page app</span>
+        <span class="trigger-tag">ziggy</span>
+        <span class="trigger-tag">breeze inertia</span>
+    </div>
+
+    <h2>Overview</h2>
+    <p>The <strong>laravel-inertia</strong> skill provides expertise for building modern single-page applications with Laravel and <a href="https://inertiajs.com/" target="_blank" rel="noopener">Inertia.js</a>. Inertia allows you to build SPAs using classic server-side routing and controllers, without building an API.</p>
+
+    <h2>What This Skill Provides</h2>
+    <ul>
+        <li><strong>Framework Support</strong> - Vue 3, React, or Svelte integration</li>
+        <li><strong>Server-Side Routing</strong> - No client-side router needed</li>
+        <li><strong>Form Handling</strong> - useForm helper with validation</li>
+        <li><strong>Partial Reloads</strong> - Optimize data fetching</li>
+        <li><strong>SSR Support</strong> - Server-side rendering for SEO</li>
+        <li><strong>File Uploads</strong> - Native FormData support with progress</li>
+    </ul>
+
+    <h2>Example Conversations</h2>
+    <pre class="language-bash"><code class="language-bash"># Building a SPA
+"Create a product management SPA with Inertia and Vue"
+
+# Forms
+"How do I handle form validation with Inertia?"
+
+# Optimization
+"Implement partial reloads for better performance"
+
+# SEO
+"Set up server-side rendering for my Inertia app"</code></pre>
+
+    <h2>Quick Start with Breeze</h2>
+    <p>The fastest way to start with Inertia is using Laravel Breeze:</p>
+    <pre class="language-bash"><code class="language-bash"># Install Breeze with Vue
+composer require laravel/breeze --dev
+php artisan breeze:install vue
+
+# Or with React
+php artisan breeze:install react
+
+# Or with TypeScript
+php artisan breeze:install vue --typescript
+
+# Build assets
+npm install
+npm run dev</code></pre>
+
+    <h2>Controller Pattern</h2>
+    <p>Return Inertia responses from your controllers:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class ProductController extends Controller
+{
+    public function index(): Response
+    {
+        return Inertia::render('Products/Index', [
+            'products' =&gt; Product::query()
+                -&gt;with('category')
+                -&gt;latest()
+                -&gt;paginate(15)
+                -&gt;through(fn ($product) =&gt; [
+                    'id' =&gt; $product-&gt;id,
+                    'name' =&gt; $product-&gt;name,
+                    'price' =&gt; $product-&gt;price_formatted,
+                    'category' =&gt; $product-&gt;category-&gt;name,
+                ]),
+            'filters' =&gt; request()-&gt;only(['search', 'category']),
+        ]);
+    }
+
+    public function store(StoreProductRequest $request): RedirectResponse
+    {
+        Product::create($request-&gt;validated());
+
+        return redirect()
+            -&gt;route('products.index')
+            -&gt;with('success', 'Product created successfully.');
+    }
+}</code></pre>
+
+    <h2>Vue Page Component</h2>
+    <pre class="language-vue"><code class="language-vue">&lt;!-- resources/js/Pages/Products/Index.vue --&gt;
+&lt;script setup&gt;
+import { Head, Link, router } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
+
+defineProps({
+    products: Object,
+    filters: Object,
+})
+
+const deleteProduct = (id) =&gt; {
+    if (confirm('Are you sure?')) {
+        router.delete(route('products.destroy', id))
+    }
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+    &lt;AppLayout&gt;
+        &lt;Head title="Products" /&gt;
+
+        &lt;div class="flex justify-between mb-6"&gt;
+            &lt;h1 class="text-2xl font-bold"&gt;Products&lt;/h1&gt;
+            &lt;Link :href="route('products.create')" class="btn"&gt;
+                Create Product
+            &lt;/Link&gt;
+        &lt;/div&gt;
+
+        &lt;table&gt;
+            &lt;tbody&gt;
+                &lt;tr v-for="product in products.data" :key="product.id"&gt;
+                    &lt;td&gt;{{ product.name }}&lt;/td&gt;
+                    &lt;td&gt;{{ product.price }}&lt;/td&gt;
+                    &lt;td&gt;
+                        &lt;Link :href="route('products.edit', product.id)"&gt;
+                            Edit
+                        &lt;/Link&gt;
+                        &lt;button @click="deleteProduct(product.id)"&gt;
+                            Delete
+                        &lt;/button&gt;
+                    &lt;/td&gt;
+                &lt;/tr&gt;
+            &lt;/tbody&gt;
+        &lt;/table&gt;
+
+        &lt;!-- Pagination --&gt;
+        &lt;div class="flex justify-between"&gt;
+            &lt;Link v-if="products.prev_page_url" :href="products.prev_page_url"&gt;
+                Previous
+            &lt;/Link&gt;
+            &lt;Link v-if="products.next_page_url" :href="products.next_page_url"&gt;
+                Next
+            &lt;/Link&gt;
+        &lt;/div&gt;
+    &lt;/AppLayout&gt;
+&lt;/template&gt;</code></pre>
+
+    <h2>Forms with useForm</h2>
+    <p>The useForm helper provides form state management and validation:</p>
+    <pre class="language-vue"><code class="language-vue">&lt;script setup&gt;
+import { useForm } from '@inertiajs/vue3'
+
+const form = useForm({
+    name: '',
+    price: '',
+    category_id: null,
+})
+
+const submit = () =&gt; {
+    form.post(route('products.store'), {
+        preserveScroll: true,
+        onSuccess: () =&gt; form.reset(),
+    })
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+    &lt;form @submit.prevent="submit"&gt;
+        &lt;input
+            v-model="form.name"
+            type="text"
+            :class="{ 'border-red-500': form.errors.name }"
+        /&gt;
+        &lt;div v-if="form.errors.name" class="text-red-500"&gt;
+            {{ form.errors.name }}
+        &lt;/div&gt;
+
+        &lt;input v-model="form.price" type="number" step="0.01" /&gt;
+
+        &lt;button type="submit" :disabled="form.processing"&gt;
+            &lt;span v-if="form.processing"&gt;Creating...&lt;/span&gt;
+            &lt;span v-else&gt;Create Product&lt;/span&gt;
+        &lt;/button&gt;
+    &lt;/form&gt;
+&lt;/template&gt;</code></pre>
+
+    <h2>File Uploads</h2>
+    <pre class="language-vue"><code class="language-vue">&lt;script setup&gt;
+import { useForm } from '@inertiajs/vue3'
+
+const form = useForm({
+    name: '',
+    image: null,
+})
+
+const handleFileChange = (e) =&gt; {
+    form.image = e.target.files[0]
+}
+
+const submit = () =&gt; {
+    form.post(route('products.store'), {
+        forceFormData: true, // Required for file uploads
+        preserveScroll: true,
+    })
+}
+&lt;/script&gt;
+
+&lt;template&gt;
+    &lt;form @submit.prevent="submit"&gt;
+        &lt;input type="file" @change="handleFileChange" accept="image/*" /&gt;
+
+        &lt;!-- Preview --&gt;
+        &lt;img
+            v-if="form.image"
+            :src="URL.createObjectURL(form.image)"
+            class="h-32 w-32"
+        /&gt;
+
+        &lt;!-- Upload Progress --&gt;
+        &lt;div v-if="form.progress"&gt;
+            &lt;div class="bg-gray-200 rounded-full h-2"&gt;
+                &lt;div
+                    class="bg-blue-600 h-2 rounded-full"
+                    :style="{ width: `${form.progress.percentage}%` }"
+                &gt;&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;p&gt;{{ form.progress.percentage }}% uploaded&lt;/p&gt;
+        &lt;/div&gt;
+
+        &lt;button type="submit" :disabled="form.processing"&gt;Upload&lt;/button&gt;
+    &lt;/form&gt;
+&lt;/template&gt;</code></pre>
+
+    <h2>Shared Data (Middleware)</h2>
+    <p>Share data across all pages using HandleInertiaRequests middleware:</p>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+namespace App\Http\Middleware;
+
+use Illuminate\Http\Request;
+use Inertia\Middleware;
+
+class HandleInertiaRequests extends Middleware
+{
+    public function share(Request $request): array
+    {
+        return [
+            ...parent::share($request),
+            'auth' =&gt; [
+                'user' =&gt; $request-&gt;user() ? [
+                    'id' =&gt; $request-&gt;user()-&gt;id,
+                    'name' =&gt; $request-&gt;user()-&gt;name,
+                    'email' =&gt; $request-&gt;user()-&gt;email,
+                    'permissions' =&gt; $request-&gt;user()-&gt;permissions,
+                ] : null,
+            ],
+            'flash' =&gt; [
+                'success' =&gt; fn () =&gt; $request-&gt;session()-&gt;get('success'),
+                'error' =&gt; fn () =&gt; $request-&gt;session()-&gt;get('error'),
+            ],
+            'errors' =&gt; fn () =&gt; $request-&gt;session()-&gt;get('errors')
+                ?-&gt;getBag('default')?-&gt;getMessages() ?? (object) [],
+        ];
+    }
+}</code></pre>
+
+    <h2>Partial Reloads</h2>
+    <p>Only reload specific props for better performance:</p>
+    <pre class="language-vue"><code class="language-vue">&lt;script setup&gt;
+import { router } from '@inertiajs/vue3'
+
+const filterByCategory = (categoryId) =&gt; {
+    router.get(
+        route('products.index'),
+        { category: categoryId },
+        {
+            only: ['products', 'filters'], // Only reload these props
+            preserveState: true,
+        }
+    )
+}
+
+const loadMore = () =&gt; {
+    router.reload({
+        only: ['products'],
+        preserveScroll: true,
+        preserveState: true,
+    })
+}
+&lt;/script&gt;</code></pre>
+
+    <h2>Lazy Props</h2>
+    <p>Defer expensive data loading until explicitly requested:</p>
+    <pre class="language-php"><code class="language-php">// Controller
+return Inertia::render('Products/Show', [
+    'product' =&gt; $product,
+    // Only load reviews when explicitly requested
+    'reviews' =&gt; Inertia::lazy(fn () =&gt; $product-&gt;reviews()-&gt;latest()-&gt;get()),
+]);</code></pre>
+
+    <pre class="language-vue"><code class="language-vue">&lt;script setup&gt;
+import { router } from '@inertiajs/vue3'
+
+const loadReviews = () =&gt; {
+    router.reload({ only: ['reviews'] })
+}
+&lt;/script&gt;</code></pre>
+
+    <h2>SEO with Head Component</h2>
+    <pre class="language-vue"><code class="language-vue">&lt;script setup&gt;
+import { Head } from '@inertiajs/vue3'
+
+defineProps({
+    product: Object,
+})
+&lt;/script&gt;
+
+&lt;template&gt;
+    &lt;div&gt;
+        &lt;Head&gt;
+            &lt;title&gt;{{ product.name }}&lt;/title&gt;
+            &lt;meta name="description" :content="product.description" /&gt;
+            &lt;meta property="og:title" :content="product.name" /&gt;
+            &lt;meta property="og:image" :content="product.image_url" /&gt;
+        &lt;/Head&gt;
+
+        &lt;!-- Page content --&gt;
+    &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+
+    <h2>Testing Inertia Apps</h2>
+    <pre class="language-php"><code class="language-php">&lt;?php
+
+use Inertia\Testing\AssertableInertia as Assert;
+
+it('renders products index page', function () {
+    Product::factory()-&gt;count(3)-&gt;create();
+
+    $this-&gt;get(route('products.index'))
+        -&gt;assertInertia(fn (Assert $page) =&gt; $page
+            -&gt;component('Products/Index')
+            -&gt;has('products.data', 3)
+            -&gt;has('products.data.0', fn (Assert $page) =&gt; $page
+                -&gt;where('id', Product::first()-&gt;id)
+                -&gt;has('name')
+                -&gt;has('price')
+                -&gt;etc()
+            )
+        );
+});
+
+it('shares auth user data', function () {
+    $this-&gt;actingAs($user = User::factory()-&gt;create());
+
+    $this-&gt;get(route('products.index'))
+        -&gt;assertInertia(fn (Assert $page) =&gt; $page
+            -&gt;has('auth.user', fn (Assert $page) =&gt; $page
+                -&gt;where('id', $user-&gt;id)
+                -&gt;where('name', $user-&gt;name)
+                -&gt;etc()
+            )
+        );
+});</code></pre>
+
+    <h2>Common Pitfalls</h2>
+
+    <h3>1. Not Using router for Navigation</h3>
+    <p><strong>Problem:</strong> Using regular &lt;a&gt; tags breaks SPA experience</p>
+    <pre class="language-vue"><code class="language-vue">&lt;!-- Bad --&gt;
+&lt;a href="/products"&gt;Products&lt;/a&gt;
+
+&lt;!-- Good --&gt;
+&lt;Link :href="route('products.index')"&gt;Products&lt;/Link&gt;</code></pre>
+
+    <h3>2. Forgetting forceFormData for File Uploads</h3>
+    <p><strong>Problem:</strong> Files aren't uploaded without FormData</p>
+    <pre class="language-javascript"><code class="language-javascript">// Bad
+form.post(route('products.store'))
+
+// Good
+form.post(route('products.store'), {
+    forceFormData: true,
+})</code></pre>
+
+    <h3>3. Not Preserving Scroll on Updates</h3>
+    <p><strong>Problem:</strong> User loses position after actions</p>
+    <pre class="language-javascript"><code class="language-javascript">// Bad
+router.delete(route('products.destroy', id))
+
+// Good
+router.delete(route('products.destroy', id), {
+    preserveScroll: true,
+})</code></pre>
+
+    <h3>4. Returning Full Models to Frontend</h3>
+    <p><strong>Problem:</strong> Exposes sensitive data and increases payload</p>
+    <pre class="language-php"><code class="language-php">// Bad
+return Inertia::render('Products/Index', [
+    'products' =&gt; Product::all(),
+]);
+
+// Good
+return Inertia::render('Products/Index', [
+    'products' =&gt; Product::all()-&gt;map(fn ($p) =&gt; [
+        'id' =&gt; $p-&gt;id,
+        'name' =&gt; $p-&gt;name,
+        'price' =&gt; $p-&gt;price_formatted,
+    ]),
+]);</code></pre>
+
+    <h3>5. N+1 Queries in Props</h3>
+    <p><strong>Problem:</strong> Causes performance issues</p>
+    <pre class="language-php"><code class="language-php">// Bad
+return Inertia::render('Products/Index', [
+    'products' =&gt; Product::all(), // N+1 when accessing relations
+]);
+
+// Good
+return Inertia::render('Products/Index', [
+    'products' =&gt; Product::with('category')-&gt;get(),
+]);</code></pre>
+
+    <h3>6. Not Using Lazy Props for Heavy Data</h3>
+    <p><strong>Problem:</strong> Slows initial page load</p>
+    <pre class="language-php"><code class="language-php">// Bad
+return Inertia::render('Dashboard', [
+    'stats' =&gt; $this-&gt;calculateHeavyStats(),
+]);
+
+// Good
+return Inertia::render('Dashboard', [
+    'stats' =&gt; Inertia::lazy(fn () =&gt; $this-&gt;calculateHeavyStats()),
+]);</code></pre>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li><strong>Transform Data in Controllers</strong> - Don't expose raw models to the frontend</li>
+        <li><strong>Use Partial Reloads</strong> - Only reload necessary data for better performance</li>
+        <li><strong>Implement Loading States</strong> - Show feedback during form submissions</li>
+        <li><strong>Preserve Scroll Intelligently</strong> - Better UX for list updates</li>
+        <li><strong>Use Lazy Props for Heavy Data</strong> - Faster initial page loads</li>
+        <li><strong>Share Only Necessary User Data</strong> - Security and performance</li>
+        <li><strong>Use Ziggy for Route Helpers</strong> - Type-safe routing in JavaScript</li>
+        <li><strong>Implement Proper Error Handling</strong> - Display validation errors properly</li>
+        <li><strong>Use SSR for SEO-Critical Pages</strong> - Better search rankings</li>
+        <li><strong>Test Inertia Assertions</strong> - Verify props and components are correct</li>
+    </ul>
+
+    <h2>Package Integration</h2>
+    <ul>
+        <li><strong>tightenco/ziggy</strong> - Laravel routes in JavaScript</li>
+        <li><strong>spatie/laravel-query-builder</strong> - Advanced filtering and sorting</li>
+        <li><strong>spatie/laravel-medialibrary</strong> - File uploads and media management</li>
+        <li><strong>laravel/sanctum</strong> - API authentication if needed</li>
+    </ul>
+
+    <h2>Related Commands</h2>
+    <ul>
+        <li><code>/laravel-agent:inertia:make</code> - Create Inertia page components</li>
+        <li><code>/laravel-agent:inertia:install</code> - Setup Inertia with Vue or React</li>
+        <li><code>/laravel-agent:breeze:install</code> - Install Laravel Breeze with Inertia</li>
+    </ul>
+
+    <h2>Related Skills</h2>
+    <ul>
+        <li><strong>laravel-api</strong> - Building REST APIs (alternative approach)</li>
+        <li><strong>laravel-livewire</strong> - Alternative reactive framework</li>
+        <li><strong>laravel-feature</strong> - Feature structure patterns</li>
+        <li><strong>laravel-testing</strong> - Testing strategies</li>
+    </ul>
+
+    <h2>Learn More</h2>
+    <ul>
+        <li><a href="https://inertiajs.com/" target="_blank" rel="noopener">Inertia.js Documentation</a></li>
+        <li><a href="https://laravel.com/docs/starter-kits#breeze-and-inertia" target="_blank" rel="noopener">Laravel Breeze with Inertia</a></li>
+        <li><a href="https://github.com/tighten/ziggy" target="_blank" rel="noopener">Ziggy - Laravel Routes in JS</a></li>
+    </ul>
+</div>

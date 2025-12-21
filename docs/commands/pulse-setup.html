@@ -1,0 +1,120 @@
+---
+layout: page
+title: /laravel-agent:pulse:setup
+description: Setup Laravel Pulse for production monitoring
+nav_active: Commands
+back_url: /commands.html
+back_text: All Commands
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="badge badge-devops">DevOps</span>
+    </div>
+    <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:pulse:setup</h1>
+    <p class="text-xl text-muted-foreground">Setup Laravel Pulse for production monitoring</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Overview</h2>
+    <p>Setup Laravel Pulse for real-time production monitoring with application performance insights, slow queries, exceptions, cache usage, queue health, and server metrics.</p>
+
+    <h2>Usage</h2>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:pulse:setup [--with-server-metrics] [--custom-recorders]</code></pre>
+
+    <h2>Examples</h2>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:pulse:setup                        # Full setup
+/laravel-agent:pulse:setup --with-server-metrics  # Include server CPU/memory
+/laravel-agent:pulse:setup --custom-recorders     # Add custom metric recorders</code></pre>
+
+    <h2>Recorders</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4">Recorder</th>
+                    <th class="text-left py-3 px-4">Metrics</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Servers</td>
+                    <td class="py-3 px-4">CPU, memory usage</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Requests</td>
+                    <td class="py-3 px-4">Request count, slow requests</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Queues</td>
+                    <td class="py-3 px-4">Queue depth, jobs processed</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Cache</td>
+                    <td class="py-3 px-4">Hit rate, misses</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">SlowQueries</td>
+                    <td class="py-3 px-4">Queries over threshold</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Exceptions</td>
+                    <td class="py-3 px-4">Exception count by type</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Installation</h2>
+    <pre class="language-bash"><code class="language-bash"># Install Pulse
+composer require laravel/pulse
+
+# Publish configuration
+php artisan vendor:publish --provider="Laravel\Pulse\PulseServiceProvider"
+php artisan migrate</code></pre>
+
+    <h2>Server Metrics</h2>
+    <pre class="language-bash"><code class="language-bash"># Add to scheduler
+Schedule::command('pulse:check')->everyFiveSeconds();</code></pre>
+
+    <h2>Telescope vs Pulse</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4">Feature</th>
+                    <th class="text-left py-3 px-4">Telescope</th>
+                    <th class="text-left py-3 px-4">Pulse</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Purpose</td>
+                    <td class="py-3 px-4">Debugging</td>
+                    <td class="py-3 px-4">Monitoring</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Environment</td>
+                    <td class="py-3 px-4">Development</td>
+                    <td class="py-3 px-4">Production</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Detail Level</td>
+                    <td class="py-3 px-4">Very detailed</td>
+                    <td class="py-3 px-4">Aggregated</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">Performance</td>
+                    <td class="py-3 px-4">Heavier</td>
+                    <td class="py-3 px-4">Lightweight</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/telescope-setup.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:telescope:setup</a> - Development debugging</li>
+        <li><a href="{{ '/commands/db-optimize.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:db:optimize</a> - Query optimization</li>
+    </ul>
+</div>

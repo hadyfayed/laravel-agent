@@ -1,0 +1,167 @@
+---
+layout: page
+title: /laravel-agent:scaffold:app
+description: Full app scaffolding from natural language description
+nav_active: Commands
+back_url: /commands.html
+back_text: All Commands
+---
+
+<div class="mb-8">
+    <div class="flex items-center gap-3 mb-4">
+        <span class="badge badge-builder">Builder</span>
+    </div>
+    <h1 class="text-3xl font-bold mb-2 font-mono">/laravel-agent:scaffold:app</h1>
+    <p class="text-xl text-muted-foreground">Full app scaffolding from natural language description</p>
+</div>
+
+<div class="prose prose-neutral dark:prose-invert max-w-none">
+    <h2>Overview</h2>
+    <p>Generate a complete Laravel application structure from a natural language description. This command creates models, migrations, controllers, views, tests, and all supporting infrastructure.</p>
+
+    <h2>Usage</h2>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:scaffold:app [app description]</code></pre>
+
+    <h2>Examples</h2>
+    <pre class="language-bash"><code class="language-bash">/laravel-agent:scaffold:app e-commerce store with products, categories, cart, and checkout
+/laravel-agent:scaffold:app blog platform with posts, comments, tags, and user profiles
+/laravel-agent:scaffold:app project management tool with tasks, milestones, and team members
+/laravel-agent:scaffold:app SaaS booking system with appointments, customers, and payments
+/laravel-agent:scaffold:app inventory management with products, warehouses, and stock tracking</code></pre>
+
+    <h2>What Gets Generated</h2>
+    <p>For each entity identified in your description:</p>
+    <ul>
+        <li><strong>Migrations</strong> - Database schema with relationships</li>
+        <li><strong>Models</strong> - Eloquent models with relationships, casts, fillable</li>
+        <li><strong>Controllers</strong> - Full CRUD operations</li>
+        <li><strong>Form Requests</strong> - Validation rules</li>
+        <li><strong>API Resources</strong> - JSON transformations</li>
+        <li><strong>Policies</strong> - Authorization rules</li>
+        <li><strong>Views/Pages</strong> - Blade or Inertia components</li>
+        <li><strong>Tests</strong> - Feature and unit tests</li>
+        <li><strong>Factories</strong> - Model factories for testing</li>
+        <li><strong>Seeders</strong> - Sample data</li>
+    </ul>
+
+    <h2>Scaffolding Process</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4">Phase</th>
+                    <th class="text-left py-3 px-4">Components</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">1. Foundation</td>
+                    <td class="py-3 px-4">Migrations, Models, Factories, Seeders</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">2. Backend</td>
+                    <td class="py-3 px-4">Form Requests, API Resources, Controllers, Services, Policies</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">3. Frontend</td>
+                    <td class="py-3 px-4">Views, Components, Layouts, Assets</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">4. Features</td>
+                    <td class="py-3 px-4">Authentication, Admin Panel, API Docs, Jobs</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4">5. Quality</td>
+                    <td class="py-3 px-4">Feature Tests, Unit Tests, Integration Tests</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Options</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-border">
+                    <th class="text-left py-3 px-4">Option</th>
+                    <th class="text-left py-3 px-4">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--api-only</code></td>
+                    <td class="py-3 px-4">Only generate API (no views)</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--admin</code></td>
+                    <td class="py-3 px-4">Include Filament admin panel</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--livewire</code></td>
+                    <td class="py-3 px-4">Use Livewire for frontend</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--inertia=vue</code></td>
+                    <td class="py-3 px-4">Use Inertia with Vue</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--inertia=react</code></td>
+                    <td class="py-3 px-4">Use Inertia with React</td>
+                </tr>
+                <tr class="border-b border-border">
+                    <td class="py-3 px-4"><code>--multi-tenant</code></td>
+                    <td class="py-3 px-4">Add tenancy support</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Example Output</h2>
+    <p>For <code>/scaffold:app e-commerce with products, categories, cart, orders</code>:</p>
+    <pre class="language-text"><code>app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── ProductController.php
+│   │   ├── CategoryController.php
+│   │   ├── CartController.php
+│   │   └── OrderController.php
+│   ├── Requests/
+│   │   ├── Product/
+│   │   ├── Category/
+│   │   └── Order/
+│   └── Resources/
+│       ├── ProductResource.php
+│       ├── CategoryResource.php
+│       └── OrderResource.php
+├── Models/
+│   ├── Product.php
+│   ├── Category.php
+│   ├── Cart.php
+│   └── Order.php
+└── Policies/
+    ├── ProductPolicy.php
+    └── OrderPolicy.php
+
+database/
+├── migrations/
+│   ├── create_categories_table.php
+│   ├── create_products_table.php
+│   ├── create_carts_table.php
+│   └── create_orders_table.php
+├── factories/
+└── seeders/
+
+tests/
+├── Feature/
+│   ├── ProductTest.php
+│   ├── CartTest.php
+│   └── OrderTest.php
+└── Unit/</code></pre>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="{{ '/commands/build.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:build</a> - Intelligent single feature building</li>
+        <li><a href="{{ '/commands/feature-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:feature:make</a> - Create single feature</li>
+        <li><a href="{{ '/commands/module-make.html' | relative_url }}" class="text-primary hover:underline">/laravel-agent:module:make</a> - Create domain module</li>
+    </ul>
+</div>
