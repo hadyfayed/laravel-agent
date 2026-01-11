@@ -8,22 +8,21 @@ allowed-tools: Task, Read, Glob, Grep, Bash, Write, Edit, MultiEdit
 Generate a service class or single-purpose action.
 
 ## Input
-$ARGUMENTS = `<Name> [type] [specification]`
+$ARGUMENTS = `<Name> [specification] [--flags]`
 
 Examples:
 - `/service:make OrderProcessor` - Service class
-- `/service:make SendWelcomeEmail action` - Native action
-- `/service:make CreateOrder action:controller,job` - Laravel Actions with traits
-- `/service:make ProcessPayment with Stripe integration`
+- `/service:make SendWelcomeEmail --action`
+- `/service:make CreateOrder --action --controller --job`
+- `/service:make ProcessPayment --action --all`
 
-## Types
-- `service` - Service class with multiple methods (default)
-- `action` - Native action with single `execute()` method
-- `action:controller` - Laravel Actions running as controller
-- `action:job` - Laravel Actions running as queued job
-- `action:listener` - Laravel Actions running as event listener
-- `action:command` - Laravel Actions running as artisan command
-- `action:all` - Laravel Actions with all contexts
+## Flags
+- `--action`: Generate a single-purpose Action. If `lorisleiva/laravel-actions` is installed, it will be a rich "Laravel Action."
+- `--controller`: (Requires `--action`) Adds the `AsController` trait.
+- `--job`: (Requires `--action`) Adds the `AsJob` trait.
+- `--listener`: (Requires `--action`) Adds the `AsListener` trait.
+- `--command`: (Requires `--action`) Adds the `AsCommand` trait.
+- `--all`: (Requires `--action`) A shorthand for `--controller --job --listener --command`.
 
 ## Process
 
@@ -33,9 +32,8 @@ Examples:
    ```
 
 2. **Parse Arguments**
-   - `name`: Service/Action name
-   - `type`: service, action, or action with contexts
-   - `spec`: Additional specification
+   - Extract `name` and `specification`.
+   - Extract flags like `--action`, `--controller`, etc.
 
 3. **Determine Domain**
    ```
@@ -53,11 +51,10 @@ Examples:
    ```
    Create:
 
-   Type: <Service|Action>
-   Domain: <domain>
    Name: <name>
    Spec: <specification>
-   RunAs: [controller, job, listener, command] (if laravel-actions)
+   Domain: <domain>
+   Flags: [--action, --controller, --job, --listener, --command, --all]
    ```
 
 5. **Report Results**

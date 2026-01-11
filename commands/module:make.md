@@ -8,13 +8,19 @@ allowed-tools: Task, Read, Glob, Grep, Bash, Write, Edit, MultiEdit
 Generate a reusable domain module under `app/Modules/<Name>` (or `Modules/` if nwidart/laravel-modules is installed).
 
 ## Input
-$ARGUMENTS = `<ModuleName> [specification]`
+$ARGUMENTS = `<ModuleName> [specification] [--flags]`
 
 Examples:
-- `/module:make Pricing` - Basic pricing module
-- `/module:make Notification with email, SMS, and push channels`
-- `/module:make Payment with Stripe and PayPal strategies`
-- `/module:make Inventory with stock tracking and alerts`
+- `/module:make Pricing --with-dto`
+- `/module:make Notification --with-events`
+- `/module:make Payment --package`
+- `/module:make Inventory --minimal`
+
+## Flags
+- `--package`: Scaffold as a distributable package in the `packages/` directory.
+- `--with-dto`: Generate a Data Transfer Object.
+- `--with-events`: Generate an `Events` directory and a sample event class.
+- `--minimal`: Generate only the ServiceProvider and the core Service class.
 
 ## Process
 
@@ -25,16 +31,15 @@ Examples:
    ```
 
 2. **Parse Arguments**
-   - `name`: Module name (PascalCase)
-   - `spec`: Additional specification
+   - Extract `name` and `specification`.
+   - Extract flags like `--package`, `--with-dto`, etc.
 
-3. **Ask About Patterns**
+3. **Ask About Patterns (if not using flags)**
+   If no flags are provided, you can still ask about patterns for guided creation.
    ```
    Which patterns should this module use?
-   - Strategy: Multiple interchangeable algorithms (e.g., payment gateways)
+   - Strategy: Multiple interchangeable algorithms
    - Repository: Data access abstraction
-   - DTO: Type-safe data transfer objects
-   - None: Simple service class
    ```
 
 4. **Invoke Module Builder**
@@ -47,6 +52,7 @@ Examples:
    Patterns: [selected patterns]
    Spec: <specification>
    UseNwidart: <yes|no based on check>
+   Flags: [--package, --with-dto, --with-events, --minimal]
    ```
 
 5. **Report Results**
