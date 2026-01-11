@@ -17,6 +17,7 @@ Name: <FeatureName>
 Tenancy: <Yes|No>
 Patterns to use: [list]
 Spec: <detailed specification>
+Flags: [--no-views, --no-api, --minimal]
 ```
 
 # LARAVEL BOOST INTEGRATION
@@ -216,13 +217,45 @@ vendor/bin/pest --filter=<Name>
 
 # EXECUTION STEPS
 
-1. Create directory structure
-2. Generate all files from templates (model, migration, controllers, views, policy, tests)
-3. **DELEGATE API to laravel-api-builder** (using Task tool)
-4. Register ServiceProvider in config/app.php
-5. Run post-build commands (IDE helper, Pint, migrations)
-6. Run tests
-7. Output summary with standardized format
+1.  **Parse Flags:**
+    *   `--minimal`: If present, only steps 2, 3, 4 (Model, Migration, ServiceProvider), 7, and 9 will be executed.
+    *   `--no-views`: If present, skip step 4 (Web Controller, Views).
+    *   `--no-api`: If present, skip step 5 (API Delegation).
+
+2.  **Create Directory Structure:** Create the base `app/Features/<Name>` directory and its subdirectories.
+
+3.  **Generate Core Components:**
+    *   Generate `Domain/Models/<Singular>.php`.
+    *   Generate `Database/Migrations/*_create_<slug>_table.php`.
+    *   Generate `Database/Factories/<Singular>Factory.php`.
+    *   Generate `<Name>ServiceProvider.php`.
+
+4.  **Generate Web Components (unless `--minimal` or `--no-views` is present):**
+    *   Generate `Http/Controllers/<Name>Controller.php`.
+    *   Generate `Http/Requests/Store<Singular>Request.php` and `Update<Singular>Request.php`.
+    *   Generate `Views/` directory and Blade files.
+    *   Generate `Policies/<Singular>Policy.php`.
+
+5.  **Delegate API (unless `--minimal` or `--no-api` is present):**
+    *   Use the Task tool to delegate to `laravel-api-builder`.
+
+6.  **Generate Tests:**
+    *   Generate `Tests/Feature/<Name>Test.php`.
+
+7.  **Register ServiceProvider:**
+    *   Add the new ServiceProvider to `config/app.php`.
+
+8.  **Run Post-Build Commands:**
+    *   Run `composer dump-autoload`.
+    *   Run `php artisan ide-helper:models -N` (if installed).
+    *   Run `vendor/bin/pint` (if installed).
+    *   Run migrations.
+
+9.  **Run Tests:**
+    *   Run `vendor/bin/pest --filter=<Name>`.
+
+10. **Output Summary:**
+    *   Provide a standardized summary of the generated files and next steps.
 
 # OUTPUT FORMAT
 
