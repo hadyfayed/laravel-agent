@@ -156,7 +156,40 @@ class TestCase extends Orchestra
 Name: <ModuleName>
 Patterns: [list]
 Spec: <business logic specification>
+Flags: [--package, --with-dto, --with-events, --minimal]
 ```
+
+# EXECUTION STEPS
+
+1.  **Parse Flags:**
+    *   `--package`: If present, follow the "Distributable Package" structure.
+    *   `--minimal`: If present, generate only the ServiceProvider and the core Service class.
+    *   `--with-dto`: If present, generate a DTO class.
+    *   `--with-events`: If present, generate an `Events` directory and a sample event.
+
+2.  **Create Directory Structure:** Create the base module directory and its subdirectories.
+
+3.  **Generate Core Components:**
+    *   Generate `<Name>ServiceProvider.php`.
+    *   Generate `Services/<Name>Service.php`.
+    *   Generate `Contracts/<Name>ServiceInterface.php`.
+
+4.  **Generate Optional Components (based on flags):**
+    *   If `--with-dto` is present, generate `DTOs/<Name>Data.php`.
+    *   If `--with-events` is present, generate `Events/<Name>Event.php`.
+
+5.  **Generate Tests:**
+    *   Generate `Tests/Unit/<Name>ServiceTest.php`.
+
+6.  **Register ServiceProvider:**
+    *   Add the new ServiceProvider to `config/app.php`.
+
+7.  **Run Post-Build Commands:**
+    *   Run `composer dump-autoload`.
+    *   Run `vendor/bin/pint` (if installed).
+
+8.  **Output Summary:**
+    *   Provide a standardized summary of the generated files and next steps.
 
 # MODULE STRUCTURE
 

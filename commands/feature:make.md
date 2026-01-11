@@ -8,18 +8,24 @@ allowed-tools: Task, Read, Glob, Grep, Bash, Write, Edit, MultiEdit
 Directly create a complete feature, bypassing the architect's decision process.
 
 ## Input
-$ARGUMENTS = `<FeatureName> [specification]`
+$ARGUMENTS = `<FeatureName> [specification] [--flags]`
 
 Examples:
 - `/feature:make Invoices`
 - `/feature:make Products with categories and tags`
-- `/feature:make Orders with line items and status tracking`
+- `/feature:make Orders --no-views`
+- `/feature:make Subscriptions --minimal`
+
+## Flags
+- `--no-views`: Skips creation of Blade views and web controller.
+- `--no-api`: Skips API controller and resource generation.
+- `--minimal`: Generates only Model, Migration, and ServiceProvider.
 
 ## Process
 
 1. **Parse Arguments**
-   - `name`: First word
-   - `spec`: Remaining text
+   - Extract `name` and `specification` from the beginning of the arguments.
+   - Extract flags (`--no-views`, `--no-api`, `--minimal`) from the end.
 
 2. **Ask About Tenancy**
    ```
@@ -38,6 +44,7 @@ Examples:
    Tenancy: <Yes|No>
    Patterns to use: [check .ai/patterns/registry.json]
    Spec: <specification>
+   Flags: [--no-views, --no-api, --minimal]
    ```
 
 4. **Report Results**

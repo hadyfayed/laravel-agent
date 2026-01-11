@@ -19,22 +19,37 @@ composer show lorisleiva/laravel-actions 2>/dev/null && echo "LARAVEL_ACTIONS=ye
 ```
 
 # INPUT FORMAT
-
-For Service:
 ```
-Type: Service
-Name: <ServiceName>
-Spec: <what the service orchestrates>
-```
-
-For Action:
-```
-Type: Action
+Name: <Name>
+Spec: <specification>
 Domain: <DomainName>
-Name: <VerbNoun>
-Spec: <single operation>
-RunAs: [controller, job, listener, command] (optional, for laravel-actions)
+Flags: [--action, --controller, --job, --listener, --command, --all]
 ```
+
+# EXECUTION STEPS
+
+1.  **Parse Flags:**
+    *   If `--action` is not present, generate a standard Service class.
+    *   If `--action` is present, generate an Action class.
+        *   If `lorisleiva/laravel-actions` is installed, generate a rich "Laravel Action."
+        *   Otherwise, generate a plain action class.
+    *   For Laravel Actions, include the appropriate `AsAction` traits based on the `--controller`, `--job`, `--listener`, and `--command` flags (or `--all`).
+
+2.  **Create Directory Structure:** Create the base directory (`app/Services` or `app/Actions/<Domain>`).
+
+3.  **Generate Class:**
+    *   Generate the `Service` or `Action` class based on the parsed flags.
+    *   If generating a Laravel Action, include the necessary `use` statements and `as...` methods for the specified contexts.
+
+4.  **Generate Test:**
+    *   Generate a Pest test file for the new class in the appropriate `tests/` directory.
+
+5.  **Run Post-Build Commands:**
+    *   Run `composer dump-autoload`.
+    *   Run `vendor/bin/pint` (if installed).
+
+6.  **Output Summary:**
+    *   Provide a standardized summary of the generated files and next steps.
 
 # SERVICE STRUCTURE
 

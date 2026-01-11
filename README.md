@@ -13,6 +13,7 @@ A Claude Code plugin with **29 specialized agents**, **47 commands**, **21 auto-
 ## Features
 
 - **Single Plugin Install** - One command installs everything
+- **Interactive Mode** - A guided experience to help you find the right command.
 - **23 Specialized Agents** - Architecture, features, APIs, testing, security, deployment, performance, packages, and more
 - **42 Commands** - Direct access to all capabilities
 - **13 Auto-Invoked Skills** - Claude automatically applies Laravel expertise based on context
@@ -42,6 +43,7 @@ That's it! All 29 agents, 47 commands, and 21 skills are now available.
 |---------|-------------|
 | `/laravel-agent:build` | Intelligent build - architect analyzes and delegates |
 | `/laravel-agent:patterns` | View current pattern usage (max 5) |
+| `/laravel-agent:interactive` | Starts an interactive session to guide you through the available commands. |
 
 ### Builders
 | Command | Description |
@@ -329,13 +331,18 @@ Visit the [documentation site](https://hadyfayed.github.io/laravel-agent/) for:
 - Architecture overview
 - Package integrations
 
+## Contributing
+
+Contributions are welcome! Please see our [Contributing Guide](CONTRIBUTING.md) for more details on how to get started.
+
+## Customization
+
+The `laravel-agent` is designed to be extensible. Check out our [Customization Guide](CUSTOMIZATION.md) to learn how to tailor the agent to your needs.
+
+
 ## License
 
 MIT
-
-## Contributing
-
-Contributions welcome! Please open an issue or pull request.
 
 ## Credits
 
