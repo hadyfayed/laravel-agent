@@ -2,6 +2,35 @@
 
 All notable changes to Laravel Agent will be documented in this file.
 
+## [2.1.0] - 2026-04-02
+
+### Added
+
+#### Claude Code Plugin Development Tools
+New meta-tools for creating and sharing Claude Code extensions:
+
+- **claude-plugin-builder** agent - Creates Claude Code plugins, commands, agents, skills, and MCP tools
+- **plugin:scaffold** command - Scaffold complete plugin structures with manifests
+- **command:make** command - Create new slash commands with proper structure
+- **agent:make** command - Create new specialized agents with workflow templates
+- **skill:make** command - Create auto-invoked skills with progressive disclosure tiers
+- **mcp:make** command - Create MCP tools (PHP or TypeScript)
+- **plugin:publish** command - Publish plugins to marketplace or GitHub
+
+#### New Capabilities
+- Complete plugin scaffolding with `plugin.json` and `marketplace.json` generation
+- Agent templates for Explorer, Builder, Orchestrator, and Reviewer types
+- Skill creation with Tier 1 (metadata), Tier 2 (core), and Tier 3 (references) structure
+- MCP tool generation for both PHP (PhpMcp) and TypeScript implementations
+- Version management and CHANGELOG generation for publishing
+
+### Changed
+- Updated plugin.json version to 2.1.0
+- Added keywords: claude-code, plugin, mcp, skills, agents
+- Updated marketplace.json with new agent/command counts (23 agents, 38 commands)
+
+---
+
 ## [1.2.0] - 2025-12-18
 
 ### Added
