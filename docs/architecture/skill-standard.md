@@ -249,7 +249,7 @@ A minimal `evals/evals.json`:
 }
 ```
 
-Provide at least two positive-trigger evals and one negative-trigger eval per skill.
+Ship a few representative trigger cases per skill (the pilot skills ship 1–3 positive cases as an interim baseline). The official `skill-creator` plugin recommends both positive-trigger and negative-trigger cases and generates them during evaluation — adopt that fuller convention when skill-creator is wired in.
 
 > **Note on schema compatibility:** The canonical `evals/evals.json` schema read and written by the official `skill-creator@claude-plugins-official` plugin should be confirmed and adopted when `skill-creator` is wired in (a tracked follow-up). The `cases`/`expect` shape used in this repo's pilot skills is an interim convention and may differ from what `skill-creator` expects.
 

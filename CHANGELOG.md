@@ -17,7 +17,7 @@ All notable changes to Laravel Agent will be documented in this file.
 ### Changed
 
 - `plugin.json` trimmed to minimal manifest fields required by the Claude Code platform; verbose keys removed.
-- Eval schema in skill-standard doc aligned with the `cases`/`expect` shape used by the pilots (was `evals`/`expected`).
+- Eval schema in skill-standard doc aligned with the `cases`/`expect` shape used by the pilots (was `evals`/`expected`); schema-compatibility note added pending skill-creator wiring.
 
 ### Fixed
 
