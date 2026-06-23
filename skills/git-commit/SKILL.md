@@ -2,7 +2,7 @@
 name: git-commit
 description: Stage and create a well-formed git commit for the current changes. Manual invoke only.
 disable-model-invocation: true
-allowed-tools: Bash(git add *) Bash(git commit *) Bash(git status *) Bash(git diff *)
+allowed-tools: Bash(git add *) Bash(git commit *) Bash(git status *) Bash(git diff *) Bash(git log *)
 argument-hint: "[optional message or scope]"
 ---
 
