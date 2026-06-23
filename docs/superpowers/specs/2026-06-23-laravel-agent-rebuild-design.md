@@ -65,7 +65,7 @@ Every topic becomes **exactly one** kind:
 **Reviewer** topics (`review:*`, `security:audit`) are scaffolders whose retained agent is read-heavy (`agent: laravel-review` / `laravel-security`).
 
 ### Effect on `agents/`
-30 → ~8–10 **retained forked workers**: `laravel-feature`, `laravel-module`, `laravel-service`, `laravel-api`, `laravel-filament`, `laravel-livewire`, `laravel-review`, `laravel-security`, `claude-plugin-builder` (+ `laravel-architect` as the scaffold-app orchestrator). Arbitrary `-builder` suffixes dropped. The remaining ~20 agents' content folds into their skill's `references/`.
+30 → **11 retained forked workers** (see §7.1): `laravel-feature`, `laravel-module`, `laravel-service`, `laravel-api`, `laravel-filament`, `laravel-livewire`, `laravel-testing`, `laravel-review`, `laravel-security`, `laravel-architect`, `claude-plugin-builder`. Arbitrary `-builder` suffixes dropped. The remaining 19 agents' content folds into their skill's `references/`.
 
 ### Effect on `commands/`
 **Deleted.** Each becomes a skill. A skill shadows a same-named legacy command cleanly (docs: "if a skill and a command share the same name, the skill takes precedence"), so migration is non-conflicting; old command files are removed during the waves.
@@ -102,44 +102,67 @@ Every topic becomes **exactly one** kind:
 
 ---
 
-## 7. Draft full classification (drives the waves — adjustable)
+## 7. Full classification (authoritative wave map)
 
-> Pilot topics in **bold**. "Agent" column = retained forked worker.
+Pilot topics in **bold**. This table accounts for **every** current artifact — all 53 commands, 30 agents, 21 skills — with no orphans (verified in §7.5).
 
-### Reference (inline, auto-trigger, no agent)
-| Skill | Source agent/skill folded in | Agent |
+### 7.0 Classification rules (apply in order; first match wins)
+
+1. **Scaffolder** — the topic produces a *coordinated multi-file unit* or is a *deep read-and-judge* task that benefits from isolated heavy reasoning. → one task skill with `context: fork` + `agent: <topic>`; keep a retained agent. *Tests:* generates ≥3 related files as one unit (feature, module, API surface, admin panel, component, test suite), or audits/reviews a codebase.
+2. **Reference** — the topic is primarily *knowledge/conventions* Claude applies inline, with no single dominant action. → one auto-trigger skill, no agent, knowledge in `references/`.
+3. **Utility** — a *single bounded action* (one-shot generator, setup wizard, git op, report). → one `disable-model-invocation` skill, no agent; any topic knowledge lives in that skill's `references/`.
+
+A topic yields **one primary skill** of its dominant kind. Genuinely separate one-shot tools on the same topic (e.g. `db-diagram`, `db-optimize` vs the `laravel-database` reference) get their own utility skills. Folded source content is never deleted — it moves into the owning skill's `references/`.
+
+### 7.1 Retained agents (11, from 30) — fork targets only
+
+`laravel-feature`, `laravel-module`, `laravel-service`, `laravel-api`, `laravel-filament`, `laravel-livewire`, `laravel-testing`, `laravel-review`, `laravel-security`, `laravel-architect`, `claude-plugin-builder`. (Renamed off the arbitrary `-builder` suffix.)
+
+### 7.2 Reference skills (6) — auto-trigger, inline, no agent
+
+| Skill | Sources folded in |
+| :-- | :-- |
+| **laravel-database** | `laravel-database` agent + skill; knowledge for `db-diagram`/`db-optimize` |
+| laravel-security | `laravel-security` agent + skill (OWASP patterns). *Also backs* the retained `laravel-security` agent used by `security-audit`/`laravel-review`, and absorbs the phantom `laravel-validator` role (false-positive filtering / confidence scoring) |
+| laravel-performance | `laravel-performance` agent + skill |
+| laravel-auth | `laravel-auth` agent + skill; `laravel-sanctum`, `laravel-passport`, `laravel-socialite` skills as `references/` |
+| laravel-inertia | `laravel-inertia` agent + skill (SPA conventions) |
+| laravel-patterns | `patterns` command |
+
+### 7.3 Scaffolder skills (11) — `context: fork` → retained agent
+
+| Skill | Agent | Sources folded in |
 | :-- | :-- | :-- |
-| **laravel-database** | laravel-database agent + skill | — |
-| laravel-performance | laravel-performance agent + skill | — |
-| laravel-patterns | `patterns` command | — |
-| laravel-auth | laravel-auth agent + skill (+ sanctum/passport/socialite as references) | — |
+| **laravel-feature** | laravel-feature | `feature:make` + `laravel-feature-builder` |
+| laravel-module | laravel-module | `module:make` + `laravel-module-builder` |
+| laravel-service | laravel-service | `service:make` + `laravel-service-builder` |
+| laravel-api | laravel-api | `api:make` + `laravel-api-builder` |
+| laravel-filament | laravel-filament | `filament:make` + `laravel-filament` agent |
+| laravel-livewire | laravel-livewire | `livewire:make` + `laravel-livewire` agent |
+| test-make | laravel-testing | `test:make` + `laravel-testing` agent + skill |
+| laravel-review | laravel-review | `review:pr` + `review:staged` + `review:audit` + `laravel-review` agent |
+| security-audit | laravel-security | `security:audit` |
+| scaffold-app | laravel-architect | `scaffold:app` + `laravel-architect` agent |
+| plugin-scaffold | claude-plugin-builder | `plugin:scaffold` + `claude-plugin-builder` agent |
 
-> **`laravel-security` is dual-natured:** a *reference* skill `laravel-security` (auto-trigger OWASP patterns, no fork) **plus** a retained `laravel-security` *agent* used as the fork target by the reviewer skills (`security-audit`, `laravel-review`). It also absorbs the role the phantom `laravel-validator` was meant to play (false-positive filtering / confidence scoring).
+### 7.4 Utility skills (~33) — `disable-model-invocation`, no agent
 
-### Scaffolder (`context: fork` → retained agent)
-| Skill | Agent | Source |
-| :-- | :-- | :-- |
-| **laravel-feature** | laravel-feature | feature:make + laravel-feature-builder |
-| laravel-module | laravel-module | module:make + laravel-module-builder |
-| laravel-service | laravel-service | service:make + laravel-service-builder |
-| laravel-api | laravel-api | api:make/api:docs + laravel-api-builder |
-| laravel-filament | laravel-filament | filament:make + laravel-filament |
-| laravel-livewire | laravel-livewire | livewire:make + laravel-livewire |
-| laravel-review | laravel-review | review:pr/review:staged/review:audit |
-| security-audit | laravel-security | security:audit (+ reference skill `laravel-security`) |
-| scaffold-app | laravel-architect | scaffold:app + laravel-architect |
-| plugin-scaffold | claude-plugin-builder | plugin:scaffold/publish, mcp:make, skill:make, agent:make, command:make |
+| Group | Skills (← command / agent source) |
+| :-- | :-- |
+| **Generators** | ai-make (`ai:make`+`laravel-ai`), api-docs (`api:docs`), broadcast-make (`broadcast:make`), dto-make (`dto:make`), geo-make (`geo:make`), import-make (`import:make`), job-make (`job:make`+`laravel-queue`/`laravel-horizon`), notification-make (`notification:make`), pdf-make (`pdf:make`), webhook-make (`webhook:make`), feature-flag-make (`feature-flag:make`+`laravel-pennant`), package-make (`laravel-package` agent) |
+| **Git** | **git-commit** (`git:commit`+`laravel-git`), git-pr (`git:pr`), git-release (`git:release`) |
+| **Setup wizards** | auth-setup (`auth:setup`), backup-setup (`backup:setup`), cashier-setup (`cashier:*`+`laravel-cashier`), cicd-setup (`cicd:setup`+`laravel-cicd`), deploy-setup (`deploy:setup`+`laravel-deploy`), health-setup (`health:setup`), nova-setup (`laravel-nova`), octane-setup (`laravel-octane`), pulse-setup (`pulse:setup`), reverb-setup (`reverb:setup`+`laravel-reverb`/`laravel-websocket`), search-setup (`search:setup`+`laravel-scout`), seo-setup (`seo:setup`), telescope-setup (`telescope:setup`) |
+| **Analysis / maintenance** | analyze-codebase (`analyze:codebase`), db-diagram (`db:diagram`), db-optimize (`db:optimize`), docs-generate (`docs:generate`), test-coverage (`test:coverage`), bug-fix (`bug:fix`), laravel-refactor (`refactor`+`laravel-refactor` agent), migrate-from-legacy (`migrate:from-legacy`+`laravel-migration`), upgrade-laravel (`upgrade:laravel`), laravel-build (`build`) |
+| **Plugin-dev meta** | agent-make (`agent:make`), command-make (`command:make`), mcp-make (`mcp:make`), skill-make (`skill:make`), plugin-publish (`plugin:publish`) |
 
-### Utility (`disable-model-invocation`, no agent)
-`git-commit` (**pilot**), git-pr, git-release, dto-make, job-make, notification-make, broadcast-make, webhook-make, import-make, pdf-make, geo-make, test-make, test-coverage, db-diagram, db-optimize, ai-make, feature-flag-make, bug-fix, refactor (laravel-refactor agent may be retained as a fork target), docs-generate, analyze-codebase, migrate-from-legacy, upgrade-laravel, build.
+### 7.5 Orphan check (must hold before waves start)
 
-### Setup utilities (`disable-model-invocation`)
-auth-setup, cicd-setup, deploy-setup, reverb-setup, pulse-setup, telescope-setup, search-setup, seo-setup, health-setup, backup-setup.
+- **53 commands** → all mapped above (each appears exactly once across §7.3/§7.4, except `review:*` which legitimately fold into one `laravel-review`, and `plugin:publish`/`plugin:scaffold` which split into `plugin-publish` utility + `plugin-scaffold` scaffolder).
+- **30 agents** → 11 retained (§7.1); 19 fold into a reference (§7.2) or a skill's `references/` (§7.3/§7.4).
+- **21 skills** → become reference skills (§7.2) or fold into a scaffolder/utility's `references/`.
+- `build-catalog --check` will fail if any disk artifact is missing from the generated `CATALOG.md`, making "no orphans" machine-enforced after the foundation lands.
 
-### Reference-via-setup topics whose agents fold to references
-laravel-cashier, laravel-deploy, laravel-cicd, laravel-octane, laravel-queue, laravel-horizon, laravel-scout, laravel-nova, laravel-inertia, laravel-reverb/websocket, laravel-pennant, laravel-ai, laravel-migration, laravel-package, laravel-testing — each becomes a reference skill (slim + `references/`), with a setup utility skill where it has a clear one-shot install action.
-
-> The exact kind for borderline topics (e.g. testing as reference vs utility) is finalized per wave; the pilot proves the pattern first.
+> Borderline calls already resolved here (testing = scaffolder; migration/refactor/upgrade = utility; inertia = reference; cashier/scout/nova/octane/queue = setup or generator utilities). If you disagree with any specific call, name it and I'll move it before the relevant wave.
 
 ---
 
@@ -174,7 +197,7 @@ User reviews the three proven patterns + foundation → waves convert the rest p
 
 ## 10. Success criteria
 
-- One `skills/` taxonomy; `commands/` gone; `agents/` ≤ ~10 retained workers.
+- One `skills/` taxonomy; `commands/` gone; `agents/` = 11 retained workers (§7.1).
 - `build-catalog --check` passes; every count in the repo matches disk; CI guard active.
 - No phantom references anywhere (`grep -r laravel-validator` clean).
 - Each pilot: `SKILL.md` ≤ ~150 lines, correct frontmatter for its kind, `evals/evals.json` present, behavior verified against a baseline.
