@@ -90,7 +90,7 @@ argument-hint: "<FeatureName> [--tenancy]"
 Required: `name`, `description`, `disable-model-invocation: true`, `allowed-tools`.
 Optional: `argument-hint`, dynamic context injection (see §5).
 
-The `allowed-tools` list scopes what tools the skill's steps may use. List each tool that the skill's shell commands or file operations need. Utility skills do not carry `context: fork` or `agent:`.
+The `allowed-tools` list scopes what tools the skill's steps may use; pattern-scoping is supported, e.g. `Bash(git *)` to restrict to specific commands. List each tool that the skill's shell commands or file operations need. Utility skills do not carry `context: fork` or `agent:`.
 
 ```yaml
 ---
@@ -110,7 +110,7 @@ argument-hint: "[message]"
 
 **Reference skills:** `laravel-<topic>` (e.g., `laravel-database`, `laravel-security`, `laravel-auth`). The `laravel-` prefix signals inline knowledge.
 
-**Scaffolder skills** take one of two forms depending on their origin:
+**Scaffolder skills** take one of two forms depending on their origin (as enumerated in §7.3 of the rebuild design spec, `docs/superpowers/specs/2026-06-23-laravel-agent-rebuild-design.md`):
 - Topics that map directly to a retained agent use the agent's name: `laravel-<topic>` (e.g., `laravel-feature`, `laravel-api`, `laravel-review`).
 - Topics derived from a legacy command or with a clear verb scope use `<topic>-<verb>` kebab-case (e.g., `test-make`, `security-audit`, `scaffold-app`, `plugin-scaffold`).
 
