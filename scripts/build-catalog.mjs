@@ -9,9 +9,29 @@ export function parseFrontmatter(text) {
   const m = text.match(/^---\n([\s\S]*?)\n---/);
   if (!m) return {};
   const out = {};
-  for (const line of m[1].split('\n')) {
-    const mm = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (mm) out[mm[1]] = mm[2].trim().replace(/^["']|["']$/g, '');
+  const lines = m[1].split('\n');
+  let i = 0;
+  while (i < lines.length) {
+    const mm = lines[i].match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+    if (mm) {
+      const key = mm[1];
+      const val = mm[2].trim();
+      if (val === '>' || val === '|') {
+        // Collect following indented lines as a block scalar
+        const parts = [];
+        i++;
+        while (i < lines.length && /^\s+/.test(lines[i])) {
+          parts.push(lines[i].trim());
+          i++;
+        }
+        out[key] = parts.join(' ');
+      } else {
+        out[key] = val.replace(/^["']|["']$/g, '');
+        i++;
+      }
+    } else {
+      i++;
+    }
   }
   return out;
 }

@@ -31,6 +31,14 @@ test('renderCatalog and counts summarize a scan result', () => {
   assert.match(md, /git-commit/);
 });
 
+test('parseFrontmatter handles folded block scalar (description: >)', () => {
+  const yaml = '---\nname: laravel-api\ndescription: >\n  Build REST APIs with versioning.\n  Use for API endpoints.\ncontext: fork\n---\nbody';
+  const fm = parseFrontmatter(yaml);
+  assert.equal(fm.name, 'laravel-api');
+  assert.match(fm.description, /Build REST APIs/);
+  assert.equal(fm.context, 'fork');
+});
+
 test('applyCounts replaces only the marker block', () => {
   const src = 'intro\n<!-- catalog:counts -->OLD<!-- /catalog:counts -->\noutro';
   const out = applyCounts(src, { skills: [1, 2], agents: [1] });

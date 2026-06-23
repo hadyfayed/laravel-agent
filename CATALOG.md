@@ -5,27 +5,27 @@
 
 ### Reference skills (21)
 
-- `laravel-api` — >
-- `laravel-auth` — >
-- `laravel-cashier` — >
-- `laravel-database` — >
-- `laravel-deploy` — >
-- `laravel-feature` — >
-- `laravel-filament` — >
-- `laravel-horizon` — >
-- `laravel-inertia` — >
-- `laravel-livewire` — >
-- `laravel-nova` — >
-- `laravel-octane` — >
-- `laravel-passport` — >
-- `laravel-performance` — >
-- `laravel-queue` — >
-- `laravel-sanctum` — >
-- `laravel-scout` — >
-- `laravel-security` — >
-- `laravel-socialite` — >
-- `laravel-testing` — >
-- `laravel-websocket` — >
+- `laravel-api` — Build production-ready REST APIs with versioning, documentation, and rate limiting. Use when the user wants to create API endpoints, build a REST API, add API resources, or generate OpenAPI documentation. Triggers: "build api", "create endpoint", "api resource", "rest api", "api documentation", "swagger", "json api", "graphql".
+- `laravel-auth` — Implement authentication and authorization in Laravel applications. Use when the user needs login, registration, roles, permissions, or access control. Triggers: "auth", "authentication", "login", "register", "permission", "role", "policy", "gate", "middleware", "sanctum", "passport".
+- `laravel-cashier` — Implement subscription billing with Laravel Cashier. Use when the user needs payments, subscriptions, Stripe integration, Paddle integration, or billing features. Triggers: "cashier", "stripe", "paddle", "subscription", "billing", "payment", "invoice", "checkout", "pricing", "recurring payment", "payment method", "webhook".
+- `laravel-database` — Optimize database operations, create migrations, fix N+1 queries, Big O complexity issues, and design schemas. Use when the user mentions database issues, needs migrations, or wants query optimization. Triggers: "migration", "database", "query", "N+1", "Big O", "O(n)", "complexity", "index", "schema", "relationship", "eloquent", "slow query", "optimize database", "nested loop", "quadratic".
+- `laravel-deploy` — Deploy Laravel applications to production with Forge, Vapor, Docker, or traditional servers. Use when the user wants to deploy, setup hosting, configure servers, or go to production. Triggers: "deploy", "production", "hosting", "server", "Forge", "Vapor", "Docker", "AWS", "CI/CD", "release", "go live".
+- `laravel-feature` — Build complete Laravel features with CRUD, views, API, and tests. Use when the user wants to create a new feature, implement functionality, or build a complete module with models, controllers, views, and tests. Triggers: "build feature", "create feature", "implement", "new module", "add functionality", "crud", "resource".
+- `laravel-filament` — Build admin panels and CRUD interfaces with Filament 3. Use when the user wants to create an admin panel, back-office, dashboard, or manage resources through a UI. Triggers: "filament", "admin panel", "admin dashboard", "resource management", "back-office", "crud interface", "admin area".
+- `laravel-horizon` — Configure and manage Laravel Horizon for Redis queue monitoring. Use when the user needs queue dashboards, failed job management, metrics, or worker configuration. Triggers: "horizon", "queue dashboard", "failed jobs", "queue metrics", "worker status", "queue monitoring", "redis queue", "job status".
+- `laravel-inertia` — Build modern SPAs with Laravel and Inertia.js using Vue or React. Use when the user needs Inertia, Vue SPA, React SPA, single-page application without API, or server-side routing with client-side rendering. Triggers: "inertia", "inertia.js", "vue spa", "react spa", "single page app", "server-driven spa", "ziggy", "breeze inertia", "server-side props".
+- `laravel-livewire` — Build reactive Livewire 3 components for Laravel applications. Use when the user wants to create interactive components, real-time updates, or dynamic forms without writing JavaScript. Triggers: "livewire", "reactive", "component", "real-time form", "dynamic table", "interactive", "SPA-like".
+- `laravel-nova` — Build admin panels with Laravel Nova. Use when the user needs Nova resources, actions, filters, lenses, metrics, or custom tools. Triggers: "nova", "nova resource", "nova action", "nova filter", "nova lens", "nova metric", "nova tool", "admin dashboard".
+- `laravel-octane` — Build high-performance Laravel applications with Octane. Use when the user needs performance, Swoole, RoadRunner, FrankenPHP, concurrent tasks, or application server optimization. Triggers: "octane", "swoole", "roadrunner", "frankenphp", "high performance", "concurrent", "application server", "worker", "persistent application", "long-running".
+- `laravel-passport` — Implement OAuth2 server with Laravel Passport. Use when the user needs OAuth2, third-party API access, authorization codes, client credentials, or personal access tokens. Triggers: "passport", "oauth2 server", "authorization code", "client credentials", "access token", "refresh token", "oauth provider".
+- `laravel-performance` — Optimize Laravel application performance including caching, query optimization, Big O complexity fixes, and scaling. Use when the user mentions slow performance, needs optimization, or wants to improve speed. Triggers: "performance", "slow", "optimize", "speed", "cache", "fast", "scaling", "bottleneck", "memory", "N+1", "Big O", "O(n)", "complexity", "nested loop", "quadratic".
+- `laravel-queue` — Implement background jobs, queues, events, and notifications in Laravel. Use when the user needs async processing, background tasks, event handling, or notifications. Triggers: "queue", "job", "background", "async", "event", "listener", "notification", "email", "dispatch", "worker", "Horizon".
+- `laravel-sanctum` — Implement API authentication with Laravel Sanctum. Use when the user needs API tokens, SPA authentication, mobile app authentication, or token abilities/scopes. Triggers: "sanctum", "api token", "spa auth", "bearer token", "personal access token", "token authentication", "api auth", "mobile auth".
+- `laravel-scout` — Implement full-text search with Laravel Scout. Use when the user needs search functionality, Algolia, Meilisearch, database search, or searchable models. Triggers: "scout", "search", "algolia", "meilisearch", "full-text", "searchable", "elasticsearch", "typesense".
+- `laravel-security` — Secure Laravel applications with OWASP best practices, authentication, authorization, and security auditing. Use when the user mentions security, vulnerabilities, authentication issues, or authorization. Triggers: "security", "vulnerability", "XSS", "SQL injection", "CSRF", "auth", "permission", "audit", "OWASP", "secure", "hack", "attack".
+- `laravel-socialite` — Implement social authentication with Laravel Socialite. Use when the user needs OAuth login, social sign-in, or third-party authentication providers. Triggers: "socialite", "oauth", "social login", "google login", "github login", "facebook login", "twitter login", "social auth", "oauth2", "sign in with".
+- `laravel-testing` — Write comprehensive tests using Pest PHP for Laravel applications. Use when the user wants to write tests, improve coverage, or implement TDD. Triggers: "test", "testing", "pest", "phpunit", "coverage", "tdd", "unit test", "feature test", "integration test".
+- `laravel-websocket` — Implement real-time features with Laravel Reverb and WebSockets. Use when the user needs real-time updates, live notifications, chat, or broadcasting. Triggers: "websocket", "real-time", "realtime", "live", "broadcast", "Reverb", "pusher", "socket", "chat", "notifications live".
 
 ### Scaffolder skills (0)
 
