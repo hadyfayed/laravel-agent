@@ -36,11 +36,6 @@
             "LaravelAgent\\Mcp\\": "src/"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "LaravelAgent\\Mcp\\Tests\\": "tests/"
-        }
-    },
     "extra": {
         "laravel": {
             "providers": [
