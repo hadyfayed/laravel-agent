@@ -1,0 +1,6 @@
+{
+  "skill": "git-commit",
+  "cases": [
+    { "prompt": "/laravel-agent:git-commit", "expect": "reads live git diff via injection and proposes a conventional commit without AI attribution" }
+  ]
+}
