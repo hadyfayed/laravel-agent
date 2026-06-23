@@ -50,6 +50,59 @@ export function counts({ skills, agents }) {
   return { skills: skills.length, agents: agents.length };
 }
 
+const BADGE = ({ skills, agents }) => `${skills.length} skills · ${agents.length} agents`;
+
+export function applyCounts(text, data) {
+  const re = /<!-- catalog:counts -->[\s\S]*?<!-- \/catalog:counts -->/;
+  const block = `<!-- catalog:counts -->${BADGE(data)}<!-- /catalog:counts -->`;
+  return re.test(text) ? text.replace(re, block) : text;
+}
+
+// Files whose embedded counts the generator owns. Each entry maps a path to a
+// transform(text, data)->text. README uses the marker block; the others get a
+// single normalized "N skills, M agents" token via regex.
+function targets(data) {
+  const badge = `${data.skills.length} skills, ${data.agents.length} agents`;
+  return [
+    { path: 'README.md', fn: (t) => applyCounts(t, data) },
+    { path: '.claude-plugin/marketplace.json',
+      fn: (t) => t
+        .replace(/\d+\s+agents,\s+\d+\s+commands/g, badge)
+        .replace(/\d+\s+skills,\s+\d+\s+agents/g, badge)
+        .replace(/\d+\s+specialized\s+agents/g, `${data.agents.length} specialized agents`) },
+    { path: 'docs/_config.yml',
+      fn: (t) => t.replace(/\d+\s+commands,\s+\d+\s+skills,\s+\d+\s+agents/g, badge).replace(/\d+\s+skills,\s+\d+\s+agents/g, badge) },
+  ];
+}
+
+export function run({ check } = {}) {
+  const data = scan();
+  const diffs = [];
+  const catalog = renderCatalog(data);
+  const catalogPath = join(ROOT, 'CATALOG.md');
+  const curCatalog = existsSync(catalogPath) ? readFileSync(catalogPath, 'utf8') : '';
+  if (curCatalog !== catalog) { diffs.push('CATALOG.md'); if (!check) writeFileSync(catalogPath, catalog); }
+  for (const { path, fn } of targets(data)) {
+    const p = join(ROOT, path);
+    if (!existsSync(p)) continue;
+    const cur = readFileSync(p, 'utf8');
+    const next = fn(cur);
+    if (cur !== next) { diffs.push(path); if (!check) writeFileSync(p, next); }
+  }
+  return { ok: diffs.length === 0, diffs };
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const check = process.argv.includes('--check');
+  const { ok, diffs } = run({ check });
+  if (check && !ok) {
+    console.error('Catalog drift detected in:\n' + diffs.map((d) => '  - ' + d).join('\n') +
+      '\nRun: node scripts/build-catalog.mjs --write');
+    process.exit(1);
+  }
+  console.log(check ? 'Catalog up to date.' : (diffs.length ? 'Updated: ' + diffs.join(', ') : 'No changes.'));
+}
+
 export function renderCatalog({ skills, agents }) {
   const byKind = (k) => skills.filter((s) => s.kind === k);
   const sec = (title, list) =>
