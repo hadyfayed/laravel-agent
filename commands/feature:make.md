@@ -30,7 +30,7 @@ Examples:
 
 3. **Invoke Feature Builder**
 
-   Use Task tool with subagent_type `laravel-feature-builder`:
+   Use Task tool with subagent_type `laravel-feature`:
    ```
    Build a complete Feature:
 

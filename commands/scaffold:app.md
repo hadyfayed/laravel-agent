@@ -193,7 +193,7 @@ Follow this process:
 Use appropriate specialized agents:
 - laravel-database for migrations/models
 - laravel-api-builder for API resources
-- laravel-feature-builder for features
+- laravel-feature for features
 - laravel-testing for tests
 - laravel-filament or laravel-livewire for admin
 ```
@@ -303,5 +303,5 @@ Generates:
 
 - `laravel-architect` - Overall architecture decisions
 - `laravel-database` - Database design
-- `laravel-feature-builder` - Feature implementation
+- `laravel-feature` - Feature implementation
 - `laravel-testing` - Test generation

@@ -177,7 +177,7 @@ The architect will:
 | Agent | Purpose |
 |-------|---------|
 | `laravel-architect` | Decision maker - analyzes requests, delegates to builders |
-| `laravel-feature-builder` | Builds complete features with CRUD, views, API |
+| `laravel-feature` | Builds complete features with CRUD, views, API |
 | `laravel-module-builder` | Builds reusable domain modules |
 | `laravel-service-builder` | Builds services and actions |
 | `laravel-refactor` | Code improvement and refactoring |

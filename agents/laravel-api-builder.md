@@ -704,7 +704,7 @@ php artisan l5-swagger:generate  # if swagger installed
 
 # INTEGRATION WITH FEATURE-BUILDER
 
-When called by laravel-feature-builder:
+When called by laravel-feature:
 - Use the same model from `app/Features/<Name>/Domain/Models/`
 - Create API resources in `app/Http/Resources/V1/` (not in feature folder)
 - This allows API versioning independent of features

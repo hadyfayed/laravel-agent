@@ -9,7 +9,7 @@ commands:
     description: "The main entry point that delegates to the architect"
 
   feature-make:
-    agent: laravel-feature-builder
+    agent: laravel-feature
     related_commands: [build, module-make, test-make]
     skills: [laravel-feature]
     description: "Creates complete features with CRUD, views, API"
@@ -124,10 +124,10 @@ commands:
 agents:
   laravel-architect:
     commands: [build]
-    delegates_to: [laravel-feature-builder, laravel-module-builder, laravel-service-builder, laravel-api-builder]
+    delegates_to: [laravel-feature, laravel-module-builder, laravel-service-builder, laravel-api-builder]
     description: "Central decision maker"
 
-  laravel-feature-builder:
+  laravel-feature:
     commands: [feature-make]
     called_by: [laravel-architect]
     description: "Builds complete features"
@@ -150,7 +150,7 @@ skills:
   laravel-feature:
     triggers: [build, feature, create, crud, implement]
     commands: [build, feature-make]
-    agents: [laravel-architect, laravel-feature-builder]
+    agents: [laravel-architect, laravel-feature]
 
   laravel-api:
     triggers: [api, rest, endpoint, openapi]

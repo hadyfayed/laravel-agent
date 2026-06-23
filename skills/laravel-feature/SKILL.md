@@ -1,338 +1,100 @@
 ---
 name: laravel-feature
-description: >
-  Build complete Laravel features with CRUD, views, API, and tests. Use when the user
-  wants to create a new feature, implement functionality, or build a complete module
-  with models, controllers, views, and tests. Triggers: "build feature", "create feature",
-  "implement", "new module", "add functionality", "crud", "resource".
-allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
+description: Scaffold a complete Laravel feature module (controllers, requests, resources, models, migrations, policies, tests). Use when building a new feature or CRUD module.
+context: fork
+agent: laravel-feature
+argument-hint: "[feature name and brief]"
 ---
 
-# Laravel Feature Builder Skill
+# Scaffold a Laravel Feature Module
 
-Build self-contained business features in Laravel following best practices.
+You are the `laravel-feature` agent. The user wants to build a self-contained Laravel feature
+module. Your job is to scaffold everything it needs — do not stop at stubs or placeholders.
 
-## When to Use
+## Task
 
-- User wants to "build a feature" or "create functionality"
-- Request involves CRUD operations with UI
-- Need models, controllers, views, and tests together
-- Building a complete business capability
+Scaffold the feature described in `$ARGUMENTS`.
 
-## Quick Start
+Parse `$ARGUMENTS` as:
+- **Name** — the feature name (PascalCase singular noun, e.g. `Invoice`, `OrderItem`)
+- **Brief** — any extra context: tenancy requirement, specific fields, package preferences, etc.
 
-```bash
-/laravel-agent:feature:make <FeatureName>
-```
+If `$ARGUMENTS` is empty or ambiguous, state your assumption and proceed.
 
-Or describe what you need and I'll build it.
+## What to build
 
-## Structure Generated
+Produce a fully working feature module at `app/Features/<Name>/`:
 
 ```
 app/Features/<Name>/
-├── <Name>ServiceProvider.php
+├── <Name>ServiceProvider.php        # loads routes, views, migrations, registers policy
 ├── Domain/
-│   ├── Models/<Name>.php
-│   ├── Events/<Name>Created.php
-│   ├── Actions/Create<Name>Action.php
-│   └── Enums/<Name>Status.php
+│   ├── Models/<Singular>.php        # Eloquent model, SoftDeletes, HasFactory
+│   ├── Enums/<Singular>Status.php   # if the spec implies status fields
+│   ├── Events/                      # if the spec implies events
+│   └── Actions/Create<Singular>Action.php
 ├── Http/
-│   ├── Controllers/<Name>Controller.php
-│   ├── Requests/Store<Name>Request.php
-│   └── Resources/<Name>Resource.php
+│   ├── Controllers/<Name>Controller.php      # web CRUD, authorizeResource()
+│   ├── Controllers/Api/<Name>Controller.php  # thin JSON controller or delegate
+│   ├── Requests/Store<Singular>Request.php
+│   ├── Requests/Update<Singular>Request.php
+│   ├── Resources/<Singular>Resource.php
+│   └── Routes/web.php, api.php
+├── Views/index, show, create, edit, _form   # Blade, full markup (no stubs)
 ├── Database/
-│   ├── Migrations/
-│   └── Factories/
-└── Tests/
-    └── <Name>FeatureTest.php
+│   ├── Migrations/*_create_<slug>_table.php
+│   ├── Factories/<Singular>Factory.php
+│   └── Seeders/<Singular>Seeder.php
+├── Policies/<Singular>Policy.php            # Laratrust-compatible permission checks
+└── Tests/Feature/<Name>Test.php             # Pest, covers CRUD + policy
 ```
 
-## Complete Example
+## Naming derivations
 
-### Model with Relationships
-```php
-<?php
+From `<Name>` (e.g. `Invoices`):
+- `<Singular>` → `Invoice`
+- `<slug>` → `invoices`
+- `<slug_singular>` → `invoice`
 
-declare(strict_types=1);
+## Key rules
 
-namespace App\Features\Products\Domain\Models;
+1. **strict_types=1** and explicit return types on every class.
+2. **final class** for models, controllers, actions, requests (nothing extends them).
+3. **No mass-assign** `created_for_id` or `created_by_id` — keep them in `$guarded`.
+4. **Tenancy**: if the brief says tenancy is required, add `created_for_id` / `created_by_id`
+   to the migration and guard them. Otherwise omit.
+5. **Policy**: use Laratrust-style `$user->hasPermission('read-<slug>')` checks.
+6. **ServiceProvider**: load routes, views, migrations; register the policy with `Gate::policy()`.
+7. **Post-build**: after creating all files, run:
+   ```bash
+   composer dump-autoload
+   php artisan migrate --pretend   # safety check
+   php artisan migrate
+   vendor/bin/pint app/Features/<Name>/  # if pint is installed
+   vendor/bin/pest --filter=<Name>
+   ```
+8. **API delegation**: for the API controller, use the `laravel-api-builder` agent via the
+   Task tool if a rich REST API is needed (versioning, OpenAPI, query builder). For simple
+   JSON responses a thin controller is fine.
 
-use App\Features\Products\Domain\Enums\ProductStatus;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+## Package awareness
 
-final class Product extends Model
-{
-    use HasFactory, SoftDeletes;
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'price',
-        'category_id',
-        'status',
-    ];
-
-    protected function casts(): array
-    {
-        return [
-            'price' => 'decimal:2',
-            'status' => ProductStatus::class,
-        ];
-    }
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function variants(): HasMany
-    {
-        return $this->hasMany(ProductVariant::class);
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', ProductStatus::Active);
-    }
-
-    public function getPriceFormattedAttribute(): string
-    {
-        return number_format($this->price, 2);
-    }
-}
+Check installed packages before generating code:
+```bash
+composer show spatie/laravel-sluggable 2>/dev/null && echo "SLUGGABLE=yes" || true
+composer show spatie/laravel-medialibrary 2>/dev/null && echo "MEDIALIBRARY=yes" || true
+composer show spatie/laravel-activitylog 2>/dev/null && echo "ACTIVITYLOG=yes" || true
+composer show spatie/laravel-tags 2>/dev/null && echo "TAGS=yes" || true
+composer show barryvdh/laravel-dompdf 2>/dev/null && echo "DOMPDF=yes" || true
+composer show maatwebsite/excel 2>/dev/null && echo "EXCEL=yes" || true
 ```
 
-### Controller with Authorization
-```php
-<?php
+Apply the relevant trait / interface to the model when a package is present and the brief
+implies its use (file uploads → MediaLibrary, audit trail → Activitylog, etc.).
+The agent's deep knowledge covers all of these — consult it rather than inventing patterns.
 
-declare(strict_types=1);
+## Output
 
-namespace App\Features\Products\Http\Controllers;
-
-use App\Features\Products\Domain\Actions\CreateProductAction;
-use App\Features\Products\Domain\Models\Product;
-use App\Features\Products\Http\Requests\StoreProductRequest;
-use App\Features\Products\Http\Requests\UpdateProductRequest;
-use App\Features\Products\Http\Resources\ProductResource;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
-
-final class ProductController extends Controller
-{
-    public function __construct()
-    {
-        $this->authorizeResource(Product::class, 'product');
-    }
-
-    public function index(): View
-    {
-        $products = Product::query()
-            ->with(['category'])
-            ->latest()
-            ->paginate(15);
-
-        return view('products.index', compact('products'));
-    }
-
-    public function store(StoreProductRequest $request, CreateProductAction $action): RedirectResponse
-    {
-        $product = $action->execute($request->validated());
-
-        return redirect()
-            ->route('products.show', $product)
-            ->with('success', 'Product created successfully.');
-    }
-
-    public function show(Product $product): View
-    {
-        $product->load(['category', 'variants']);
-
-        return view('products.show', compact('product'));
-    }
-
-    public function update(UpdateProductRequest $request, Product $product): RedirectResponse
-    {
-        $product->update($request->validated());
-
-        return redirect()
-            ->route('products.show', $product)
-            ->with('success', 'Product updated successfully.');
-    }
-
-    public function destroy(Product $product): RedirectResponse
-    {
-        $product->delete();
-
-        return redirect()
-            ->route('products.index')
-            ->with('success', 'Product deleted successfully.');
-    }
-}
-```
-
-### Form Request with Validation
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Features\Products\Http\Requests;
-
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-
-final class StoreProductRequest extends FormRequest
-{
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:255', 'unique:products,slug'],
-            'description' => ['nullable', 'string', 'max:5000'],
-            'price' => ['required', 'numeric', 'min:0', 'max:999999.99'],
-            'category_id' => ['required', 'exists:categories,id'],
-            'status' => ['required', Rule::enum(ProductStatus::class)],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'name.required' => 'Product name is required.',
-            'price.min' => 'Price cannot be negative.',
-        ];
-    }
-}
-```
-
-### Action for Business Logic
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Features\Products\Domain\Actions;
-
-use App\Features\Products\Domain\Events\ProductCreated;
-use App\Features\Products\Domain\Models\Product;
-
-final class CreateProductAction
-{
-    public function execute(array $data): Product
-    {
-        $product = Product::create($data);
-
-        event(new ProductCreated($product));
-
-        return $product;
-    }
-}
-```
-
-### Pest Test
-```php
-<?php
-
-declare(strict_types=1);
-
-use App\Features\Products\Domain\Models\Product;
-use App\Models\User;
-
-beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user);
-});
-
-describe('ProductController', function () {
-    it('displays products index', function () {
-        Product::factory()->count(3)->create();
-
-        $response = $this->get(route('products.index'));
-
-        $response->assertOk();
-        $response->assertViewHas('products');
-    });
-
-    it('creates a product', function () {
-        $data = Product::factory()->make()->toArray();
-
-        $response = $this->post(route('products.store'), $data);
-
-        $response->assertRedirect();
-        $this->assertDatabaseHas('products', ['name' => $data['name']]);
-    });
-
-    it('validates required fields', function () {
-        $response = $this->post(route('products.store'), []);
-
-        $response->assertSessionHasErrors(['name', 'price', 'category_id']);
-    });
-
-    it('soft deletes a product', function () {
-        $product = Product::factory()->create();
-
-        $this->delete(route('products.destroy', $product));
-
-        $this->assertSoftDeleted('products', ['id' => $product->id]);
-    });
-});
-```
-
-## Decision Matrix
-
-| Request Type | Implementation |
-|--------------|----------------|
-| CRUD + UI + API | Feature (this skill) |
-| Reusable logic only | Module |
-| Single operation | Action |
-| Business orchestration | Service |
-
-## Common Pitfalls
-
-1. **Fat Controllers** - Move logic to Actions/Services
-2. **Missing Authorization** - Always use Policies
-3. **N+1 Queries** - Eager load relationships
-4. **No Validation** - Use Form Requests
-5. **Hardcoded Values** - Use Enums and Config
-6. **Missing Tests** - Every feature needs tests
-
-## Package Integration
-
-- **spatie/laravel-sluggable** - Auto-generate slugs
-- **spatie/laravel-medialibrary** - Handle file uploads
-- **spatie/laravel-activitylog** - Track changes
-- **spatie/laravel-tags** - Add tagging
-
-## Best Practices
-
-- Use `final class` for non-inheritable classes
-- Declare `strict_types=1`
-- Follow SOLID principles
-- Max 5 design patterns per project
-- Include factory and tests
-- Use Enums for status fields
-- Implement soft deletes
-
-## Related Commands
-
-- `/laravel-agent:feature:make` - Create a complete Laravel feature
-- `/laravel-agent:module:make` - Create a reusable domain module
-- `/laravel-agent:service:make` - Create a service class or action
-
-## Related Agents
-
-- `laravel-feature-builder` - Feature creation specialist
-- `laravel-architect` - Architecture and planning
+After completing all files, list each path created or modified, one per line,
+prefixed with `[created]` or `[modified]`. Close with a one-paragraph summary
+noting the feature name, tenancy setting, packages applied, and any deviations from the spec.

@@ -154,7 +154,7 @@ New meta-tools for creating and sharing Claude Code extensions:
 - beyondcode/laravel-query-detector
 
 #### Agent Enhancements
-- **laravel-feature-builder** - Added settings, SEO, revisions, sortable, schemaless attributes
+- **laravel-feature** - Added settings, SEO, revisions, sortable, schemaless attributes
 - **laravel-api-builder** - Added spatie/laravel-fractal for transformers
 - **laravel-database** - Added N+1 detection with query-detector, devtoolbox commands
 - **laravel-deploy** - Added laravel/envoy task runner

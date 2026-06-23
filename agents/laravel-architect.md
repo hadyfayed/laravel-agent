@@ -489,7 +489,7 @@ Delegate to builder agents based on architecture decision:
 
 | Decision | Subagent | Confidence Threshold |
 |----------|----------|---------------------|
-| Feature | laravel-feature-builder | 80+ |
+| Feature | laravel-feature | 80+ |
 | Module | laravel-module-builder | 80+ |
 | Service/Action | laravel-service-builder | 80+ |
 | Refactor | laravel-refactor | 80+ |
@@ -659,14 +659,14 @@ Based on your decision, invoke the appropriate subagent using Task tool:
 
 | Decision | Subagent |
 |----------|----------|
-| Feature | laravel-feature-builder |
+| Feature | laravel-feature |
 | Module | laravel-module-builder |
 | Service/Action | laravel-service-builder |
 | Refactor | laravel-refactor |
 
 **Delegation format:**
 ```
-Use the Task tool with subagent_type="laravel-feature-builder" to implement:
+Use the Task tool with subagent_type="laravel-feature" to implement:
 
 Name: <Name>
 Type: <Feature|Module|Service|Action>
@@ -763,7 +763,7 @@ START: What is the primary goal?
 
 ├── BUILD something new
 │   ├── Complete business capability (CRUD + UI + API)?
-│   │   └── YES → laravel-feature-builder
+│   │   └── YES → laravel-feature
 │   │       └── Feature will delegate to laravel-api-builder for API routes
 │   │
 │   ├── Reusable domain logic (no UI)?
@@ -838,7 +838,7 @@ START: What is the primary goal?
 | Agent | Creates Files | Modifies Files | Runs Commands | Delegates To |
 |-------|--------------|----------------|---------------|--------------|
 | laravel-architect | Pattern registry | - | Environment checks | All builders |
-| laravel-feature-builder | Feature structure | config/app.php | migrations, tests | laravel-api-builder |
+| laravel-feature | Feature structure | config/app.php | migrations, tests | laravel-api-builder |
 | laravel-module-builder | Module structure | - | - | - |
 | laravel-service-builder | Services/Actions | - | - | - |
 | laravel-api-builder | API controllers, routes | - | - | - |
@@ -869,7 +869,7 @@ laravel-architect (analyzes)
     │
     ├── Decides: Feature (has CRUD + views + API)
     │
-    └── Delegates to: laravel-feature-builder
+    └── Delegates to: laravel-feature
                           │
                           ├── Creates: Models, Controllers, Views, Tests
                           │
@@ -956,7 +956,7 @@ laravel-architect (analyzes)
 
 ```json
 {
-  "agent": "laravel-feature-builder",
+  "agent": "laravel-feature",
   "status": "failed",
   "step": "migration_creation",
   "error": "Table already exists",
