@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseFrontmatter, classifySkill, renderCatalog, counts, applyCounts } from './build-catalog.mjs';
+import { parseFrontmatter, classifySkill, renderCatalog, counts, applyCounts, targets } from './build-catalog.mjs';
 
 test('parseFrontmatter reads top-level scalar keys', () => {
   const fm = parseFrontmatter('---\nname: x\ndescription: does y\ncontext: fork\n---\nbody');
@@ -45,4 +45,30 @@ test('applyCounts replaces only the marker block', () => {
   assert.match(out, /<!-- catalog:counts -->2 skills · 1 agents<!-- \/catalog:counts -->/);
   assert.match(out, /intro/);
   assert.match(out, /outro/);
+});
+
+test('targets() docs/index.html transform replaces stale agent/command/skill phrase with badge', () => {
+  const data = {
+    skills: new Array(12).fill({ name: 'x', kind: 'reference', description: '' }),
+    agents: new Array(23).fill('a'),
+  };
+  const entry = targets(data).find((e) => e.path === 'docs/index.html');
+  const stale = 'description: AI-powered Laravel development assistant for Claude Code with 23 agents, 42 commands, 12 skills, and 7 hooks.';
+  const out = entry.fn(stale);
+  assert.match(out, /12 skills, 23 agents/);
+  assert.ok(!out.match(/23 agents, 42 commands, 12 skills/), 'stale phrase should be gone');
+  assert.match(out, /and 7 hooks/, 'hook mention must be preserved');
+});
+
+test('targets() docs/commands.html transform replaces stale command count with badge', () => {
+  const data = {
+    skills: new Array(12).fill({ name: 'x', kind: 'reference', description: '' }),
+    agents: new Array(23).fill('a'),
+  };
+  const entry = targets(data).find((e) => e.path === 'docs/commands.html');
+  const stale1 = 'description: 47 commands for Laravel development with Claude Code';
+  const stale2 = '        <p class="text-muted-foreground">47 commands for Laravel development with Claude Code</p>';
+  assert.match(entry.fn(stale1), /12 skills, 23 agents for Laravel development/);
+  assert.match(entry.fn(stale2), /12 skills, 23 agents for Laravel development/);
+  assert.ok(!entry.fn(stale1).match(/47 commands/), 'stale phrase should be gone');
 });

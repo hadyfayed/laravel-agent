@@ -81,7 +81,7 @@ export function applyCounts(text, data) {
 // Files whose embedded counts the generator owns. Each entry maps a path to a
 // transform(text, data)->text. README uses the marker block; the others get a
 // single normalized "N skills, M agents" token via regex.
-function targets(data) {
+export function targets(data) {
   const badge = `${data.skills.length} skills, ${data.agents.length} agents`;
   return [
     { path: 'README.md', fn: (t) => applyCounts(t, data) },
@@ -92,6 +92,10 @@ function targets(data) {
         .replace(/\d+\s+specialized\s+agents/g, `${data.agents.length} specialized agents`) },
     { path: 'docs/_config.yml',
       fn: (t) => t.replace(/\d+\s+commands,\s+\d+\s+skills,\s+\d+\s+agents/g, badge).replace(/\d+\s+skills,\s+\d+\s+agents/g, badge) },
+    { path: 'docs/index.html',
+      fn: (t) => t.replace(/\d+\s+agents,\s+\d+\s+commands,\s+\d+\s+skills/g, badge) },
+    { path: 'docs/commands.html',
+      fn: (t) => t.replace(/\d+\s+commands/g, badge) },
   ];
 }
 
