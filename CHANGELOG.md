@@ -2,6 +2,34 @@
 
 All notable changes to Laravel Agent will be documented in this file.
 
+## [3.0.0-dev] — unreleased
+
+### Added
+
+- **Catalog generator** (`scripts/build-catalog.mjs`) — single source of truth for skill/agent counts; `--write` regenerates `CATALOG.md`, `--check` exits non-zero on drift. Five unit tests (`scripts/build-catalog.test.mjs`) cover parse, classify, render, and apply-counts.
+- **CI drift guard** (`.github/workflows/catalog-check.yml`) — fails the build if `CATALOG.md` is out of sync with the actual skill and agent files.
+- **Skill standard doc** (`docs/architecture/skill-standard.md`) — written contract for the three skill kinds (reference, scaffolder, utility), required frontmatter per kind, naming conventions, progressive disclosure budget, dynamic context injection, retained-agent template, and eval schema.
+- **Three pilot conversions** demonstrating the three kinds:
+  - `skills/laravel-database` — reference pilot (93 lines, inline auto-trigger)
+  - `skills/laravel-feature` — scaffolder pilot (100 lines, forks `agents/laravel-feature`)
+  - `skills/git-commit` — utility pilot (83 lines, `disable-model-invocation: true`)
+
+### Changed
+
+- `plugin.json` trimmed to minimal manifest fields required by the Claude Code platform; verbose keys removed.
+- Eval schema in skill-standard doc aligned with the `cases`/`expect` shape used by the pilots (was `evals`/`expected`).
+
+### Fixed
+
+- Phantom `laravel-validator` skill reference removed from `plugin.json` and all non-doc files.
+- MCP `composer.json` autoload fixed to resolve class-not-found errors at bootstrap.
+
+### Notes
+
+Command→skill renames and the full migration table (remaining ~37 topics) land during the conversion waves, which begin after the human review checkpoint that follows this foundation release.
+
+---
+
 ## [2.1.0] - 2026-04-02
 
 ### Added

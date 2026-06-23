@@ -236,20 +236,22 @@ A minimal `evals/evals.json`:
 ```json
 {
   "skill": "<skill-directory-name>",
-  "evals": [
+  "cases": [
     {
       "prompt": "<user message that should trigger this skill>",
-      "expected": "<one-sentence description of the correct outcome>"
+      "expect": "<one-sentence description of the correct outcome>"
     },
     {
       "prompt": "<user message that should NOT trigger this skill>",
-      "expected": "skill does not activate; handled by a different skill or inline"
+      "expect": "skill does not activate; handled by a different skill or inline"
     }
   ]
 }
 ```
 
 Provide at least two positive-trigger evals and one negative-trigger eval per skill.
+
+> **Note on schema compatibility:** The canonical `evals/evals.json` schema read and written by the official `skill-creator@claude-plugins-official` plugin should be confirmed and adopted when `skill-creator` is wired in (a tracked follow-up). The `cases`/`expect` shape used in this repo's pilot skills is an interim convention and may differ from what `skill-creator` expects.
 
 ---
 
