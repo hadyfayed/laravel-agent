@@ -173,13 +173,13 @@ New meta-tools for creating and sharing Claude Code extensions:
 #### Consolidated
 - **notification:make** now handles both notification creation AND channel setup (merged notification:setup)
 - **seo:setup** replaces seo:sitemap with expanded functionality (meta tags, Open Graph)
-- **laravel-security** now includes validation pipeline from laravel-validator
-- **laravel-review** uses laravel-security for false positive filtering
+- **laravel-security** now owns the validation pipeline and false-positive filtering capability
+- **laravel-review** delegates false-positive filtering to laravel-security
 
 ### Removed
 - **notification:setup** - Merged into notification:make with `--setup` flag
 - **seo:sitemap** - Replaced by seo:setup
-- **laravel-validator** - Merged into laravel-security agent
+- Phantom agent removed; capability consolidated into laravel-security
 
 ### Fixed
 - Consistent structure across all 42 commands

@@ -823,7 +823,7 @@ START: What is the primary goal?
 
 ├── REVIEW
 │   ├── Review staged changes?
-│   │   └── YES → laravel-review → uses laravel-validator
+│   │   └── YES → laravel-review → delegates false-positive filtering to laravel-security
 │   │
 │   └── Review pull request?
 │       └── YES → laravel-review
@@ -855,8 +855,7 @@ START: What is the primary goal?
 | laravel-security | - | - | - | - |
 | laravel-refactor | - | Target files | pint | - |
 | laravel-testing | Test files | - | pest | - |
-| laravel-review | - | - | - | laravel-validator |
-| laravel-validator | - | - | - | - |
+| laravel-review | - | - | - | laravel-security |
 | laravel-git | - | - | git commands | - |
 
 # AGENT INTERACTION WORKFLOWS
@@ -910,7 +909,7 @@ laravel-review (orchestrates)
     │   ├── Laravel Best Practices Reviewer
     │   └── Test Coverage Reviewer
     │
-    └── Validates with: laravel-validator
+    └── Validates with: laravel-security
                             │
                             └── Filters false positives (confidence >= 80%)
 ```
