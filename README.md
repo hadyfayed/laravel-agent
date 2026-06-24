@@ -6,7 +6,7 @@
 
 > AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.
 
-<!-- catalog:counts -->22 skills · 30 agents<!-- /catalog:counts -->
+<!-- catalog:counts -->23 skills · 30 agents<!-- /catalog:counts -->
 
 **[View Documentation](https://hadyfayed.github.io/laravel-agent/)**
 

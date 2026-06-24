@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-patterns",
+  "cases": [
+    { "prompt": "My OrderController has 150 lines creating orders, charging payment, and sending email — how should I restructure it?", "expect": "recommends extracting an Action/Service, names SRP, keeps controller thin" },
+    { "prompt": "I have three places building the same complex invoice query — what pattern fits?", "expect": "suggests a Repository or query object to encapsulate the repeated query, references DRY" },
+    { "prompt": "Payment handling switches on provider type inside the service — how do I make this extensible?", "expect": "recommends a Strategy pattern bound by interface, references OCP" }
+  ]
+}
