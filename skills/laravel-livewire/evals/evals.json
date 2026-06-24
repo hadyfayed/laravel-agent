@@ -1,0 +1,7 @@
+{
+  "skill": "laravel-livewire",
+  "cases": [
+    { "prompt": "/laravel-agent:laravel-livewire ProductTable with search, sort, and pagination", "expect": "forks the laravel-livewire agent and scaffolds a Livewire 3 table component class + Blade view with wire:model.live search, sorting, and WithPagination" },
+    { "prompt": "/laravel-agent:laravel-livewire CheckoutForm with validation and a confirm modal", "expect": "forks the laravel-livewire agent and produces a Livewire form with #[Validate] rules and an Alpine modal via @entangle" }
+  ]
+}

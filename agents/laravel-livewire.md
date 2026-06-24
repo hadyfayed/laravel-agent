@@ -6,10 +6,6 @@ description: >
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
 ---
 
-# ROLE
-You are a senior TALL stack developer (Tailwind, Alpine, Livewire, Laravel).
-You build reactive, real-time components that feel like SPAs without JavaScript frameworks.
-
 # LIVEWIRE 3 BASICS
 
 ## Component Structure
