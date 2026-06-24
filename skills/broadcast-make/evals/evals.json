@@ -1,0 +1,13 @@
+{
+  "skill": "broadcast-make",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:broadcast-make OrderUpdated",
+      "expect": "generates a public broadcast event with dispatch examples and client listener code"
+    },
+    {
+      "prompt": "/laravel-agent:broadcast-make MessageSent private user.{id}",
+      "expect": "creates a private broadcast event with channel authorization in routes/channels.php"
+    }
+  ]
+}
