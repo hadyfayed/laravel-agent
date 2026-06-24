@@ -57,8 +57,6 @@ php artisan reverb:restart                  # Restart daemon
 
 ## Reference
 
-Broadcasting event conventions, channel authorization, Echo listener patterns, and Reverb/broadcasting best practices: see the **laravel-websocket** reference skill for comprehensive guidance on building real-time features.
+Echo client setup, channel patterns, and broadcasting best practices are owned by the **laravel-websocket** skill (`/laravel-agent:laravel-websocket`) — use it for comprehensive guidance on building real-time features.
 
 Supervisor configuration for production deployment: `references/supervisor-setup.md`.
-
-Echo client setup and Vite integration: `references/echo-setup.md`.
