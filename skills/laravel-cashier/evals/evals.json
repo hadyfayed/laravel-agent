@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-cashier",
+  "cases": [
+    { "prompt": "I need to add Stripe subscriptions with a 14-day trial to my Laravel app", "expect": "references newSubscription + trialDays, the Billable trait, and webhook handling from references/subscriptions.md" },
+    { "prompt": "How do I verify Stripe webhooks in Laravel Cashier?", "expect": "uses Cashier WebhookController + STRIPE_WEBHOOK_SECRET + CSRF exception from references/webhooks-and-invoices.md" },
+    { "prompt": "Set up Laravel Cashier with Paddle instead of Stripe", "expect": "references laravel/cashier-paddle, Paddle Billable trait, and Paddle env vars from references/paddle.md" }
+  ]
+}
