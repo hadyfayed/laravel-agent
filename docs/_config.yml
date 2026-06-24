@@ -1,6 +1,6 @@
 # Jekyll Configuration for Laravel Agent Docs
 title: Laravel Agent
-description: Claude Code plugin for Laravel development with 48 skills, 30 agents, and 7 hooks
+description: Claude Code plugin for Laravel development with 49 skills, 30 agents, and 7 hooks
 url: "https://hadyfayed.github.io"
 baseurl: "/laravel-agent"
 
