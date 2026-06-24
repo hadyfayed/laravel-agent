@@ -1,0 +1,13 @@
+{
+  "skill": "laravel-refactor",
+  "cases": [
+    {
+      "prompt": "I need to refactor this god class that's over 400 lines and violates SRP",
+      "expect": "Skill activates; guides extraction of service classes and methods per SOLID principles"
+    },
+    {
+      "prompt": "There's a method with 30 lines and deep nesting; how do I improve it?",
+      "expect": "Skill activates; references extract method pattern and code smell thresholds"
+    }
+  ]
+}
