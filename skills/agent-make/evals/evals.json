@@ -1,0 +1,13 @@
+{
+  "skill": "agent-make",
+  "cases": [
+    {
+      "prompt": "Create a new agent called code-reviewer for reviewing code quality",
+      "expect": "Scaffolds agents/code-reviewer.md with agent frontmatter, role section, capabilities, and workflow phases"
+    },
+    {
+      "prompt": "I need to make a deployment-expert agent",
+      "expect": "Creates agents/deployment-expert.md with placeholder role and workflow structure ready for customization"
+    }
+  ]
+}
