@@ -93,9 +93,13 @@ export function targets(data) {
     { path: 'docs/_config.yml',
       fn: (t) => t.replace(/\d+\s+commands,\s+\d+\s+skills,\s+\d+\s+agents/g, badge).replace(/\d+\s+skills,\s+\d+\s+agents/g, badge) },
     { path: 'docs/index.html',
-      fn: (t) => t.replace(/\d+\s+agents,\s+\d+\s+commands,\s+\d+\s+skills/g, badge) },
+      fn: (t) => t
+        .replace(/\d+\s+agents,\s+\d+\s+commands,\s+\d+\s+skills/g, badge)
+        .replace(/\d+\s+skills,\s+\d+\s+agents/g, badge) },
     { path: 'docs/commands.html',
-      fn: (t) => t.replace(/\d+\s+commands/g, badge) },
+      fn: (t) => t
+        .replace(/\d+\s+commands\b/g, badge)
+        .replace(/\d+\s+skills,\s+\d+\s+agents/g, badge) },
   ];
 }
 

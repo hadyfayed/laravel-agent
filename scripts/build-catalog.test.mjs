@@ -72,3 +72,16 @@ test('targets() docs/commands.html transform replaces stale command count with b
   assert.match(entry.fn(stale2), /12 skills, 23 agents for Laravel development/);
   assert.ok(!entry.fn(stale1).match(/47 commands/), 'stale phrase should be gone');
 });
+
+test('docs count targets refresh and are idempotent (no silent freeze)', () => {
+  const data = { skills: new Array(65), agents: new Array(11) };
+  const badge = '65 skills, 11 agents';
+  for (const path of ['docs/index.html', 'docs/commands.html']) {
+    const fn = targets(data).find((t) => t.path === path).fn;
+    // a file already in badge form (with STALE counts) must refresh, not freeze:
+    const refreshed = fn('prefix 22 skills, 30 agents suffix');
+    assert.ok(refreshed.includes(badge), `${path} froze instead of refreshing stale counts`);
+    // and applying the transform again must be a no-op:
+    assert.equal(fn(refreshed), refreshed, `${path} transform not idempotent`);
+  }
+});
