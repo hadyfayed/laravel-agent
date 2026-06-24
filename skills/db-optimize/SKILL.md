@@ -72,18 +72,14 @@ Generate a prioritized markdown report with:
 - **Missing Indexes** — table, column(s), query pattern, and SQL recommendations
 - **Optimization Checklist** — eager loading, withCount(), schema efficiency
 
-## Laravel Relationship Optimization
+## Pattern Reference
 
-See `references/n1-patterns.md`, `references/bigO-patterns.md`, and `references/index-strategy.md` for detailed patterns, code examples, and optimization strategies.
+For detailed patterns and solutions, see **laravel-database** skill's performance reference:
+- **N+1 query patterns** — detection and fixes with eager loading strategies
+- **Big O complexity patterns** — O(n²) loops, nested searches, and optimization techniques
+- **Index design and strategy** — single-column, composite, and covering indexes
 
-## Reference
-
-For detailed patterns and solutions:
-- `${CLAUDE_SKILL_DIR}/references/n1-patterns.md` — N+1 query detection and fixes
-- `${CLAUDE_SKILL_DIR}/references/bigO-patterns.md` — Big O complexity patterns
-- `${CLAUDE_SKILL_DIR}/references/index-strategy.md` — Index design and optimization
-
-Also refer to the `laravel-database` reference skill for comprehensive database best practices.
+This skill's role is to **detect and report** these issues; `laravel-database` owns the **canonical pattern library**.
 
 ## Options
 
