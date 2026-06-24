@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-inertia",
+  "cases": [
+    { "prompt": "How do I set up Inertia with Vue in a fresh Laravel project?", "expect": "points to setup.md: composer/pnpm install, app.js bootstrap, root Blade template, HandleInertiaRequests middleware" },
+    { "prompt": "My Inertia form loses input on validation errors and uploads fail for files.", "expect": "recommends preserveState on submit and forceFormData: true for file uploads from forms-and-validation.md" },
+    { "prompt": "How do I test that an Inertia page renders with the right props?", "expect": "shows assertInertia with AssertableInertia component/has/where assertions from ssr-and-advanced.md" }
+  ]
+}
