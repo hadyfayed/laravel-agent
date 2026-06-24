@@ -23,8 +23,6 @@ Analyze a Laravel application for database performance issues and recommend opti
    - Lazy loading inside loops
    - Missing eager loading in queries
    - Nested relationship loading without `with()`
-   
-   See `${CLAUDE_SKILL_DIR}/references/n1-patterns.md` for patterns and fixes.
 
 2. **Detect Big O Complexity Issues**
    ```bash
@@ -36,8 +34,6 @@ Analyze a Laravel application for database performance issues and recommend opti
    - O(n²) contains() in loops
    - O(n²) array searches
    - O(n) queries in loops
-
-   See `${CLAUDE_SKILL_DIR}/references/bigO-patterns.md` for patterns and fixes.
 
 3. **Analyze Index Coverage**
    - Foreign keys without indexes
