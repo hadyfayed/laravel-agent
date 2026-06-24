@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-octane",
+  "cases": [
+    { "prompt": "My Octane dashboard controller runs four count queries sequentially — how do I run them in parallel?", "expect": "references concurrency-and-tasks.md: Octane::concurrently([...fns]) returning destructured results" },
+    { "prompt": "Users report seeing each other's data since I enabled Octane — what's wrong with my service binding?", "expect": "references memory-safety-and-config.md: singleton holding user state -> switch to scoped binding" },
+    { "prompt": "How do I choose between Swoole, RoadRunner, and FrankenPHP and configure workers for production?", "expect": "references setup-and-servers.md: server trade-offs, octane:install --server, swoole max_request + supervisor" }
+  ]
+}
