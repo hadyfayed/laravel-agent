@@ -1,0 +1,13 @@
+{
+  "skill": "mcp-make",
+  "cases": [
+    {
+      "prompt": "Create a new MCP tool called get_tickets for fetching Jira tickets",
+      "expect": "Scaffolds mcp/src/Tools/GetTicketsTool.php with PhpMcp attributes, parameters, and error handling"
+    },
+    {
+      "prompt": "Make a TypeScript MCP tool for running tests",
+      "expect": "Creates mcp/src/tools/run-tests.ts with input schema, handler function, and execute placeholder"
+    }
+  ]
+}
