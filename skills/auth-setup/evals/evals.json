@@ -1,0 +1,7 @@
+{
+  "skill": "auth-setup",
+  "cases": [
+    { "prompt": "/laravel-agent:auth-setup api", "expect": "installs/configures Sanctum token auth and reports routes + remaining .env keys without duplicating laravel-auth conventions" },
+    { "prompt": "/laravel-agent:auth-setup --authz=spatie", "expect": "installs spatie/laravel-permission, seeds roles/permissions, and points to laravel-auth for policy/gate conventions" }
+  ]
+}
