@@ -1,0 +1,13 @@
+{
+  "skill": "import-make",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:import-make ProductImport --model=Product",
+      "expect": "generates a complete CSV/Excel importer with validation, batching, error handling, and controller"
+    },
+    {
+      "prompt": "/laravel-agent:import-make UserImport --package=spatie",
+      "expect": "creates a lightweight streaming importer using spatie/simple-excel with chunked processing"
+    }
+  ]
+}
