@@ -6,9 +6,11 @@
 
 > AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.
 
-<!-- catalog:counts -->65 skills · 11 agents<!-- /catalog:counts -->
+<!-- catalog:counts -->66 skills · 11 agents<!-- /catalog:counts -->
 
 **[View Documentation](https://hadyfayed.github.io/laravel-agent/)**
+
+> **v3.0.0 — now skill-based.** The old colon commands (`/feature:make`) are now **skills** invoked as `/laravel-agent:<skill>` (e.g. `/laravel-agent:laravel-feature`). New to the tool? Run **`/laravel-agent:interactive`** for a guided "what do you want to build?" walkthrough. See the [CHANGELOG](CHANGELOG.md) for the full command→skill migration table, [CONTRIBUTING.md](CONTRIBUTING.md) for the skill architecture, and [CUSTOMIZATION.md](CUSTOMIZATION.md) to adapt it to your project. *(The command listing below is mid-migration to the new skill names.)*
 
 ## Features
 

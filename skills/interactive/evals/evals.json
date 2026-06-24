@@ -1,0 +1,7 @@
+{
+  "skill": "interactive",
+  "cases": [
+    { "prompt": "/laravel-agent:interactive", "expect": "greets, asks what the user wants to build, and offers the top-level intents (scaffold / setup / generate / review / learn)" },
+    { "prompt": "/laravel-agent:interactive I want to build an invoicing feature", "expect": "maps directly to a recommendation of /laravel-agent:laravel-feature with the invoicing brief and offers to run it" }
+  ]
+}
