@@ -16,7 +16,8 @@ export function parseFrontmatter(text) {
     if (mm) {
       const key = mm[1];
       const val = mm[2].trim();
-      if (val === '>' || val === '|') {
+      // Handle block scalars: >, |, >-, >+, |-, |+
+      if (val === '>' || val === '|' || val === '>-' || val === '>+' || val === '|-' || val === '|+') {
         // Collect following indented lines as a block scalar
         const parts = [];
         i++;
@@ -74,8 +75,11 @@ const BADGE = ({ skills, agents }) => `${skills.length} skills · ${agents.lengt
 
 export function applyCounts(text, data) {
   const re = /<!-- catalog:counts -->[\s\S]*?<!-- \/catalog:counts -->/;
+  if (!re.test(text)) {
+    throw new Error('Missing <!-- catalog:counts --> marker in text. The marker is required for applyCounts to work.');
+  }
   const block = `<!-- catalog:counts -->${BADGE(data)}<!-- /catalog:counts -->`;
-  return re.test(text) ? text.replace(re, block) : text;
+  return text.replace(re, block);
 }
 
 // Files whose embedded counts the generator owns. Each entry maps a path to a
