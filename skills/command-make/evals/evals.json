@@ -1,0 +1,13 @@
+{
+  "skill": "command-make",
+  "cases": [
+    {
+      "prompt": "Create a new command called feature:make for building features",
+      "expect": "Scaffolds commands/feature:make.md with command frontmatter, process steps, and execution logic placeholder"
+    },
+    {
+      "prompt": "I need a deploy command",
+      "expect": "Creates commands/deploy.md with frontmatter, input parsing, and report sections"
+    }
+  ]
+}
