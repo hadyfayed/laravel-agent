@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-performance",
+  "cases": [
+    { "prompt": "My Laravel app is slow and I'm hitting N+1 queries on the orders list — how do I fix and prevent it?", "expect": "recommends eager loading with(), preventLazyLoading, and references query-optimization.md" },
+    { "prompt": "I have a nested loop matching users to orders that gets exponentially slower — how do I optimize the Big O?", "expect": "replaces O(n²) loop with keyBy()/groupBy() O(1) lookup or eager-loaded relationships" },
+    { "prompt": "How should I cache an expensive featured-products query and invalidate it when products change?", "expect": "uses Cache::remember with TTL plus model saved/deleted cache invalidation from references/caching.md" }
+  ]
+}

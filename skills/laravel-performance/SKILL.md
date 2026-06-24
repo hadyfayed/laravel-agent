@@ -1,260 +1,57 @@
 ---
 name: laravel-performance
-description: >
-  Optimize Laravel application performance including caching, query optimization,
-  Big O complexity fixes, and scaling. Use when the user mentions slow performance, needs optimization,
-  or wants to improve speed. Triggers: "performance", "slow", "optimize", "speed",
-  "cache", "fast", "scaling", "bottleneck", "memory", "N+1", "Big O", "O(n)", "complexity", "nested loop", "quadratic".
-allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
+description: Laravel performance optimization — caching strategies, query and N+1 fixes, Big O complexity, Octane/queue tuning, profiling, scaling, and server tuning. Use when the app is slow, you need to optimize speed, reduce memory, fix bottlenecks, or scale for traffic. Triggers "performance", "slow", "optimize", "speed", "cache", "fast", "scaling", "bottleneck", "memory", "N+1", "Big O", "O(n)", "complexity", "nested loop", "quadratic".
 ---
 
 # Laravel Performance Skill
 
-Optimize Laravel applications for speed and scalability.
+Optimize Laravel applications for speed and scalability. Profile before optimizing, fix root causes over symptoms, and apply the right layer (query, cache, queue, or server) for each bottleneck.
 
 ## When to Use
 
-- Application is slow
-- Need to improve response times
-- Scaling for high traffic
-- Memory issues
-- Database bottlenecks
+- Application is slow or response times are high
+- Need to scale for high traffic
+- Memory issues or large-dataset processing
+- Database bottlenecks (slow queries, N+1, Big O)
+- Reviewing or tuning caching, queues, Octane, or PHP/server config
+
+## Conventions Checklist
+
+### Queries
+- [ ] Eager-load relations with `with()` — no lazy loading in loops
+- [ ] `Model::preventLazyLoading(!app()->isProduction())` enabled
+- [ ] Select only needed columns (`->select(['id','name'])`)
+- [ ] Use `chunk()` / `chunkById()` / `lazy()` / `cursor()` for large datasets
+- [ ] Use `->count()` / `->pluck()` at the query level, not collection methods
+- [ ] Add indexes for every `WHERE` / `ORDER BY` column and composite indexes for column pairs
+- [ ] Batch updates with `whereIn(...)->update(...)` instead of per-row queries
+
+### Big O
+- [ ] No nested loops over two collections — eager-load or `keyBy()` / `groupBy()` for O(1) lookup
+- [ ] Replace `contains()` in loops with `flip()->has()` (O(1))
+- [ ] Replace `filter()` per category with a pre-grouped map
+- [ ] Build strings via array + `implode()`, not repeated concatenation
+
+### Caching
+- [ ] Cache expensive queries with `Cache::remember()` and a TTL
+- [ ] Use cache tags (Redis/Memcached) for invalidatable groups
+- [ ] Invalidate model caches on `saved` / `deleted`
+- [ ] Never cache user-specific data without per-user keys
+
+### Async / Server
+- [ ] Queue slow request work (mail, imports, reports) via `->queue()` / `dispatch()`
+- [ ] Run `config:cache`, `route:cache`, `view:cache`, `event:cache` in production
+- [ ] Redis for cache, sessions, and queues
+- [ ] OPcache + JIT enabled; PHP-FPM tuned
+- [ ] Octane only with container-injected state (no statics)
 
 ## Quick Analysis
 
 ```bash
-# Check cache status
-php artisan about
-
-# Find N+1 queries
-php artisan dev:db:n1  # if devtoolbox installed
-
-# Check slow queries
-php artisan telescope  # if telescope installed
+php artisan about            # cache/optimization status
+php artisan db:show          # table & index overview
+php artisan telescope        # dev profiling (if installed)
 ```
-
-## Quick Wins
-
-### 1. Enable Caching
-```bash
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-php artisan event:cache
-```
-
-### 2. Fix N+1 Queries
-```php
-// Before (N+1)
-$posts = Post::all();
-foreach ($posts as $post) {
-    echo $post->author->name; // N+1!
-}
-
-// After (Eager loading)
-$posts = Post::with('author')->get();
-
-// Prevent in development
-Model::preventLazyLoading(!app()->isProduction());
-```
-
-### 3. Query Optimization
-```php
-// Select only needed columns
-User::select('id', 'name', 'email')->get();
-
-// Use chunking for large datasets
-User::chunk(1000, function ($users) {
-    // Process
-});
-
-// Add missing indexes
-Schema::table('orders', function ($table) {
-    $table->index(['user_id', 'status']);
-});
-```
-
-### 4. Cache Expensive Queries
-```php
-$products = Cache::remember('products:featured', 3600, function () {
-    return Product::featured()->with('category')->get();
-});
-```
-
-### 5. Fix Big O Complexity Issues
-
-Big O complexity issues cause exponential slowdowns as data grows. Identify and fix O(n²) patterns.
-
-```php
-// BAD: O(n²) - Nested loops
-foreach ($users as $user) {
-    foreach ($orders as $order) {
-        if ($order->user_id === $user->id) {
-            // Process - runs n×m times!
-        }
-    }
-}
-
-// GOOD: O(n) - Use relationships or keyBy
-$users = User::with('orders')->get();
-// Or index for O(1) lookup
-$ordersByUser = $orders->groupBy('user_id');
-foreach ($users as $user) {
-    $userOrders = $ordersByUser->get($user->id, collect());
-}
-
-// BAD: O(n²) - contains() in loop
-foreach ($newUsers as $userData) {
-    if (!$existingEmails->contains($userData['email'])) {
-        User::create($userData);
-    }
-}
-
-// GOOD: O(n) - Use flip() for O(1) lookup
-$existingEmails = User::pluck('email')->flip();
-foreach ($newUsers as $userData) {
-    if (!$existingEmails->has($userData['email'])) {
-        User::create($userData);
-    }
-}
-```
-
-## Redis Configuration
-
-```env
-CACHE_DRIVER=redis
-SESSION_DRIVER=redis
-QUEUE_CONNECTION=redis
-```
-
-## Laravel Octane
-
-```bash
-composer require laravel/octane
-php artisan octane:install
-php artisan octane:start --workers=4
-```
-
-## Performance Checklist
-
-| Area | Action |
-|------|--------|
-| Queries | Add indexes, eager load, select specific columns |
-| Big O | Avoid nested loops, use keyBy/groupBy for O(1) lookups |
-| Caching | Redis for cache/sessions, cache expensive queries |
-| Assets | CDN, minification, compression |
-| PHP | OPcache, JIT (PHP 8.1+) |
-| Server | Nginx tuning, HTTP/2, gzip |
-
-## Laravel Pulse Setup
-
-```bash
-composer require laravel/pulse
-php artisan vendor:publish --provider="Laravel\Pulse\PulseServiceProvider"
-php artisan migrate
-```
-
-```php
-// config/pulse.php
-'ingest' => [
-    'trim_lottery' => [1, 1000], // Run trim 1 in 1000 requests
-],
-
-'recorders' => [
-    Recorders\SlowQueries::class => [
-        'threshold' => 100, // Log queries > 100ms
-    ],
-    Recorders\SlowJobs::class => [
-        'threshold' => 1000, // Log jobs > 1s
-    ],
-],
-```
-
-## Database Optimization
-
-```php
-// Prevent lazy loading in development
-Model::preventLazyLoading(!app()->isProduction());
-
-// Use cursor for memory efficiency
-User::cursor()->each(function (User $user) {
-    // Process one at a time, low memory
-});
-
-// Use lazy collections
-User::lazy()->each(function (User $user) {
-    // Memory efficient iteration
-});
-
-// Batch operations
-User::where('active', false)
-    ->chunkById(1000, function ($users) {
-        $users->each->delete();
-    });
-```
-
-## Memory Optimization
-
-```php
-// Clear query log in long processes
-DB::disableQueryLog();
-
-// Unset large variables
-unset($largeDataset);
-
-// Use generators for large data
-function processLargeFile($path): Generator
-{
-    $handle = fopen($path, 'r');
-    while (($line = fgets($handle)) !== false) {
-        yield $line;
-    }
-    fclose($handle);
-}
-```
-
-## View Optimization
-
-```php
-// Fragment caching
-@cache('sidebar-' . auth()->id(), 3600)
-    <div class="sidebar">
-        {{ $heavyComputation }}
-    </div>
-@endcache
-
-// Or use blade cache
-@cache('key')
-    Expensive content
-@endcache
-```
-
-## API Response Optimization
-
-```php
-// Use API Resources with conditional attributes
-final class ProductResource extends JsonResource
-{
-    public function toArray($request): array
-    {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            // Only include when needed
-            'reviews' => $this->when(
-                $request->include === 'reviews',
-                ReviewResource::collection($this->reviews)
-            ),
-        ];
-    }
-}
-```
-
-## Monitoring
-
-- **Laravel Telescope** - Development profiling
-- **Laravel Pulse** - Production monitoring
-- **Debugbar** - Request profiling
 
 ## Optimization Targets
 
@@ -267,110 +64,36 @@ final class ProductResource extends JsonResource
 
 ## Common Pitfalls
 
-1. **Caching Without Invalidation** - Stale data issues
-   ```php
-   // Bad - no way to invalidate
-   Cache::forever('products', $products);
+1. **N+1 queries** — eager load with `with()`
+2. **Big O (nested loops / `contains()` in loops)** — `keyBy()` / `flip()->has()`
+3. **`SELECT *` and `->get()->pluck()`** — select/aggregate at query level
+4. **Missing indexes** — index `WHERE` + `ORDER BY` columns
+5. **No chunking** — `chunk()` / `lazy()` for large datasets
+6. **Cache without invalidation** — tags or short TTL
+7. **Heavy work in requests** — push to a queue
+8. **Uncached routes/config** — `php artisan optimize`
 
-   // Good - use tags or short TTL
-   Cache::tags(['products'])->put('all', $products, 3600);
-   Cache::tags(['products'])->flush(); // Invalidate
-   ```
+## Package Integration
 
-2. **Eager Loading Too Much** - Loading unused relations
-   ```php
-   // Bad - loading everything
-   Post::with('author', 'comments', 'tags', 'category')->get();
-
-   // Good - load only what's needed
-   Post::with('author')->get();
-   ```
-
-3. **Not Using Database Indexes** - Slow queries
-   ```php
-   // Add indexes for where/orderBy columns
-   Schema::table('orders', function (Blueprint $table) {
-       $table->index(['user_id', 'created_at']);
-       $table->index('status');
-   });
-   ```
-
-4. **Heavy Operations in Requests** - Slow response
-   ```php
-   // Bad - sync in request
-   foreach ($users as $user) {
-       Mail::send(new WelcomeEmail($user));
-   }
-
-   // Good - queue it
-   foreach ($users as $user) {
-       Mail::queue(new WelcomeEmail($user));
-   }
-   ```
-
-5. **Not Using Query Builder Methods**
-   ```php
-   // Bad - fetches all columns
-   User::where('active', true)->get()->pluck('id');
-
-   // Good - only fetches id
-   User::where('active', true)->pluck('id');
-   ```
-
-6. **Forgetting Route Caching** - Slow route resolution
-   ```bash
-   # Always run in production
-   php artisan route:cache
-   ```
-
-7. **Big O Complexity Issues** - Exponential slowdowns
-   ```php
-   // Bad - O(n²) nested loops
-   foreach ($users as $user) {
-       foreach ($orders as $order) {
-           if ($order->user_id === $user->id) { /* ... */ }
-       }
-   }
-
-   // Good - O(n) with indexed lookups
-   $ordersByUser = $orders->groupBy('user_id');
-   foreach ($users as $user) {
-       $userOrders = $ordersByUser->get($user->id, collect());
-   }
-   ```
-
-8. **contains() in Loops** - Hidden O(n²)
-   ```php
-   // Bad - contains() is O(n), called n times = O(n²)
-   foreach ($items as $item) {
-       if ($collection->contains($item->id)) { /* ... */ }
-   }
-
-   // Good - flip() once, has() is O(1)
-   $lookup = $collection->pluck('id')->flip();
-   foreach ($items as $item) {
-       if ($lookup->has($item->id)) { /* ... */ }
-   }
-   ```
-
-## Best Practices
-
-- Profile before optimizing
-- Fix root causes, not symptoms
-- Cache at appropriate levels
-- Use queues for slow operations
-- Monitor production performance
-- Use database indexes strategically
-- Prevent lazy loading in development
-- Use Pulse for production insights
-- Avoid O(n²) patterns - use keyBy/groupBy for O(1) lookups
-- Use flip()->has() instead of contains() in loops
+- **barryvdh/laravel-debugbar** — request/query profiling (dev)
+- **laravel/telescope** — development profiling
+- **laravel/pulse** — production monitoring
+- **beyondcode/laravel-query-detector** — N+1 detection
+- **laravel/horizon** — queue monitoring
+- **laravel/octane** — high-performance application server
 
 ## Related Commands
 
-- `/laravel-agent:db:optimize` - Database optimization
+- `/laravel-agent:db:optimize` — analyze and optimize database queries
 
 ## Related Skills
 
-- `laravel-database` - Query patterns and N+1 fixes
-- `laravel-queue` - Offload work to background jobs
+- `laravel-database` — migration/schema/index conventions and N+1 patterns
+- `laravel-queue` — offload work to background jobs
+- `laravel-octane` — Octane server setup and safety
+
+## Additional references
+
+- Caching strategies (query cache, model cache, Redis, fragments) → [references/caching.md](references/caching.md)
+- Query & Big-O optimization (N+1, chunking, indexes, O(n²) fixes) → [references/query-optimization.md](references/query-optimization.md)
+- Profiling, scaling & server tuning (Octane, queues, Pulse, OPcache, Nginx, benchmarking) → [references/profiling-and-scaling.md](references/profiling-and-scaling.md)
