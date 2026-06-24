@@ -82,7 +82,8 @@ From `<Name>` (e.g. `Invoices`):
 Before scaffolding, read the reference files relevant to the feature:
 
 - **For models, migrations, controllers, policies, service providers, and tests**: Read `${CLAUDE_SKILL_DIR}/references/templates.md` to apply project-standardized code stubs.
-- **For billing/subscriptions, file handling, storage, notifications, monitoring, or external integrations**: Read `${CLAUDE_SKILL_DIR}/references/billing.md` for detailed patterns and boilerplate.
+- **For billing/subscriptions**: Read `${CLAUDE_SKILL_DIR}/references/billing.md` — it delegates to the **laravel-cashier** skill to keep billing domain knowledge centralized. Scaffold the core feature here; use laravel-cashier for subscription/payment logic.
+- **For file handling, storage, notifications, monitoring, or external integrations**: Consult the appropriate specialist skills (laravel-storage, laravel-notification, etc.).
 
 Check installed packages before generating code and apply the relevant traits/interfaces when a package is present and the brief implies its use (file uploads → MediaLibrary, audit trail → Activitylog, etc.).
 
