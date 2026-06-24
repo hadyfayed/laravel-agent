@@ -16,16 +16,16 @@ nav_active: Home
 
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <a href="{{ '/agents.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
-            <div class="text-3xl font-bold mb-1">23</div>
-            <div class="text-sm text-muted-foreground">Specialized Agents</div>
-        </a>
-        <a href="{{ '/commands.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
-            <div class="text-3xl font-bold mb-1">42</div>
-            <div class="text-sm text-muted-foreground">Commands</div>
+            <div class="text-3xl font-bold mb-1">{{ site.data.catalog.counts.agents }}</div>
+            <div class="text-sm text-muted-foreground">Agents</div>
         </a>
         <a href="{{ '/skills.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
-            <div class="text-3xl font-bold mb-1">12</div>
-            <div class="text-sm text-muted-foreground">Auto-Invoked Skills</div>
+            <div class="text-3xl font-bold mb-1">{{ site.data.catalog.counts.skills }}</div>
+            <div class="text-sm text-muted-foreground">Skills</div>
+        </a>
+        <a href="{{ '/hooks.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
+            <div class="text-3xl font-bold mb-1">9</div>
+            <div class="text-sm text-muted-foreground">Hooks</div>
         </a>
         <a href="#packages" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
             <div class="text-3xl font-bold mb-1">85+</div>

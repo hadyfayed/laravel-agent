@@ -110,6 +110,13 @@ export function run({ check } = {}) {
   const catalogPath = join(ROOT, 'CATALOG.md');
   const curCatalog = existsSync(catalogPath) ? readFileSync(catalogPath, 'utf8') : '';
   if (curCatalog !== catalog) { diffs.push('CATALOG.md'); if (!check) writeFileSync(catalogPath, catalog); }
+
+  // Write catalog.json data file for Jekyll
+  const catalogJsonPath = join(ROOT, 'docs', '_data', 'catalog.json');
+  const catalogJson = JSON.stringify({ skills: data.skills, agents: data.agents, counts: counts(data) }, null, 2);
+  const curCatalogJson = existsSync(catalogJsonPath) ? readFileSync(catalogJsonPath, 'utf8') : '';
+  if (curCatalogJson !== catalogJson) { diffs.push('docs/_data/catalog.json'); if (!check) writeFileSync(catalogJsonPath, catalogJson); }
+
   for (const { path, fn } of targets(data)) {
     const p = join(ROOT, path);
     if (!existsSync(p)) continue;
