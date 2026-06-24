@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-horizon",
+  "cases": [
+    { "prompt": "Set up Laravel Horizon with auto-scaling supervisors for production", "expect": "references balance=auto + autoScalingStrategy + per-environment maxProcesses from references/supervisors-and-configuration.md" },
+    { "prompt": "Why do my Horizon workers keep using old code after deploy?", "expect": "references horizon:terminate on deploy + Supervisor restart from references/operations-and-monitoring.md" },
+    { "prompt": "Configure Slack alerts when Horizon jobs wait too long", "expect": "references routeLongWaitTimeNotificationsTo from references/operations-and-monitoring.md" }
+  ]
+}
