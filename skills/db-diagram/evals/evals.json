@@ -1,0 +1,13 @@
+{
+  "skill": "db-diagram",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:db-diagram",
+      "expect": "generates a complete database schema diagram in Mermaid ERD format showing all tables, columns, relationships, and cardinalities"
+    },
+    {
+      "prompt": "/laravel-agent:db-diagram dbml users,orders",
+      "expect": "generates a DBML-format schema for users and orders tables with foreign key relationships"
+    }
+  ]
+}
