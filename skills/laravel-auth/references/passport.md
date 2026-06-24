@@ -17,7 +17,7 @@ Use **Sanctum** instead when:
 - Don't need OAuth2 complexity
 - Want lighter weight solution
 
-# Passport vs Sanctum
+# Password Grant (First-Party Apps) vs Sanctum
 
 | Feature | Passport | Sanctum |
 |---------|----------|---------|
@@ -325,7 +325,7 @@ Route::middleware(['client'])->group(function () {
 });
 ```
 
-### 3. Password Grant (First-Party APPS)
+### 3. Password Grant (First-Party Apps)
 
 **Use Case:** Your own mobile/desktop apps (Deprecated in OAuth2.1)
 

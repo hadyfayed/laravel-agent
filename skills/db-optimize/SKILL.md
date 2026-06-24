@@ -66,71 +66,15 @@ Analyze a Laravel application for database performance issues and recommend opti
 
 ## Output Report
 
-Generate a prioritized report with:
-
-### N+1 Queries
-| File | Line | Relationship | Current | Fix |
-|------|------|--------------|---------|-----|
-| OrderController:45 | 45 | user | `$order->user` in loop | `with('user')` |
-| UserController:23 | 23 | roles | `$user->roles` in loop | `with('roles')` |
-
-### Big O Issues
-| File | Line | Pattern | Complexity | Fix |
-|------|------|---------|------------|-----|
-| ImportService:42 | 42 | Nested loops | O(n²) | Use `groupBy()` or keyed collection |
-| SyncService:85 | 85 | `contains()` in loop | O(n²) | Use `flip()->has()` for O(1) |
-
-### Missing Indexes
-| Table | Column(s) | Query Pattern | Priority |
-|-------|-----------|---------------|----------|
-| orders | user_id | WHERE user_id = ? | High |
-| users | email | WHERE email = ? | High |
-| orders | (user_id, status) | WHERE user_id AND status | Medium |
-
-### Index Recommendations
-```sql
-ALTER TABLE orders ADD INDEX idx_user_id (user_id);
-ALTER TABLE users ADD INDEX idx_email (email);
-ALTER TABLE orders ADD INDEX idx_user_status (user_id, status);
-```
+Generate a prioritized markdown report with:
+- **N+1 Queries** — file, line, relationship, and eager loading fix
+- **Big O Issues** — nested loops, contains() in loops, array searches, and fixes
+- **Missing Indexes** — table, column(s), query pattern, and SQL recommendations
+- **Optimization Checklist** — eager loading, withCount(), schema efficiency
 
 ## Laravel Relationship Optimization
 
-### Eager Loading
-```php
-// N+1 issue
-foreach (Order::all() as $order) {
-    echo $order->user->name;
-}
-
-// Fixed with eager loading
-foreach (Order::with('user')->get() as $order) {
-    echo $order->user->name;
-}
-```
-
-### Relationship Counts
-```php
-// N+1 issue — COUNT query per order
-foreach ($orders as $order) {
-    echo $order->items()->count();
-}
-
-// Fixed with withCount()
-$orders = Order::withCount('items')->get();
-foreach ($orders as $order) {
-    echo $order->items_count;
-}
-```
-
-### Nested Relationships
-```php
-// N+1 on nested relationships
-Order::with('items')->get()->each(fn($o) => $o->items->each(fn($i) => $i->product));
-
-// Fixed with nested eager loading
-Order::with('items.product')->get();
-```
+See `references/n1-patterns.md`, `references/bigO-patterns.md`, and `references/index-strategy.md` for detailed patterns, code examples, and optimization strategies.
 
 ## Reference
 

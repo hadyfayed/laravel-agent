@@ -10,13 +10,13 @@
 
 **[View Documentation](https://hadyfayed.github.io/laravel-agent/)**
 
-> **v3.0.0 — now skill-based.** The old colon commands (`/feature:make`) are now **skills** invoked as `/laravel-agent:<skill>` (e.g. `/laravel-agent:laravel-feature`). New to the tool? Run **`/laravel-agent:interactive`** for a guided "what do you want to build?" walkthrough. See the [CHANGELOG](CHANGELOG.md) for the full command→skill migration table, [CONTRIBUTING.md](CONTRIBUTING.md) for the skill architecture, and [CUSTOMIZATION.md](CUSTOMIZATION.md) to adapt it to your project. *(The command listing below is mid-migration to the new skill names.)*
+> **v3.0.0 — skill-based.** The old colon commands (`/feature:make`) are now **skills** invoked as `/laravel-agent:<skill>` (e.g. `/laravel-agent:laravel-feature`). New to the tool? Run **`/laravel-agent:interactive`** for a guided "what do you want to build?" walkthrough. See [CHANGELOG.md](CHANGELOG.md) for the full command→skill migration table, [CONTRIBUTING.md](CONTRIBUTING.md) for the skill architecture, and [CUSTOMIZATION.md](CUSTOMIZATION.md) to adapt it to your project.
 
 ## Features
 
 - **Single Plugin Install** - One command installs everything
 - **Pre-configured Hooks** - Laravel linting and auto-formatting on file changes
-- **MCP Extension** - Complements Laravel Boost with testing, queue, and performance tools
+- **MCP Extension** - (experimental) Proposed Artisan-backed tools; see `mcp/README`
 - **SOLID/DRY Enforcement** - Every generated code follows best practices
 - **Pattern Limit** - Max 5 design patterns per project to prevent complexity
 - **Multi-Tenancy Support** - Optional tenant isolation (opt-in, not forced)
@@ -32,102 +32,115 @@
 /plugin install laravel-agent@hadyfayed-laravel-agent
 ```
 
-## Available Commands
+## Available Skills
 
-### Core
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:build` | Intelligent build - architect analyzes and delegates |
-| `/laravel-agent:patterns` | View current pattern usage (max 5) |
+### Architecture & Builders (11 scaffolder)
+- **`/laravel-agent:build`** — Intelligent build: architect analyzes requests and delegates to appropriate builder
+- **`/laravel-agent:laravel-feature`** — Scaffold a complete feature (controllers, requests, models, migrations, tests)
+- **`/laravel-agent:laravel-module`** — Scaffold a reusable domain module
+- **`/laravel-agent:laravel-service`** — Scaffold a service or action class
+- **`/laravel-agent:scaffold-app`** — Full app scaffolding from natural language description
+- **`/laravel-agent:laravel-api`** — Scaffold a REST/JSON API with versioning
+- **`/laravel-agent:laravel-review`** — Review code, PRs, staged changes for quality/security
+- **`/laravel-agent:laravel-refactor`** — Refactor code for SOLID/DRY compliance
+- **`/laravel-agent:plugin-scaffold`** — Scaffold Claude Code plugin artifacts
+- **`/laravel-agent:security-audit`** — OWASP security audit with confidence scoring
+- **`/laravel-agent:test-make`** — Generate Pest/PHPUnit tests (unit, feature, API, Dusk)
 
-### Builders
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:feature:make` | Create complete feature (CRUD, views, API, tests) |
-| `/laravel-agent:module:make` | Create reusable domain module |
-| `/laravel-agent:service:make` | Create service or action |
-| `/laravel-agent:scaffold:app` | Full app scaffolding from natural language description |
-
-### API
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:api:make` | Create versioned API resource |
-| `/laravel-agent:api:docs` | Generate OpenAPI documentation |
-
-### Testing
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:test:make` | Generate Pest tests |
-| `/laravel-agent:test:coverage` | Run coverage analysis |
+### Testing & Quality
+- **`/laravel-agent:test-coverage`** — Run test coverage and identify gaps
+- **`/laravel-agent:laravel-testing`** — Test patterns, assertions, TDD guidance
 
 ### Database
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:db:optimize` | Optimize queries and indexes |
-| `/laravel-agent:db:diagram` | Generate ER diagram |
+- **`/laravel-agent:db-optimize`** — Optimize queries, detect N+1 and Big O issues, suggest indexes
+- **`/laravel-agent:db-diagram`** — Generate ER diagram (Mermaid, DBML, PlantUML)
+- **`/laravel-agent:laravel-database`** — Database conventions, migrations, relationships, optimization
 
-### Frontend
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:livewire:make` | Create Livewire 3 component |
-| `/laravel-agent:filament:make` | Create Filament resource |
+### Frontend & UI
+- **`/laravel-agent:laravel-livewire`** — Build Livewire 3 components and reactive forms
+- **`/laravel-agent:laravel-filament`** — Build Filament v3/v4 admin panels with RBAC
+- **`/laravel-agent:laravel-inertia`** — Build Inertia.js SPAs with Vue 3 or React
 
-### Auth & Security
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:auth:setup` | Setup authentication |
-| `/laravel-agent:security:audit` | Run OWASP security audit |
+### API & Integration
+- **`/laravel-agent:api-docs`** — Generate OpenAPI documentation
+- **`/laravel-agent:laravel-passport`** — Full OAuth2 server implementation
+- **`/laravel-agent:laravel-sanctum`** — API token and SPA authentication
+- **`/laravel-agent:webhook-make`** — Scaffold webhook infrastructure with signature verification
 
-### Async & Notifications
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:job:make` | Create queued job |
-| `/laravel-agent:broadcast:make` | Create broadcast event |
-| `/laravel-agent:notification:make` | Create multi-channel notification (55+ channels) or setup channel |
+### Authentication & Authorization
+- **`/laravel-agent:auth-setup`** — Set up authentication (Sanctum/Fortify/Breeze)
+- **`/laravel-agent:laravel-auth`** — Auth patterns, guards, policies, roles & permissions
 
-### AI & Content
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:ai:make` | Create AI-powered feature (Prism PHP) |
-| `/laravel-agent:bug:fix` | AI-assisted bug fixing |
-| `/laravel-agent:docs:generate` | Generate documentation |
-| `/laravel-agent:pdf:make` | Generate PDF templates (invoices, reports) |
-| `/laravel-agent:seo:setup` | Setup SEO infrastructure (sitemaps, meta tags, Open Graph) |
-| `/laravel-agent:geo:make` | Create geolocation features |
+### Background Jobs & Async
+- **`/laravel-agent:job-make`** — Create queued jobs with retries/backoff
+- **`/laravel-agent:broadcast-make`** — Create broadcast events and channels
+- **`/laravel-agent:notification-make`** — Multi-channel notifications (mail, SMS, Telegram, Discord, Slack, etc.)
+- **`/laravel-agent:laravel-queue`** — Job batching, chains, event listeners, Horizon integration
 
-### DevOps & Infrastructure
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:deploy:setup` | Setup deployment (Forge, Vapor, Docker) |
-| `/laravel-agent:cicd:setup` | Setup CI/CD pipeline |
-| `/laravel-agent:reverb:setup` | Setup Laravel Reverb WebSockets |
-| `/laravel-agent:feature-flag:make` | Create feature flag (Pennant) |
-| `/laravel-agent:migrate:from-legacy` | Migrate from legacy codebase |
-| `/laravel-agent:backup:setup` | Configure automated backups (spatie/laravel-backup) |
-| `/laravel-agent:health:setup` | Setup health monitoring (spatie/laravel-health) |
-| `/laravel-agent:search:setup` | Configure Scout + Meilisearch/Algolia/Typesense |
-| `/laravel-agent:telescope:setup` | Setup Laravel Telescope for debugging |
-| `/laravel-agent:pulse:setup` | Setup Laravel Pulse for production monitoring |
+### Real-Time & WebSockets
+- **`/laravel-agent:reverb-setup`** — Configure Laravel Reverb WebSocket server
+- **`/laravel-agent:laravel-websocket`** — WebSocket patterns, broadcasting, scaling
 
-### Data & Integration
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:dto:make` | Create Data Transfer Objects (spatie/laravel-data) |
-| `/laravel-agent:webhook:make` | Create webhook handlers (Stripe, GitHub, etc.) |
-| `/laravel-agent:import:make` | Create CSV/Excel importers |
-| `/laravel-agent:upgrade:laravel` | Automated Laravel version upgrades |
+### Monitoring & Observability
+- **`/laravel-agent:telescope-setup`** — Install Telescope for debugging and request inspection
+- **`/laravel-agent:pulse-setup`** — Configure Laravel Pulse for production monitoring
+- **`/laravel-agent:health-setup`** — Configure application health checks and monitoring
 
-### Code Review & Git
-| Command | Description |
-|---------|-------------|
-| `/laravel-agent:review:staged` | Review staged changes |
-| `/laravel-agent:review:pr` | Review pull request |
-| `/laravel-agent:review:audit` | Full code audit |
-| `/laravel-agent:analyze:codebase` | Full codebase health report |
-| `/laravel-agent:refactor` | Refactor code for SOLID/DRY |
-| `/laravel-agent:git:commit` | Create conventional commit |
-| `/laravel-agent:git:pr` | Create pull request |
-| `/laravel-agent:git:release` | Create release |
+### Search & Performance
+- **`/laravel-agent:search-setup`** — Set up Scout with Algolia/Meilisearch/Typesense
+- **`/laravel-agent:laravel-scout`** — Full-text search patterns and optimization
+- **`/laravel-agent:laravel-performance`** — Performance optimization (caching, N+1 fixes, scaling)
+- **`/laravel-agent:laravel-octane`** — High-performance servers (Swoole, RoadRunner, FrankenPHP)
+- **`/laravel-agent:laravel-horizon`** — Redis queue dashboard and auto-scaling
+
+### AI & Content Generation
+- **`/laravel-agent:ai-make`** — Create AI features with Prism PHP (chat, embeddings, tool-calling)
+- **`/laravel-agent:bug-fix`** — Systematically diagnose and fix bugs
+- **`/laravel-agent:docs-generate`** — Generate project documentation
+- **`/laravel-agent:pdf-make`** — Generate PDF documents (invoices, reports, certificates)
+- **`/laravel-agent:seo-setup`** — Configure SEO infrastructure (sitemaps, meta tags, schema)
+- **`/laravel-agent:geo-make`** — Create geolocation features with distance queries
+
+### Data & Imports
+- **`/laravel-agent:dto-make`** — Create Data Transfer Objects (spatie/laravel-data)
+- **`/laravel-agent:import-make`** — Create CSV/Excel importers with validation
+- **`/laravel-agent:analyze-codebase`** — Comprehensive codebase health report
+
+### Deployment & DevOps
+- **`/laravel-agent:deploy-setup`** — Configure deployment (Forge/Vapor/Docker)
+- **`/laravel-agent:cicd-setup`** — Set up CI/CD pipelines (GitHub Actions/GitLab/Bitbucket)
+- **`/laravel-agent:laravel-deploy`** — Deployment patterns, zero-downtime releases
+
+### Billing & Subscriptions
+- **`/laravel-agent:laravel-cashier`** — Stripe/Paddle subscriptions, invoices, webhooks
+
+### Features & Patterns
+- **`/laravel-agent:feature-flag-make`** — Create feature flags (Pennant)
+- **`/laravel-agent:laravel-patterns`** — Design patterns (Action, Service, Repository, DTO, Strategy)
+
+### Utilities & Framework
+- **`/laravel-agent:backup-setup`** — Configure automated backups (spatie/laravel-backup)
+- **`/laravel-agent:migrate-from-legacy`** — Migrate legacy apps/databases into Laravel
+- **`/laravel-agent:upgrade-laravel`** — Upgrade Laravel/PHP versions with breaking changes
+- **`/laravel-agent:laravel-build`** — Run full build pipeline (Pint, PHPStan, tests, assets)
+- **`/laravel-agent:command-make`** — Create custom Artisan commands
+- **`/laravel-agent:mcp-make`** — Scaffold MCP tools/servers
+- **`/laravel-agent:skill-make`** — Create new skills
+- **`/laravel-agent:agent-make`** — Create new agents
+- **`/laravel-agent:git-commit`** — Create conventional commits
+- **`/laravel-agent:git-pr`** — Create pull requests
+- **`/laravel-agent:git-release`** — Cut releases with version bumps and tags
+- **`/laravel-agent:interactive`** — Guided mode to pick the right skill for your task
+- **`/laravel-agent:package-make`** — Scaffold reusable Laravel packages
+- **`/laravel-agent:plugin-publish`** — Publish plugins to marketplace
+- **`/laravel-agent:laravel-socialite`** — OAuth social authentication
+
+### Security & Best Practices
+- **`/laravel-agent:laravel-security`** — OWASP best practices, XSS/CSRF/injection prevention
+- **`/laravel-agent:laravel-nova`** — Laravel Nova admin panels
+- **`/laravel-agent:laravel-health`** — Health check patterns and monitoring
+
+**New to laravel-agent?** Start with `/laravel-agent:interactive` for a guided walkthrough of what you want to build.
 
 ## Usage Examples
 

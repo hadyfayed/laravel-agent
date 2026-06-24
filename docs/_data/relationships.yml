@@ -17,7 +17,7 @@ commands:
   module-make:
     agent: laravel-module
     related_commands: [build, feature-make, service-make]
-    skills: [laravel-feature]
+    skills: [laravel-module]
     description: "Creates reusable domain modules"
 
   service-make:
