@@ -1,0 +1,13 @@
+{
+  "skill": "analyze-codebase",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:analyze-codebase",
+      "expect": "generates a comprehensive health report with architecture, quality, security, performance, testing, and dependency analyses"
+    },
+    {
+      "prompt": "/laravel-agent:analyze-codebase --focus=security",
+      "expect": "generates a focused security audit identifying SQL injection, XSS, auth, and dependency vulnerabilities"
+    }
+  ]
+}
