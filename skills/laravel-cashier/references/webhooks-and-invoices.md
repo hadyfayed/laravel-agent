@@ -2,6 +2,19 @@
 
 Webhook handling, invoices, checkout sessions, and Stripe CLI testing for Laravel Cashier (Stripe). These handlers also fire notifications provisioned in the subscription flow.
 
+## Contents
+
+- [Invoices and Receipts](#invoices-and-receipts)
+- [Checkout Sessions (Stripe)](#checkout-sessions-stripe)
+- [Webhooks Handling](#webhooks-handling)
+- [Webhook Handler (with Notifications and Provisioning)](#webhook-handler-with-notifications-and-provisioning)
+- [Stripe Checkout (with Customer Portal)](#stripe-checkout-with-customer-portal)
+- [Subscription Plans View](#subscription-plans-view)
+- [Routes](#routes)
+- [Subscription Middleware](#subscription-middleware)
+- [Testing with Stripe CLI](#testing-with-stripe-cli)
+- [Pest Tests](#pest-tests)
+
 ## Invoices and Receipts
 
 ### Accessing Invoices (Stripe)

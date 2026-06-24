@@ -2,6 +2,20 @@
 
 Implement full-featured OAuth2 server with Laravel Passport for third-party API access.
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [OAuth2 Grant Types](#oauth2-grant-types)
+- [Token Scopes](#token-scopes)
+- [Personal Access Tokens](#personal-access-tokens)
+- [OAuth Client Management](#oauth-client-management)
+- [Consuming Your Own API](#consuming-your-own-api)
+- [Token Lifetimes](#token-lifetimes)
+- [Revoking Tokens](#revoking-tokens)
+- [Middleware and Guards](#middleware-and-guards)
+
 ## When to Use
 
 Use **Passport** when:
