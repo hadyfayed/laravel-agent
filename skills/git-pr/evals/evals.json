@@ -1,0 +1,13 @@
+{
+  "skill": "git-pr",
+  "cases": [
+    {
+      "prompt": "Create a pull request for this branch",
+      "expect": "Validates current branch, pushes to remote, and creates PR via gh pr create with base=main"
+    },
+    {
+      "prompt": "Create a draft PR to develop",
+      "expect": "Creates draft PR (--draft flag) with base=develop"
+    }
+  ]
+}
