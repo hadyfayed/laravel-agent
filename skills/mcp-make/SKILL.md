@@ -1,8 +1,6 @@
 ---
 name: mcp-make
-description: >
-  Scaffold an MCP tool/server for a Claude Code plugin (PhpMcp attributes, TypeScript schema, or config).
-  Use when adding MCP tools to extend capabilities.
+description: Scaffold an MCP tool or server (PHP/TypeScript); when adding MCP capabilities to a plugin.
 disable-model-invocation: true
 allowed-tools: Read Write Edit Bash(mkdir *) Bash(test *) Bash(find *)
 argument-hint: "<tool-name> [--type=php|typescript]"

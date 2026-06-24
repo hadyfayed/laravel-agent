@@ -1,6 +1,6 @@
 ---
 name: laravel-feature
-description: Scaffold a complete Laravel feature module (controllers, requests, resources, models, migrations, policies, tests). Use when building a new feature or CRUD module.
+description: Scaffold a complete Laravel feature module — controllers, requests, resources, models, migrations, policies, tests; when building a new feature or CRUD (NOT for entire app; use scaffold-app).
 context: fork
 agent: laravel-feature
 argument-hint: "[feature name and brief]"

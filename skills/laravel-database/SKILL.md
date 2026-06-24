@@ -1,6 +1,6 @@
 ---
 name: laravel-database
-description: Laravel database conventions — safe migrations, Eloquent relationships, N+1 and Big-O query optimization, indexing. Use when writing migrations, models, queries, fixing slow queries, or reviewing database code.
+description: Reference on Laravel database conventions — migrations, Eloquent relationships, N+1 and Big-O query optimization, indexing; when learning or reviewing database code (NOT for optimizing performance; use db-optimize).
 ---
 
 # Laravel Database Skill

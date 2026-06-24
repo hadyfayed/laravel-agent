@@ -1,6 +1,6 @@
 ---
 name: laravel-review
-description: Review code, a pull request, staged changes, or a path across security, quality, Laravel best practices, and testing — each finding scored by severity and confidence (>= 80% only). Use when reviewing a PR, auditing a diff, or checking staged changes before commit. Triggers: "review pr", "code review", "review diff", "review staged", "audit code", "review this", "pr review".
+description: Review code, a pull request, staged changes, or a path across security, quality, Laravel best practices, and testing; when reviewing a PR, auditing a diff, or checking staged changes (NOT for running a dedicated security audit; use security-audit).
 context: fork
 agent: laravel-review
 argument-hint: "[PR number or 'staged' or path]"

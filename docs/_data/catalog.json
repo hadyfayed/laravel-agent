@@ -3,7 +3,7 @@
     {
       "name": "agent-make",
       "kind": "utility",
-      "description": "Scaffold a new Claude Code agent file (.md with frontmatter, role, capabilities, and workflow). Use when creating a plugin agent."
+      "description": "Scaffold a Claude Code agent with role, capabilities, and workflow; when creating a plugin agent."
     },
     {
       "name": "ai-make",
@@ -18,7 +18,7 @@
     {
       "name": "auth-setup",
       "kind": "utility",
-      "description": "Set up Laravel authentication — Sanctum/Fortify/Breeze, guards, roles & permissions (Spatie/Laratrust), policies, social login, 2FA. Triggers: \"set up auth\", \"configure authentication\", \"add login\", \"roles and permissions\", \"API tokens\", \"Sanctum\", \"Passport\"."
+      "description": "SET UP Laravel authentication with Sanctum/Fortify/Breeze, guards, roles & permissions, policies, social login, 2FA; when initializing auth in a new project (NOT for reference questions)."
     },
     {
       "name": "backup-setup",
@@ -43,7 +43,7 @@
     {
       "name": "command-make",
       "kind": "utility",
-      "description": "Scaffold a new Claude Code slash-command file (frontmatter + prompt body). Use when creating a plugin command."
+      "description": "Scaffold a Claude Code slash-command with frontmatter and prompt; when creating a plugin command."
     },
     {
       "name": "db-diagram",
@@ -53,7 +53,7 @@
     {
       "name": "db-optimize",
       "kind": "utility",
-      "description": "Optimize database performance by analyzing queries, detecting N+1 and Big O issues, suggesting indexes, and recommending query tuning; when improving database performance."
+      "description": "Optimize database performance by analyzing queries, detecting N+1 and Big O issues, suggesting indexes, and recommending query tuning; when improving database speed (NOT for database conventions; use laravel-database)."
     },
     {
       "name": "deploy-setup",
@@ -123,7 +123,7 @@
     {
       "name": "laravel-auth",
       "kind": "reference",
-      "description": "Laravel authentication & authorization — login, register, guards, policies, gates, roles & permissions, API tokens (Sanctum), OAuth2 (Passport), social login (Socialite), 2FA. Use when wiring up auth, access control, or tokens."
+      "description": "Wiring up Laravel authentication & authorization — login, register, guards, policies, gates, roles, permissions, API tokens (Sanctum), OAuth2 (Passport), social login (Socialite), 2FA; NOT for Passport/Sanctum/Socialite alone (use those references instead)."
     },
     {
       "name": "laravel-build",
@@ -138,7 +138,7 @@
     {
       "name": "laravel-database",
       "kind": "reference",
-      "description": "Laravel database conventions — safe migrations, Eloquent relationships, N+1 and Big-O query optimization, indexing. Use when writing migrations, models, queries, fixing slow queries, or reviewing database code."
+      "description": "Reference on Laravel database conventions — migrations, Eloquent relationships, N+1 and Big-O query optimization, indexing; when learning or reviewing database code (NOT for optimizing performance; use db-optimize)."
     },
     {
       "name": "laravel-deploy",
@@ -148,7 +148,7 @@
     {
       "name": "laravel-feature",
       "kind": "scaffolder",
-      "description": "Scaffold a complete Laravel feature module (controllers, requests, resources, models, migrations, policies, tests). Use when building a new feature or CRUD module."
+      "description": "Scaffold a complete Laravel feature module — controllers, requests, resources, models, migrations, policies, tests; when building a new feature or CRUD (NOT for entire app; use scaffold-app)."
     },
     {
       "name": "laravel-filament",
@@ -173,7 +173,7 @@
     {
       "name": "laravel-module",
       "kind": "scaffolder",
-      "description": "Scaffold a reusable domain module under app/Modules (contracts, services, DTOs, events, strategies). Use when building a shared module or domain logic without UI/routes."
+      "description": "Scaffold a reusable domain module under app/Modules with contracts, services, DTOs, events, strategies; when building a shared module or domain logic without UI/routes (NOT for feature scaffolding; use laravel-feature)."
     },
     {
       "name": "laravel-nova",
@@ -203,12 +203,12 @@
     {
       "name": "laravel-refactor",
       "kind": "utility",
-      "description": "Refactor Laravel code for SOLID/DRY compliance — extract god classes, long methods, improve structure without changing behavior. Triggers: \"refactor\", \"code smell\", \"SOLID\", \"god class\", \"extract method\"."
+      "description": "Refactor Laravel code for SOLID/DRY compliance — extract god classes, improve structure without changing behavior; when refactoring for better code quality."
     },
     {
       "name": "laravel-review",
       "kind": "scaffolder",
-      "description": "Review code, a pull request, staged changes, or a path across security, quality, Laravel best practices, and testing — each finding scored by severity and confidence (>= 80% only). Use when reviewing a PR, auditing a diff, or checking staged changes before commit. Triggers: \"review pr\", \"code review\", \"review diff\", \"review staged\", \"audit code\", \"review this\", \"pr review\"."
+      "description": "Review code, a pull request, staged changes, or a path across security, quality, Laravel best practices, and testing; when reviewing a PR, auditing a diff, or checking staged changes (NOT for running a dedicated security audit; use security-audit)."
     },
     {
       "name": "laravel-scout",
@@ -218,12 +218,12 @@
     {
       "name": "laravel-security",
       "kind": "reference",
-      "description": "Laravel security conventions and OWASP best practices — XSS, SQL injection, CSRF, mass assignment, auth/authorization checks, security headers, rate limiting, encrypted attributes, and security review. Use when hardening controllers, reviewing code for vulnerabilities, or running a security audit. Triggers: \"security\", \"vulnerability\", \"XSS\", \"SQL injection\", \"CSRF\", \"mass assignment\", \"auth check\", \"authorization\", \"permission\", \"audit\", \"OWASP\", \"secure\", \"hack\", \"attack\", \"CSP\", \"security headers\"."
+      "description": "Laravel security conventions and OWASP best practices — XSS, SQL injection, CSRF, mass assignment, auth/authorization checks, security headers, rate limiting, encrypted attributes; when hardening code, reviewing for vulnerabilities (NOT for running a specific audit; use security-audit)."
     },
     {
       "name": "laravel-service",
       "kind": "scaffolder",
-      "description": "Scaffold a service or single-purpose action class. Use when extracting business logic into a service, orchestrating operations, or creating a testable action."
+      "description": "Scaffold a service or single-purpose action class; when extracting business logic into a service, orchestrating operations, or creating a testable action."
     },
     {
       "name": "laravel-testing",
@@ -238,12 +238,12 @@
     {
       "name": "mcp-make",
       "kind": "utility",
-      "description": "Scaffold an MCP tool/server for a Claude Code plugin (PhpMcp attributes, TypeScript schema, or config). Use when adding MCP tools to extend capabilities."
+      "description": "Scaffold an MCP tool or server (PHP/TypeScript); when adding MCP capabilities to a plugin."
     },
     {
       "name": "migrate-from-legacy",
       "kind": "utility",
-      "description": "Migrate a legacy app/database into Laravel — schema import, data migration, model generation. Handles both framework migrations (Symfony→Laravel) and version upgrades (Laravel 9→10→11). Triggers: \"migrate\", \"legacy\", \"upgrade\", \"import\", \"framework migration\", \"data migration\"."
+      "description": "Migrate a legacy app or database into Laravel — schema import, data migration, model generation; when upgrading a framework or version."
     },
     {
       "name": "notification-make",
@@ -263,7 +263,7 @@
     {
       "name": "plugin-publish",
       "kind": "utility",
-      "description": "Publish a Claude Code plugin to marketplace or GitHub — validate manifest, bump version, tag, and release. Use when publishing a plugin version."
+      "description": "Publish a Claude Code plugin to marketplace — validate, bump version, tag, release; when releasing a plugin."
     },
     {
       "name": "plugin-scaffold",
@@ -283,7 +283,7 @@
     {
       "name": "scaffold-app",
       "kind": "scaffolder",
-      "description": "Scaffold a complete new Laravel application and architecture (multi-phase: migrations, models, controllers, views, policies, tests, seeders). Use when starting a new app or large architecture from a natural-language description. Triggers: \"scaffold app\", \"scaffold application\", \"build new app\", \"scaffold from description\", \"generate full application\"."
+      "description": "Scaffold a complete new Laravel application with architecture — migrations, models, controllers, views, policies, tests, seeders; when building a new app from a natural-language description (NOT for a single feature; use laravel-feature)."
     },
     {
       "name": "search-setup",
@@ -293,7 +293,7 @@
     {
       "name": "security-audit",
       "kind": "scaffolder",
-      "description": "Run an OWASP security audit of Laravel code with false-positive filtering and confidence scoring. Use when auditing or reviewing for vulnerabilities, injection, XSS, CSRF, auth/authz gaps, mass assignment, or insecure config. Triggers: \"security audit\", \"audit vulnerabilities\", \"OWASP\", \"scan for security issues\", \"pen test\"."
+      "description": "Run an OWASP security audit of Laravel code with false-positive filtering and confidence scoring; when auditing for vulnerabilities, injection, XSS, CSRF, auth gaps, mass assignment, or insecure config (NOT for general security best practices; use laravel-security)."
     },
     {
       "name": "seo-setup",
@@ -303,7 +303,7 @@
     {
       "name": "skill-make",
       "kind": "utility",
-      "description": "Scaffold a new Claude Code skill directory with SKILL.md, references/, and evals/evals.json. Use when creating a skill. Reference docs/architecture/skill-standard.md for detailed rules."
+      "description": "Scaffold a Claude Code skill with directory structure, references, and evals; when creating a skill."
     },
     {
       "name": "telescope-setup",
@@ -323,7 +323,7 @@
     {
       "name": "upgrade-laravel",
       "kind": "utility",
-      "description": "Upgrade Laravel/PHP versions (9→10→11→12, PHP 8.1→8.4) — breaking changes, automated fixes, dependency bumps. Perform version-by-version migration with validation. Triggers: \"upgrade\", \"upgrade Laravel\", \"version bump\", \"breaking changes\"."
+      "description": "Upgrade Laravel/PHP versions with breaking-change handling, automated fixes, and dependency bumps; when upgrading to a newer Laravel/PHP version."
     },
     {
       "name": "webhook-make",

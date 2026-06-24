@@ -1,6 +1,6 @@
 ---
 name: auth-setup
-description: Set up Laravel authentication — Sanctum/Fortify/Breeze, guards, roles & permissions (Spatie/Laratrust), policies, social login, 2FA. Triggers: "set up auth", "configure authentication", "add login", "roles and permissions", "API tokens", "Sanctum", "Passport".
+description: SET UP Laravel authentication with Sanctum/Fortify/Breeze, guards, roles & permissions, policies, social login, 2FA; when initializing auth in a new project (NOT for reference questions).
 disable-model-invocation: true
 allowed-tools: Bash(composer require) Bash(composer show *) Bash(php artisan *) Read Write Edit
 argument-hint: "[api|spa|oauth|social|web|full] [--authz=spatie|laratrust|policies]"

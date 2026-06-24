@@ -1,6 +1,6 @@
 ---
 name: db-optimize
-description: Optimize database performance by analyzing queries, detecting N+1 and Big O issues, suggesting indexes, and recommending query tuning; when improving database performance.
+description: Optimize database performance by analyzing queries, detecting N+1 and Big O issues, suggesting indexes, and recommending query tuning; when improving database speed (NOT for database conventions; use laravel-database).
 disable-model-invocation: true
 allowed-tools: Bash(php artisan *) Read Grep Glob Edit
 argument-hint: "[target]"

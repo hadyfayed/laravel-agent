@@ -1,6 +1,6 @@
 ---
 name: laravel-service
-description: Scaffold a service or single-purpose action class. Use when extracting business logic into a service, orchestrating operations, or creating a testable action.
+description: Scaffold a service or single-purpose action class; when extracting business logic into a service, orchestrating operations, or creating a testable action.
 context: fork
 agent: laravel-service
 argument-hint: "[service/action name]"

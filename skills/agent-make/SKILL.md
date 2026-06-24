@@ -1,8 +1,6 @@
 ---
 name: agent-make
-description: >
-  Scaffold a new Claude Code agent file (.md with frontmatter, role, capabilities, and workflow).
-  Use when creating a plugin agent.
+description: Scaffold a Claude Code agent with role, capabilities, and workflow; when creating a plugin agent.
 disable-model-invocation: true
 allowed-tools: Read Write Edit Bash(mkdir *) Bash(test *) Bash(find *)
 argument-hint: "<agent-name> [description]"
@@ -31,7 +29,7 @@ Parse `$ARGUMENTS`:
 ```markdown
 ---
 name: <agent-name>
-description: >
+description: Scaffold a Claude Code agent with role, capabilities, and workflow; when creating a plugin agent.
   <One-line description of what this agent does.
   Include key capabilities and when to use.>
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
