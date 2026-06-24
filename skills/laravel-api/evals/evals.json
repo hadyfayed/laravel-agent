@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-api",
+  "cases": [
+    { "prompt": "/laravel-agent:laravel-api Products with filtering, sorting, and v1 OpenAPI docs", "expect": "forks the laravel-api agent and scaffolds versioned REST controllers, resources, validation, routes, and rate limiting" },
+    { "prompt": "/laravel-agent:laravel-api Orders GraphQL with Sanctum auth", "expect": "forks the laravel-api agent and emits Lighthouse GraphQL schema with auth-guarded queries/mutations" },
+    { "prompt": "/laravel-agent:laravel-feature Invoice module with web CRUD", "expect": "skill does not activate; routed to laravel-feature instead" }
+  ]
+}

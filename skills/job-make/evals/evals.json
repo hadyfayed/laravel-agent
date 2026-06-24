@@ -1,0 +1,13 @@
+{
+  "skill": "job-make",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:job-make ProcessOrder",
+      "expect": "generates a queued job with retry strategy, backoff, and handle() implementation"
+    },
+    {
+      "prompt": "/laravel-agent:job-make OrderCreated event",
+      "expect": "creates an event class with ShouldBroadcast and listener wiring setup"
+    }
+  ]
+}

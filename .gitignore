@@ -1,3 +1,4 @@
 
 # Jekyll build output
 docs/_site/
+.DS_Store

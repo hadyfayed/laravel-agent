@@ -1,0 +1,13 @@
+{
+  "skill": "webhook-make",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:webhook-make Stripe --events=payment_intent.succeeded,customer.subscription.created",
+      "expect": "generates Stripe webhook controller, signature verification middleware, event handlers, and routes"
+    },
+    {
+      "prompt": "/laravel-agent:webhook-make GitHub",
+      "expect": "creates webhook infrastructure for GitHub with push/pull_request/issues handlers and HMAC verification"
+    }
+  ]
+}

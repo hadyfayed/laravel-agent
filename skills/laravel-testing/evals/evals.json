@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-testing",
+  "cases": [
+    { "prompt": "Write a feature test for creating an order via the API", "expect": "uses RefreshDatabase, actingAs, postJson, assertCreated/assertJsonValidationErrors, assertDatabaseHas" },
+    { "prompt": "How do I test that a job is dispatched when an order is confirmed?", "expect": "uses Queue::fake() then Queue::assertPushed" },
+    { "prompt": "Set up a model factory with pending and delivered states", "expect": "defines definition() with faker and named state methods returning $this->state(...)" }
+  ]
+}

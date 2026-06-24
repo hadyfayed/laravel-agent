@@ -1,0 +1,8 @@
+{
+  "skill": "plugin-scaffold",
+  "cases": [
+    { "prompt": "/laravel-agent:plugin-scaffold jira-assistant A Jira integration plugin for Claude Code", "expect": "forks the claude-plugin-builder agent and scaffolds a complete plugin with plugin.json, marketplace.json, directory structure, CLAUDE.md, and README" },
+    { "prompt": "scaffold a new Claude Code plugin called pdf-tools --minimal", "expect": "forks the claude-plugin-builder agent and produces only manifests plus CLAUDE.md and README with no component stubs" },
+    { "prompt": "build a claude code plugin with custom agents and commands", "expect": "forks the claude-plugin-builder agent and scaffolds the plugin structure including agents/ and commands/ directories" }
+  ]
+}

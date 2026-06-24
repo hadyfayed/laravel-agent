@@ -1,0 +1,13 @@
+{
+  "skill": "feature-flag-make",
+  "cases": [
+    {
+      "prompt": "Create a feature flag for a new dashboard with Pennant",
+      "expect": "Generates a boolean feature class in app/Features/NewDashboard.php with resolve() method"
+    },
+    {
+      "prompt": "Add an A/B test variant feature for the checkout page",
+      "expect": "Creates a feature flag that returns weighted variant strings (control/variant-a/variant-b)"
+    }
+  ]
+}

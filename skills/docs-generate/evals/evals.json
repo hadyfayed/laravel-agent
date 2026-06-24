@@ -1,0 +1,13 @@
+{
+  "skill": "docs-generate",
+  "cases": [
+    {
+      "prompt": "Generate README and API documentation for my Laravel project",
+      "expect": "Docs skill activates to generate README and API reference from codebase"
+    },
+    {
+      "prompt": "Document the app/Services directory with architecture overview",
+      "expect": "Skill creates ARCHITECTURE.md covering Services directory structure and patterns"
+    }
+  ]
+}

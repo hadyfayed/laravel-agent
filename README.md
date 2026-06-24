@@ -6,16 +6,13 @@
 
 > AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.
 
-A Claude Code plugin with **29 specialized agents**, **47 commands**, **21 auto-invoked skills**, and **9 quality hooks** covering the entire Laravel development lifecycle.
+<!-- catalog:counts -->65 skills · 11 agents<!-- /catalog:counts -->
 
 **[View Documentation](https://hadyfayed.github.io/laravel-agent/)**
 
 ## Features
 
 - **Single Plugin Install** - One command installs everything
-- **23 Specialized Agents** - Architecture, features, APIs, testing, security, deployment, performance, packages, and more
-- **42 Commands** - Direct access to all capabilities
-- **13 Auto-Invoked Skills** - Claude automatically applies Laravel expertise based on context
 - **Pre-configured Hooks** - Laravel linting and auto-formatting on file changes
 - **MCP Extension** - Complements Laravel Boost with testing, queue, and performance tools
 - **SOLID/DRY Enforcement** - Every generated code follows best practices
@@ -32,8 +29,6 @@ A Claude Code plugin with **29 specialized agents**, **47 commands**, **21 auto-
 # Install the plugin
 /plugin install laravel-agent@hadyfayed-laravel-agent
 ```
-
-That's it! All 29 agents, 47 commands, and 21 skills are now available.
 
 ## Available Commands
 
@@ -182,11 +177,11 @@ The architect will:
 | Agent | Purpose |
 |-------|---------|
 | `laravel-architect` | Decision maker - analyzes requests, delegates to builders |
-| `laravel-feature-builder` | Builds complete features with CRUD, views, API |
-| `laravel-module-builder` | Builds reusable domain modules |
-| `laravel-service-builder` | Builds services and actions |
+| `laravel-feature` | Builds complete features with CRUD, views, API |
+| `laravel-module` | Builds reusable domain modules |
+| `laravel-service` | Builds services and actions |
 | `laravel-refactor` | Code improvement and refactoring |
-| `laravel-api-builder` | REST APIs with versioning, OpenAPI |
+| `laravel-api` | REST APIs with versioning, OpenAPI |
 | `laravel-testing` | Pest tests - unit, feature, API, browser |
 | `laravel-database` | Migrations, optimization, relationships |
 | `laravel-auth` | Authentication, authorization, policies |

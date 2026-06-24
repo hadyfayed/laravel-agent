@@ -1,268 +1,106 @@
 ---
 name: laravel-auth
-description: >
-  Implement authentication and authorization in Laravel applications. Use when the user
-  needs login, registration, roles, permissions, or access control. Triggers: "auth",
-  "authentication", "login", "register", "permission", "role", "policy", "gate",
-  "middleware", "sanctum", "passport".
-allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
+description: Laravel authentication & authorization — login, register, guards, policies, gates, roles & permissions, API tokens (Sanctum), OAuth2 (Passport), social login (Socialite), 2FA. Use when wiring up auth, access control, or tokens.
 ---
 
 # Laravel Auth Skill
 
-Implement authentication and authorization for Laravel applications.
+Apply Laravel authentication and authorization conventions when building login/register, access control, policies, gates, roles/permissions, API tokens, OAuth2, or social login.
 
 ## When to Use
 
-- Setting up user authentication
-- Implementing role-based access control
-- Creating authorization policies
-- API authentication with Sanctum/Passport
+- Setting up user authentication (login, register, logout)
+- Role-based access control and permissions
+- Creating authorization policies and gates
+- API token authentication (Sanctum) for SPAs/mobile
+- Full OAuth2 server (Passport) for third-party integrations
+- Social login (Socialite) with Google, GitHub, Facebook, etc.
+- Two-factor authentication (Fortify)
 - Multi-guard authentication
 
-## Quick Start
+## Conventions Checklist
 
-```bash
-/laravel-agent:auth:setup
-```
+### Authentication
+- [ ] Hash passwords via the `hashed` cast or `Hash::make()` — never plain
+- [ ] Rate limit login endpoints (`throttle`)
+- [ ] Regenerate the session after login to prevent session fixation
+- [ ] Implement proper logout (revoke tokens, invalidate session)
+- [ ] Use HTTPS in production
 
-## User Model with Roles
+### Guards
+- [ ] Use `web` (session) guard for browser, `sanctum`/`api` for tokens
+- [ ] Define guards and providers explicitly in `config/auth.php`
+- [ ] For Passport, set `api` driver to `passport`
 
-```php
-<?php
+### Authorization — Policies
+- [ ] Use policies for model-level authorization
+- [ ] Implement `before()` for super-admin short-circuit (return `null` to fall through)
+- [ ] Use `authorizeResource()` for automatic controller authorization
+- [ ] Auto-discovered at `App\Policies\{Model}Policy` (Laravel 10+) or register manually
 
-declare(strict_types=1);
+### Authorization — Gates
+- [ ] Use gates for non-model abilities (`access-admin`, `manage-team`)
+- [ ] Define in `AuthServiceProvider`/`AppServiceProvider::boot()`
+- [ ] Check via `Gate::allows()` / `$this->authorize()` / `@can`
 
-namespace App\Models;
+### Roles & Permissions
+- [ ] Permission naming: `<action>-<resource>` (`read-orders`, `approve-orders`)
+- [ ] Seed roles and permissions in a `RolesAndPermissionsSeeder`
+- [ ] **Spatie** for simpler setups; **Laratrust** for team/multi-tenant permissions
+- [ ] Scope routes with `role:` / `permission:` middleware
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Sanctum\HasApiTokens;
+### API Tokens (Sanctum)
+- [ ] Add `HasApiTokens` trait to User
+- [ ] Grant scoped abilities (`createToken('name', ['posts:read'])`)
+- [ ] Check abilities with `$user->tokenCan('ability')` or `ability:`/`abilities:` middleware
+- [ ] Revoke tokens on password change and logout
+- [ ] For SPAs: CSRF cookie → session login; set `SANCTUM_STATEFUL_DOMAINS` + `supports_credentials`
 
-final class User extends Authenticatable
-{
-    use HasApiTokens;
+### OAuth2 (Passport)
+- [ ] Use Authorization Code + PKCE for SPAs/mobile (never expose client secrets)
+- [ ] Use Client Credentials for machine-to-machine
+- [ ] Never use Password Grant for third-party apps (deprecated)
+- [ ] Define scopes via `Passport::tokensCan()`; enforce with `scope:`/`scopes:` middleware
+- [ ] Set token lifetimes; prune revoked tokens (`passport:purge`)
+- [ ] HTTPS required in production
 
-    protected $fillable = ['name', 'email', 'password'];
-
-    protected $hidden = ['password', 'remember_token'];
-
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class);
-    }
-
-    public function hasRole(string $role): bool
-    {
-        return $this->roles()->where('name', $role)->exists();
-    }
-
-    public function hasPermission(string $permission): bool
-    {
-        return $this->roles()
-            ->whereHas('permissions', fn ($q) => $q->where('name', $permission))
-            ->exists();
-    }
-
-    public function isAdmin(): bool
-    {
-        return $this->hasRole('admin');
-    }
-}
-```
-
-## Policy Implementation
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Policies;
-
-use App\Models\Post;
-use App\Models\User;
-
-final class PostPolicy
-{
-    public function before(User $user, string $ability): ?bool
-    {
-        if ($user->isAdmin()) {
-            return true;
-        }
-        return null;
-    }
-
-    public function view(User $user, Post $post): bool
-    {
-        return $post->published || $user->id === $post->user_id;
-    }
-
-    public function update(User $user, Post $post): bool
-    {
-        return $user->id === $post->user_id;
-    }
-
-    public function delete(User $user, Post $post): bool
-    {
-        return $user->id === $post->user_id;
-    }
-}
-```
-
-## Gates Definition
-
-```php
-// app/Providers/AppServiceProvider.php
-use Illuminate\Support\Facades\Gate;
-
-public function boot(): void
-{
-    Gate::define('access-admin', function (User $user) {
-        return $user->isAdmin();
-    });
-
-    Gate::define('manage-users', function (User $user) {
-        return $user->hasPermission('users.manage');
-    });
-}
-```
-
-## API Authentication (Sanctum)
-
-```php
-// routes/api.php
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', fn (Request $request) => $request->user());
-    Route::post('/logout', [AuthController::class, 'logout']);
-});
-```
-
-## Auth Controller
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Http\Controllers;
-
-use App\Models\User;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-
-final class AuthController extends Controller
-{
-    public function login(Request $request): JsonResponse
-    {
-        $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Invalid credentials.'],
-            ]);
-        }
-
-        return response()->json([
-            'user' => $user,
-            'token' => $user->createToken('api')->plainTextToken,
-        ]);
-    }
-
-    public function logout(Request $request): JsonResponse
-    {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json(['message' => 'Logged out']);
-    }
-}
-```
-
-## Controller Authorization
-
-```php
-final class PostController extends Controller
-{
-    public function __construct()
-    {
-        $this->authorizeResource(Post::class, 'post');
-    }
-
-    public function update(Request $request, Post $post)
-    {
-        // Policy automatically checked
-        $post->update($request->validated());
-        return redirect()->route('posts.show', $post);
-    }
-}
-```
-
-## Blade Authorization
-
-```blade
-@auth
-    <p>Welcome, {{ auth()->user()->name }}</p>
-@endauth
-
-@can('update', $post)
-    <a href="{{ route('posts.edit', $post) }}">Edit</a>
-@endcan
-
-@can('access-admin')
-    <a href="/admin">Admin Panel</a>
-@endcan
-```
+### Social Login (Socialite)
+- [ ] Validate provider names against an allowlist
+- [ ] Handle email conflicts across providers
+- [ ] Encrypt `provider_token` / `provider_refresh_token` (use `encrypted` cast)
+- [ ] Use `->stateless()` for API/token flows
+- [ ] Exact-match redirect URIs (HTTPS in production)
 
 ## Common Pitfalls
 
-1. **Storing Plain Passwords** - Always use Hash::make()
-2. **No Policy Registration** - Register in AuthServiceProvider
-3. **Missing Middleware** - Protect routes with auth
-4. **Token Exposure** - Never log tokens
-5. **No Rate Limiting** - Rate limit login attempts
-6. **Session Fixation** - Regenerate session after login
+1. **Storing plain passwords** — always hash
+2. **Missing policy registration** — register or follow auto-discovery naming
+3. **Unprotected routes** — guard with `auth` + scopes/abilities
+4. **Token exposure** — never log tokens; client secrets never reach the frontend
+5. **No rate limiting** — throttle auth endpoints
+6. **Session fixation** — regenerate session after login
+7. **Wrong HasApiTokens** — Passport vs Sanctum trait must match the guard
 
-## Package Integration
+## Package Choice
 
-- **laravel/sanctum** - API token authentication
-- **laravel/passport** - Full OAuth2 server
-- **spatie/laravel-permission** - Role & permission management
-- **laravel/fortify** - Authentication backend
-
-## Best Practices
-
-- Use policies for model authorization
-- Use gates for general abilities
-- Rate limit authentication endpoints
-- Use HTTPS in production
-- Regenerate session after login
-- Implement proper logout
+- **laravel/sanctum** — API/SPA token auth (first-party)
+- **laravel/passport** — full OAuth2 server (third-party)
+- **spatie/laravel-permission** — roles & permissions (simple)
+- **santigarcor/laratrust** — roles & permissions (teams/multi-tenant)
+- **laravel/socialite** — social login
+- **laravel/fortify** — auth backend + 2FA
 
 ## Related Commands
 
-- `/laravel-agent:auth:setup` - Setup authentication and authorization
-
-## Related Agents
-
-- `laravel-auth` - Authentication and authorization specialist
+- `/laravel-agent:auth:setup` — scaffold authentication and authorization
 
 ## Related Skills
 
-- `laravel-security` - Security audits and hardening
+- `laravel-security` — security audits and hardening
+
+## Additional references
+
+- Core auth: guards, policies, gates, roles/permissions, 2FA → [references/core-auth.md](references/core-auth.md)
+- API/SPA token authentication (Sanctum) → [references/sanctum.md](references/sanctum.md)
+- Full OAuth2 server (Passport) → [references/passport.md](references/passport.md)
+- Social login (Socialite) → [references/socialite.md](references/socialite.md)

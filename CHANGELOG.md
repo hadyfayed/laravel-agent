@@ -2,6 +2,94 @@
 
 All notable changes to Laravel Agent will be documented in this file.
 
+## [3.0.0] — 2026-06-24
+
+Major restructure to the modern Claude Code **skill standard**. The previous mix of 30 agents, 53 colon-namespaced commands, and 21 skills (with heavy three-way duplication) is now a single, coherent `skills/` taxonomy of **65 skills** under a written three-kind contract, backed by **11 retained agents** and a generated single-source-of-truth catalog.
+
+### Breaking changes
+
+- **Commands removed.** All 53 `commands/*.md` are deleted; each is replaced by an equivalent **skill** invoked as `/laravel-agent:<skill>`. See the migration table below.
+- **Agents consolidated 30 → 11.** Topic agents whose knowledge now lives in reference skills were removed; only the 11 forked-worker agents remain (`laravel-feature, laravel-module, laravel-service, laravel-api, laravel-filament, laravel-livewire, laravel-testing, laravel-review, laravel-security, laravel-architect, claude-plugin-builder`).
+- **Auth family consolidated.** `laravel-sanctum`, `laravel-passport`, `laravel-socialite` skills folded into `laravel-auth`.
+
+### Added
+
+- **Three-kind skill contract** (`docs/architecture/skill-standard.md`): reference (auto-trigger knowledge), scaffolder (`context: fork` → retained agent), utility (`disable-model-invocation`). 15 reference + 11 scaffolder + 39 utility skills, each with `evals/evals.json`.
+- **Catalog generator** (`scripts/build-catalog.mjs`, 8 unit tests) — owns all counts + generates `CATALOG.md`; `--check` + CI guard (`.github/workflows/catalog-check.yml`) make count drift impossible.
+- Progressive disclosure throughout: large skills split into `references/`.
+
+### Fixed
+
+- Phantom `laravel-validator` agent reference (repointed to `laravel-security`).
+- MCP `composer.json` autoload (dangling `tests/` mapping).
+- Catalog generator docs-count targets were non-idempotent and silently froze; now re-matchable + regression-tested.
+- Removed fictional `skills/SKILLS.md`; `plugin.json` trimmed to a minimal manifest (auto-discovery is the source of truth).
+
+### Migration — command → skill
+
+Invoke the new skill in place of the old command. Skills also auto-trigger when relevant (except utilities, which stay manual).
+
+| Old command | New invocation |
+| :-- | :-- |
+| `/agent:make` | `/laravel-agent:agent-make` |
+| `/ai:make` | `/laravel-agent:ai-make` |
+| `/analyze:codebase` | `/laravel-agent:analyze-codebase` |
+| `/api:docs` | `/laravel-agent:laravel-api` |
+| `/api:make` | `/laravel-agent:laravel-api` |
+| `/auth:setup` | `/laravel-agent:auth-setup` |
+| `/backup:setup` | `/laravel-agent:backup-setup` |
+| `/broadcast:make` | `/laravel-agent:broadcast-make` |
+| `/bug:fix` | `/laravel-agent:bug-fix` |
+| `/build` | `/laravel-agent:laravel-build` |
+| `/cicd:setup` | `/laravel-agent:cicd-setup` |
+| `/command:make` | `/laravel-agent:command-make` |
+| `/db:diagram` | `/laravel-agent:db-diagram` |
+| `/db:optimize` | `/laravel-agent:db-optimize` |
+| `/deploy:setup` | `/laravel-agent:deploy-setup` |
+| `/docs:generate` | `/laravel-agent:docs-generate` |
+| `/dto:make` | `/laravel-agent:dto-make` |
+| `/feature-flag:make` | `/laravel-agent:feature-flag-make` |
+| `/feature:make` | `/laravel-agent:laravel-feature` |
+| `/filament:make` | `/laravel-agent:laravel-filament` |
+| `/geo:make` | `/laravel-agent:geo-make` |
+| `/git:commit` | `/laravel-agent:git-commit` |
+| `/git:pr` | `/laravel-agent:git-pr` |
+| `/git:release` | `/laravel-agent:git-release` |
+| `/health:setup` | `/laravel-agent:health-setup` |
+| `/import:make` | `/laravel-agent:import-make` |
+| `/job:make` | `/laravel-agent:job-make` |
+| `/livewire:make` | `/laravel-agent:laravel-livewire` |
+| `/mcp:make` | `/laravel-agent:mcp-make` |
+| `/migrate:from-legacy` | `/laravel-agent:migrate-from-legacy` |
+| `/module:make` | `/laravel-agent:laravel-module` |
+| `/notification:make` | `/laravel-agent:notification-make` |
+| `/patterns` | `/laravel-agent:laravel-patterns` |
+| `/pdf:make` | `/laravel-agent:pdf-make` |
+| `/plugin:publish` | `/laravel-agent:plugin-publish` |
+| `/plugin:scaffold` | `/laravel-agent:plugin-scaffold` |
+| `/pulse:setup` | `/laravel-agent:pulse-setup` |
+| `/refactor` | `/laravel-agent:laravel-refactor` |
+| `/reverb:setup` | `/laravel-agent:reverb-setup` |
+| `/review:audit` | `/laravel-agent:laravel-review` |
+| `/review:pr` | `/laravel-agent:laravel-review` |
+| `/review:staged` | `/laravel-agent:laravel-review` |
+| `/scaffold:app` | `/laravel-agent:scaffold-app` |
+| `/search:setup` | `/laravel-agent:search-setup` |
+| `/security:audit` | `/laravel-agent:security-audit` |
+| `/seo:setup` | `/laravel-agent:seo-setup` |
+| `/service:make` | `/laravel-agent:laravel-service` |
+| `/skill:make` | `/laravel-agent:skill-make` |
+| `/telescope:setup` | `/laravel-agent:telescope-setup` |
+| `/test:coverage` | `/laravel-agent:test-coverage` |
+| `/test:make` | `/laravel-agent:test-make` |
+| `/upgrade:laravel` | `/laravel-agent:upgrade-laravel` |
+| `/webhook:make` | `/laravel-agent:webhook-make` |
+
+### Deferred to follow-ups
+
+- Docs site (Jekyll) regeneration against the new taxonomy.
+- Cosmetic dedup/typo polish; adopting the official `skill-creator` eval schema. See `docs/superpowers/v3-cleanup-and-deferred.md`.
+
 ## [2.1.0] - 2026-04-02
 
 ### Added
@@ -154,7 +242,7 @@ New meta-tools for creating and sharing Claude Code extensions:
 - beyondcode/laravel-query-detector
 
 #### Agent Enhancements
-- **laravel-feature-builder** - Added settings, SEO, revisions, sortable, schemaless attributes
+- **laravel-feature** - Added settings, SEO, revisions, sortable, schemaless attributes
 - **laravel-api-builder** - Added spatie/laravel-fractal for transformers
 - **laravel-database** - Added N+1 detection with query-detector, devtoolbox commands
 - **laravel-deploy** - Added laravel/envoy task runner
@@ -173,13 +261,13 @@ New meta-tools for creating and sharing Claude Code extensions:
 #### Consolidated
 - **notification:make** now handles both notification creation AND channel setup (merged notification:setup)
 - **seo:setup** replaces seo:sitemap with expanded functionality (meta tags, Open Graph)
-- **laravel-security** now includes validation pipeline from laravel-validator
-- **laravel-review** uses laravel-security for false positive filtering
+- **laravel-security** now owns the validation pipeline and false-positive filtering capability
+- **laravel-review** delegates false-positive filtering to laravel-security
 
 ### Removed
 - **notification:setup** - Merged into notification:make with `--setup` flag
 - **seo:sitemap** - Replaced by seo:setup
-- **laravel-validator** - Merged into laravel-security agent
+- Phantom agent removed; capability consolidated into laravel-security
 
 ### Fixed
 - Consistent structure across all 42 commands

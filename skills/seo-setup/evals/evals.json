@@ -1,0 +1,13 @@
+{
+  "skill": "seo-setup",
+  "cases": [
+    {
+      "prompt": "Set up SEO for my Laravel app with sitemap and meta tags.",
+      "expect": "Skill installs spatie/laravel-sitemap and artesaos/seotools, publishes config, and creates sitemap command."
+    },
+    {
+      "prompt": "Configure sitemaps and structured data for my models.",
+      "expect": "Skill enables model-based SEO via ralphjsmit/laravel-seo and provides Filament integration for SEO data."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-deploy",
+  "cases": [
+    { "prompt": "Set up a zero-downtime Laravel deployment on a traditional server with rollback", "expect": "references symlink releases + shared storage/.env + rollback script from references/zero-downtime-and-env.md" },
+    { "prompt": "Deploy my Laravel app with Docker and docker-compose in production", "expect": "references multi-stage Dockerfile + nginx/supervisor + compose from references/docker.md" },
+    { "prompt": "Configure Laravel Vapor for staging and production", "expect": "references vapor.yml environments + vapor deploy commands from references/forge-and-vapor.md" }
+  ]
+}

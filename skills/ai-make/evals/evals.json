@@ -1,0 +1,13 @@
+{
+  "skill": "ai-make",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:ai-make ChatBot",
+      "expect": "generates a conversational AI service with Prism PHP, message history, and streaming support"
+    },
+    {
+      "prompt": "/laravel-agent:ai-make ProductRecommender embeddings",
+      "expect": "creates an embeddings service with vector storage, pgvector migration, and semantic search"
+    }
+  ]
+}

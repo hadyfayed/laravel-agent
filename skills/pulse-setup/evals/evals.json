@@ -1,0 +1,13 @@
+{
+  "skill": "pulse-setup",
+  "cases": [
+    {
+      "prompt": "I need to set up Laravel Pulse to monitor slow queries, exceptions, and queue performance in production.",
+      "expect": "pulse-setup skill activates and guides through installing laravel/pulse, configuring recorders, and setting up the monitoring dashboard."
+    },
+    {
+      "prompt": "Add performance monitoring to track slow requests and cache interactions with Redis-backed ingest.",
+      "expect": "pulse-setup skill activates and covers recorder configuration, Redis ingest driver setup, and worker scheduling."
+    }
+  ]
+}

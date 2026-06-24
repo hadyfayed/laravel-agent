@@ -1,0 +1,6 @@
+{
+  "skill": "laravel-feature",
+  "cases": [
+    { "prompt": "/laravel-agent:laravel-feature Invoicing with CRUD and PDF export", "expect": "forks the laravel-feature agent and proposes a multi-file feature module plan" }
+  ]
+}

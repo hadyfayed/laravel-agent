@@ -1,0 +1,13 @@
+{
+  "skill": "upgrade-laravel",
+  "cases": [
+    {
+      "prompt": "I need to upgrade from Laravel 10 to Laravel 11; what should I check first?",
+      "expect": "Skill activates; references pre-upgrade checklist and version-specific breaking changes"
+    },
+    {
+      "prompt": "How do I safely upgrade PHP 8.2 to 8.3 while running Laravel 11?",
+      "expect": "Skill activates; references PHP breaking changes and version-by-version migration guide"
+    }
+  ]
+}

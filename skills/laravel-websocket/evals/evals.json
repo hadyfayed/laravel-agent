@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-websocket",
+  "cases": [
+    { "prompt": "Broadcast an order status change to that order's owner over a private channel", "expect": "implements ShouldBroadcast, returns a PrivateChannel orders.{userId}, authorizes in channels.php" },
+    { "prompt": "Build a presence-based chat room with Echo on the frontend", "expect": "uses PresenceChannel, Echo.join with here/joining/leaving, authorizes chat.{roomId} membership" },
+    { "prompt": "My Echo client isn't receiving the broadcast event", "expect": "checks implements ShouldBroadcast and the .event.name dot prefix from broadcastAs" }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "skill": "skill-make",
+  "cases": [
+    {
+      "prompt": "Create a new skill for database optimization",
+      "expect": "Scaffolds skills/database-optimization/ with SKILL.md, evals/evals.json, and references/ directory"
+    },
+    {
+      "prompt": "Make a skill called api-tester",
+      "expect": "Creates skills/api-tester/ with proper structure and placeholder SKILL.md ready for customization"
+    }
+  ]
+}

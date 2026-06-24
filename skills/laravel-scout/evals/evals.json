@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-scout",
+  "cases": [
+    { "prompt": "Add full-text search to my Post model with Meilisearch", "expect": "uses the Searchable trait, defines toSearchableArray, configures SCOUT_DRIVER=meilisearch and filterable attributes" },
+    { "prompt": "Why is my Scout search ignoring the where('status','published') filter?", "expect": "explains Meilisearch filterableAttributes must be configured then scout:sync-index-settings run" },
+    { "prompt": "Search a model then eager-load relations and paginate", "expect": "uses Post::search($q)->query(fn $b => $b->with(...))->paginate()" }
+  ]
+}

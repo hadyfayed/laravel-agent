@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-database",
+  "cases": [
+    { "prompt": "Why is this Eloquent loop slow and how do I fix the N+1?", "expect": "names eager loading / with() and references the performance guidance" },
+    { "prompt": "Write a safe migration to add a money column with an index", "expect": "uses decimal/bigInteger cents, adds index, includes down()" },
+    { "prompt": "How should I structure a many-to-many with a pivot here?", "expect": "belongsToMany + pivot guidance from references/migrations.md" }
+  ]
+}

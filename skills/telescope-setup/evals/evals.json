@@ -1,0 +1,13 @@
+{
+  "skill": "telescope-setup",
+  "cases": [
+    {
+      "prompt": "Set up Laravel Telescope for debugging with authorization gating.",
+      "expect": "Skill installs Telescope, publishes config, creates TelescopeServiceProvider with gate, and configures watchers."
+    },
+    {
+      "prompt": "Configure Telescope for local development only with pruning.",
+      "expect": "Skill enables --local-only setup via AppServiceProvider, adds dont-discover to composer.json, and schedules pruning."
+    }
+  ]
+}

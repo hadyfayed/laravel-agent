@@ -1,0 +1,13 @@
+{
+  "skill": "package-make",
+  "cases": [
+    {
+      "prompt": "scaffold a new Laravel package for spatie/my-awesome-package with migrations",
+      "expect": "Creates complete package skeleton in packages/spatie/my-awesome-package with ServiceProvider, Facade, config, tests, and GitHub Actions workflow."
+    },
+    {
+      "prompt": "create a Laravel package structure for my vendor with database support",
+      "expect": "Scaffolds package with database migrations, factories, TestCase, and all publishing boilerplate."
+    }
+  ]
+}

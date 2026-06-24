@@ -1,0 +1,13 @@
+{
+  "skill": "deploy-setup",
+  "cases": [
+    {
+      "prompt": "Configure deployment to Laravel Forge with database, cache, and queue workers",
+      "expect": "Creates deploy.sh script with git pull, migrations, cache clear, queue restart; documents Forge webhook URL setup; lists required environment variables (DB_*, REDIS_*, AWS_*)"
+    },
+    {
+      "prompt": "Set up Docker containerization for my Laravel app with MySQL and Redis services",
+      "expect": "Creates Dockerfile with multi-stage build, PHP-FPM setup, and composer install; creates docker-compose.yml with app, MySQL, Redis, Nginx services"
+    }
+  ]
+}

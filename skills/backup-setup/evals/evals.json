@@ -1,0 +1,13 @@
+{
+  "skill": "backup-setup",
+  "cases": [
+    {
+      "prompt": "Set up automated backups using spatie/laravel-backup with S3 storage and Slack notifications",
+      "expect": "Installs package, publishes config, configures S3 disk, sets schedule in Kernel, adds environment variables for AWS and Slack webhook"
+    },
+    {
+      "prompt": "I need to configure backups for production. Want database-only backups daily at 2am with email notifications.",
+      "expect": "Configures backup-setup with --db-only flag, schedules at 02:00, enables mail notifications"
+    }
+  ]
+}

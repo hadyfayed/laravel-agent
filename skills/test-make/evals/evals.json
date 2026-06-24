@@ -1,0 +1,8 @@
+{
+  "skill": "test-make",
+  "cases": [
+    { "prompt": "/laravel-agent:test-make OrderService", "expect": "forks the laravel-testing agent and generates Pest unit tests for OrderService covering happy path and edge cases" },
+    { "prompt": "/laravel-agent:test-make ProductController feature comprehensive", "expect": "forks the laravel-testing agent and generates feature tests in tests/Feature/ covering index/store/destroy, validation, and authorization" },
+    { "prompt": "/laravel-agent:test-make api/v1/products api", "expect": "forks the laravel-testing agent and generates JSON API tests with auth, pagination, and 422/404 assertions" }
+  ]
+}

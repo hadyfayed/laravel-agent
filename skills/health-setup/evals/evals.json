@@ -1,0 +1,13 @@
+{
+  "skill": "health-setup",
+  "cases": [
+    {
+      "prompt": "I need to set up application health monitoring to track database, cache, and queue status.",
+      "expect": "health-setup skill activates and guides through installing spatie/laravel-health, configuring checks, and setting up monitoring routes."
+    },
+    {
+      "prompt": "Add health checks for disk space and scheduler to our Laravel app.",
+      "expect": "health-setup skill activates and covers disk space and schedule check configuration alongside other checks."
+    }
+  ]
+}

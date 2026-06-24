@@ -1,0 +1,13 @@
+{
+  "skill": "dto-make",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:dto-make CreateUserData",
+      "expect": "generates a basic DTO with typed properties for user creation with request validation"
+    },
+    {
+      "prompt": "/laravel-agent:dto-make ProductData --from=model --resource",
+      "expect": "creates a DTO for transforming Eloquent models to API resources with lazy-loaded relationships"
+    }
+  ]
+}

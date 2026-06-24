@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-security",
+  "cases": [
+    { "prompt": "Review this controller for security issues before I deploy it", "expect": "checks authorization (authorize/policy), mass assignment ($fillable), input validation, and references the secure-patterns guidance" },
+    { "prompt": "How do I prevent SQL injection in this raw DB::select query?", "expect": "recommends query bindings / Eloquent over string interpolation, cites injection-prevention pattern" },
+    { "prompt": "Add security headers and a Content-Security-Policy to my Laravel app", "expect": "provides the SecurityHeaders middleware with CSP from references/owasp-top-10.md" }
+  ]
+}

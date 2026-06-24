@@ -1,0 +1,13 @@
+{
+  "skill": "reverb-setup",
+  "cases": [
+    {
+      "prompt": "I need to install and configure Laravel Reverb for real-time WebSocket communication in our app.",
+      "expect": "reverb-setup skill activates and guides through installing laravel/reverb, configuring environment variables, and setting up Echo client."
+    },
+    {
+      "prompt": "Set up Reverb with Supervisor for production and enable Redis scaling across multiple servers.",
+      "expect": "reverb-setup skill activates and covers Reverb installation, Redis scaling config, and Supervisor process management setup."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "skill": "cicd-setup",
+  "cases": [
+    {
+      "prompt": "Set up GitHub Actions CI/CD pipeline with tests, linting, security scanning, and deploy to Forge",
+      "expect": "Creates .github/workflows/ci.yml with tests, lint, static-analysis, security jobs; creates .github/workflows/deploy.yml for Forge deployment; documents required secrets (FORGE_DEPLOY_URL, CODECOV_TOKEN)"
+    },
+    {
+      "prompt": "I want to configure GitLab CI for my Laravel app with parallel test and lint jobs",
+      "expect": "Creates .gitlab-ci.yml with build, test, lint, security stages; sets up MySQL and Redis services; configures parallel execution"
+    }
+  ]
+}

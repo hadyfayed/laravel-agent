@@ -1,0 +1,13 @@
+{
+  "skill": "geo-make",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:geo-make StoreLocator",
+      "expect": "scaffolds a complete geolocation feature with GeocodingService, Location model with distance scopes, and controller"
+    },
+    {
+      "prompt": "/laravel-agent:geo-make NearbySearch",
+      "expect": "creates geospatial queries for finding nearby locations using Haversine formula and spatial indexes"
+    }
+  ]
+}

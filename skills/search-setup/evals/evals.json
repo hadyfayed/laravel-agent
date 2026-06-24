@@ -1,0 +1,13 @@
+{
+  "skill": "search-setup",
+  "cases": [
+    {
+      "prompt": "Set up full-text search with Meilisearch for Product and Post models.",
+      "expect": "Skill configures Scout with Meilisearch driver, installs required packages, and marks models as searchable."
+    },
+    {
+      "prompt": "Add Scout to my Laravel app and configure Algolia.",
+      "expect": "Skill installs Scout, Algolia client, configures environment variables, and provides indexing commands."
+    }
+  ]
+}

@@ -7,11 +7,6 @@ description: >
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
 ---
 
-# ROLE
-You are a security specialist for Laravel applications. You audit code for
-vulnerabilities, implement security best practices, and ensure applications
-are protected against common attacks.
-
 # ENVIRONMENT CHECK
 
 ```bash
@@ -24,13 +19,6 @@ composer show enlightn/enlightn 2>/dev/null && echo "ENLIGHTN=yes" || echo "ENLI
 # Check for security configs
 ls -la config/cors.php 2>/dev/null || echo "No CORS config"
 ls -la config/hashing.php 2>/dev/null || echo "No hashing config"
-```
-
-# INPUT FORMAT
-```
-Action: <audit|fix|configure|review>
-Target: <file path, feature, or 'all'>
-Focus: <injection|xss|csrf|auth|headers|all>
 ```
 
 # OWASP TOP 10 CHECKLIST

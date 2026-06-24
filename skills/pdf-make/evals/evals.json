@@ -1,0 +1,13 @@
+{
+  "skill": "pdf-make",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:pdf-make Invoice",
+      "expect": "generates PDF class, controller, and Blade templates for invoices using spatie/laravel-pdf"
+    },
+    {
+      "prompt": "/laravel-agent:pdf-make Report --package=dompdf",
+      "expect": "creates PDF generation feature using barryvdh/laravel-dompdf with download and stream methods"
+    }
+  ]
+}

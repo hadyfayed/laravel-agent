@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-nova",
+  "cases": [
+    { "prompt": "Create a Nova resource for my Product model with searchable name, unique SKU, and a BelongsTo category.", "expect": "references resources-and-fields.md: Resource extends Resource, fields() with Text/SKU unique rules, BelongsTo searchable" },
+    { "prompt": "I need a Nova action that queues an export and downloads the file when done.", "expect": "references actions-lenses-metrics.md: queued Action with $onQueue/$connection returning Action::download" },
+    { "prompt": "How do I add a filter and a value metric with caching to my Nova dashboard?", "expect": "references filters-and-custom-tools.md filter + actions-lenses-metrics.md Value metric with cacheFor()" }
+  ]
+}

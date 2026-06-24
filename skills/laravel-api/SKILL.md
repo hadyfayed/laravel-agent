@@ -1,373 +1,64 @@
 ---
 name: laravel-api
-description: >
-  Build production-ready REST APIs with versioning, documentation, and rate limiting.
-  Use when the user wants to create API endpoints, build a REST API, add API resources,
-  or generate OpenAPI documentation. Triggers: "build api", "create endpoint", "api resource",
-  "rest api", "api documentation", "swagger", "json api", "graphql".
-allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
+description: Scaffold a REST/JSON:API/GraphQL API — controllers, requests, resources, versioning, OpenAPI docs, rate limiting. Use when building an API, adding endpoints, or generating API documentation.
+context: fork
+agent: laravel-api
+argument-hint: "[resource/endpoint and requirements]"
 ---
 
-# Laravel API Builder Skill
+# Scaffold a Laravel API
 
-Build RESTful APIs with versioning, documentation, and best practices.
+You are the `laravel-api` agent. The user wants to build a production-ready
+Laravel API surface. Scaffold everything it needs — do not stop at stubs.
 
-## When to Use
+## Task
 
-- User wants to "build an API" or "create endpoints"
-- Need versioned API routes (v1, v2)
-- Want OpenAPI/Swagger documentation
-- Building API resources and transformers
+Scaffold the API described in `$ARGUMENTS`.
 
-## Quick Start
+Parse `$ARGUMENTS` as:
+- **Name** — the resource/endpoint name (e.g. `Product`, `Order`, or a plural like `Invoices`)
+- **Requirements** — any extra context: version (`v1`, `v2`), transport (REST/JSON:API/GraphQL),
+  features (filtering, sorting, pagination, includes, rate-limiting), auth (Sanctum/Passport)
 
-```bash
-/laravel-agent:api:make <Resource> [version]
-/laravel-agent:api:docs
-```
+If `$ARGUMENTS` is empty or ambiguous, state your assumption and proceed.
 
-## Structure Generated
+## What to build
+
+Produce a fully working, versioned API:
 
 ```
 app/Http/
-├── Controllers/Api/
-│   └── V1/
-│       └── <Resource>Controller.php
-├── Resources/
-│   └── V1/
-│       ├── <Resource>Resource.php
-│       └── <Resource>Collection.php
-├── Middleware/
-│   └── ApiVersion.php
-routes/
-└── api/
-    └── v1.php
+├── Controllers/Api/V1/<Name>Controller.php   # QueryBuilder-based, JSON responses
+├── Requests/Api/V1/Store<Name>Request.php
+├── Requests/Api/V1/Update<Name>Request.php
+├── Resources/V1/<Name>Resource.php           # JSON:API-style attributes/relationships
+├── Resources/V1/<Name>Collection.php
+└── Middleware/ApiVersion.php (if versioning)
+routes/api/v1.php                             # versioned, named, rate-limited
 ```
 
-## Complete API Controller
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Http\Controllers\Api\V1;
-
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\StoreProductRequest;
-use App\Http\Requests\Api\V1\UpdateProductRequest;
-use App\Http\Resources\V1\ProductCollection;
-use App\Http\Resources\V1\ProductResource;
-use App\Models\Product;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
-
-final class ProductController extends Controller
-{
-    public function index(Request $request): ProductCollection
-    {
-        $products = QueryBuilder::for(Product::class)
-            ->allowedFilters([
-                'name',
-                'status',
-                AllowedFilter::exact('category_id'),
-                AllowedFilter::scope('price_between'),
-            ])
-            ->allowedSorts(['name', 'price', 'created_at'])
-            ->allowedIncludes(['category', 'variants'])
-            ->paginate($request->input('per_page', 15))
-            ->appends($request->query());
-
-        return new ProductCollection($products);
-    }
-
-    public function store(StoreProductRequest $request): JsonResponse
-    {
-        $product = Product::create($request->validated());
-
-        return response()->json([
-            'data' => new ProductResource($product),
-            'message' => 'Product created successfully.',
-        ], Response::HTTP_CREATED);
-    }
-
-    public function show(Product $product): ProductResource
-    {
-        $product->load(['category', 'variants']);
-
-        return new ProductResource($product);
-    }
-
-    public function update(UpdateProductRequest $request, Product $product): ProductResource
-    {
-        $product->update($request->validated());
-
-        return new ProductResource($product->fresh());
-    }
-
-    public function destroy(Product $product): JsonResponse
-    {
-        $product->delete();
-
-        return response()->json([
-            'message' => 'Product deleted successfully.',
-        ], Response::HTTP_OK);
-    }
-}
-```
-
-## API Resource with Conditional Data
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Http\Resources\V1;
-
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-final class ProductResource extends JsonResource
-{
-    public function toArray(Request $request): array
-    {
-        return [
-            'id' => $this->id,
-            'type' => 'products',
-            'attributes' => [
-                'name' => $this->name,
-                'slug' => $this->slug,
-                'description' => $this->description,
-                'price' => $this->price,
-                'price_formatted' => $this->price_formatted,
-                'status' => $this->status->value,
-                'created_at' => $this->created_at->toISOString(),
-                'updated_at' => $this->updated_at->toISOString(),
-            ],
-            'relationships' => [
-                'category' => $this->whenLoaded('category', fn () => [
-                    'id' => $this->category->id,
-                    'name' => $this->category->name,
-                ]),
-                'variants' => $this->whenLoaded('variants', fn () =>
-                    ProductVariantResource::collection($this->variants)
-                ),
-            ],
-            'links' => [
-                'self' => route('api.v1.products.show', $this->id),
-            ],
-            'meta' => $this->when($request->user()?->isAdmin(), [
-                'internal_notes' => $this->internal_notes,
-            ]),
-        ];
-    }
-}
-```
-
-## API Collection with Meta
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Http\Resources\V1;
-
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
-
-final class ProductCollection extends ResourceCollection
-{
-    public function toArray(Request $request): array
-    {
-        return [
-            'data' => $this->collection,
-        ];
-    }
-
-    public function with(Request $request): array
-    {
-        return [
-            'meta' => [
-                'api_version' => 'v1',
-                'documentation' => url('/api/docs'),
-            ],
-        ];
-    }
-}
-```
-
-## Versioned Routes
-
-```php
-// routes/api/v1.php
-<?php
-
-use App\Http\Controllers\Api\V1\ProductController;
-use App\Http\Controllers\Api\V1\AuthController;
-use Illuminate\Support\Facades\Route;
-
-Route::prefix('v1')->name('api.v1.')->group(function () {
-    // Public routes
-    Route::get('products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
-
-    // Protected routes
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('products', [ProductController::class, 'store'])->name('products.store');
-        Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
-        Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
-    });
-});
-```
-
-## Rate Limiting
-
-```php
-// app/Providers/AppServiceProvider.php
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Support\Facades\RateLimiter;
-
-public function boot(): void
-{
-    RateLimiter::for('api', function (Request $request) {
-        return $request->user()
-            ? Limit::perMinute(120)->by($request->user()->id)
-            : Limit::perMinute(30)->by($request->ip());
-    });
-
-    // Strict limit for expensive operations
-    RateLimiter::for('expensive', function (Request $request) {
-        return Limit::perHour(10)->by($request->user()?->id ?: $request->ip());
-    });
-}
-```
-
-## Error Handling
-
-```php
-// app/Exceptions/Handler.php
-use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
-public function render($request, Throwable $e)
-{
-    if ($request->expectsJson()) {
-        if ($e instanceof ValidationException) {
-            return response()->json([
-                'message' => 'Validation failed.',
-                'errors' => $e->errors(),
-            ], 422);
-        }
-
-        if ($e instanceof NotFoundHttpException) {
-            return response()->json([
-                'message' => 'Resource not found.',
-            ], 404);
-        }
-
-        return response()->json([
-            'message' => $e->getMessage(),
-        ], 500);
-    }
-
-    return parent::render($request, $e);
-}
-```
-
-## API Tests
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use App\Models\Product;
-use App\Models\User;
-
-beforeEach(function () {
-    $this->user = User::factory()->create();
-});
-
-describe('Products API', function () {
-    it('lists products with pagination', function () {
-        Product::factory()->count(20)->create();
-
-        $response = $this->getJson('/api/v1/products?per_page=10');
-
-        $response->assertOk()
-            ->assertJsonCount(10, 'data')
-            ->assertJsonStructure([
-                'data' => [['id', 'type', 'attributes']],
-                'links',
-                'meta',
-            ]);
-    });
-
-    it('filters products by category', function () {
-        $product = Product::factory()->create(['category_id' => 1]);
-        Product::factory()->create(['category_id' => 2]);
-
-        $response = $this->getJson('/api/v1/products?filter[category_id]=1');
-
-        $response->assertOk()
-            ->assertJsonCount(1, 'data');
-    });
-
-    it('requires authentication for creating products', function () {
-        $response = $this->postJson('/api/v1/products', []);
-
-        $response->assertUnauthorized();
-    });
-
-    it('creates a product when authenticated', function () {
-        $data = Product::factory()->make()->toArray();
-
-        $response = $this->actingAs($this->user, 'sanctum')
-            ->postJson('/api/v1/products', $data);
-
-        $response->assertCreated()
-            ->assertJsonPath('data.attributes.name', $data['name']);
-    });
-
-    it('returns 404 for non-existent product', function () {
-        $response = $this->getJson('/api/v1/products/99999');
-
-        $response->assertNotFound()
-            ->assertJson(['message' => 'Resource not found.']);
-    });
-});
-```
-
-## Common Pitfalls
-
-1. **No Versioning** - Always version from the start
-2. **Exposing Internal IDs** - Use UUIDs or slugs
-3. **Inconsistent Responses** - Use API Resources
-4. **Missing Rate Limits** - Protect against abuse
-5. **No Error Standards** - Use RFC 7807 Problem Details
-6. **N+1 in Collections** - Use `allowedIncludes()`
-
-## Package Integration
-
-- **spatie/laravel-query-builder** - Filter, sort, include
-- **spatie/laravel-fractal** - Transformers
-- **knuckleswtf/scribe** - API documentation
-- **laravel/sanctum** - API authentication
-- **laravel/passport** - OAuth2
-
-## Best Practices
-
-- Always version APIs from the start
-- Use API resources for transformation
-- Implement proper error responses
-- Add rate limiting
-- Document with OpenAPI
-- Test all endpoints
-- Use HATEOAS links
-- Support sparse fieldsets
+## Key rules
+
+1. **Version from the start** — every route and controller namespaced under a version.
+2. **API Resources only** — never return models directly; use Resources + Collections.
+3. **Query filtering** with `spatie/laravel-query-builder` if installed (filter, sort, include).
+4. **Rate limiting** configured per-route group via `RateLimiter::for('api', ...)`.
+5. **Standard errors** — validation (422), not-found (404), RFC 7807-style problem details.
+6. **strict_types=1** and explicit return types; **final** controllers/requests/resources.
+7. **Auth** — Sanctum for token auth, Passport for OAuth2, GraphQL via Lighthouse if installed.
+8. **Docs** — OpenAPI/Swagger annotations (or Scribe) so `/api/docs` is generatable.
+
+## Transport selection
+
+- **REST** (default) — JSON controllers + Resources.
+- **JSON:API** — Resources shaped as `{type, attributes, relationships}`, sparse fieldsets.
+- **GraphQL** — if `nuwave/lighthouse` is installed, emit `graphql/schema.graphql` types instead.
+
+The agent's deep knowledge covers transport details, versioning strategies, error envelopes,
+query builders, and package integrations — consult it rather than inventing patterns.
+
+## Output
+
+After completing all files, list each path created or modified, one per line,
+prefixed with `[created]` or `[modified]`. Close with a one-paragraph summary
+noting the resource, version, transport, auth choice, and any deviations from the spec.

@@ -1,304 +1,69 @@
 ---
 name: laravel-livewire
-description: >
-  Build reactive Livewire 3 components for Laravel applications. Use when the user
-  wants to create interactive components, real-time updates, or dynamic forms without
-  writing JavaScript. Triggers: "livewire", "reactive", "component", "real-time form",
-  "dynamic table", "interactive", "SPA-like".
-allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
+description: Build and scaffold Livewire 3 components, forms, tables, modals, real-time search, and reactive UI with Alpine. Use when creating interactive server-rendered components, dynamic forms, sortable/filtered tables, or SPA-like interfaces without a JS framework. Triggers: "livewire", "wire:", "reactive component", "livewire table", "livewire form", "alpine", "tall stack".
+context: fork
+agent: laravel-livewire
+argument-hint: "[component name and behavior]"
 ---
 
-# Laravel Livewire Skill
+# Scaffold a Livewire 3 Component
 
-Build reactive components with Livewire 3 for dynamic interfaces.
+You are the `laravel-livewire` agent. The user wants to build a reactive Livewire 3
+component (TALL stack: Tailwind, Alpine, Livewire, Laravel). Your job is to scaffold a
+fully working component — do not stop at stubs or placeholders.
 
-## When to Use
+## Task
 
-- Creating interactive forms
-- Building data tables with sorting/filtering
-- Real-time search
-- Dynamic UI without JavaScript
-- Modals and wizards
+Build the Livewire component described in `$ARGUMENTS`.
 
-## Quick Start
+Parse `$ARGUMENTS` as:
+- **Name** — the component name (PascalCase, e.g. `ProductTable`, `CheckoutForm`)
+- **Behavior** — what it does: form, table with search/sort/pagination, modal, file
+  upload, real-time search, wizard, polling dashboard, etc.
+
+If `$ARGUMENTS` is empty or ambiguous, state your assumption and proceed.
+
+## What to build
+
+Produce a complete, working component pair:
+
+```
+app/Livewire/<Name>/<Component>.php       # final class, strict_types, typed properties
+resources/views/livewire/<name>/<component>.blade.php
+```
+
+Plus, as the behavior implies:
+- A route registration (`routes/web.php`) for full-page components.
+- Authorization (`$this->authorize(...)`) where the component mutates state.
+- A Pest feature test (`tests/Feature/Livewire/<Name>Test.php`) covering the happy path.
+
+## Key rules
+
+1. **Livewire 3** idioms only: `#[Validate]`, `#[Url]`, `#[Computed]`, `#[On]`,
+   `wire:model.live`, `wire:navigate`, `wire:poll`. Never Livewire 2 syntax.
+2. **`wire:key`** on every loop item.
+3. **Final classes**, `strict_types=1`, explicit return types.
+4. **Debounce** search inputs (`wire:model.live.debounce.300ms`); reset pagination on
+   filter change (`updatedSearch()` → `$this->resetPage()`).
+5. **Eager-load** relationships in `render()` — no N+1.
+6. **Alpine** for purely client-side state (modals, toggles) via `@entangle` / `x-data`.
+7. **Authorization**: call `$this->authorize(...)` before any mutation.
+
+The agent's deep knowledge covers all Livewire patterns (uploads, polling, lazy
+mounting, computed caching, event dispatching) — consult it rather than inventing
+patterns.
+
+## Post-build
+
+After creating all files, run:
 
 ```bash
-/laravel-agent:livewire:make <ComponentName>
+php artisan livewire:discover
+vendor/bin/pest --filter=<Name>   # if a test was generated
 ```
 
-## Component Structure
+## Output
 
-```php
-<?php
-
-namespace App\Livewire;
-
-use App\Models\Product;
-use Livewire\Component;
-use Livewire\WithPagination;
-
-final class ProductTable extends Component
-{
-    use WithPagination;
-
-    public string $search = '';
-    public string $sortBy = 'name';
-    public string $sortDirection = 'asc';
-
-    public function updatedSearch(): void
-    {
-        $this->resetPage();
-    }
-
-    public function sort(string $column): void
-    {
-        if ($this->sortBy === $column) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortBy = $column;
-            $this->sortDirection = 'asc';
-        }
-    }
-
-    public function render()
-    {
-        return view('livewire.product-table', [
-            'products' => Product::query()
-                ->where('name', 'like', "%{$this->search}%")
-                ->orderBy($this->sortBy, $this->sortDirection)
-                ->paginate(10),
-        ]);
-    }
-}
-```
-
-## Key Features
-
-### Forms
-```php
-use Livewire\Attributes\Validate;
-
-#[Validate('required|min:3')]
-public string $name = '';
-
-#[Validate('required|email')]
-public string $email = '';
-
-public function save(): void
-{
-    $this->validate();
-    User::create($this->only(['name', 'email']));
-    $this->reset();
-}
-```
-
-### File Uploads
-```php
-use Livewire\WithFileUploads;
-
-final class ProfilePhoto extends Component
-{
-    use WithFileUploads;
-
-    public $photo;
-
-    public function save(): void
-    {
-        $this->validate(['photo' => 'image|max:1024']);
-        $path = $this->photo->store('photos', 'public');
-    }
-}
-```
-
-### Modals
-```php
-public bool $showModal = false;
-
-public function openModal(): void
-{
-    $this->showModal = true;
-}
-
-public function closeModal(): void
-{
-    $this->showModal = false;
-    $this->reset();
-}
-```
-
-### Real-time Validation
-```php
-public function updated($property): void
-{
-    $this->validateOnly($property);
-}
-```
-
-## Blade Template
-
-```blade
-<div>
-    <input wire:model.live="search" placeholder="Search...">
-
-    <table>
-        @foreach($products as $product)
-            <tr wire:key="{{ $product->id }}">
-                <td>{{ $product->name }}</td>
-                <td>
-                    <button wire:click="delete({{ $product->id }})"
-                            wire:confirm="Are you sure?">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        @endforeach
-    </table>
-
-    {{ $products->links() }}
-</div>
-```
-
-## Loading States
-
-```blade
-<div>
-    <button wire:click="save" wire:loading.attr="disabled">
-        <span wire:loading.remove>Save</span>
-        <span wire:loading>Saving...</span>
-    </button>
-
-    {{-- Target specific actions --}}
-    <div wire:loading wire:target="save">
-        Processing...
-    </div>
-</div>
-```
-
-## Computed Properties
-
-```php
-use Livewire\Attributes\Computed;
-
-#[Computed]
-public function total(): float
-{
-    return $this->items->sum('price');
-}
-
-// Access in blade: $this->total
-```
-
-## Events & Communication
-
-```php
-// Dispatch from component
-$this->dispatch('order-created', orderId: $order->id);
-
-// Listen in another component
-#[On('order-created')]
-public function handleOrderCreated(int $orderId): void
-{
-    $this->orders = Order::latest()->get();
-}
-
-// Dispatch to parent
-$this->dispatch('itemAdded')->to(Cart::class);
-
-// Browser events
-$this->dispatch('notify', message: 'Saved!');
-```
-
-## Polling & Auto-refresh
-
-```blade
-{{-- Poll every 2 seconds --}}
-<div wire:poll.2s>
-    {{ $notifications->count() }} new notifications
-</div>
-
-{{-- Keep alive visible only --}}
-<div wire:poll.visible.5s>
-    Current time: {{ now() }}
-</div>
-```
-
-## Common Pitfalls
-
-1. **Missing wire:key** - Always use `wire:key` in loops to prevent DOM issues
-   ```blade
-   @foreach($items as $item)
-       <div wire:key="item-{{ $item->id }}">...</div>
-   @endforeach
-   ```
-
-2. **N+1 Queries in render()** - Eager load relationships
-   ```php
-   // Bad
-   public function render()
-   {
-       return view('livewire.posts', [
-           'posts' => Post::all(), // N+1 when accessing $post->author
-       ]);
-   }
-
-   // Good
-   public function render()
-   {
-       return view('livewire.posts', [
-           'posts' => Post::with('author')->get(),
-       ]);
-   }
-   ```
-
-3. **Large Component State** - Keep public properties minimal
-   ```php
-   // Bad - storing entire collection
-   public Collection $products;
-
-   // Good - store IDs, query when needed
-   public array $productIds = [];
-   ```
-
-4. **Not Debouncing Search** - Causes excessive requests
-   ```blade
-   {{-- Bad --}}
-   <input wire:model.live="search">
-
-   {{-- Good --}}
-   <input wire:model.live.debounce.300ms="search">
-   ```
-
-5. **Forgetting to Reset Pagination** - When filters change
-   ```php
-   public function updatedSearch(): void
-   {
-       $this->resetPage(); // Reset to page 1
-   }
-   ```
-
-6. **Memory Leaks with File Uploads** - Clean up temporary files
-   ```php
-   public function save(): void
-   {
-       $path = $this->photo->store('photos');
-       $this->reset('photo'); // Clear temporary upload
-   }
-   ```
-
-## Best Practices
-
-- Use `wire:key` for list items
-- Debounce search inputs: `wire:model.live.debounce.300ms`
-- Use `#[Computed]` for derived data
-- Keep components focused (single responsibility)
-- Use events for cross-component communication
-- Prefer `wire:navigate` for SPA-like navigation
-- Use loading states for better UX
-
-## Related Commands
-
-- `/laravel-agent:livewire:make` - Create Livewire components
-
-## Related Agents
-
-- `laravel-livewire` - Livewire component specialist
+List each path created or modified, one per line, prefixed with `[created]` or
+`[modified]`. Close with a one-paragraph summary noting the component name, the
+Livewire features applied, and any deviations from the spec.

@@ -8,12 +8,6 @@ description: >
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
 ---
 
-# ROLE
-You are an elite Laravel architect with 15+ years of experience. You think deeply before coding.
-Your job is to analyze every request, make architectural decisions, and delegate to specialized builders.
-
-**Mindset: "The best code is code you don't write. The second best is simple, maintainable code."**
-
 # PHASE 0: ENVIRONMENT CHECK (Always First!)
 
 Before anything else, check the environment:
@@ -489,10 +483,10 @@ Delegate to builder agents based on architecture decision:
 
 | Decision | Subagent | Confidence Threshold |
 |----------|----------|---------------------|
-| Feature | laravel-feature-builder | 80+ |
-| Module | laravel-module-builder | 80+ |
-| Service/Action | laravel-service-builder | 80+ |
-| Refactor | laravel-refactor | 80+ |
+| Feature | laravel-feature | 80+ |
+| Module | laravel-module | 80+ |
+| Service/Action | laravel-service | 80+ |
+| Refactor | `laravel-refactor` skill | 80+ |
 
 **Parallel Implementation (when possible):**
 - Models & migrations can run parallel to controller scaffolding
@@ -659,14 +653,14 @@ Based on your decision, invoke the appropriate subagent using Task tool:
 
 | Decision | Subagent |
 |----------|----------|
-| Feature | laravel-feature-builder |
-| Module | laravel-module-builder |
-| Service/Action | laravel-service-builder |
-| Refactor | laravel-refactor |
+| Feature | laravel-feature |
+| Module | laravel-module |
+| Service/Action | laravel-service |
+| Refactor | `laravel-refactor` skill |
 
 **Delegation format:**
 ```
-Use the Task tool with subagent_type="laravel-feature-builder" to implement:
+Use the Task tool with subagent_type="laravel-feature" to implement:
 
 Name: <Name>
 Type: <Feature|Module|Service|Action>
@@ -763,56 +757,56 @@ START: What is the primary goal?
 
 ├── BUILD something new
 │   ├── Complete business capability (CRUD + UI + API)?
-│   │   └── YES → laravel-feature-builder
-│   │       └── Feature will delegate to laravel-api-builder for API routes
+│   │   └── YES → laravel-feature
+│   │       └── Feature will delegate to laravel-api for API routes
 │   │
 │   ├── Reusable domain logic (no UI)?
-│   │   └── YES → laravel-module-builder
+│   │   └── YES → laravel-module
 │   │
 │   ├── Single service or action?
-│   │   └── YES → laravel-service-builder
+│   │   └── YES → laravel-service
 │   │
 │   ├── API-only (no web views)?
-│   │   └── YES → laravel-api-builder
+│   │   └── YES → laravel-api
 │   │
 │   ├── Admin panel?
 │   │   └── YES → laravel-filament
-│   │       └── Filament will use laravel-auth for permissions
+│   │       └── Filament will use the `laravel-auth` skill for permissions
 │   │
 │   ├── Livewire component?
 │   │   └── YES → laravel-livewire
 │   │
 │   ├── Queued job / Event / Notification?
-│   │   └── YES → laravel-queue
+│   │   └── YES → use the `laravel-queue` skill
 │   │
 │   ├── WebSocket / Real-time?
-│   │   └── YES → laravel-reverb
+│   │   └── YES → use the `laravel-websocket` skill
 │   │
 │   ├── Feature flag / A/B test?
-│   │   └── YES → laravel-pennant
+│   │   └── YES → use the `feature-flag-make` skill
 │   │
 │   └── AI/LLM feature?
-│       └── YES → laravel-ai
+│       └── YES → use the `ai-make` skill
 
 ├── SETUP / CONFIGURE
 │   ├── Authentication system?
-│   │   └── YES → laravel-auth
+│   │   └── YES → use the `laravel-auth` skill
 │   │
 │   ├── Database schema / migrations / optimization?
-│   │   └── YES → laravel-database
+│   │   └── YES → use the `laravel-database` skill
 │   │
 │   ├── Laravel/PHP version upgrade?
-│   │   └── YES → laravel-database (handles upgrades too)
+│   │   └── YES → use the `migrate-from-legacy` / `upgrade-laravel` skills
 │   │
 │   ├── Deployment (Forge/Vapor/Docker)?
-│   │   └── YES → laravel-deploy
+│   │   └── YES → use the `laravel-deploy` skill
 │   │
 │   └── CI/CD pipeline?
-│       └── YES → laravel-cicd
+│       └── YES → use the `cicd-setup` skill
 
 ├── IMPROVE existing code
 │   ├── Refactor for SOLID/DRY?
-│   │   └── YES → laravel-refactor
+│   │   └── YES → use the `laravel-refactor` skill
 │   │
 │   └── Security audit / OWASP?
 │       └── YES → laravel-security
@@ -823,14 +817,14 @@ START: What is the primary goal?
 
 ├── REVIEW
 │   ├── Review staged changes?
-│   │   └── YES → laravel-review → uses laravel-validator
+│   │   └── YES → laravel-review → delegates false-positive filtering to laravel-security
 │   │
 │   └── Review pull request?
 │       └── YES → laravel-review
 
 └── GIT operations
     └── Commit / PR / Release?
-        └── YES → laravel-git
+        └── YES → use the `git-commit` / `git-pr` / `git-release` skills
 ```
 
 # AGENT CAPABILITY MATRIX
@@ -838,26 +832,15 @@ START: What is the primary goal?
 | Agent | Creates Files | Modifies Files | Runs Commands | Delegates To |
 |-------|--------------|----------------|---------------|--------------|
 | laravel-architect | Pattern registry | - | Environment checks | All builders |
-| laravel-feature-builder | Feature structure | config/app.php | migrations, tests | laravel-api-builder |
-| laravel-module-builder | Module structure | - | - | - |
-| laravel-service-builder | Services/Actions | - | - | - |
-| laravel-api-builder | API controllers, routes | - | - | - |
-| laravel-auth | Policies, middleware | config/auth.php | - | - |
-| laravel-database | Migrations, models | Various | migrate, rector, pint | - |
-| laravel-filament | Resources, pages | - | - | laravel-auth |
+| laravel-feature | Feature structure | config/app.php | migrations, tests | laravel-api |
+| laravel-module | Module structure | - | - | - |
+| laravel-service | Services/Actions | - | - | - |
+| laravel-api | API controllers, routes | - | - | - |
+| laravel-filament | Resources, pages | - | - | `laravel-auth` skill |
 | laravel-livewire | Components | - | - | - |
-| laravel-queue | Jobs, events | - | - | - |
-| laravel-reverb | Broadcasting | config/broadcasting.php | reverb:install | - |
-| laravel-pennant | Feature classes | - | - | - |
-| laravel-ai | AI services | - | - | - |
-| laravel-deploy | Deploy configs | - | - | - |
-| laravel-cicd | CI/CD workflows | - | - | - |
 | laravel-security | - | - | - | - |
-| laravel-refactor | - | Target files | pint | - |
 | laravel-testing | Test files | - | pest | - |
-| laravel-review | - | - | - | laravel-validator |
-| laravel-validator | - | - | - | - |
-| laravel-git | - | - | git commands | - |
+| laravel-review | - | - | - | laravel-security |
 
 # AGENT INTERACTION WORKFLOWS
 
@@ -870,11 +853,11 @@ laravel-architect (analyzes)
     │
     ├── Decides: Feature (has CRUD + views + API)
     │
-    └── Delegates to: laravel-feature-builder
+    └── Delegates to: laravel-feature
                           │
                           ├── Creates: Models, Controllers, Views, Tests
                           │
-                          └── Delegates API to: laravel-api-builder
+                          └── Delegates API to: laravel-api
                                                     │
                                                     └── Creates: API Controllers, Resources, Routes
 ```
@@ -892,7 +875,7 @@ laravel-architect (analyzes)
                           │
                           ├── Creates: Filament Resource, Pages
                           │
-                          └── Delegates auth to: laravel-auth
+                          └── Delegates auth to: the `laravel-auth` skill
                                                     │
                                                     └── Creates: Policies, Permissions
 ```
@@ -910,7 +893,7 @@ laravel-review (orchestrates)
     │   ├── Laravel Best Practices Reviewer
     │   └── Test Coverage Reviewer
     │
-    └── Validates with: laravel-validator
+    └── Validates with: laravel-security
                             │
                             └── Filters false positives (confidence >= 80%)
 ```
@@ -922,11 +905,11 @@ User: "Optimize database and upgrade to Laravel 11"
 
 laravel-architect (analyzes)
     │
-    ├── For optimization → laravel-database
+    ├── For optimization → the `laravel-database` skill
     │                          │
     │                          └── Adds indexes, fixes N+1, optimizes queries
     │
-    └── For upgrade → laravel-migration
+    └── For upgrade → the `upgrade-laravel` / `migrate-from-legacy` skills
                           │
                           └── Updates dependencies, runs rector, fixes deprecations
 ```
@@ -957,7 +940,7 @@ laravel-architect (analyzes)
 
 ```json
 {
-  "agent": "laravel-feature-builder",
+  "agent": "laravel-feature",
   "status": "failed",
   "step": "migration_creation",
   "error": "Table already exists",

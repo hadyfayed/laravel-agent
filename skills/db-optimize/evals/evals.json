@@ -1,0 +1,13 @@
+{
+  "skill": "db-optimize",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:db-optimize",
+      "expect": "generates a database optimization report analyzing N+1 queries, Big O issues, missing indexes, and relationship optimization opportunities"
+    },
+    {
+      "prompt": "/laravel-agent:db-optimize app/Http/Controllers/OrderController",
+      "expect": "scans OrderController for N+1 patterns, missing eager loading, and performance issues with specific line references and fixes"
+    }
+  ]
+}

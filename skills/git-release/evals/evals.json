@@ -1,0 +1,13 @@
+{
+  "skill": "git-release",
+  "cases": [
+    {
+      "prompt": "Cut a patch release (1.0.0 to 1.0.1)",
+      "expect": "Bumps patch version, generates changelog, creates tag, pushes release"
+    },
+    {
+      "prompt": "Do a minor version bump without pushing",
+      "expect": "Uses --dry-run to show version bump and changelog changes without committing"
+    }
+  ]
+}

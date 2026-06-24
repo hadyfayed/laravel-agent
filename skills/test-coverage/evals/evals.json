@@ -1,0 +1,13 @@
+{
+  "skill": "test-coverage",
+  "cases": [
+    {
+      "prompt": "Check test coverage with an 85% minimum threshold",
+      "expect": "Skill runs Pest/PHPUnit with coverage, reports summary and identifies uncovered areas"
+    },
+    {
+      "prompt": "Generate HTML coverage report to identify test gaps",
+      "expect": "Skill generates coverage report and analyzes missing test coverage"
+    }
+  ]
+}
