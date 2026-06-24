@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-queue",
+  "cases": [
+    { "prompt": "Create a queued job to process an order with retries, exponential backoff, and a failure handler.", "expect": "references jobs-and-dispatching.md + retries-and-failure.md: ShouldQueue, $tries, $backoff array, failed(Throwable)" },
+    { "prompt": "How do I dispatch a batch of jobs and run something when they all finish, plus chain a few ordered jobs?", "expect": "references batches-chains-events.md: Bus::batch with then/finally, and Bus::chain([...])" },
+    { "prompt": "My queued job keeps retrying forever and workers serve stale code after deploys — how do I fix both?", "expect": "references retries-and-failure.md: set $tries/$backoff, run php artisan queue:restart after deploy" }
+  ]
+}
