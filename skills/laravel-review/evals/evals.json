@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-review",
+  "cases": [
+    { "prompt": "/laravel-agent:laravel-review 123", "expect": "forks the laravel-review agent, runs parallel security/quality/laravel/testing reviewers on the PR diff, and returns a confidence-scored markdown report with a verdict" },
+    { "prompt": "/laravel-agent:laravel-review staged", "expect": "forks the laravel-review agent and reviews staged changes as a pre-commit gate, reporting only high-confidence issues with PASS/FAIL verdict" },
+    { "prompt": "/laravel-agent:laravel-review app/Services", "expect": "forks the laravel-review agent and audits the given path for security, quality, Laravel best-practices, and testing gaps" }
+  ]
+}
