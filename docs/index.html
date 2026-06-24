@@ -116,47 +116,6 @@ nav_active: Home
     </div>
 </section>
 
-<!-- Commands Preview -->
-<section id="commands-preview" class="mb-16">
-    <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
-                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            </div>
-            <h2 class="text-2xl font-bold">Commands</h2>
-            <span class="badge badge-secondary">42</span>
-        </div>
-        <a href="{{ '/commands.html' | relative_url }}" class="flex items-center gap-2 text-sm text-primary hover:underline">
-            View all
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        </a>
-    </div>
-
-    <div class="grid md:grid-cols-3 gap-4">
-        <a href="{{ '/commands/build.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start justify-between mb-3">
-                <code class="text-sm font-mono text-primary">/build</code>
-                <span class="badge badge-core">Core</span>
-            </div>
-            <p class="text-sm text-muted-foreground">Intelligent build - architect analyzes and decides approach</p>
-        </a>
-        <a href="{{ '/commands/feature-make.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start justify-between mb-3">
-                <code class="text-sm font-mono text-primary">/feature:make</code>
-                <span class="badge badge-builder">Builder</span>
-            </div>
-            <p class="text-sm text-muted-foreground">Create complete feature with CRUD, views, API, tests</p>
-        </a>
-        <a href="{{ '/commands/test-make.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start justify-between mb-3">
-                <code class="text-sm font-mono text-primary">/test:make</code>
-                <span class="badge badge-testing">Testing</span>
-            </div>
-            <p class="text-sm text-muted-foreground">Generate Pest tests for any class or feature</p>
-        </a>
-    </div>
-</section>
-
 <!-- Skills Preview -->
 <section id="skills-preview" class="mb-16">
     <div class="flex items-center justify-between mb-6">
@@ -164,8 +123,8 @@ nav_active: Home
             <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
                 <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
             </div>
-            <h2 class="text-2xl font-bold">Auto-Invoked Skills</h2>
-            <span class="badge badge-secondary">12</span>
+            <h2 class="text-2xl font-bold">Skills</h2>
+            <span class="badge badge-secondary">{{ site.data.catalog.counts.skills }}</span>
         </div>
         <a href="{{ '/skills.html' | relative_url }}" class="flex items-center gap-2 text-sm text-primary hover:underline">
             View all
@@ -173,23 +132,18 @@ nav_active: Home
         </a>
     </div>
 
-    <p class="text-muted-foreground mb-6">Skills activate automatically based on conversation context.</p>
+    <p class="text-muted-foreground mb-6">{{ site.data.catalog.counts.skills }} specialized skills organized by type: reference, scaffolder, and utility.</p>
 
     <div class="grid md:grid-cols-2 gap-4">
-        <a href="{{ '/skills/laravel-testing.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
+        {% for skill in site.data.catalog.skills | slice: 0, 2 %}
+        <a href="https://github.com/hadyfayed/laravel-agent/blob/main/skills/{{ skill.name }}/SKILL.md" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
             <div class="flex items-center gap-3 mb-2">
-                <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                <span class="font-semibold">laravel-testing</span>
+                <span class="w-3 h-3 rounded-full {% if skill.kind == 'reference' %}bg-blue-500{% elsif skill.kind == 'scaffolder' %}bg-green-500{% else %}bg-purple-500{% endif %}"></span>
+                <span class="font-semibold">{{ skill.name }}</span>
             </div>
-            <p class="text-sm text-muted-foreground">Triggers: "test", "pest", "coverage" - Pest PHP testing</p>
+            <p class="text-sm text-muted-foreground">{{ skill.description | truncatewords: 15 }}</p>
         </a>
-        <a href="{{ '/skills/laravel-database.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-center gap-3 mb-2">
-                <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                <span class="font-semibold">laravel-database</span>
-            </div>
-            <p class="text-sm text-muted-foreground">Triggers: "migration", "N+1", "query" - Database optimization</p>
-        </a>
+        {% endfor %}
     </div>
 </section>
 
@@ -201,7 +155,7 @@ nav_active: Home
                 <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
             <h2 class="text-2xl font-bold">Specialized Agents</h2>
-            <span class="badge badge-secondary">23</span>
+            <span class="badge badge-secondary">{{ site.data.catalog.counts.agents }}</span>
         </div>
         <a href="{{ '/agents.html' | relative_url }}" class="flex items-center gap-2 text-sm text-primary hover:underline">
             View all
