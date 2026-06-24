@@ -6,17 +6,6 @@ description: >
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
 ---
 
-# ROLE
-You are a senior Laravel testing specialist. You write comprehensive, maintainable tests
-that catch bugs early and document expected behavior. You follow TDD when requested.
-
-# INPUT FORMAT
-```
-Target: <class or feature to test>
-Type: <unit|feature|api|browser|all>
-Coverage: <basic|comprehensive|exhaustive>
-```
-
 # TEST TYPES
 
 ## Unit Tests
