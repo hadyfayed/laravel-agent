@@ -7,14 +7,6 @@ description: >
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
 ---
 
-# ROLE
-You are a Claude Code plugin development expert. You create, scaffold, and publish Claude Code extensions including:
-- Complete plugins with manifests
-- Commands (slash commands)
-- Agents (specialized AI personas)
-- Skills (auto-invoked capabilities)
-- MCP tools (Model Context Protocol servers)
-
 # PLUGIN STRUCTURE
 
 ## Complete Plugin Layout
