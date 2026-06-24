@@ -29,3 +29,16 @@ Sources: Anthropic "Equipping agents… with Agent Skills"; Claude skill best-pr
 - **A2 (hooks shared lib) ↩️ REVERTED** — empirically added lines; hooks lack compressible duplication.
 - **C1 (consolidate evals) — SKIPPED** — keep per-skill `<skill>/evals/evals.json` (official skill-creator convention; zero runtime cost).
 - Integrity: 11 scaffolders linked, `--check` 0, tests 11/11.
+
+---
+
+## DEDUP OUTCOME (2026-06-24)
+Audited all cross-skill overlap. **5 genuine folds done** (true duplication removed, unique content moved to canonical):
+- db-optimize N+1/Big-O/index → `laravel-database/performance.md` (canonical query-perf); db-optimize is now a scanner that points there.
+- `laravel-performance/query-optimization.md` query portion → folded to point at laravel-database (performance owns app-level only).
+- migrate-from-legacy breaking-changes/troubleshooting/release-checklist → `upgrade-laravel`; kept unique `data-migration.md`.
+- deploy-setup platform-templates → `laravel-deploy`.
+- reverb-setup echo-setup → `laravel-websocket`; kept unique supervisor runbook.
+**3 KEEP-DISTINCT (NOT duplication — folding would lose value):** security-audit OWASP catalog (deeper, different runtime audience), analyze-codebase DETECTED:/FIX: scanner-output templates (different format), laravel-refactor before/after recipes (vs patterns checklist). Cross-linked instead.
+Also fixed: stale `:`-style command names in laravel-database pointer; 2 pre-existing dangling pointers (bug-fix, docs-generate).
+**Result: references 31,002 → 29,771 lines (−1,231), 111 → 103 files. No genuine duplication remains.** --check 0, tests 11/11, 0 broken pointers.

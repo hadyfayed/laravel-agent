@@ -62,5 +62,4 @@ Generate comprehensive documentation from your Laravel codebase. Types: `README`
 
 ## See also
 
-- `${CLAUDE_SKILL_DIR}/references/doc-templates.md` — template formats for each doc type
 - Laravel API docs for model introspection patterns

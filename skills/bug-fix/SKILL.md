@@ -69,6 +69,5 @@ Diagnose and fix a bug in your Laravel application.
 
 ## See also
 
-- `${CLAUDE_SKILL_DIR}/references/error-patterns.md` — detailed diagnosis guides per error type
 - `laravel-testing` reference skill for test patterns
 - Laravel documentation for Eloquent, validation, authentication

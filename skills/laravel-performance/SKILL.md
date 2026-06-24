@@ -95,5 +95,7 @@ php artisan telescope        # dev profiling (if installed)
 ## Additional references
 
 - Caching strategies (query cache, model cache, Redis, fragments) → [references/caching.md](references/caching.md)
-- Query & Big-O optimization (N+1, chunking, indexes, O(n²) fixes) → [references/query-optimization.md](references/query-optimization.md)
+- Application-level streaming, batching, and memory optimization → [references/query-optimization.md](references/query-optimization.md)
 - Profiling, scaling & server tuning (Octane, queues, Pulse, OPcache, Nginx, benchmarking) → [references/profiling-and-scaling.md](references/profiling-and-scaling.md)
+
+**Query-level optimization** (N+1 patterns, Big O complexity, indexes) is owned by the **laravel-database** skill — see its performance reference.

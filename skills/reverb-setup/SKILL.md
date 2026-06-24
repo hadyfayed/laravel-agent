@@ -32,7 +32,7 @@ Install and configure Laravel Reverb for real-time WebSocket communication. Set 
 3. **Setup Echo client** (frontend):
    - Create `resources/js/echo.js` with broadcaster config
    - Import Echo in `resources/js/app.js`
-   - See `references/echo-setup.md` for client-side details
+   - For comprehensive Echo client setup patterns, use the **laravel-websocket** skill (`/laravel-agent:laravel-websocket`)
 
 4. **Configure Reverb** (optional scaling):
    - If `--scaled`: enable Redis in `config/reverb.php` for multi-server deployments
@@ -57,8 +57,6 @@ php artisan reverb:restart                  # Restart daemon
 
 ## Reference
 
-Broadcasting event conventions, channel authorization, Echo listener patterns, and Reverb/broadcasting best practices: see the **laravel-websocket** reference skill for comprehensive guidance on building real-time features.
+Echo client setup, channel patterns, and broadcasting best practices are owned by the **laravel-websocket** skill (`/laravel-agent:laravel-websocket`) — use it for comprehensive guidance on building real-time features.
 
 Supervisor configuration for production deployment: `references/supervisor-setup.md`.
-
-Echo client setup and Vite integration: `references/echo-setup.md`.

@@ -71,4 +71,4 @@ Configure deployment for Forge, Vapor, Docker, or Bref. `$ARGUMENTS` specifies t
 
 ## Deep references
 
-Platform-specific deployment patterns, zero-downtime strategies, health checks, and queue/scheduler setup: see the **laravel-deploy** reference skill for comprehensive guidance.
+Deployment platform specifics (Forge/Vapor/Docker/Bref, zero-downtime, env) are owned by the **laravel-deploy** skill — apply its conventions (it auto-loads as a reference).
