@@ -1,7 +1,7 @@
 ---
 name: laravel-filament
 description: >
-  Build Filament 3/4 admin panels with resources, custom pages, widgets, forms,
+  Build Filament v3/v4 admin panels with resources, custom pages, widgets, forms,
   tables, and actions. Supports Filament Shield for RBAC. Creates complete CRUD
   with relationships, filters, and bulk actions.
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task

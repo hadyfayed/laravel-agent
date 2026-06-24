@@ -45,7 +45,7 @@ Apply proven architecture and design patterns when structuring Laravel code, ref
 | **Observer** | React to Eloquent lifecycle events without bloating the model | `app/Observers` |
 | **Query Object** | Encapsulate a complex, composable filter set | `app/Query` |
 | **Presenter** | Format model output for a view without leaking into Blade | `app/Presenters` |
-| **Builder** | Stepwise construction of a complex object | `app/Builders` |
+| **Builder** | Stepwise construction of a complex object (object builders, not Eloquent query builders) | `app/Builders` |
 
 ## Anti-Patterns to Avoid
 

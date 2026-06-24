@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseFrontmatter, classifySkill, renderCatalog, counts, applyCounts, targets } from './build-catalog.mjs';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { parseFrontmatter, classifySkill, renderCatalog, counts, applyCounts, targets, run, scan } from './build-catalog.mjs';
 
 test('parseFrontmatter reads top-level scalar keys', () => {
   const fm = parseFrontmatter('---\nname: x\ndescription: does y\ncontext: fork\n---\nbody');
@@ -39,12 +41,33 @@ test('parseFrontmatter handles folded block scalar (description: >)', () => {
   assert.equal(fm.context, 'fork');
 });
 
+test('parseFrontmatter handles block scalar with chomping indicators (>-, >+, |-, |+)', () => {
+  const yaml1 = '---\nname: test-clip\ndescription: >-\n  Multi-line text.\n  With clip indicator.\ncontext: fork\n---\nbody';
+  const fm1 = parseFrontmatter(yaml1);
+  assert.match(fm1.description, /Multi-line text/);
+  assert.equal(fm1.context, 'fork');
+
+  const yaml2 = '---\nname: test-keep\ndescription: |+\n  Literal block.\n  With keep indicator.\ncontext: fork\n---\nbody';
+  const fm2 = parseFrontmatter(yaml2);
+  assert.match(fm2.description, /Literal block/);
+  assert.equal(fm2.context, 'fork');
+});
+
 test('applyCounts replaces only the marker block', () => {
   const src = 'intro\n<!-- catalog:counts -->OLD<!-- /catalog:counts -->\noutro';
   const out = applyCounts(src, { skills: [1, 2], agents: [1] });
   assert.match(out, /<!-- catalog:counts -->2 skills · 1 agents<!-- \/catalog:counts -->/);
   assert.match(out, /intro/);
   assert.match(out, /outro/);
+});
+
+test('applyCounts throws error when catalog:counts marker is missing', () => {
+  const src = 'intro\nno marker here\noutro';
+  assert.throws(
+    () => applyCounts(src, { skills: [1, 2], agents: [1] }),
+    /Missing <!-- catalog:counts --> marker/,
+    'should throw when marker is absent'
+  );
 });
 
 test('targets() docs/index.html transform replaces stale agent/command/skill phrase with badge', () => {
@@ -84,4 +107,15 @@ test('docs count targets refresh and are idempotent (no silent freeze)', () => {
     // and applying the transform again must be a no-op:
     assert.equal(fn(refreshed), refreshed, `${path} transform not idempotent`);
   }
+});
+
+test('catalog.json data file is emitted and matches scan()', async () => {
+  const data = scan();
+  const { ok, diffs } = run();
+  const catalogJsonPath = join(process.cwd(), 'docs', '_data', 'catalog.json');
+  assert.ok(existsSync(catalogJsonPath), 'catalog.json should exist');
+  const jsonContent = JSON.parse(readFileSync(catalogJsonPath, 'utf8'));
+  assert.deepEqual(jsonContent.skills, data.skills, 'skills in JSON should match scan()');
+  assert.deepEqual(jsonContent.agents, data.agents, 'agents in JSON should match scan()');
+  assert.deepEqual(jsonContent.counts, counts(data), 'counts in JSON should match scan()');
 });

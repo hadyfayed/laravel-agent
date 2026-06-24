@@ -39,56 +39,7 @@ Key settings:
 
 ### 3. Authorization (Production)
 
-Create/edit `app/Providers/TelescopeServiceProvider.php`:
-
-```php
-<?php
-declare(strict_types=1);
-
-namespace App\Providers;
-
-use Illuminate\Support\Facades\Gate;
-use Laravel\Telescope\Telescope;
-use Laravel\Telescope\TelescopeApplicationServiceProvider;
-
-final class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
-{
-    public function register(): void
-    {
-        Telescope::night();  // dark mode
-
-        $this->hideSensitiveRequestDetails();
-
-        // Only record on local or critical events in production
-        Telescope::filter(function ($entry) {
-            if ($this->app->environment('local')) {
-                return true;
-            }
-
-            return $entry->isReportableException()
-                || $entry->isFailedRequest()
-                || $entry->isFailedJob();
-        });
-    }
-
-    protected function hideSensitiveRequestDetails(): void
-    {
-        if ($this->app->environment('local')) {
-            return;
-        }
-
-        Telescope::hideRequestParameters(['_token', 'password']);
-        Telescope::hideRequestHeaders(['cookie', 'x-csrf-token']);
-    }
-
-    protected function gate(): void
-    {
-        Gate::define('viewTelescope', fn ($user) =>
-            in_array($user->email, ['admin@example.com']) || $user->isAdmin()
-        );
-    }
-}
-```
+Configure `app/Providers/TelescopeServiceProvider.php` with filtering, sensitivity masking, and gate authorization. See `references/telescope-auth.md` for detailed examples and production setup.
 
 ### 4. Local-Only Setup (Optional)
 

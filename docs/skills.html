@@ -1,7 +1,7 @@
 ---
 layout: list
 title: Skills
-description: 21 auto-invoked skills for Laravel development with Claude Code
+description: 66 specialized skills for Laravel development with Claude Code
 nav_active: Skills
 ---
 
@@ -17,434 +17,99 @@ nav_active: Skills
 <div class="max-w-5xl mx-auto px-6 lg:px-8 py-8">
     <div class="mb-8">
         <h1 class="text-3xl font-bold mb-2">Skills</h1>
-        <p class="text-muted-foreground">21 auto-invoked skills that activate based on context - no commands needed</p>
+        <p class="text-muted-foreground">{{ site.data.catalog.counts.skills }} specialized skills organized by type</p>
     </div>
 
-    <div class="bg-card border border-border rounded-[var(--radius)] p-6 mb-8">
-        <h2 class="font-semibold mb-3 flex items-center gap-2">
-            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            How Skills Work
-        </h2>
-        <p class="text-muted-foreground text-sm">Skills are automatically activated when Claude detects relevant keywords in your conversation. Simply describe what you need, and the appropriate skill will engage to provide specialized Laravel expertise.</p>
-    </div>
-
-        <!-- Empty State -->
+    <!-- Empty State -->
     <div id="empty-state" class="hidden empty-state col-span-full">
         <svg class="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
         <p class="font-medium text-foreground mb-1">No skills found</p>
-        <p class="text-sm text-muted-foreground">Try a different search term or filter</p>
+        <p class="text-sm text-muted-foreground">Try a different search term</p>
     </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="skills-grid">
-        <a href="{{ 'skills/laravel-feature.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-blue-500 to-blue-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-feature</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Build complete Laravel features with CRUD, views, API, and tests.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">build feature</span>
-                        <span class="trigger-tag">create feature</span>
-                        <span class="trigger-tag">implement</span>
-                        <span class="trigger-tag">crud</span>
-                    </div>
-                </div>
+    <div class="space-y-8">
+        <!-- Reference Skills -->
+        <div id="reference-section">
+            <h2 class="text-2xl font-semibold mb-4">Reference Skills</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 skill-grid" data-kind="reference">
+                {% for skill in site.data.catalog.skills %}
+                    {% if skill.kind == 'reference' %}
+                    <a href="https://github.com/hadyfayed/laravel-agent/blob/main/skills/{{ skill.name }}/SKILL.md" class="skill-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-name="{{ skill.name }}" data-kind="reference">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="font-semibold">{{ skill.name }}</h3>
+                            <span class="category-badge text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">reference</span>
+                        </div>
+                        <p class="text-sm text-muted-foreground mb-3">{{ skill.description }}</p>
+                        <div class="text-xs text-muted-foreground font-mono">/laravel-agent:{{ skill.name }}</div>
+                    </a>
+                    {% endif %}
+                {% endfor %}
             </div>
-        </a>
+        </div>
 
-        <a href="{{ 'skills/laravel-api.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-green-500 to-green-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-api</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Build REST APIs with versioning and OpenAPI documentation.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">build api</span>
-                        <span class="trigger-tag">rest api</span>
-                        <span class="trigger-tag">endpoint</span>
-                        <span class="trigger-tag">openapi</span>
-                    </div>
-                </div>
+        <!-- Scaffolder Skills -->
+        <div id="scaffolder-section">
+            <h2 class="text-2xl font-semibold mb-4">Scaffolder Skills</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 skill-grid" data-kind="scaffolder">
+                {% for skill in site.data.catalog.skills %}
+                    {% if skill.kind == 'scaffolder' %}
+                    <a href="https://github.com/hadyfayed/laravel-agent/blob/main/skills/{{ skill.name }}/SKILL.md" class="skill-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-name="{{ skill.name }}" data-kind="scaffolder">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="font-semibold">{{ skill.name }}</h3>
+                            <span class="category-badge text-xs px-2 py-1 rounded-full bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300">scaffolder</span>
+                        </div>
+                        <p class="text-sm text-muted-foreground mb-3">{{ skill.description }}</p>
+                        <div class="text-xs text-muted-foreground font-mono">/laravel-agent:{{ skill.name }}</div>
+                    </a>
+                    {% endif %}
+                {% endfor %}
             </div>
-        </a>
+        </div>
 
-        <a href="{{ 'skills/laravel-database.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-amber-500 to-amber-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-database</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Optimize queries, fix N+1 issues, design schemas with indexes.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">migration</span>
-                        <span class="trigger-tag">N+1</span>
-                        <span class="trigger-tag">query</span>
-                        <span class="trigger-tag">eloquent</span>
-                    </div>
-                </div>
+        <!-- Utility Skills -->
+        <div id="utility-section">
+            <h2 class="text-2xl font-semibold mb-4">Utility Skills</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 skill-grid" data-kind="utility">
+                {% for skill in site.data.catalog.skills %}
+                    {% if skill.kind == 'utility' %}
+                    <a href="https://github.com/hadyfayed/laravel-agent/blob/main/skills/{{ skill.name }}/SKILL.md" class="skill-card block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50" data-name="{{ skill.name }}" data-kind="utility">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="font-semibold">{{ skill.name }}</h3>
+                            <span class="category-badge text-xs px-2 py-1 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">utility</span>
+                        </div>
+                        <p class="text-sm text-muted-foreground mb-3">{{ skill.description }}</p>
+                        <div class="text-xs text-muted-foreground font-mono">/laravel-agent:{{ skill.name }}</div>
+                    </a>
+                    {% endif %}
+                {% endfor %}
             </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-testing.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-purple-500 to-purple-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-testing</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Comprehensive testing with Pest PHP - unit, feature, API, browser.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">test</span>
-                        <span class="trigger-tag">pest</span>
-                        <span class="trigger-tag">coverage</span>
-                        <span class="trigger-tag">tdd</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-auth.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-red-500 to-red-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-auth</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Setup authentication with policies, gates, roles, Sanctum.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">auth</span>
-                        <span class="trigger-tag">permission</span>
-                        <span class="trigger-tag">policy</span>
-                        <span class="trigger-tag">sanctum</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-livewire.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-pink-500 to-pink-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-livewire</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Create Livewire 3 components with forms, tables, modals.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">livewire</span>
-                        <span class="trigger-tag">reactive</span>
-                        <span class="trigger-tag">component</span>
-                        <span class="trigger-tag">alpine</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-inertia.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-purple-500 to-indigo-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-inertia</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Build SPAs with Laravel and Inertia.js using Vue or React.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">inertia</span>
-                        <span class="trigger-tag">vue spa</span>
-                        <span class="trigger-tag">react spa</span>
-                        <span class="trigger-tag">ziggy</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-filament.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-orange-500 to-orange-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-filament</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Build admin panels with resources, pages, widgets.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">filament</span>
-                        <span class="trigger-tag">admin panel</span>
-                        <span class="trigger-tag">widget</span>
-                        <span class="trigger-tag">dashboard</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-nova.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-indigo-500 to-indigo-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-nova</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Build premium admin panels with Nova resources, actions, metrics.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">nova</span>
-                        <span class="trigger-tag">nova resource</span>
-                        <span class="trigger-tag">nova action</span>
-                        <span class="trigger-tag">admin dashboard</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-performance.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-cyan-500 to-cyan-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-performance</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Optimize with caching, Pulse monitoring, memory management.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">slow</span>
-                        <span class="trigger-tag">optimize</span>
-                        <span class="trigger-tag">cache</span>
-                        <span class="trigger-tag">pulse</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-security.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-rose-500 to-rose-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-security</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Security audits for OWASP vulnerabilities and fixes.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">security</span>
-                        <span class="trigger-tag">XSS</span>
-                        <span class="trigger-tag">SQL injection</span>
-                        <span class="trigger-tag">OWASP</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-deploy.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-indigo-500 to-indigo-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-deploy</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Configure deployment with zero-downtime, health checks.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">deploy</span>
-                        <span class="trigger-tag">production</span>
-                        <span class="trigger-tag">forge</span>
-                        <span class="trigger-tag">vapor</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-queue.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-teal-500 to-teal-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-queue</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Create jobs, events, listeners with rate limiting.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">queue</span>
-                        <span class="trigger-tag">job</span>
-                        <span class="trigger-tag">event</span>
-                        <span class="trigger-tag">horizon</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-websocket.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-violet-500 to-violet-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.14 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-websocket</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Build real-time features with Laravel Reverb.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">websocket</span>
-                        <span class="trigger-tag">real-time</span>
-                        <span class="trigger-tag">Reverb</span>
-                        <span class="trigger-tag">broadcast</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-horizon.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-purple-500 to-purple-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-horizon</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Monitor and manage Redis queues with dashboard and metrics.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">horizon</span>
-                        <span class="trigger-tag">queue dashboard</span>
-                        <span class="trigger-tag">failed jobs</span>
-                        <span class="trigger-tag">metrics</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-sanctum.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-indigo-500 to-indigo-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-sanctum</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Implement API token and SPA authentication.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">sanctum</span>
-                        <span class="trigger-tag">api token</span>
-                        <span class="trigger-tag">spa auth</span>
-                        <span class="trigger-tag">bearer</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-socialite.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-pink-500 to-pink-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-socialite</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Implement OAuth social authentication with multiple providers.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">socialite</span>
-                        <span class="trigger-tag">oauth</span>
-                        <span class="trigger-tag">social login</span>
-                        <span class="trigger-tag">google login</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-passport.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-blue-500 to-blue-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-passport</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Implement full OAuth2 server with all grant types.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">passport</span>
-                        <span class="trigger-tag">oauth2 server</span>
-                        <span class="trigger-tag">authorization code</span>
-                        <span class="trigger-tag">refresh token</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-scout.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-emerald-500 to-emerald-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-scout</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Full-text search with Algolia, Meilisearch, or Typesense.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">scout</span>
-                        <span class="trigger-tag">search</span>
-                        <span class="trigger-tag">algolia</span>
-                        <span class="trigger-tag">meilisearch</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-cashier.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-green-500 to-green-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-cashier</h3>
-                    <p class="text-sm text-muted-foreground mb-3">Subscription billing with Stripe or Paddle.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">cashier</span>
-                        <span class="trigger-tag">stripe</span>
-                        <span class="trigger-tag">subscription</span>
-                        <span class="trigger-tag">billing</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ 'skills/laravel-octane.html' | relative_url }}" class="skill-card block p-6 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start gap-4">
-                <div class="skill-icon bg-gradient-to-br from-yellow-500 to-orange-600">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-2">laravel-octane</h3>
-                    <p class="text-sm text-muted-foreground mb-3">High-performance with Swoole, RoadRunner, or FrankenPHP.</p>
-                    <div class="flex flex-wrap">
-                        <span class="trigger-tag">octane</span>
-                        <span class="trigger-tag">swoole</span>
-                        <span class="trigger-tag">roadrunner</span>
-                        <span class="trigger-tag">frankenphp</span>
-                    </div>
-                </div>
-            </div>
-        </a>
+        </div>
     </div>
 </div>
 
 <script>
-    // Elements
-    const emptyState = document.getElementById('empty-state');
-    const searchInput = document.getElementById('search');
-    const skillCards = document.querySelectorAll('.skill-card');
+document.getElementById('search').addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase();
+  const cards = document.querySelectorAll('.skill-card');
+  const sections = document.querySelectorAll('[id$="-section"]');
+  let totalVisible = 0;
 
-    // Empty state helper
-    function updateEmptyState() {
-        const visibleCards = document.querySelectorAll('.skill-card:not([style*="display: none"])');
-        if (visibleCards.length === 0) {
-            emptyState.classList.remove('hidden');
-        } else {
-            emptyState.classList.add('hidden');
-        }
-    }
+  cards.forEach(card => {
+    const name = card.dataset.name.toLowerCase();
+    const description = card.textContent.toLowerCase();
+    const matches = name.includes(query) || description.includes(query);
+    card.style.display = matches ? '' : 'none';
+    if (matches) totalVisible++;
+  });
 
-    // Search functionality with debounce
-    let searchTimeout;
-    searchInput.addEventListener('input', (e) => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            const query = e.target.value.toLowerCase();
-            skillCards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(query) ? 'block' : 'none';
-            });
-            updateEmptyState();
-        }, 150);
-    });
+  // Show/hide sections based on visible cards
+  sections.forEach(section => {
+    const visibleCards = section.querySelectorAll('.skill-card:not([style*="display: none"])').length;
+    section.style.display = visibleCards > 0 ? '' : 'none';
+  });
+
+  document.getElementById('empty-state').classList.toggle('hidden', totalVisible > 0);
+});
 </script>

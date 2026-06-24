@@ -16,16 +16,16 @@ nav_active: Home
 
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <a href="{{ '/agents.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
-            <div class="text-3xl font-bold mb-1">23</div>
-            <div class="text-sm text-muted-foreground">Specialized Agents</div>
-        </a>
-        <a href="{{ '/commands.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
-            <div class="text-3xl font-bold mb-1">42</div>
-            <div class="text-sm text-muted-foreground">Commands</div>
+            <div class="text-3xl font-bold mb-1">{{ site.data.catalog.counts.agents }}</div>
+            <div class="text-sm text-muted-foreground">Agents</div>
         </a>
         <a href="{{ '/skills.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
-            <div class="text-3xl font-bold mb-1">12</div>
-            <div class="text-sm text-muted-foreground">Auto-Invoked Skills</div>
+            <div class="text-3xl font-bold mb-1">{{ site.data.catalog.counts.skills }}</div>
+            <div class="text-sm text-muted-foreground">Skills</div>
+        </a>
+        <a href="{{ '/hooks.html' | relative_url }}" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
+            <div class="text-3xl font-bold mb-1">9</div>
+            <div class="text-sm text-muted-foreground">Hooks</div>
         </a>
         <a href="#packages" class="bg-card rounded-[var(--radius)] p-5 border border-border hover:border-primary/50 transition-colors card-hover">
             <div class="text-3xl font-bold mb-1">85+</div>
@@ -99,7 +99,7 @@ nav_active: Home
                 <div class="flex-1">
                     <h3 class="font-semibold mb-2">Create Features Directly</h3>
                     <p class="text-muted-foreground text-sm mb-3">Build complete features with CRUD, views, API, and tests:</p>
-                    <div class="bg-muted rounded-[var(--radius)] p-3"><code class="text-sm">/laravel-agent:feature:make Products with categories</code></div>
+                    <div class="bg-muted rounded-[var(--radius)] p-3"><code class="text-sm">/laravel-feature Products with categories</code></div>
                 </div>
             </div>
         </div>
@@ -109,51 +109,10 @@ nav_active: Home
                 <div class="flex-1">
                     <h3 class="font-semibold mb-2">Generate Tests</h3>
                     <p class="text-muted-foreground text-sm mb-3">Create comprehensive Pest tests for any class:</p>
-                    <div class="bg-muted rounded-[var(--radius)] p-3"><code class="text-sm">/laravel-agent:test:make App/Services/PaymentService</code></div>
+                    <div class="bg-muted rounded-[var(--radius)] p-3"><code class="text-sm">/laravel-testing App/Services/PaymentService</code></div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- Commands Preview -->
-<section id="commands-preview" class="mb-16">
-    <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
-                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            </div>
-            <h2 class="text-2xl font-bold">Commands</h2>
-            <span class="badge badge-secondary">42</span>
-        </div>
-        <a href="{{ '/commands.html' | relative_url }}" class="flex items-center gap-2 text-sm text-primary hover:underline">
-            View all
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        </a>
-    </div>
-
-    <div class="grid md:grid-cols-3 gap-4">
-        <a href="{{ '/commands/build.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start justify-between mb-3">
-                <code class="text-sm font-mono text-primary">/build</code>
-                <span class="badge badge-core">Core</span>
-            </div>
-            <p class="text-sm text-muted-foreground">Intelligent build - architect analyzes and decides approach</p>
-        </a>
-        <a href="{{ '/commands/feature-make.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start justify-between mb-3">
-                <code class="text-sm font-mono text-primary">/feature:make</code>
-                <span class="badge badge-builder">Builder</span>
-            </div>
-            <p class="text-sm text-muted-foreground">Create complete feature with CRUD, views, API, tests</p>
-        </a>
-        <a href="{{ '/commands/test-make.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-start justify-between mb-3">
-                <code class="text-sm font-mono text-primary">/test:make</code>
-                <span class="badge badge-testing">Testing</span>
-            </div>
-            <p class="text-sm text-muted-foreground">Generate Pest tests for any class or feature</p>
-        </a>
     </div>
 </section>
 
@@ -164,8 +123,8 @@ nav_active: Home
             <div class="w-10 h-10 rounded-[var(--radius)] bg-primary/10 flex items-center justify-center">
                 <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
             </div>
-            <h2 class="text-2xl font-bold">Auto-Invoked Skills</h2>
-            <span class="badge badge-secondary">12</span>
+            <h2 class="text-2xl font-bold">Skills</h2>
+            <span class="badge badge-secondary">{{ site.data.catalog.counts.skills }}</span>
         </div>
         <a href="{{ '/skills.html' | relative_url }}" class="flex items-center gap-2 text-sm text-primary hover:underline">
             View all
@@ -173,23 +132,18 @@ nav_active: Home
         </a>
     </div>
 
-    <p class="text-muted-foreground mb-6">Skills activate automatically based on conversation context.</p>
+    <p class="text-muted-foreground mb-6">{{ site.data.catalog.counts.skills }} specialized skills organized by type: reference, scaffolder, and utility.</p>
 
     <div class="grid md:grid-cols-2 gap-4">
-        <a href="{{ '/skills/laravel-testing.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
+        {% for skill in site.data.catalog.skills | slice: 0, 2 %}
+        <a href="https://github.com/hadyfayed/laravel-agent/blob/main/skills/{{ skill.name }}/SKILL.md" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
             <div class="flex items-center gap-3 mb-2">
-                <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                <span class="font-semibold">laravel-testing</span>
+                <span class="w-3 h-3 rounded-full {% if skill.kind == 'reference' %}bg-blue-500{% elsif skill.kind == 'scaffolder' %}bg-green-500{% else %}bg-purple-500{% endif %}"></span>
+                <span class="font-semibold">{{ skill.name }}</span>
             </div>
-            <p class="text-sm text-muted-foreground">Triggers: "test", "pest", "coverage" - Pest PHP testing</p>
+            <p class="text-sm text-muted-foreground">{{ skill.description | truncatewords: 15 }}</p>
         </a>
-        <a href="{{ '/skills/laravel-database.html' | relative_url }}" class="card-hover block p-5 rounded-[var(--radius)] border border-border bg-card hover:border-primary/50">
-            <div class="flex items-center gap-3 mb-2">
-                <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                <span class="font-semibold">laravel-database</span>
-            </div>
-            <p class="text-sm text-muted-foreground">Triggers: "migration", "N+1", "query" - Database optimization</p>
-        </a>
+        {% endfor %}
     </div>
 </section>
 
@@ -201,7 +155,7 @@ nav_active: Home
                 <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
             <h2 class="text-2xl font-bold">Specialized Agents</h2>
-            <span class="badge badge-secondary">23</span>
+            <span class="badge badge-secondary">{{ site.data.catalog.counts.agents }}</span>
         </div>
         <a href="{{ '/agents.html' | relative_url }}" class="flex items-center gap-2 text-sm text-primary hover:underline">
             View all
@@ -219,9 +173,15 @@ nav_active: Home
             </thead>
             <tbody class="divide-y divide-border">
                 <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-architect</td><td class="px-6 py-3 text-sm text-muted-foreground">Analyzes requests, decides approach, delegates to builders</td></tr>
-                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-feature-builder</td><td class="px-6 py-3 text-sm text-muted-foreground">Builds complete features with CRUD, views, API, tests</td></tr>
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-feature</td><td class="px-6 py-3 text-sm text-muted-foreground">Builds complete features with CRUD, views, API, tests</td></tr>
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-api</td><td class="px-6 py-3 text-sm text-muted-foreground">Scaffolds REST/GraphQL APIs with validation, policies, tests</td></tr>
                 <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-testing</td><td class="px-6 py-3 text-sm text-muted-foreground">Pest tests - unit, feature, API, browser</td></tr>
                 <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-security</td><td class="px-6 py-3 text-sm text-muted-foreground">OWASP audits, security headers, vulnerability fixes</td></tr>
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-review</td><td class="px-6 py-3 text-sm text-muted-foreground">Code review, architecture audit, performance analysis</td></tr>
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-filament</td><td class="px-6 py-3 text-sm text-muted-foreground">Filament admin resources, dashboards, tables, forms</td></tr>
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-livewire</td><td class="px-6 py-3 text-sm text-muted-foreground">Livewire components with validation, events, caching</td></tr>
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-module</td><td class="px-6 py-3 text-sm text-muted-foreground">Modular architecture with nwidart/laravel-modules</td></tr>
+                <tr class="hover:bg-accent/50"><td class="px-6 py-3 text-sm font-mono text-primary">laravel-service</td><td class="px-6 py-3 text-sm text-muted-foreground">Service classes with dependency injection and contracts</td></tr>
             </tbody>
         </table>
     </div>

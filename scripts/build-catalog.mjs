@@ -16,7 +16,8 @@ export function parseFrontmatter(text) {
     if (mm) {
       const key = mm[1];
       const val = mm[2].trim();
-      if (val === '>' || val === '|') {
+      // Handle block scalars: >, |, >-, >+, |-, |+
+      if (val === '>' || val === '|' || val === '>-' || val === '>+' || val === '|-' || val === '|+') {
         // Collect following indented lines as a block scalar
         const parts = [];
         i++;
@@ -74,8 +75,11 @@ const BADGE = ({ skills, agents }) => `${skills.length} skills · ${agents.lengt
 
 export function applyCounts(text, data) {
   const re = /<!-- catalog:counts -->[\s\S]*?<!-- \/catalog:counts -->/;
+  if (!re.test(text)) {
+    throw new Error('Missing <!-- catalog:counts --> marker in text. The marker is required for applyCounts to work.');
+  }
   const block = `<!-- catalog:counts -->${BADGE(data)}<!-- /catalog:counts -->`;
-  return re.test(text) ? text.replace(re, block) : text;
+  return text.replace(re, block);
 }
 
 // Files whose embedded counts the generator owns. Each entry maps a path to a
@@ -110,6 +114,13 @@ export function run({ check } = {}) {
   const catalogPath = join(ROOT, 'CATALOG.md');
   const curCatalog = existsSync(catalogPath) ? readFileSync(catalogPath, 'utf8') : '';
   if (curCatalog !== catalog) { diffs.push('CATALOG.md'); if (!check) writeFileSync(catalogPath, catalog); }
+
+  // Write catalog.json data file for Jekyll
+  const catalogJsonPath = join(ROOT, 'docs', '_data', 'catalog.json');
+  const catalogJson = JSON.stringify({ skills: data.skills, agents: data.agents, counts: counts(data) }, null, 2);
+  const curCatalogJson = existsSync(catalogJsonPath) ? readFileSync(catalogJsonPath, 'utf8') : '';
+  if (curCatalogJson !== catalogJson) { diffs.push('docs/_data/catalog.json'); if (!check) writeFileSync(catalogJsonPath, catalogJson); }
+
   for (const { path, fn } of targets(data)) {
     const p = join(ROOT, path);
     if (!existsSync(p)) continue;
