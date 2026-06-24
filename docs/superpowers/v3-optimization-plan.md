@@ -18,3 +18,14 @@ Progressive disclosure is the design: metadata at startup → SKILL.md on trigge
 - Merging reference files; inflating SKILL.md; "one agent per task" (the coordination article's anti-pattern — keep 11 consolidated).
 
 Sources: Anthropic "Equipping agents… with Agent Skills"; Claude skill best-practices docs; Ibrahim "context amnesia/coordination"; claudecodeguides token-budgeting & progressive-disclosure.
+
+---
+
+## OUTCOME (2026-06-24)
+
+- **A1 (agents) ✅ DONE** — all 11 agents slimmed: **7,588 → 1,822 lines (−76%)**; deep content relocated to skill `references/` (load-on-demand) or deduped to pointers (`laravel-feature` billing 1118→60, points to `laravel-cashier`). Per-fork prompt cost cut ~76% for scaffolders. Total repo −1,653 lines net.
+- **A1 behavioral test ✅ PASS** — simulated the `laravel-feature` fork: agent read `references/templates.md` on demand and produced a complete 18-file feature with zero gaps vs templates. No degradation.
+- **B1 (TOCs) ✅** / **B2 (descriptions) ✅** — 5 TOCs; 20 collision-prone descriptions sharpened.
+- **A2 (hooks shared lib) ↩️ REVERTED** — empirically added lines; hooks lack compressible duplication.
+- **C1 (consolidate evals) — SKIPPED** — keep per-skill `<skill>/evals/evals.json` (official skill-creator convention; zero runtime cost).
+- Integrity: 11 scaffolders linked, `--check` 0, tests 11/11.
