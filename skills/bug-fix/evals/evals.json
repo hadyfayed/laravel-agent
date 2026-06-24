@@ -1,0 +1,13 @@
+{
+  "skill": "bug-fix",
+  "cases": [
+    {
+      "prompt": "Fix a QueryException about unknown column in users table",
+      "expect": "Skill diagnoses migration/schema issue and suggests creating migration or fixing query scope"
+    },
+    {
+      "prompt": "Debug and fix a Class not found exception in my auth middleware",
+      "expect": "Skill analyzes stack trace, identifies namespace/import issue, and provides fix with regression test"
+    }
+  ]
+}
