@@ -48,6 +48,7 @@ Plus, as the behavior implies:
 5. **Eager-load** relationships in `render()` — no N+1.
 6. **Alpine** for purely client-side state (modals, toggles) via `@entangle` / `x-data`.
 7. **Authorization**: call `$this->authorize(...)` before any mutation.
+8. **Code templates**: Before generating forms, tables, modals, search, or file upload components, read `${CLAUDE_SKILL_DIR}/references/templates.md` for production-ready stubs with proper validation, binding, and Alpine patterns.
 
 The agent's deep knowledge covers all Livewire patterns (uploads, polling, lazy
 mounting, computed caching, event dispatching) — consult it rather than inventing
