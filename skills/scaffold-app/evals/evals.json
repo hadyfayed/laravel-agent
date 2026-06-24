@@ -1,0 +1,8 @@
+{
+  "skill": "scaffold-app",
+  "cases": [
+    { "prompt": "/laravel-agent:scaffold-app e-commerce store with products, categories, cart, and checkout", "expect": "forks the laravel-architect agent, drafts a blueprint, and scaffolds a multi-phase application (migrations, models, controllers, views, tests) from the description" },
+    { "prompt": "scaffold a new SaaS booking app with appointments, customers, and payments --api-only --multi-tenant", "expect": "forks the laravel-architect agent and generates an API-only, multi-tenant application with no Blade views" },
+    { "prompt": "/laravel-agent:scaffold-app blog platform with posts, comments, and tags --admin", "expect": "forks the laravel-architect agent and includes a Filament admin panel alongside the scaffolded app" }
+  ]
+}
