@@ -1,0 +1,13 @@
+{
+  "skill": "laravel-build",
+  "cases": [
+    {
+      "prompt": "run the full build pipeline before committing",
+      "expect": "Executes Pint, PHPStan, tests, asset build, and optimization sequentially; reports final status and exit code."
+    },
+    {
+      "prompt": "run build but skip tests",
+      "expect": "Executes Pint, PHPStan, asset build, and optimization; skips test suite per --no-test flag."
+    }
+  ]
+}
