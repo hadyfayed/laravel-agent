@@ -1,0 +1,8 @@
+{
+  "skill": "security-audit",
+  "cases": [
+    { "prompt": "/laravel-agent:security-audit app/Http/Controllers", "expect": "forks the laravel-security agent and runs an OWASP audit scoped to the given path, returning a confidence-scored report with severity counts and actionable fixes" },
+    { "prompt": "audit my Laravel app for security vulnerabilities", "expect": "forks the laravel-security agent for a full-codebase OWASP audit and reports only findings at confidence >= 80%" },
+    { "prompt": "/laravel-agent:security-audit injection", "expect": "forks the laravel-security agent focused on SQL/command injection across the codebase" }
+  ]
+}
