@@ -53,12 +53,15 @@ invent resources the user did not ask for.
 7. For soft-deleted models, add `TrashedFilter` plus `RestoreAction`/`ForceDeleteAction`.
 8. Keep heavy computation out of the table — use accessors or eager `withSum`, not per-row closures.
 
+## Code templates and stubs
+
+Before generating a Resource, form schema, table schema, relation manager, widget, or custom action, read `${CLAUDE_SKILL_DIR}/references/templates.md` for production-ready stubs with proper field types, columns, filters, and action patterns.
+
+For complex authorization using Shield, delegate to the **laravel-auth** skill to generate policies and role seeders.
+
 ## Deferral
 
-This skill is the task prompt only. The agent carries the full Filament knowledge base:
-component catalogs, Shield setup, relation-manager templates, v3/v4 API differences,
-package integrations, and pitfalls. Consult the agent for the deep how-to rather than
-duplicating it here.
+The agent carries the full Filament knowledge base: v3/v4 API differences, package integrations, and pitfalls. Consult it for the deep how-to rather than duplicating.
 
 ## Output
 
