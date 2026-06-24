@@ -484,7 +484,7 @@ Delegate to builder agents based on architecture decision:
 | Decision | Subagent | Confidence Threshold |
 |----------|----------|---------------------|
 | Feature | laravel-feature | 80+ |
-| Module | laravel-module-builder | 80+ |
+| Module | laravel-module | 80+ |
 | Service/Action | laravel-service-builder | 80+ |
 | Refactor | laravel-refactor | 80+ |
 
@@ -654,7 +654,7 @@ Based on your decision, invoke the appropriate subagent using Task tool:
 | Decision | Subagent |
 |----------|----------|
 | Feature | laravel-feature |
-| Module | laravel-module-builder |
+| Module | laravel-module |
 | Service/Action | laravel-service-builder |
 | Refactor | laravel-refactor |
 
@@ -761,7 +761,7 @@ START: What is the primary goal?
 │   │       └── Feature will delegate to laravel-api for API routes
 │   │
 │   ├── Reusable domain logic (no UI)?
-│   │   └── YES → laravel-module-builder
+│   │   └── YES → laravel-module
 │   │
 │   ├── Single service or action?
 │   │   └── YES → laravel-service-builder
@@ -833,7 +833,7 @@ START: What is the primary goal?
 |-------|--------------|----------------|---------------|--------------|
 | laravel-architect | Pattern registry | - | Environment checks | All builders |
 | laravel-feature | Feature structure | config/app.php | migrations, tests | laravel-api |
-| laravel-module-builder | Module structure | - | - | - |
+| laravel-module | Module structure | - | - | - |
 | laravel-service-builder | Services/Actions | - | - | - |
 | laravel-api | API controllers, routes | - | - | - |
 | laravel-auth | Policies, middleware | config/auth.php | - | - |

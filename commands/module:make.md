@@ -39,7 +39,7 @@ Examples:
 
 4. **Invoke Module Builder**
 
-   Use Task tool with subagent_type `laravel-module-builder`:
+   Use Task tool with subagent_type `laravel-module`:
    ```
    Build a reusable Module:
 

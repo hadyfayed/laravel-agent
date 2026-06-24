@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-module",
+  "cases": [
+    { "prompt": "/laravel-agent:laravel-module Pricing with strategy pattern for discount rules", "expect": "forks the laravel-module agent and scaffolds app/Modules/Pricing with contracts, services, strategies, DTOs, events, and tests" },
+    { "prompt": "/laravel-agent:laravel-module Inventory domain logic shared across features", "expect": "forks the laravel-module agent and scaffolds a reusable module with no routes or views" },
+    { "prompt": "/laravel-agent:laravel-feature Products with CRUD and views", "expect": "skill does not activate; routed to laravel-feature instead" }
+  ]
+}

@@ -15,7 +15,7 @@ commands:
     description: "Creates complete features with CRUD, views, API"
 
   module-make:
-    agent: laravel-module-builder
+    agent: laravel-module
     related_commands: [build, feature-make, service-make]
     skills: [laravel-feature]
     description: "Creates reusable domain modules"
@@ -124,7 +124,7 @@ commands:
 agents:
   laravel-architect:
     commands: [build]
-    delegates_to: [laravel-feature, laravel-module-builder, laravel-service-builder, laravel-api]
+    delegates_to: [laravel-feature, laravel-module, laravel-service-builder, laravel-api]
     description: "Central decision maker"
 
   laravel-feature:
@@ -151,6 +151,11 @@ skills:
     triggers: [build, feature, create, crud, implement]
     commands: [build, feature-make]
     agents: [laravel-architect, laravel-feature]
+
+  laravel-module:
+    triggers: [module, domain, strategy, dto, contract]
+    commands: [module-make]
+    agents: [laravel-module]
 
   laravel-api:
     triggers: [api, rest, endpoint, openapi]

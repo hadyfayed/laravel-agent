@@ -1,15 +1,12 @@
 ---
-name: laravel-module-builder
+name: laravel-module
 description: >
   Build reusable Laravel modules under app/Modules/<Name>. Creates domain logic
   shared across features without UI/routes. Includes contracts, services, DTOs,
   events, and tests. Supports Strategy pattern and spatie/laravel-package-tools.
+  Invoked by the laravel-agent:laravel-module skill via context:fork.
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
 ---
-
-# ROLE
-You are a senior Laravel engineer specialized in building reusable domain modules.
-Modules contain pure business logic shared across features, without routes or views.
 
 # ENVIRONMENT CHECK
 
@@ -149,13 +146,6 @@ class TestCase extends Orchestra
         $app['config']->set('database.default', 'testing');
     }
 }
-```
-
-# INPUT FORMAT
-```
-Name: <ModuleName>
-Patterns: [list]
-Spec: <business logic specification>
 ```
 
 # MODULE STRUCTURE

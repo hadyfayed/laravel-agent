@@ -6,7 +6,7 @@
 
 > AI-powered Laravel development assistant - architecture decisions, code generation, testing, deployment, and more.
 
-<!-- catalog:counts -->25 skills · 30 agents<!-- /catalog:counts -->
+<!-- catalog:counts -->26 skills · 30 agents<!-- /catalog:counts -->
 
 **[View Documentation](https://hadyfayed.github.io/laravel-agent/)**
 
@@ -178,7 +178,7 @@ The architect will:
 |-------|---------|
 | `laravel-architect` | Decision maker - analyzes requests, delegates to builders |
 | `laravel-feature` | Builds complete features with CRUD, views, API |
-| `laravel-module-builder` | Builds reusable domain modules |
+| `laravel-module` | Builds reusable domain modules |
 | `laravel-service-builder` | Builds services and actions |
 | `laravel-refactor` | Code improvement and refactoring |
 | `laravel-api` | REST APIs with versioning, OpenAPI |
