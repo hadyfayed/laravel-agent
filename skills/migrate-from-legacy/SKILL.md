@@ -40,13 +40,13 @@ Source: symfony
 
 ## Migration process
 
-1. **Analyze breaking changes** — consult `references/breaking-changes.md` for version-specific issues
+1. **Analyze breaking changes** — for Laravel/PHP version breaking-changes, use the **upgrade-laravel** skill (`/laravel-agent:upgrade-laravel`)
 2. **Backup current state** — create git branch and database snapshot
 3. **Update dependencies** — composer.json version constraints
 4. **Apply automated fixes** — Rector rules, deprecated method replacements
 5. **Run test suite** — verify no regressions
 6. **Manual review** — check custom code for migration-specific issues
-7. **Deploy** — follow release checklist from `references/release-checklist.md`
+7. **Deploy** — upgrade-laravel's deployment guide and troubleshooting are canonical for version upgrades
 
 ## Data migration (schema import)
 
@@ -79,7 +79,7 @@ php artisan optimize:clear
 - **Database issues** — verify connection and migration status
 - **Custom code** — manually review services, providers, models
 
-See `references/troubleshooting.md` for detailed solutions.
+For Laravel/PHP version breaking-changes and upgrade troubleshooting, use the **upgrade-laravel** skill (`/laravel-agent:upgrade-laravel`).
 
 ## Post-migration validation
 
