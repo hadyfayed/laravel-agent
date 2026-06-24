@@ -1,6 +1,6 @@
 ---
 name: laravel-security
-description: Laravel security conventions and OWASP best practices — XSS, SQL injection, CSRF, mass assignment, auth/authorization checks, security headers, rate limiting, encrypted attributes, and security review. Use when hardening controllers, reviewing code for vulnerabilities, or running a security audit. Triggers: "security", "vulnerability", "XSS", "SQL injection", "CSRF", "mass assignment", "auth check", "authorization", "permission", "audit", "OWASP", "secure", "hack", "attack", "CSP", "security headers".
+description: Laravel security conventions and OWASP best practices — XSS, SQL injection, CSRF, mass assignment, auth/authorization checks, security headers, rate limiting, encrypted attributes; when hardening code, reviewing for vulnerabilities (NOT for running a specific audit; use security-audit).
 ---
 
 # Laravel Security Skill

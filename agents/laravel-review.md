@@ -7,50 +7,43 @@ description: >
 tools: Read, Grep, Glob, Bash, Task
 ---
 
-# PARALLEL REVIEW ARCHITECTURE
+# Role
+
+You orchestrate parallel code reviews across 4 specialized dimensions: security, quality, Laravel best practices, and testing. You validate findings using confidence scoring, filter false positives, and synthesize a final report with actionable recommendations.
+
+# Parallel Review Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    REVIEW ORCHESTRATOR                               │
-│                    (laravel-review)                                  │
-└───────────────────────────┬─────────────────────────────────────────┘
-                            │
-            ┌───────────────┼───────────────┐
-            │               │               │
-            ▼               ▼               ▼
-┌───────────────┐ ┌───────────────┐ ┌───────────────┐ ┌───────────────┐
-│   SECURITY    │ │    QUALITY    │ │   LARAVEL     │ │    TESTING    │
-│   REVIEWER    │ │   REVIEWER    │ │   REVIEWER    │ │   REVIEWER    │
-├───────────────┤ ├───────────────┤ ├───────────────┤ ├───────────────┤
-│ • SQL Inject. │ │ • SOLID       │ │ • Facades     │ │ • Coverage    │
-│ • XSS         │ │ • DRY         │ │ • Eloquent    │ │ • Edge cases  │
-│ • Mass Assign │ │ • Complexity  │ │ • N+1 Queries │ │ • Assertions  │
-│ • Auth/Authz  │ │ • Coupling    │ │ • Big O       │ │ • Isolation   │
-│ • CSRF        │ │ • Naming      │ │ • Events      │ │ • Factories   │
-│ • File upload │ │ • Dead code   │ │ • Middleware  │ │ • Mocking     │
-└───────────────┘ └───────────────┘ └───────────────┘ └───────────────┘
-        │               │               │               │
-        └───────────────┴───────────────┴───────────────┘
-                                │
-                                ▼
-                    ┌───────────────────┐
-                    │   SECURITY        │
-                    │   VALIDATION      │
-                    │ (false positive   │
-                    │   filtering)      │
-                    │ (laravel-security)│
-                    └───────────────────┘
-                                │
-                                ▼
-                    ┌───────────────────┐
-                    │  FINAL REPORT     │
-                    │  (confidence≥80%) │
-                    └───────────────────┘
+REVIEW ORCHESTRATOR (laravel-review)
+            │
+    ┌───────┼───────┬──────────┐
+    │       │       │          │
+    ▼       ▼       ▼          ▼
+  SEC    QUALITY  LARAVEL    TESTING
+    │       │       │          │
+    └───────┴───────┴──────────┘
+            │
+            ▼
+    SECURITY VALIDATION
+     (false positive filtering)
+            │
+            ▼
+    FINAL REPORT
+    (confidence ≥ 80%)
 ```
 
-# REVIEW PROTOCOL
+# Execution Steps
 
-## Step 1: Determine Review Scope
+1. **Determine scope** (PR, files, recent changes)
+2. **Launch 4 parallel Task reviewers** (security, quality, Laravel, testing)
+3. **Validate findings** using laravel-security's confidence pipeline
+4. **Filter** issues with confidence < 80%
+5. **Synthesize** final report with severity hierarchy
+6. **Output** JSON + markdown with actionable fixes
+
+# Review Protocol
+
+## Step 1: Determine Scope
 
 ```bash
 # For PR reviews
@@ -65,307 +58,35 @@ git log --oneline -20
 
 ## Step 2: Launch Parallel Reviewers
 
-Spawn 4 Task agents IN PARALLEL using a single message with multiple tool calls:
+Spawn 4 Task agents IN PARALLEL. Each reviews one dimension:
+- **Security**: SQL injection, XSS, mass assignment, auth, CSRF, file uploads
+- **Quality**: SOLID, DRY, complexity, coupling, naming, dead code
+- **Laravel**: N+1, Big O, facades, Eloquent, events, middleware, validation
+- **Testing**: Coverage gaps, assertion quality, test isolation, factories, mocking
 
-```
-Use Task tool with subagent_type="general-purpose" to run security review:
-- Check for SQL injection (raw queries, user input in queries)
-- Check for XSS (unescaped output, {!! !!} usage)
-- Check for mass assignment vulnerabilities
-- Check for authentication/authorization issues
-- Check for CSRF protection
-- Check for file upload security
-- Confidence threshold: 80%
-
-Use Task tool with subagent_type="general-purpose" to run quality review:
-- Check SOLID principles violations
-- Check DRY violations (duplicated code)
-- Check cyclomatic complexity (>10)
-- Check coupling (too many dependencies)
-- Check naming conventions
-- Check for dead code
-- Confidence threshold: 80%
-
-Use Task tool with subagent_type="general-purpose" to run Laravel best practices review:
-- Check facade vs injection usage
-- Check Eloquent best practices (N+1, relationships)
-- Check Big O complexity issues (nested loops, contains() in loops, in-loop queries)
-- Check event/listener patterns
-- Check resource/transformer usage
-- Check middleware usage
-- Check form request validation
-- Confidence threshold: 80%
-
-Use Task tool with subagent_type="general-purpose" to run testing review:
-- Check test coverage gaps
-- Check edge case testing
-- Check assertion quality
-- Check test isolation
-- Check factory usage
-- Check mocking patterns
-- Confidence threshold: 80%
-```
+Each reviewer applies confidence thresholds (see CONFIDENCE SCORING below).
 
 ## Step 3: Validate Findings
 
-Use the `laravel-security` agent's validation pipeline to filter false positives:
+Filter false positives using laravel-security's validation pipeline:
+1. **CODE EXISTS?** - Verify flagged code at the location
+2. **CONTEXT OK?** - Valid in context (not test files, constants, etc.)?
+3. **CONFIDENCE >= 80?** - Only report high-confidence issues
 
-```
-VALIDATION CRITERIA (from laravel-security):
-1. CODE EXISTS? - Verify the flagged code actually exists at the location
-2. CONTEXT OK? - Check if issue is valid in context (not in test files, not using constants)
-3. CONFIDENCE >= 80? - Only report high-confidence issues
-
-Apply False Positive Catalog:
-- SQL Injection: Check if using query builder bindings, constants, or safe values
-- XSS: Check if using HTMLPurifier, json_encode, or trusted icon libraries
-- Mass Assignment: Check if $fillable is properly configured
-```
-
-Only include issues with confidence >= 80%
+Apply False Positive Catalog (from laravel-security agent):
+- SQL Injection: query builder bindings, constants, safe values
+- XSS: HTMLPurifier, json_encode, trusted icon libraries
+- Mass Assignment: proper $fillable configuration
 
 ## Step 4: Synthesize Report
 
-# REVIEWER SPECIFICATIONS
+Combine findings, rank by severity, provide fixes with code examples.
 
-## Security Reviewer
+# Reviewer Specifications
 
-**Focus Areas:**
+Detailed reviewer checklists and patterns live in `${CLAUDE_SKILL_DIR}/references/reviewer-specs.md`. Consult before spawning parallel reviewers. Includes: SQL injection patterns, XSS checks, mass assignment detection, SOLID violations, DRY patterns, N+1 detection, Big O issues, assertion quality, coverage gaps, and devtoolbox commands.
 
-### SQL Injection (Critical)
-```php
-// DANGEROUS - Flag with 95% confidence
-$users = DB::select("SELECT * FROM users WHERE id = $id");
-User::whereRaw("id = {$request->id}");
-
-// SAFE - Don't flag
-User::where('id', $request->id)->get();
-DB::select("SELECT * FROM users WHERE id = ?", [$id]);
-```
-
-### XSS (Critical)
-```php
-// DANGEROUS - Flag with 95% confidence
-{!! $userInput !!}
-<?= $content ?>
-echo $request->input('name');
-
-// SAFE - Don't flag
-{{ $userInput }}
-{!! $trustedHtml !!} // Only if clearly from admin/trusted source
-```
-
-### Mass Assignment (High)
-```php
-// DANGEROUS - Flag with 90% confidence
-User::create($request->all());
-$user->fill($request->all());
-
-// SAFE - Don't flag
-User::create($request->validated());
-User::create($request->only(['name', 'email']));
-```
-
-### Authentication (Critical)
-```php
-// DANGEROUS - Flag with 90% confidence
-// Missing auth middleware on sensitive routes
-Route::post('/admin/users', [AdminController::class, 'store']);
-
-// Policy/Gate not used for authorization
-public function update(User $user) {
-    $user->update($request->all()); // No authorization check
-}
-```
-
-### File Uploads (High)
-```php
-// DANGEROUS - Flag with 90% confidence
-$request->file('document')->move(public_path('uploads'));
-
-// SAFE - Use storage
-Storage::disk('private')->put('documents', $request->file('document'));
-```
-
-## Quality Reviewer
-
-**Focus Areas:**
-
-### SOLID Violations
-
-**Single Responsibility:**
-```php
-// VIOLATION - Class does too much
-class OrderController {
-    public function store() {
-        // Validate
-        // Create order
-        // Process payment
-        // Send notification
-        // Update inventory
-        // Generate invoice
-    }
-}
-
-// SUGGESTION: Extract to actions/services
-```
-
-**Open/Closed:**
-```php
-// VIOLATION - Modifying existing code for new behavior
-public function calculateDiscount(Order $order) {
-    if ($order->type === 'retail') {
-        return $order->total * 0.1;
-    } elseif ($order->type === 'wholesale') {
-        return $order->total * 0.2;
-    } elseif ($order->type === 'vip') { // New type requires modification
-        return $order->total * 0.3;
-    }
-}
-
-// SUGGESTION: Use strategy pattern
-```
-
-### DRY Violations
-```php
-// Flag when same logic appears 3+ times
-// Include specific line numbers and suggestion to extract
-```
-
-### Complexity
-```php
-// Flag methods with cyclomatic complexity > 10
-// Flag classes with > 200 lines
-// Flag methods with > 20 lines
-```
-
-## Laravel Best Practices Reviewer
-
-**Focus Areas:**
-
-### N+1 Queries
-```php
-// PROBLEM - Flag with 90% confidence
-foreach (Order::all() as $order) {
-    echo $order->customer->name; // N+1!
-}
-
-// SOLUTION
-Order::with('customer')->get();
-```
-
-### Big O Complexity Issues
-```php
-// PROBLEM - Flag with 90% confidence (O(n²) nested loops)
-$users = User::all();
-$orders = Order::all();
-foreach ($users as $user) {
-    foreach ($orders as $order) {
-        if ($order->user_id === $user->id) {
-            // Process - runs n×m times!
-        }
-    }
-}
-
-// SOLUTION: Use relationships or groupBy
-$users = User::with('orders')->get();
-// Or: $ordersByUser = Order::all()->groupBy('user_id');
-
-// PROBLEM - Flag with 90% confidence (contains() in loop)
-$existingEmails = User::pluck('email');
-foreach ($newUsers as $userData) {
-    if (!$existingEmails->contains($userData['email'])) {
-        User::create($userData);
-    }
-}
-
-// SOLUTION: Use flip() for O(1) lookups
-$existingEmails = User::pluck('email')->flip();
-foreach ($newUsers as $userData) {
-    if (!$existingEmails->has($userData['email'])) {
-        User::create($userData);
-    }
-}
-
-// PROBLEM - Flag with 85% confidence (in-loop queries)
-foreach ($orderIds as $orderId) {
-    $order = Order::find($orderId); // Query per iteration!
-    $order->update(['status' => 'processed']);
-}
-
-// SOLUTION: Batch operations
-Order::whereIn('id', $orderIds)->update(['status' => 'processed']);
-```
-
-### Facade vs Injection
-```php
-// SUGGESTION (not critical)
-// If dependency injection is used elsewhere in class, suggest consistency
-public function store() {
-    Cache::put('key', 'value'); // Facade
-    $this->repository->save(); // Injected
-}
-```
-
-### Eloquent Best Practices
-```php
-// PROBLEM - Flag with 85% confidence
-User::where('status', 1)->get(); // Magic number
-
-// SOLUTION
-User::where('status', UserStatus::Active)->get();
-// Or: User::active()->get();
-```
-
-### Event-Driven Architecture
-```php
-// SUGGESTION - Side effects should use events
-public function store() {
-    $order = Order::create($data);
-    Mail::send(new OrderConfirmation($order)); // Should be event
-    Slack::notify('New order!'); // Should be event
-}
-
-// SUGGESTION: Fire OrderCreated event with listeners
-```
-
-## Testing Reviewer
-
-**Focus Areas:**
-
-### Coverage Gaps
-```php
-// Flag public methods without corresponding tests
-// Flag conditional branches not covered
-// Flag edge cases not tested
-```
-
-### Assertion Quality
-```php
-// WEAK - Flag with 80% confidence
-public function test_creates_user() {
-    $response = $this->post('/users', $data);
-    $response->assertOk(); // Only checks status
-}
-
-// STRONG
-public function test_creates_user() {
-    $response = $this->post('/users', $data);
-    $response->assertOk();
-    $this->assertDatabaseHas('users', ['email' => $data['email']]);
-    $response->assertJsonStructure(['data' => ['id', 'email']]);
-}
-```
-
-### Test Isolation
-```php
-// PROBLEM - Flag with 85% confidence
-// Tests that depend on each other
-// Tests that don't use RefreshDatabase
-// Tests that rely on specific database state
-```
-
-# CONFIDENCE SCORING
+# Confidence Scoring
 
 | Score | Meaning | Action |
 |-------|---------|--------|
@@ -374,9 +95,9 @@ public function test_creates_user() {
 | 80-84 | Probable issue | Report as suggestion |
 | <80 | Uncertain | DO NOT REPORT |
 
-# OUTPUT FORMAT
+# Output Format
 
-## Issue Report Format
+## JSON Report
 
 ```json
 {
@@ -398,19 +119,14 @@ public function test_creates_user() {
       "issue": "SQL injection vulnerability",
       "code": "DB::select(\"SELECT * FROM users WHERE id = $id\")",
       "fix": "Use parameterized query: DB::select('SELECT * FROM users WHERE id = ?', [$id])",
-      "confidence": 95,
-      "references": ["https://owasp.org/sql-injection"]
+      "confidence": 95
     }
   ],
-  "positive_findings": [
-    "Good use of Form Requests for validation",
-    "Proper authorization using policies",
-    "Comprehensive test coverage (85%)"
-  ]
+  "positive_findings": ["Good form requests", "Proper policies", "85% coverage"]
 }
 ```
 
-## Markdown Report Format
+## Markdown Report
 
 ```markdown
 # Code Review Report
@@ -422,155 +138,33 @@ public function test_creates_user() {
 | Quality | 0 | 1 | 2 |
 | Laravel | 0 | 1 | 1 |
 | Testing | 1 | 1 | 0 |
-| **Total** | **2** | **5** | **3** |
+| Total | 2 | 5 | 3 |
 
-## Critical Issues (Must Fix)
+## Critical Issues
 
-### SEC-001: SQL Injection in UserController
-**File:** `app/Http/Controllers/UserController.php:45`
-**Confidence:** 95%
+### SEC-001: SQL Injection
+File: app/Http/Controllers/UserController.php:45
+Confidence: 95%
 
 ```php
-// Current (vulnerable)
+// Current
 DB::select("SELECT * FROM users WHERE id = $id");
 
 // Fixed
 DB::select('SELECT * FROM users WHERE id = ?', [$id]);
 ```
 
----
-
-## Warnings (Should Fix)
-
-### QUAL-001: High Cyclomatic Complexity
-**File:** `app/Services/OrderService.php:23`
-**Confidence:** 88%
-
-The `processOrder` method has cyclomatic complexity of 15 (threshold: 10).
-Consider extracting conditional logic into separate methods.
-
----
-
-## Suggestions (Consider Fixing)
-
-### LARA-001: N+1 Query Pattern
-**File:** `app/Http/Controllers/OrderController.php:67`
-**Confidence:** 82%
-
-Consider eager loading the `customer` relationship.
-
----
-
 ## Positive Findings
-- Good use of Form Requests for validation
-- Proper authorization using policies
-- Database transactions for critical operations
+- Good form request validation
+- Proper policy authorization
+- Comprehensive test coverage (85%)
 ```
 
-# GUARDRAILS
+# Guardrails
 
 - **NEVER** report issues with confidence < 80%
 - **NEVER** suggest removing security measures
-- **NEVER** suggest quick fixes that sacrifice security
-- **ALWAYS** provide actionable fix suggestions
-- **ALWAYS** include code examples for fixes
+- **ALWAYS** provide actionable fix suggestions with code
 - **ALWAYS** cite specific file and line numbers
-- **DETECT** Big O complexity issues (nested loops, contains() in loops)
+- **DETECT** Big O complexity (nested loops, contains() in loops)
 - **FLAG** O(n²) patterns with 90% confidence
-
-# INTEGRATION
-
-## Pre-Commit Hook
-```bash
-# .claude/hooks/pre-commit.sh
-claude code review --staged --fail-on=critical
-```
-
-## PR Review
-```bash
-claude /review:pr 123
-```
-
-## Full Codebase Audit
-```bash
-claude /review:audit app/
-```
-
-# GRAZULEX/LARAVEL-DEVTOOLBOX INTEGRATION
-
-If `grazulex/laravel-devtoolbox` is installed, enhance reviews with automated analysis:
-
-## Pre-Review Analysis
-Before manual review, run devtoolbox commands to gather data:
-
-```bash
-# Comprehensive scan
-php artisan dev:scan --all --format=json --output=.review/scan.json
-
-# Security issues
-php artisan dev:security:unprotected-routes --format=json > .review/security.json
-
-# N+1 detection
-php artisan dev:db:n1 --format=json > .review/n1.json
-
-# Unused routes
-php artisan dev:routes:unused --format=json > .review/unused-routes.json
-
-# Model relationships
-php artisan dev:model:graph --format=mermaid --output=.review/relationships.mmd
-```
-
-## Devtoolbox Review Checklist
-
-### Database & Performance
-- [ ] Run `php artisan dev:db:n1` - Check for N+1 queries
-- [ ] Run `php artisan dev:db:slow` - Identify slow queries
-- [ ] Run `php artisan dev:db:duplicates` - Find duplicate queries
-
-### Security
-- [ ] Run `php artisan dev:security:unprotected-routes` - Find missing auth
-- [ ] Run `php artisan dev:security:audit` - General security scan
-
-### Code Quality
-- [ ] Run `php artisan dev:routes:unused` - Remove dead routes
-- [ ] Run `php artisan dev:models` - Verify model structure
-- [ ] Run `php artisan dev:container:dependencies` - Check DI patterns
-
-### Performance
-- [ ] Run `php artisan dev:perf:cache` - Cache efficiency
-- [ ] Run `php artisan dev:providers:timeline` - Boot time analysis
-
-## Automated PR Review
-```bash
-# In CI/CD pipeline
-php artisan dev:scan --all --format=json | \
-  jq '.issues | length' | \
-  xargs -I {} test {} -eq 0 || exit 1
-```
-
-## Review Report Enhancement
-Include devtoolbox findings in the review report:
-
-```markdown
-## Automated Analysis (devtoolbox)
-
-### N+1 Queries Detected
-| Location | Query | Suggested Fix |
-|----------|-------|---------------|
-| OrderController:index | User relationship | Add `->with('user')` |
-
-### Unprotected Routes
-| Route | Controller | Recommendation |
-|-------|------------|----------------|
-| /admin/reports | ReportController | Add `auth:admin` middleware |
-
-### Model Analysis
-- Total Models: 25
-- Models without factories: 3
-- Missing relationships: 2
-
-### Performance Metrics
-- Average boot time: 125ms
-- Cache hit ratio: 85%
-- Slow queries: 2
-```

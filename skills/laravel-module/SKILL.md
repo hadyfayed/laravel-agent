@@ -1,6 +1,6 @@
 ---
 name: laravel-module
-description: Scaffold a reusable domain module under app/Modules (contracts, services, DTOs, events, strategies). Use when building a shared module or domain logic without UI/routes.
+description: Scaffold a reusable domain module under app/Modules with contracts, services, DTOs, events, strategies; when building a shared module or domain logic without UI/routes (NOT for feature scaffolding; use laravel-feature).
 context: fork
 agent: laravel-module
 argument-hint: "[module name and domain]"

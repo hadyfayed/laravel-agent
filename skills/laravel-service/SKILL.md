@@ -1,6 +1,6 @@
 ---
 name: laravel-service
-description: Scaffold a service or single-purpose action class. Use when extracting business logic into a service, orchestrating operations, or creating a testable action.
+description: Scaffold a service or single-purpose action class; when extracting business logic into a service, orchestrating operations, or creating a testable action.
 context: fork
 agent: laravel-service
 argument-hint: "[service/action name]"
@@ -48,6 +48,7 @@ app/Actions/<Domain>/<VerbNoun>Action.php   # single handle() method, runnable a
    abstraction; bind it in a ServiceProvider.
 3. **Actions are single-purpose** — one public method (`handle` for native,
    `asController`/`asJob`/`asListener` for laravel-actions when a run context is given).
+4. **Code templates**: Before generating a service, action, or test, read `${CLAUDE_SKILL_DIR}/references/templates.md` for production-ready stubs with proper injection, validation, authorization, and Octane-safe patterns.
 4. **strict_types=1**, explicit return types, **final** classes.
 5. **Typed exceptions** — throw a domain-specific exception rather than generic ones.
 6. **Return value objects / DTOs** for complex results; never leak Eloquent where a

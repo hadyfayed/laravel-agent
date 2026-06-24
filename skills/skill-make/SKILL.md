@@ -1,8 +1,6 @@
 ---
 name: skill-make
-description: >
-  Scaffold a new Claude Code skill directory with SKILL.md, references/, and evals/evals.json.
-  Use when creating a skill. Reference docs/architecture/skill-standard.md for detailed rules.
+description: Scaffold a Claude Code skill with directory structure, references, and evals; when creating a skill.
 disable-model-invocation: true
 allowed-tools: Read Write Edit Bash(mkdir *) Bash(test *) Bash(find *)
 argument-hint: "<skill-name> [description]"
@@ -35,7 +33,7 @@ Parse `$ARGUMENTS`:
 ```markdown
 ---
 name: <skill-name>
-description: >
+description: Scaffold a Claude Code skill with directory structure, references, and evals; when creating a skill.
   <Trigger-rich one-line description: what action + when>.
 disable-model-invocation: true
 allowed-tools: <tools the skill needs>

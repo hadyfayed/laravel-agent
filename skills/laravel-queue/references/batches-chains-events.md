@@ -2,6 +2,19 @@
 
 Job batching, chains, events/listeners, notifications (multi-channel), broadcasting, scheduled tasks, Laravel Prompts artisan commands, and Horizon.
 
+## Contents
+
+- [Job Batching](#job-batching)
+- [Job Chains](#job-chains)
+- [Events & Listeners](#events--listeners)
+- [Notifications](#notifications)
+- [Laravel Notification Channels](#laravel-notification-channels)
+- [Broadcast Queue Events](#broadcast-queue-events)
+- [Broadcasting (WebSockets)](#broadcasting-websockets)
+- [Scheduled Tasks](#scheduled-tasks)
+- [Artisan Commands with Laravel Prompts](#artisan-commands-with-laravel-prompts)
+- [Laravel Horizon (Queue Dashboard)](#laravel-horizon-queue-dashboard)
+
 ## Job Batching
 
 ```php

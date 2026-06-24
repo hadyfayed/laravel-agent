@@ -1,9 +1,6 @@
 ---
 name: migrate-from-legacy
-description: >
-  Migrate a legacy app/database into Laravel — schema import, data migration, model generation.
-  Handles both framework migrations (Symfony→Laravel) and version upgrades (Laravel 9→10→11). 
-  Triggers: "migrate", "legacy", "upgrade", "import", "framework migration", "data migration".
+description: Migrate a legacy app or database into Laravel — schema import, data migration, model generation; when upgrading a framework or version.
 disable-model-invocation: true
 allowed-tools: Bash(php artisan *) Bash(composer *) Read Grep Glob Write Edit
 argument-hint: "<source> [target] [--dry-run]"

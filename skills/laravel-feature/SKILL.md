@@ -1,6 +1,6 @@
 ---
 name: laravel-feature
-description: Scaffold a complete Laravel feature module (controllers, requests, resources, models, migrations, policies, tests). Use when building a new feature or CRUD module.
+description: Scaffold a complete Laravel feature module — controllers, requests, resources, models, migrations, policies, tests; when building a new feature or CRUD (NOT for entire app; use scaffold-app).
 context: fork
 agent: laravel-feature
 argument-hint: "[feature name and brief]"
@@ -77,21 +77,15 @@ From `<Name>` (e.g. `Invoices`):
    Task tool if a rich REST API is needed (versioning, OpenAPI, query builder). For simple
    JSON responses a thin controller is fine.
 
-## Package awareness
+## Reference Files
 
-Check installed packages before generating code:
-```bash
-composer show spatie/laravel-sluggable 2>/dev/null && echo "SLUGGABLE=yes" || true
-composer show spatie/laravel-medialibrary 2>/dev/null && echo "MEDIALIBRARY=yes" || true
-composer show spatie/laravel-activitylog 2>/dev/null && echo "ACTIVITYLOG=yes" || true
-composer show spatie/laravel-tags 2>/dev/null && echo "TAGS=yes" || true
-composer show barryvdh/laravel-dompdf 2>/dev/null && echo "DOMPDF=yes" || true
-composer show maatwebsite/excel 2>/dev/null && echo "EXCEL=yes" || true
-```
+Before scaffolding, read the reference files relevant to the feature:
 
-Apply the relevant trait / interface to the model when a package is present and the brief
-implies its use (file uploads → MediaLibrary, audit trail → Activitylog, etc.).
-The agent's deep knowledge covers all of these — consult it rather than inventing patterns.
+- **For models, migrations, controllers, policies, service providers, and tests**: Read `${CLAUDE_SKILL_DIR}/references/templates.md` to apply project-standardized code stubs.
+- **For billing/subscriptions**: Read `${CLAUDE_SKILL_DIR}/references/billing.md` — it delegates to the **laravel-cashier** skill to keep billing domain knowledge centralized. Scaffold the core feature here; use laravel-cashier for subscription/payment logic.
+- **For file handling, storage, notifications, monitoring, or external integrations**: Consult the appropriate specialist skills (laravel-storage, laravel-notification, etc.).
+
+Check installed packages before generating code and apply the relevant traits/interfaces when a package is present and the brief implies its use (file uploads → MediaLibrary, audit trail → Activitylog, etc.).
 
 ## Output
 

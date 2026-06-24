@@ -2,6 +2,16 @@
 
 Memory management, service container state, testing, benchmarks, best practices, pitfalls, and guardrails for long-running Octane workers.
 
+## Contents
+
+- [Memory Management (Avoiding Memory Leaks)](#memory-management-avoiding-memory-leaks)
+- [Service Container Considerations](#service-container-considerations)
+- [Testing Octane Applications](#testing-octane-applications)
+- [Performance Benchmarks](#performance-benchmarks)
+- [Common Pitfalls](#common-pitfalls)
+- [Best Practices](#best-practices)
+- [Guardrails](#guardrails)
+
 ## Memory Management (Avoiding Memory Leaks)
 
 Critical for long-running workers:

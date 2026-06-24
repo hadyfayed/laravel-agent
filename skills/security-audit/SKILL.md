@@ -1,6 +1,6 @@
 ---
 name: security-audit
-description: Run an OWASP security audit of Laravel code with false-positive filtering and confidence scoring. Use when auditing or reviewing for vulnerabilities, injection, XSS, CSRF, auth/authz gaps, mass assignment, or insecure config. Triggers: "security audit", "audit vulnerabilities", "OWASP", "scan for security issues", "pen test".
+description: Run an OWASP security audit of Laravel code with false-positive filtering and confidence scoring; when auditing for vulnerabilities, injection, XSS, CSRF, auth gaps, mass assignment, or insecure config (NOT for general security best practices; use laravel-security).
 context: fork
 agent: laravel-security
 argument-hint: "[path or scope to audit]"

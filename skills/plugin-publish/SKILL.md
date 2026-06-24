@@ -1,8 +1,6 @@
 ---
 name: plugin-publish
-description: >
-  Publish a Claude Code plugin to marketplace or GitHub — validate manifest, bump version, tag, and release.
-  Use when publishing a plugin version.
+description: Publish a Claude Code plugin to marketplace — validate, bump version, tag, release; when releasing a plugin.
 disable-model-invocation: true
 allowed-tools: Bash(git *) Bash(claude *) Read Write Edit
 argument-hint: "[version] [--channel=marketplace|github|both]"

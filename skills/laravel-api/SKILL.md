@@ -54,6 +54,10 @@ routes/api/v1.php                             # versioned, named, rate-limited
 - **JSON:API** — Resources shaped as `{type, attributes, relationships}`, sparse fieldsets.
 - **GraphQL** — if `nuwave/lighthouse` is installed, emit `graphql/schema.graphql` types instead.
 
+## Code templates and stubs
+
+Before generating controller, resource, collection, or filter classes, read `${CLAUDE_SKILL_DIR}/references/templates.md` for production-ready stubs with OpenAPI annotations, filtering, sorting, and error handling patterns.
+
 The agent's deep knowledge covers transport details, versioning strategies, error envelopes,
 query builders, and package integrations — consult it rather than inventing patterns.
 

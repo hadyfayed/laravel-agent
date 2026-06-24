@@ -1,6 +1,6 @@
 ---
 name: scaffold-app
-description: Scaffold a complete new Laravel application and architecture (multi-phase: migrations, models, controllers, views, policies, tests, seeders). Use when starting a new app or large architecture from a natural-language description. Triggers: "scaffold app", "scaffold application", "build new app", "scaffold from description", "generate full application".
+description: Scaffold a complete new Laravel application with architecture — migrations, models, controllers, views, policies, tests, seeders; when building a new app from a natural-language description (NOT for a single feature; use laravel-feature).
 context: fork
 agent: laravel-architect
 argument-hint: "[app type and key requirements]"

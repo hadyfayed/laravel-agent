@@ -1,6 +1,6 @@
 ---
 name: laravel-auth
-description: Laravel authentication & authorization — login, register, guards, policies, gates, roles & permissions, API tokens (Sanctum), OAuth2 (Passport), social login (Socialite), 2FA. Use when wiring up auth, access control, or tokens.
+description: Wiring up Laravel authentication & authorization — login, register, guards, policies, gates, roles, permissions, API tokens (Sanctum), OAuth2 (Passport), social login (Socialite), 2FA; NOT for Passport/Sanctum/Socialite alone (use those references instead).
 ---
 
 # Laravel Auth Skill

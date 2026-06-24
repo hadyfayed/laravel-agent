@@ -2,6 +2,26 @@
 
 Authentication and authorization conventions using Laravel's built-in features, Laratrust, or Spatie Permission.
 
+## Contents
+
+- [User Model with Roles](#user-model-with-roles)
+- [Policy Implementation](#policy-implementation)
+- [Gates Definition](#gates-definition)
+- [Auth Controller](#auth-controller)
+- [Controller Authorization](#controller-authorization)
+- [Blade Authorization](#blade-authorization)
+- [Common Pitfalls](#common-pitfalls)
+- [Best Practices](#best-practices)
+- [Package Integration](#package-integration)
+- [Installation](#installation)
+- [Blade Directives (Spatie)](#blade-directives-spatie)
+- [Middleware (Spatie)](#middleware-spatie)
+- [Configuration (config/laratrust.php)](#configuration-configlaratrustphp)
+- [In Controllers](#in-controllers)
+- [In Blade](#in-blade)
+- [In Routes](#in-routes)
+- [Auth Implementation: <Target>](#auth-implementation-target)
+
 ## User Model with Roles
 
 ```php

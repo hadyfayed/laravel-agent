@@ -5,9 +5,9 @@
 
 ### Reference skills (15)
 
-- `laravel-auth` — Laravel authentication & authorization — login, register, guards, policies, gates, roles & permissions, API tokens (Sanctum), OAuth2 (Passport), social login (Socialite), 2FA. Use when wiring up auth, access control, or tokens.
+- `laravel-auth` — Wiring up Laravel authentication & authorization — login, register, guards, policies, gates, roles, permissions, API tokens (Sanctum), OAuth2 (Passport), social login (Socialite), 2FA; NOT for Passport/Sanctum/Socialite alone (use those references instead).
 - `laravel-cashier` — Laravel Cashier billing — Stripe/Paddle subscriptions, trials, invoices, webhooks, payment methods, single charges, and customer portal. Use when implementing subscriptions, recurring billing, Stripe or Paddle integration, checkout flows, or payment webhook handling. Triggers: "cashier", "stripe", "paddle", "subscription", "billing", "payment", "invoice", "checkout", "pricing", "recurring payment", "payment method", "webhook".
-- `laravel-database` — Laravel database conventions — safe migrations, Eloquent relationships, N+1 and Big-O query optimization, indexing. Use when writing migrations, models, queries, fixing slow queries, or reviewing database code.
+- `laravel-database` — Reference on Laravel database conventions — migrations, Eloquent relationships, N+1 and Big-O query optimization, indexing; when learning or reviewing database code (NOT for optimizing performance; use db-optimize).
 - `laravel-deploy` — Laravel deployment — Forge, Vapor, Docker, Bref (AWS Lambda), traditional servers, zero-downtime releases, environment/secrets, CI/CD pipelines, and Envoy task runner. Use when deploying, configuring hosting/servers, going to production, or wiring up CI/CD. Triggers: "deploy", "production", "hosting", "server", "Forge", "Vapor", "Docker", "AWS", "Bref", "Lambda", "CI/CD", "release", "go live", "rollback".
 - `laravel-horizon` — Laravel Horizon — Redis queue dashboard, supervisors and auto-scaling/balancing, multi-queue worker config, metrics, failed-job management, alerting (Slack/email/wait-time), job tags, and silencing. Use when configuring or monitoring queues with Horizon. Triggers: "horizon", "queue dashboard", "failed jobs", "queue metrics", "worker status", "queue monitoring", "redis queue", "job status".
 - `laravel-inertia` — Build server-driven single-page apps with Laravel + Inertia.js (Vue 3 or React) — controllers, shared props, useForm, partial reloads, file uploads, SSR. Use when the user mentions Inertia, a Vue/React SPA without an API, server-side routing with client-side rendering, Ziggy, or Breeze inertia.
@@ -17,37 +17,37 @@
 - `laravel-performance` — Laravel performance optimization — caching strategies, query and N+1 fixes, Big O complexity, Octane/queue tuning, profiling, scaling, and server tuning. Use when the app is slow, you need to optimize speed, reduce memory, fix bottlenecks, or scale for traffic. Triggers "performance", "slow", "optimize", "speed", "cache", "fast", "scaling", "bottleneck", "memory", "N+1", "Big O", "O(n)", "complexity", "nested loop", "quadratic".
 - `laravel-queue` — Laravel queues — jobs, batching, chains, events/listeners, notifications, retries, failure handling, and workers. Use when building async/background processing, dispatching jobs, sending queued notifications, or wiring up events and Horizon.
 - `laravel-scout` — Laravel Scout full-text search — Algolia, Meilisearch, Typesense, database driver; searchable models, indexes, filters, pagination; when adding search. Use when the user mentions Scout, full-text search, Algolia, Meilisearch, Typesense, search indexes, searchable models, facets, or typo-tolerant search.
-- `laravel-security` — Laravel security conventions and OWASP best practices — XSS, SQL injection, CSRF, mass assignment, auth/authorization checks, security headers, rate limiting, encrypted attributes, and security review. Use when hardening controllers, reviewing code for vulnerabilities, or running a security audit. Triggers: "security", "vulnerability", "XSS", "SQL injection", "CSRF", "mass assignment", "auth check", "authorization", "permission", "audit", "OWASP", "secure", "hack", "attack", "CSP", "security headers".
+- `laravel-security` — Laravel security conventions and OWASP best practices — XSS, SQL injection, CSRF, mass assignment, auth/authorization checks, security headers, rate limiting, encrypted attributes; when hardening code, reviewing for vulnerabilities (NOT for running a specific audit; use security-audit).
 - `laravel-testing` — Laravel testing conventions — Pest/PHPUnit patterns, feature/unit/API tests, factories, assertions, TDD practices; when writing or structuring tests. Use when the user mentions testing, tests, Pest, PHPUnit, coverage, TDD, unit tests, feature tests, integration tests, or factories.
 - `laravel-websocket` — Laravel real-time / WebSockets — Reverb server, broadcasting events, public/private/presence channels, Echo client, scaling with Redis; when building real-time features (chat, notifications, live updates). Use when the user mentions WebSockets, real-time, Reverb, broadcasting, Echo, presence channels, live chat, pusher, or socket.
 
 ### Scaffolder skills (11)
 
 - `laravel-api` — Scaffold a REST/JSON:API/GraphQL API — controllers, requests, resources, versioning, OpenAPI docs, rate limiting. Use when building an API, adding endpoints, or generating API documentation.
-- `laravel-feature` — Scaffold a complete Laravel feature module (controllers, requests, resources, models, migrations, policies, tests). Use when building a new feature or CRUD module.
+- `laravel-feature` — Scaffold a complete Laravel feature module — controllers, requests, resources, models, migrations, policies, tests; when building a new feature or CRUD (NOT for entire app; use scaffold-app).
 - `laravel-filament` — Scaffold or build a Filament v3/v4 admin panel with resources, forms, tables, widgets, custom pages, relation managers, and RBAC (Filament Shield). Use when building an admin panel, back-office, dashboard, CRUD resource, or managing resources through a UI.
 - `laravel-livewire` — Build and scaffold Livewire 3 components, forms, tables, modals, real-time search, and reactive UI with Alpine. Use when creating interactive server-rendered components, dynamic forms, sortable/filtered tables, or SPA-like interfaces without a JS framework. Triggers: "livewire", "wire:", "reactive component", "livewire table", "livewire form", "alpine", "tall stack".
-- `laravel-module` — Scaffold a reusable domain module under app/Modules (contracts, services, DTOs, events, strategies). Use when building a shared module or domain logic without UI/routes.
-- `laravel-review` — Review code, a pull request, staged changes, or a path across security, quality, Laravel best practices, and testing — each finding scored by severity and confidence (>= 80% only). Use when reviewing a PR, auditing a diff, or checking staged changes before commit. Triggers: "review pr", "code review", "review diff", "review staged", "audit code", "review this", "pr review".
-- `laravel-service` — Scaffold a service or single-purpose action class. Use when extracting business logic into a service, orchestrating operations, or creating a testable action.
+- `laravel-module` — Scaffold a reusable domain module under app/Modules with contracts, services, DTOs, events, strategies; when building a shared module or domain logic without UI/routes (NOT for feature scaffolding; use laravel-feature).
+- `laravel-review` — Review code, a pull request, staged changes, or a path across security, quality, Laravel best practices, and testing; when reviewing a PR, auditing a diff, or checking staged changes (NOT for running a dedicated security audit; use security-audit).
+- `laravel-service` — Scaffold a service or single-purpose action class; when extracting business logic into a service, orchestrating operations, or creating a testable action.
 - `plugin-scaffold` — Scaffold Claude Code plugin artifacts — plugin structure, manifests (plugin.json/marketplace.json), commands, agents, skills, MCP, and hooks. Use when building a Claude Code plugin or extension for distribution. Triggers: "scaffold plugin", "create plugin", "build claude plugin", "plugin structure", "marketplace plugin".
-- `scaffold-app` — Scaffold a complete new Laravel application and architecture (multi-phase: migrations, models, controllers, views, policies, tests, seeders). Use when starting a new app or large architecture from a natural-language description. Triggers: "scaffold app", "scaffold application", "build new app", "scaffold from description", "generate full application".
-- `security-audit` — Run an OWASP security audit of Laravel code with false-positive filtering and confidence scoring. Use when auditing or reviewing for vulnerabilities, injection, XSS, CSRF, auth/authz gaps, mass assignment, or insecure config. Triggers: "security audit", "audit vulnerabilities", "OWASP", "scan for security issues", "pen test".
+- `scaffold-app` — Scaffold a complete new Laravel application with architecture — migrations, models, controllers, views, policies, tests, seeders; when building a new app from a natural-language description (NOT for a single feature; use laravel-feature).
+- `security-audit` — Run an OWASP security audit of Laravel code with false-positive filtering and confidence scoring; when auditing for vulnerabilities, injection, XSS, CSRF, auth gaps, mass assignment, or insecure config (NOT for general security best practices; use laravel-security).
 - `test-make` — Generate comprehensive Pest/PHPUnit tests (unit, feature, API, or Dusk browser) for a target class, controller, or feature. Use when writing tests, adding coverage for existing code, or doing TDD. Triggers: "write tests", "generate tests", "test coverage", "pest test", "add tests for", "TDD", "test this class".
 
 ### Utility skills (40)
 
-- `agent-make` — Scaffold a new Claude Code agent file (.md with frontmatter, role, capabilities, and workflow). Use when creating a plugin agent.
+- `agent-make` — Scaffold a Claude Code agent with role, capabilities, and workflow; when creating a plugin agent.
 - `ai-make` — Generate AI features with Prism PHP (chat, embeddings, tool-calling) across OpenAI/Anthropic/Ollama; when adding AI services.
 - `analyze-codebase` — Generate a comprehensive codebase health report analyzing architecture, quality, security, performance, and dependencies; when auditing or understanding a Laravel project.
-- `auth-setup` — Set up Laravel authentication — Sanctum/Fortify/Breeze, guards, roles & permissions (Spatie/Laratrust), policies, social login, 2FA. Triggers: "set up auth", "configure authentication", "add login", "roles and permissions", "API tokens", "Sanctum", "Passport".
+- `auth-setup` — SET UP Laravel authentication with Sanctum/Fortify/Breeze, guards, roles & permissions, policies, social login, 2FA; when initializing auth in a new project (NOT for reference questions).
 - `backup-setup` — Configure automated backups (spatie/laravel-backup) — schedule, storage disks, retention, monitoring/notifications; when setting up backups.
 - `broadcast-make` — Generate a broadcast event + channel wiring for real-time updates; when adding broadcasting.
 - `bug-fix` — Systematically diagnose and fix a bug — reproduce, root-cause, fix, regression test; when fixing a reported bug.
 - `cicd-setup` — Set up CI/CD pipelines (GitHub Actions/GitLab/Bitbucket) — tests, linting, security scan, deploy stages; when configuring CI/CD.
-- `command-make` — Scaffold a new Claude Code slash-command file (frontmatter + prompt body). Use when creating a plugin command.
+- `command-make` — Scaffold a Claude Code slash-command with frontmatter and prompt; when creating a plugin command.
 - `db-diagram` — Generate a database ER diagram or schema visualization from migrations and models in Mermaid or DBML format; when documenting the database schema.
-- `db-optimize` — Optimize database performance by analyzing queries, detecting N+1 and Big O issues, suggesting indexes, and recommending query tuning; when improving database performance.
+- `db-optimize` — Optimize database performance by analyzing queries, detecting N+1 and Big O issues, suggesting indexes, and recommending query tuning; when improving database speed (NOT for database conventions; use laravel-database).
 - `deploy-setup` — Configure deployment — Forge/Vapor/Docker, env/secrets, zero-downtime, deploy scripts; when setting up deployment.
 - `docs-generate` — Generate project documentation — API docs, code docs, README sections from the codebase; when documenting a project.
 - `dto-make` — Generate a typed DTO with spatie/laravel-data, validation, and casting; when creating data transfer objects.
@@ -61,21 +61,21 @@
 - `interactive` — Guided interactive mode — helps you pick the right laravel-agent skill for what you want to build. Use when unsure which skill or command to run, or when exploring what laravel-agent can do.
 - `job-make` — Generate a queued job with retries/backoff/middleware; when creating async jobs.
 - `laravel-build` — Run the full Laravel build and quality pipeline—Pint, PHPStan/Larastan, tests, asset build, optimization—as a one-shot quality gate before commit or deploy.
-- `laravel-refactor` — Refactor Laravel code for SOLID/DRY compliance — extract god classes, long methods, improve structure without changing behavior. Triggers: "refactor", "code smell", "SOLID", "god class", "extract method".
-- `mcp-make` — Scaffold an MCP tool/server for a Claude Code plugin (PhpMcp attributes, TypeScript schema, or config). Use when adding MCP tools to extend capabilities.
-- `migrate-from-legacy` — Migrate a legacy app/database into Laravel — schema import, data migration, model generation. Handles both framework migrations (Symfony→Laravel) and version upgrades (Laravel 9→10→11). Triggers: "migrate", "legacy", "upgrade", "import", "framework migration", "data migration".
+- `laravel-refactor` — Refactor Laravel code for SOLID/DRY compliance — extract god classes, improve structure without changing behavior; when refactoring for better code quality.
+- `mcp-make` — Scaffold an MCP tool or server (PHP/TypeScript); when adding MCP capabilities to a plugin.
+- `migrate-from-legacy` — Migrate a legacy app or database into Laravel — schema import, data migration, model generation; when upgrading a framework or version.
 - `notification-make` — Generate a Laravel notification with multi-channel support (mail, database, broadcast, SMS, Telegram, Discord, Slack, WebPush, FCM) and queueing; when adding notifications.
 - `package-make` — Scaffold a reusable Laravel package with proper structure, service provider, config/facade publishing, tests, and Packagist release setup—when building a distributable Laravel package.
 - `pdf-make` — Generate PDF documents (invoices, reports, certificates) using spatie/laravel-pdf or barryvdh/laravel-dompdf with templates and controllers; when adding PDF generation.
-- `plugin-publish` — Publish a Claude Code plugin to marketplace or GitHub — validate manifest, bump version, tag, and release. Use when publishing a plugin version.
+- `plugin-publish` — Publish a Claude Code plugin to marketplace — validate, bump version, tag, release; when releasing a plugin.
 - `pulse-setup` — Set up Laravel Pulse performance monitoring — cards, recorders, custom metrics, dashboard auth; when adding app monitoring.
 - `reverb-setup` — Install and configure Laravel Reverb WebSocket server — env, scaling, supervisor; when setting up Reverb.
 - `search-setup` — Set up full-text search with Laravel Scout — install and configure Algolia, Meilisearch, Typesense, or database driver; mark models as searchable; index data. Triggers: "search", "Scout", "full-text search", "when adding search".
 - `seo-setup` — Set up SEO infrastructure — sitemaps, meta tags, Open Graph, structured data/schema, robots.txt. Triggers: "SEO", "sitemap", "meta tags", "schema", "Open Graph", "when adding SEO".
-- `skill-make` — Scaffold a new Claude Code skill directory with SKILL.md, references/, and evals/evals.json. Use when creating a skill. Reference docs/architecture/skill-standard.md for detailed rules.
+- `skill-make` — Scaffold a Claude Code skill with directory structure, references, and evals; when creating a skill.
 - `telescope-setup` — Install and configure Laravel Telescope — debugging, request/exception/query inspection, watchers, auth gating, pruning, production guards. Triggers: "Telescope", "debugging", "when adding Telescope", "when adding debugging".
 - `test-coverage` — Run and report test coverage (Pest/PHPUnit), identify gaps, enforce thresholds; when checking coverage.
-- `upgrade-laravel` — Upgrade Laravel/PHP versions (9→10→11→12, PHP 8.1→8.4) — breaking changes, automated fixes, dependency bumps. Perform version-by-version migration with validation. Triggers: "upgrade", "upgrade Laravel", "version bump", "breaking changes".
+- `upgrade-laravel` — Upgrade Laravel/PHP versions with breaking-change handling, automated fixes, and dependency bumps; when upgrading to a newer Laravel/PHP version.
 - `webhook-make` — Scaffold webhook infrastructure with receiver endpoints, signature verification, dispatch/retry, and event handling; when integrating webhooks.
 
 ### Agents (11)

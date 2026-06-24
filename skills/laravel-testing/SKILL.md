@@ -48,6 +48,10 @@ Apply Laravel testing conventions when writing or structuring tests with Pest (t
 - [ ] Edge cases and error states
 - [ ] Behavior, not implementation
 
+## Code templates and stubs
+
+Before generating unit, feature, API, or browser tests, read `${CLAUDE_SKILL_DIR}/references/templates.md` for production-ready test stubs with proper describe/it structure, assertions, factories, and authorization checks.
+
 ## Common Pitfalls
 
 1. **No RefreshDatabase** — always reset DB state between tests

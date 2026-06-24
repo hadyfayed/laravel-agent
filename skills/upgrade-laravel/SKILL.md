@@ -1,8 +1,6 @@
 ---
 name: upgrade-laravel
-description: >
-  Upgrade Laravel/PHP versions (9→10→11→12, PHP 8.1→8.4) — breaking changes, automated fixes,
-  dependency bumps. Perform version-by-version migration with validation. Triggers: "upgrade", "upgrade Laravel", "version bump", "breaking changes".
+description: Upgrade Laravel/PHP versions with breaking-change handling, automated fixes, and dependency bumps; when upgrading to a newer Laravel/PHP version.
 disable-model-invocation: true
 allowed-tools: Bash(composer *) Bash(php artisan *) Read Grep Glob Edit
 argument-hint: "<target-version> [--check-only|--dry-run]"

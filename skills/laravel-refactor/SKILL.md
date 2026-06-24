@@ -1,8 +1,6 @@
 ---
 name: laravel-refactor
-description: >
-  Refactor Laravel code for SOLID/DRY compliance — extract god classes, long methods,
-  improve structure without changing behavior. Triggers: "refactor", "code smell", "SOLID", "god class", "extract method".
+description: Refactor Laravel code for SOLID/DRY compliance — extract god classes, improve structure without changing behavior; when refactoring for better code quality.
 disable-model-invocation: true
 allowed-tools: Bash(php artisan *) Read Grep Glob Edit Write
 argument-hint: "<target> [--focus=<concern>]"

@@ -1,8 +1,6 @@
 ---
 name: command-make
-description: >
-  Scaffold a new Claude Code slash-command file (frontmatter + prompt body).
-  Use when creating a plugin command.
+description: Scaffold a Claude Code slash-command with frontmatter and prompt; when creating a plugin command.
 disable-model-invocation: true
 allowed-tools: Read Write Edit Bash(mkdir *) Bash(test *) Bash(find *)
 argument-hint: "<command-name> [description]"
@@ -30,7 +28,7 @@ Parse `$ARGUMENTS`:
 
 ```markdown
 ---
-description: "<description or 'Perform [action] for [purpose]'>"
+description: Scaffold a Claude Code slash-command with frontmatter and prompt; when creating a plugin command.
 allowed-tools: Read, Glob, Grep, Write, Edit, Bash
 ---
 
