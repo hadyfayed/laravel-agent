@@ -1,0 +1,9 @@
+{
+  "skill": "laravel-auth",
+  "cases": [
+    { "prompt": "How do I set up a PostPolicy so only the owner can update and admins bypass everything?", "expect": "references core-auth.md policy guidance: before() admin short-circuit, owner check, authorizeResource" },
+    { "prompt": "I need to issue API tokens with scoped abilities for a mobile app", "expect": "references sanctum.md: createToken with abilities, tokenCan check, auth:sanctum middleware" },
+    { "prompt": "Build an OAuth2 authorization server so third-party apps can access my API", "expect": "references passport.md: authorization code + PKCE, client credentials, scope middleware, not password grant for third-party" },
+    { "prompt": "Add 'Sign in with Google and GitHub' social login", "expect": "references socialite.md: provider config, redirect/callback controller, validateProvider, provider/provider_id migration" }
+  ]
+}

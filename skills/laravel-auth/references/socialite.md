@@ -1,14 +1,4 @@
----
-name: laravel-socialite
-description: >
-  Implement social authentication with Laravel Socialite. Use when the user needs OAuth login,
-  social sign-in, or third-party authentication providers.
-  Triggers: "socialite", "oauth", "social login", "google login", "github login", "facebook login",
-  "twitter login", "social auth", "oauth2", "sign in with".
-allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
----
-
-# Laravel Socialite Skill
+# Laravel Socialite — Social Login (OAuth)
 
 Implement social authentication with Laravel Socialite.
 
@@ -336,18 +326,123 @@ composer require socialiteproviders/discord
 composer require socialiteproviders/microsoft
 ```
 
-### Configuring Community Providers
+### SocialiteProviders Manager Setup
+
+For the broader `socialiteproviders/manager` package:
+
+```bash
+composer require socialiteproviders/manager
+# Install specific providers:
+composer require socialiteproviders/google
+composer require socialiteproviders/github
+composer require socialiteproviders/apple
+```
+
+#### Configuration (config/services.php)
 
 ```php
-<?php
+'google' => [
+    'client_id' => env('GOOGLE_CLIENT_ID'),
+    'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+    'redirect' => env('GOOGLE_REDIRECT_URI'),
+],
 
+'github' => [
+    'client_id' => env('GITHUB_CLIENT_ID'),
+    'client_secret' => env('GITHUB_CLIENT_SECRET'),
+    'redirect' => env('GITHUB_REDIRECT_URI'),
+],
+```
+
+#### Event Listener
+
+```php
 // app/Providers/EventServiceProvider.php
 protected $listen = [
     \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+        \SocialiteProviders\Google\GoogleExtendSocialite::class.'@handle',
+        \SocialiteProviders\GitHub\GitHubExtendSocialite::class.'@handle',
         \SocialiteProviders\Apple\AppleExtendSocialite::class.'@handle',
         \SocialiteProviders\Discord\DiscordExtendSocialite::class.'@handle',
     ],
 ];
+```
+
+#### Social Auth Controller (SocialiteProviders variant)
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Laravel\Socialite\Facades\Socialite;
+
+final class SocialAuthController extends Controller
+{
+    public function redirect(string $provider): RedirectResponse
+    {
+        $this->validateProvider($provider);
+
+        return Socialite::driver($provider)->redirect();
+    }
+
+    public function callback(string $provider): RedirectResponse
+    {
+        $this->validateProvider($provider);
+
+        $socialUser = Socialite::driver($provider)->user();
+
+        $user = User::updateOrCreate(
+            ['email' => $socialUser->getEmail()],
+            [
+                'name' => $socialUser->getName(),
+                'provider' => $provider,
+                'provider_id' => $socialUser->getId(),
+                'avatar' => $socialUser->getAvatar(),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        auth()->login($user, remember: true);
+
+        return redirect()->intended('/dashboard');
+    }
+
+    private function validateProvider(string $provider): void
+    {
+        if (!in_array($provider, ['google', 'github', 'apple'])) {
+            abort(404);
+        }
+    }
+}
+```
+
+#### Routes for Social Login (SocialiteProviders variant)
+
+```php
+Route::get('/auth/{provider}', [SocialAuthController::class, 'redirect'])
+    ->name('social.redirect');
+
+Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])
+    ->name('social.callback');
+```
+
+#### Migration for Social Fields (SocialiteProviders variant)
+
+```php
+Schema::table('users', function (Blueprint $table) {
+    $table->string('provider')->nullable();
+    $table->string('provider_id')->nullable();
+    $table->string('avatar')->nullable();
+    $table->string('password')->nullable()->change(); // Allow null for social users
+
+    $table->unique(['provider', 'provider_id']);
+});
 ```
 
 ## Blade Components
@@ -496,12 +591,3 @@ it('redirects to github', function () {
 - Log social authentication events
 - Test OAuth flows thoroughly
 - Use stateless for API authentication
-
-## Related Commands
-
-- `/laravel-agent:auth:setup` - Setup authentication
-
-## Related Skills
-
-- `laravel-auth` - Authentication and authorization
-- `laravel-sanctum` - API token authentication

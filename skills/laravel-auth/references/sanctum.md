@@ -1,14 +1,4 @@
----
-name: laravel-sanctum
-description: >
-  Implement API authentication with Laravel Sanctum. Use when the user needs API tokens,
-  SPA authentication, mobile app authentication, or token abilities/scopes.
-  Triggers: "sanctum", "api token", "spa auth", "bearer token", "personal access token",
-  "token authentication", "api auth", "mobile auth".
-allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
----
-
-# Laravel Sanctum Skill
+# Laravel Sanctum — API/SPA Token Authentication
 
 Implement lightweight API authentication with Laravel Sanctum.
 
@@ -496,12 +486,3 @@ it('issues token on login', function () {
 - Use HTTPS in production
 - Validate token abilities in controllers
 - Clean up expired tokens regularly
-
-## Related Commands
-
-- `/laravel-agent:auth:setup` - Setup authentication
-
-## Related Skills
-
-- `laravel-auth` - Authentication and authorization
-- `laravel-api` - API development

@@ -1,14 +1,4 @@
----
-name: laravel-passport
-description: >
-  Implement OAuth2 server with Laravel Passport. Use when the user needs OAuth2,
-  third-party API access, authorization codes, client credentials, or personal access tokens.
-  Triggers: "passport", "oauth2 server", "authorization code", "client credentials",
-  "access token", "refresh token", "oauth provider".
-allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
----
-
-# Laravel Passport Skill
+# Laravel Passport — Full OAuth2 Server
 
 Implement full-featured OAuth2 server with Laravel Passport for third-party API access.
 
@@ -26,6 +16,21 @@ Use **Sanctum** instead when:
 - Simple token authentication is sufficient
 - Don't need OAuth2 complexity
 - Want lighter weight solution
+
+# Passport vs Sanctum
+
+| Feature | Passport | Sanctum |
+|---------|----------|---------|
+| OAuth2 Server | Yes | No |
+| Third-party apps | Yes | No |
+| Authorization Code | Yes | No |
+| Personal Access Tokens | Yes | Yes |
+| SPA Authentication | Possible | Better |
+| Mobile Apps | Yes | Yes |
+| Complexity | Higher | Lower |
+
+**Use Passport when:** You need a full OAuth2 server for third-party integrations.
+**Use Sanctum when:** You only need API tokens for first-party apps.
 
 ## Quick Start
 
@@ -82,6 +87,40 @@ class User extends Authenticatable
     use HasApiTokens;
 
     // ...
+}
+```
+
+The Passport `HasApiTokens` trait also supports custom credential lookups:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Passport\HasApiTokens;
+
+final class User extends Authenticatable
+{
+    use HasApiTokens;
+
+    /**
+     * Find user for Passport authentication.
+     */
+    public function findForPassport(string $username): ?self
+    {
+        return $this->where('email', $username)->first();
+    }
+
+    /**
+     * Validate password for Passport (optional custom validation).
+     */
+    public function validateForPassportPasswordGrant(string $password): bool
+    {
+        return \Hash::check($password, $this->password);
+    }
 }
 ```
 
@@ -286,7 +325,7 @@ Route::middleware(['client'])->group(function () {
 });
 ```
 
-### 3. Password Grant (First-Party Apps)
+### 3. Password Grant (First-Party APPS)
 
 **Use Case:** Your own mobile/desktop apps (Deprecated in OAuth2.1)
 
@@ -313,6 +352,56 @@ Content-Type: application/json
 ```
 
 **Warning:** Password grant is deprecated. Use Authorization Code with PKCE for mobile apps.
+
+A first-party login controller that proxies the password grant:
+
+```php
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
+final class LoginController extends Controller
+{
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $response = Http::asForm()->post(config('app.url') . '/oauth/token', [
+            'grant_type' => 'password',
+            'client_id' => config('passport.password_client_id'),
+            'client_secret' => config('passport.password_client_secret'),
+            'username' => $request->email,
+            'password' => $request->password,
+            'scope' => 'read write',
+        ]);
+
+        if ($response->successful()) {
+            return response()->json($response->json());
+        }
+
+        return response()->json(['error' => 'Invalid credentials'], 401);
+    }
+
+    public function refresh(Request $request)
+    {
+        $response = Http::asForm()->post(config('app.url') . '/oauth/token', [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $request->refresh_token,
+            'client_id' => config('passport.password_client_id'),
+            'client_secret' => config('passport.password_client_secret'),
+            'scope' => '',
+        ]);
+
+        return response()->json($response->json());
+    }
+}
+```
 
 ### 4. Implicit Grant (Deprecated)
 
@@ -833,6 +922,33 @@ class RequireScope
 }
 ```
 
+## Routes
+
+```php
+<?php
+
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\TokenController;
+
+// Public auth routes
+Route::post('/auth/login', [LoginController::class, 'login']);
+Route::post('/auth/refresh', [LoginController::class, 'refresh']);
+
+// Protected routes
+Route::middleware('auth:api')->group(function () {
+    Route::get('/user', fn (Request $request) => $request->user());
+    Route::post('/auth/logout', [LoginController::class, 'logout']);
+
+    // Token management
+    Route::apiResource('tokens', TokenController::class)->only(['index', 'store', 'destroy']);
+});
+
+// Client credentials routes
+Route::middleware('client:read')->prefix('api')->group(function () {
+    Route::get('/public-data', PublicDataController::class);
+});
+```
+
 ## Testing OAuth Flows
 
 ### Test Authorization Code Flow
@@ -961,6 +1077,60 @@ it('refreshes access token', function () {
 
     $response->assertOk()
         ->assertJsonStructure(['access_token', 'refresh_token']);
+});
+```
+
+### Test Password Grant / Scope Enforcement
+
+```php
+<?php
+
+use App\Models\User;
+use Laravel\Passport\Passport;
+
+describe('API Authentication', function () {
+    it('authenticates with password grant', function () {
+        $user = User::factory()->create([
+            'password' => bcrypt('password'),
+        ]);
+
+        // Create password grant client
+        $client = \Laravel\Passport\Client::factory()->create([
+            'password_client' => true,
+        ]);
+
+        $response = $this->postJson('/oauth/token', [
+            'grant_type' => 'password',
+            'client_id' => $client->id,
+            'client_secret' => $client->secret,
+            'username' => $user->email,
+            'password' => 'password',
+            'scope' => '*',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonStructure(['access_token', 'refresh_token']);
+    });
+
+    it('protects routes with token', function () {
+        Passport::actingAs(
+            User::factory()->create(),
+            ['read', 'write']
+        );
+
+        $this->getJson('/api/user')
+            ->assertOk();
+    });
+
+    it('enforces scopes', function () {
+        Passport::actingAs(
+            User::factory()->create(),
+            ['read'] // No 'write' scope
+        );
+
+        $this->postJson('/api/resources')
+            ->assertForbidden();
+    });
 });
 ```
 
@@ -1113,9 +1283,48 @@ php artisan passport:keys
 php artisan passport:keys --force
 ```
 
-## Related Skills
+---
 
-- `laravel-sanctum` - Lightweight API authentication
-- `laravel-api` - Building REST APIs
-- `laravel-auth` - Authentication and authorization
-- `laravel-security` - Security best practices
+# Output Format
+
+```markdown
+## laravel-passport Complete
+
+### Summary
+- **Grant Types**: Authorization Code, Password, Client Credentials, Personal Access
+- **Scopes**: read, write, delete, admin
+- **PKCE**: Enabled for public clients
+- **Status**: Success|Partial|Failed
+
+### Files Created/Modified
+- `app/Models/User.php` - Added HasApiTokens
+- `app/Http/Controllers/Auth/LoginController.php`
+- `app/Http/Controllers/TokenController.php`
+- `config/auth.php` - Added api guard
+- `routes/api.php` - Protected routes
+
+### Clients Created
+- Password Grant Client: For mobile/SPA first-party apps
+- Personal Access Client: For API tokens
+
+### Environment Variables
+```
+PASSPORT_PASSWORD_CLIENT_ID=
+PASSPORT_PASSWORD_CLIENT_SECRET=
+```
+
+### Next Steps
+1. Create OAuth clients as needed
+2. Configure token expiration times
+3. Set up HTTPS for production
+4. Test OAuth flows
+```
+
+# Guardrails
+
+- **ALWAYS** use HTTPS in production
+- **ALWAYS** use PKCE for public clients
+- **ALWAYS** validate scopes on protected routes
+- **NEVER** expose client secrets to frontend
+- **NEVER** use overly long token expiration
+- **NEVER** skip token revocation on logout
