@@ -137,12 +137,12 @@ final class <Name>Controller extends Controller
 }
 ```
 
-## API Controller - DELEGATE TO laravel-api-builder
+## API Controller - DELEGATE TO laravel-api
 
-For API endpoints, delegate to laravel-api-builder using Task tool:
+For API endpoints, delegate to laravel-api using Task tool:
 
 ```
-Use the Task tool with subagent_type="laravel-api-builder" to implement API:
+Use the Task tool with subagent_type="laravel-api" to implement API:
 
 Name: <Name>
 Version: v1
@@ -231,7 +231,7 @@ vendor/bin/pest --filter=<Name>
 
 1. Create directory structure
 2. Generate all files from templates (model, migration, controllers, views, policy, tests)
-3. **DELEGATE API to laravel-api-builder** (using Task tool)
+3. **DELEGATE API to laravel-api** (using Task tool)
 4. Register ServiceProvider in config/app.php
 5. Run post-build commands (IDE helper, Pint, migrations)
 6. Run tests
@@ -282,7 +282,7 @@ vendor/bin/pest --filter=<Name>
 - `read-<slug>`, `create-<slug>`, `update-<slug>`, `delete-<slug>`
 
 ### Delegated To
-- **laravel-api-builder** for API endpoints - [status]
+- **laravel-api** for API endpoints - [status]
 
 ### Next Steps
 1. Run `php artisan migrate`

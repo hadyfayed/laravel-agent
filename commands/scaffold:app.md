@@ -192,7 +192,7 @@ Follow this process:
 
 Use appropriate specialized agents:
 - laravel-database for migrations/models
-- laravel-api-builder for API resources
+- laravel-api for API resources
 - laravel-feature for features
 - laravel-testing for tests
 - laravel-filament or laravel-livewire for admin

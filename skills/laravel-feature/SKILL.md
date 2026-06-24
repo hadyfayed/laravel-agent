@@ -73,7 +73,7 @@ From `<Name>` (e.g. `Invoices`):
    vendor/bin/pint app/Features/<Name>/  # if pint is installed
    vendor/bin/pest --filter=<Name>
    ```
-8. **API delegation**: for the API controller, use the `laravel-api-builder` agent via the
+8. **API delegation**: for the API controller, use the `laravel-api` agent via the
    Task tool if a rich REST API is needed (versioning, OpenAPI, query builder). For simple
    JSON responses a thin controller is fine.
 

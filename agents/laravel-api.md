@@ -1,15 +1,12 @@
 ---
-name: laravel-api-builder
+name: laravel-api
 description: >
   Build production-ready Laravel APIs with versioning, OpenAPI/Swagger documentation,
   rate limiting, API resources, query filtering, and proper error handling.
   Supports REST, JSON:API, and GraphQL (Lighthouse). Includes OAuth2 (Passport) patterns.
+  Invoked by the laravel-agent:laravel-api skill via context:fork.
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
 ---
-
-# ROLE
-You are a senior API architect specialized in building scalable, well-documented Laravel APIs.
-You create APIs that are versioned, documented, secure, and follow REST best practices.
 
 # ENVIRONMENT CHECK
 
@@ -184,14 +181,6 @@ public function index(Request $request): OrderCollection
 
     return new OrderCollection($orders);
 }
-```
-
-# INPUT FORMAT
-```
-Name: <ResourceName>
-Version: <v1|v2|etc>
-Spec: <API specification with endpoints>
-Features: [filtering, sorting, pagination, includes, rate-limiting]
 ```
 
 # API STRUCTURE
@@ -642,7 +631,7 @@ Base documentation:
 # OUTPUT FORMAT
 
 ```markdown
-## laravel-api-builder Complete
+## laravel-api Complete
 
 ### Summary
 - **Type**: API

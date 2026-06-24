@@ -758,7 +758,7 @@ START: What is the primary goal?
 ├── BUILD something new
 │   ├── Complete business capability (CRUD + UI + API)?
 │   │   └── YES → laravel-feature
-│   │       └── Feature will delegate to laravel-api-builder for API routes
+│   │       └── Feature will delegate to laravel-api for API routes
 │   │
 │   ├── Reusable domain logic (no UI)?
 │   │   └── YES → laravel-module-builder
@@ -767,7 +767,7 @@ START: What is the primary goal?
 │   │   └── YES → laravel-service-builder
 │   │
 │   ├── API-only (no web views)?
-│   │   └── YES → laravel-api-builder
+│   │   └── YES → laravel-api
 │   │
 │   ├── Admin panel?
 │   │   └── YES → laravel-filament
@@ -832,10 +832,10 @@ START: What is the primary goal?
 | Agent | Creates Files | Modifies Files | Runs Commands | Delegates To |
 |-------|--------------|----------------|---------------|--------------|
 | laravel-architect | Pattern registry | - | Environment checks | All builders |
-| laravel-feature | Feature structure | config/app.php | migrations, tests | laravel-api-builder |
+| laravel-feature | Feature structure | config/app.php | migrations, tests | laravel-api |
 | laravel-module-builder | Module structure | - | - | - |
 | laravel-service-builder | Services/Actions | - | - | - |
-| laravel-api-builder | API controllers, routes | - | - | - |
+| laravel-api | API controllers, routes | - | - | - |
 | laravel-auth | Policies, middleware | config/auth.php | - | - |
 | laravel-database | Migrations, models | Various | migrate, rector, pint | - |
 | laravel-filament | Resources, pages | - | - | laravel-auth |
@@ -867,7 +867,7 @@ laravel-architect (analyzes)
                           │
                           ├── Creates: Models, Controllers, Views, Tests
                           │
-                          └── Delegates API to: laravel-api-builder
+                          └── Delegates API to: laravel-api
                                                     │
                                                     └── Creates: API Controllers, Resources, Routes
 ```

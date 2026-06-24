@@ -181,7 +181,7 @@ The architect will:
 | `laravel-module-builder` | Builds reusable domain modules |
 | `laravel-service-builder` | Builds services and actions |
 | `laravel-refactor` | Code improvement and refactoring |
-| `laravel-api-builder` | REST APIs with versioning, OpenAPI |
+| `laravel-api` | REST APIs with versioning, OpenAPI |
 | `laravel-testing` | Pest tests - unit, feature, API, browser |
 | `laravel-database` | Migrations, optimization, relationships |
 | `laravel-auth` | Authentication, authorization, policies |

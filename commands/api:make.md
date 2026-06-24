@@ -161,7 +161,7 @@ class ProductController extends Controller
 
 2. **Invoke API Builder**
 
-   Use Task tool with subagent_type `laravel-api-builder`:
+   Use Task tool with subagent_type `laravel-api`:
    ```
    Build API resource:
 
