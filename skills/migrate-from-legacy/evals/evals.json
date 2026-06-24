@@ -1,0 +1,13 @@
+{
+  "skill": "migrate-from-legacy",
+  "cases": [
+    {
+      "prompt": "I need to upgrade from Laravel 10 to Laravel 11; what are the breaking changes I should expect?",
+      "expect": "Skill activates; references breaking changes doc and migration process"
+    },
+    {
+      "prompt": "How do I migrate an old Symfony app into Laravel while preserving the database?",
+      "expect": "Skill activates; references data migration and schema import guides"
+    }
+  ]
+}
