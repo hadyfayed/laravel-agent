@@ -1,19 +1,12 @@
----
-name: laravel-git
-description: >
-  Git workflow automation for Laravel projects. Handles conventional commits,
-  branch strategies, PR creation, release management, and changelog generation.
-  Integrates with review system for pre-commit checks.
-tools: Read, Grep, Glob, Bash
----
+# Git workflow automation reference
 
-# ROLE
-You are a Git workflow specialist for Laravel projects. You automate common Git
-operations while enforcing best practices and integrating with the review system.
+Knowledge folded from the retired `laravel-git` agent. Use alongside the
+`git-commit`, `git-pr`, and `git-release` skills for branch strategy, commit
+message generation, and review-system integration.
 
 **Philosophy: "Clean history, atomic commits, meaningful messages."**
 
-# WORKFLOW ARCHITECTURE
+## Workflow architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -33,9 +26,9 @@ operations while enforcing best practices and integrating with the review system
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-# COMMIT CONVENTIONS
+## Commit conventions
 
-## Conventional Commits Format
+### Conventional Commits Format
 
 ```
 <type>(<scope>): <subject>
@@ -125,9 +118,9 @@ git diff --cached
    - docs(readme): update installation steps
    ```
 
-# BRANCH STRATEGY
+## Branch strategy
 
-## GitFlow for Laravel
+### GitFlow for Laravel
 
 ```
 main ─────────────────────────────────────────────────► (production)
@@ -141,7 +134,7 @@ main ─────────────────────────
        └───────────────────────────────┴────────────────►
 ```
 
-## Branch Naming
+### Branch Naming
 
 ```
 <type>/<ticket>-<description>
@@ -161,10 +154,9 @@ Examples:
 - refactor/extract-payment-service
 ```
 
-# COMMANDS
+## Command workflows
 
-## /git:commit
-Smart commit with review integration
+### /git:commit — Smart commit with review integration
 
 ```bash
 # Process:
@@ -195,8 +187,7 @@ Closes #123
 [Approve] [Edit] [Cancel]
 ```
 
-## /git:branch
-Smart branch creation
+### /git:branch — Smart branch creation
 
 ```bash
 # Process:
@@ -212,8 +203,7 @@ Creating branch: feature/add-pdf-export-invoices
 From: develop
 ```
 
-## /git:pr
-Create pull request with generated description
+### /git:pr — Create pull request with generated description
 
 ```bash
 # Process:
@@ -243,8 +233,7 @@ Create pull request with generated description
 <If UI changes detected>
 ```
 
-## /git:release
-Create release with changelog
+### /git:release — Create release with changelog
 
 ```bash
 # Process:
@@ -272,9 +261,9 @@ None
 [Create Release] [Edit] [Cancel]
 ```
 
-# INTEGRATION WITH REVIEW SYSTEM
+## Integration with review system
 
-## Pre-Commit Hook
+### Pre-Commit Hook
 
 ```bash
 #!/bin/bash
@@ -294,7 +283,7 @@ echo "Pre-commit check passed"
 exit 0
 ```
 
-## Pre-Push Hook
+### Pre-Push Hook
 
 ```bash
 #!/bin/bash
@@ -320,7 +309,7 @@ fi
 exit 0
 ```
 
-# GUARDRAILS
+## Guardrails
 
 - **NEVER** force push to main/master
 - **NEVER** commit sensitive data (secrets, credentials)

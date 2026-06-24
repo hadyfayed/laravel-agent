@@ -58,7 +58,7 @@ commands:
     description: "OWASP security audit"
 
   auth-setup:
-    agent: laravel-auth
+    agent: laravel-auth (skill)
     related_commands: [api-make]
     skills: [laravel-auth]
     description: "Setup authentication and authorization"
@@ -76,37 +76,37 @@ commands:
     description: "Create Filament admin resources"
 
   db-optimize:
-    agent: laravel-database
+    agent: laravel-database (skill)
     related_commands: [db-diagram]
     skills: [laravel-database]
     description: "Optimize database queries"
 
   db-diagram:
-    agent: laravel-database
+    agent: laravel-database (skill)
     related_commands: [db-optimize]
     skills: [laravel-database]
     description: "Generate database diagrams"
 
   deploy-setup:
-    agent: laravel-deploy
+    agent: laravel-deploy (skill)
     related_commands: [cicd-setup]
     skills: [laravel-deploy]
     description: "Configure deployment"
 
   cicd-setup:
-    agent: laravel-cicd
+    agent: cicd-setup (skill)
     related_commands: [deploy-setup]
     skills: []
     description: "Setup CI/CD pipelines"
 
   git-commit:
-    agent: laravel-git
+    agent: git-commit (skill)
     related_commands: [review-staged, git-pr]
     hooks: [pre-commit]
     description: "Smart commit with message generation"
 
   git-pr:
-    agent: laravel-git
+    agent: git-pr (skill)
     related_commands: [git-commit, git-release]
     description: "Create pull requests"
 
@@ -116,7 +116,7 @@ commands:
     description: "Review staged changes"
 
   reverb-setup:
-    agent: laravel-reverb
+    agent: laravel-websocket (skill)
     related_commands: [broadcast-make]
     skills: [laravel-websocket]
     description: "Setup WebSocket server"
@@ -175,12 +175,12 @@ skills:
   laravel-database:
     triggers: [migration, query, eloquent, n+1]
     commands: [db-optimize, db-diagram]
-    agents: [laravel-database]
+    agents: []
 
   laravel-auth:
     triggers: [auth, permission, policy, sanctum]
     commands: [auth-setup]
-    agents: [laravel-auth]
+    agents: []
 
   laravel-security:
     triggers: [security, xss, sql injection, owasp]

@@ -81,3 +81,7 @@ Before committing, verify that staged files do not contain:
 - TODO comments that should be resolved before merge
 
 If any of the above are found, report them and pause — do not commit until the user confirms or resolves.
+
+## Additional references
+
+- `references/git-workflow.md` — branch strategy (GitFlow, branch naming), smart commit message generation rules, `/git:pr` and `/git:release` workflows, and pre-commit/pre-push review-system hook integration.

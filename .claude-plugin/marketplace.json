@@ -1,6 +1,6 @@
 {
   "name": "laravel-agent",
-  "description": "AI-powered Laravel development assistant with Claude Code plugin development tools. 49 skills, 30 agents.",
+  "description": "AI-powered Laravel development assistant with Claude Code plugin development tools. 65 skills, 11 agents.",
   "owner": {
     "name": "Laravel Agent",
     "url": "https://github.com/hadyfayed/laravel-agent"
@@ -9,7 +9,7 @@
     {
       "name": "laravel-agent",
       "source": "./",
-      "description": "Complete Laravel development assistant with 30 specialized agents for architecture, features, modules, services, APIs, testing, database, auth, Livewire, Filament, queues, AI/LLM, deployment, CI/CD, security, WebSockets, feature flags, migrations, code review, git workflow automation, and Claude Code plugin development (plugin scaffolding, command/agent/skill/MCP creation, and publishing)",
+      "description": "Complete Laravel development assistant with 11 specialized agents for architecture, features, modules, services, APIs, testing, database, auth, Livewire, Filament, queues, AI/LLM, deployment, CI/CD, security, WebSockets, feature flags, migrations, code review, git workflow automation, and Claude Code plugin development (plugin scaffolding, command/agent/skill/MCP creation, and publishing)",
       "version": "2.1.0"
     }
   ]

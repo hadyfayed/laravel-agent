@@ -81,8 +81,8 @@ authorization.
 
 ## Related Skills
 
-- `laravel-auth` — authentication and authorization setup
-- `laravel-sanctum` / `laravel-passport` — API token & OAuth2 auth
+- `laravel-auth` — authentication and authorization setup (includes Sanctum/Passport references)
+- `laravel-passport` — OAuth2 auth (folded into the `laravel-auth` skill)
 
 ## Additional references
 

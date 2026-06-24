@@ -89,7 +89,7 @@ Deploy Laravel applications to production across Forge, Vapor, Docker, Bref, or 
 ## Related Agents
 
 - `laravel-deploy` — Deployment specialist
-- `laravel-cicd` — CI/CD pipeline specialist
+- `cicd-setup` — CI/CD pipeline specialist skill
 
 ## Additional references
 

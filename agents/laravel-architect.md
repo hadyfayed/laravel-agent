@@ -486,7 +486,7 @@ Delegate to builder agents based on architecture decision:
 | Feature | laravel-feature | 80+ |
 | Module | laravel-module | 80+ |
 | Service/Action | laravel-service | 80+ |
-| Refactor | laravel-refactor | 80+ |
+| Refactor | `laravel-refactor` skill | 80+ |
 
 **Parallel Implementation (when possible):**
 - Models & migrations can run parallel to controller scaffolding
@@ -656,7 +656,7 @@ Based on your decision, invoke the appropriate subagent using Task tool:
 | Feature | laravel-feature |
 | Module | laravel-module |
 | Service/Action | laravel-service |
-| Refactor | laravel-refactor |
+| Refactor | `laravel-refactor` skill |
 
 **Delegation format:**
 ```
@@ -771,42 +771,42 @@ START: What is the primary goal?
 │   │
 │   ├── Admin panel?
 │   │   └── YES → laravel-filament
-│   │       └── Filament will use laravel-auth for permissions
+│   │       └── Filament will use the `laravel-auth` skill for permissions
 │   │
 │   ├── Livewire component?
 │   │   └── YES → laravel-livewire
 │   │
 │   ├── Queued job / Event / Notification?
-│   │   └── YES → laravel-queue
+│   │   └── YES → use the `laravel-queue` skill
 │   │
 │   ├── WebSocket / Real-time?
-│   │   └── YES → laravel-reverb
+│   │   └── YES → use the `laravel-websocket` skill
 │   │
 │   ├── Feature flag / A/B test?
-│   │   └── YES → laravel-pennant
+│   │   └── YES → use the `feature-flag-make` skill
 │   │
 │   └── AI/LLM feature?
-│       └── YES → laravel-ai
+│       └── YES → use the `ai-make` skill
 
 ├── SETUP / CONFIGURE
 │   ├── Authentication system?
-│   │   └── YES → laravel-auth
+│   │   └── YES → use the `laravel-auth` skill
 │   │
 │   ├── Database schema / migrations / optimization?
-│   │   └── YES → laravel-database
+│   │   └── YES → use the `laravel-database` skill
 │   │
 │   ├── Laravel/PHP version upgrade?
-│   │   └── YES → laravel-database (handles upgrades too)
+│   │   └── YES → use the `migrate-from-legacy` / `upgrade-laravel` skills
 │   │
 │   ├── Deployment (Forge/Vapor/Docker)?
-│   │   └── YES → laravel-deploy
+│   │   └── YES → use the `laravel-deploy` skill
 │   │
 │   └── CI/CD pipeline?
-│       └── YES → laravel-cicd
+│       └── YES → use the `cicd-setup` skill
 
 ├── IMPROVE existing code
 │   ├── Refactor for SOLID/DRY?
-│   │   └── YES → laravel-refactor
+│   │   └── YES → use the `laravel-refactor` skill
 │   │
 │   └── Security audit / OWASP?
 │       └── YES → laravel-security
@@ -824,7 +824,7 @@ START: What is the primary goal?
 
 └── GIT operations
     └── Commit / PR / Release?
-        └── YES → laravel-git
+        └── YES → use the `git-commit` / `git-pr` / `git-release` skills
 ```
 
 # AGENT CAPABILITY MATRIX
@@ -836,21 +836,11 @@ START: What is the primary goal?
 | laravel-module | Module structure | - | - | - |
 | laravel-service | Services/Actions | - | - | - |
 | laravel-api | API controllers, routes | - | - | - |
-| laravel-auth | Policies, middleware | config/auth.php | - | - |
-| laravel-database | Migrations, models | Various | migrate, rector, pint | - |
-| laravel-filament | Resources, pages | - | - | laravel-auth |
+| laravel-filament | Resources, pages | - | - | `laravel-auth` skill |
 | laravel-livewire | Components | - | - | - |
-| laravel-queue | Jobs, events | - | - | - |
-| laravel-reverb | Broadcasting | config/broadcasting.php | reverb:install | - |
-| laravel-pennant | Feature classes | - | - | - |
-| laravel-ai | AI services | - | - | - |
-| laravel-deploy | Deploy configs | - | - | - |
-| laravel-cicd | CI/CD workflows | - | - | - |
 | laravel-security | - | - | - | - |
-| laravel-refactor | - | Target files | pint | - |
 | laravel-testing | Test files | - | pest | - |
 | laravel-review | - | - | - | laravel-security |
-| laravel-git | - | - | git commands | - |
 
 # AGENT INTERACTION WORKFLOWS
 
@@ -885,7 +875,7 @@ laravel-architect (analyzes)
                           │
                           ├── Creates: Filament Resource, Pages
                           │
-                          └── Delegates auth to: laravel-auth
+                          └── Delegates auth to: the `laravel-auth` skill
                                                     │
                                                     └── Creates: Policies, Permissions
 ```
@@ -915,11 +905,11 @@ User: "Optimize database and upgrade to Laravel 11"
 
 laravel-architect (analyzes)
     │
-    ├── For optimization → laravel-database
+    ├── For optimization → the `laravel-database` skill
     │                          │
     │                          └── Adds indexes, fixes N+1, optimizes queries
     │
-    └── For upgrade → laravel-migration
+    └── For upgrade → the `upgrade-laravel` / `migrate-from-legacy` skills
                           │
                           └── Updates dependencies, runs rector, fixes deprecations
 ```
