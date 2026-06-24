@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-filament",
+  "cases": [
+    { "prompt": "/laravel-agent:laravel-filament Product resource with name, price, category relationship and Shield permissions", "expect": "forks the laravel-filament agent and scaffolds a Filament Resource with form/table schema, relation, and Shield-based RBAC" },
+    { "prompt": "/laravel-agent:laravel-filament Build an admin panel for managing orders and customers", "expect": "forks the laravel-filament agent and proposes a multi-resource Filament panel plan" },
+    { "prompt": "/laravel-agent:laravel-filament Add a stats overview widget to the existing dashboard", "expect": "forks the laravel-filament agent and scaffolds a Filament stats widget class" }
+  ]
+}

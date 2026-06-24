@@ -1,371 +1,67 @@
 ---
 name: laravel-filament
-description: >
-  Build admin panels and CRUD interfaces with Filament 3. Use when the user wants
-  to create an admin panel, back-office, dashboard, or manage resources through a UI.
-  Triggers: "filament", "admin panel", "admin dashboard", "resource management",
-  "back-office", "crud interface", "admin area".
-allowed-tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash, Task
+description: Scaffold or build a Filament v3/v4 admin panel with resources, forms, tables, widgets, custom pages, relation managers, and RBAC (Filament Shield). Use when building an admin panel, back-office, dashboard, CRUD resource, or managing resources through a UI.
+context: fork
+agent: laravel-filament
+argument-hint: "[resource/panel name and requirements]"
 ---
 
-# Laravel Filament Skill
+# Scaffold a Filament Admin Panel
 
-Build beautiful admin panels with Filament 3.
+You are the `laravel-filament` agent. The user wants to build or extend a Filament v3/v4 admin
+panel. Your job is to scaffold everything it needs — panels, resources, forms, tables, widgets,
+and authorization — do not stop at stubs or placeholders.
 
-## When to Use
+## Task
 
-- Creating admin panels
-- Building CRUD interfaces
-- Dashboard and reporting
-- Resource management UIs
-- Back-office systems
+Scaffold the Filament surface described in `$ARGUMENTS`.
 
-## Quick Start
+Parse `$ARGUMENTS` as:
+- **Name** — the resource or panel name (PascalCase, e.g. `Product`, `OrderItem`, `Admin`)
+- **Requirements** — any extra context: target panel, fields, relationships, filters, the
+  Filament major version (v3 or v4), whether Shield RBAC is in use, etc.
 
-```bash
-/laravel-agent:filament:make <Resource>
-```
+If `$ARGUMENTS` is empty or ambiguous, state your assumption and proceed.
 
-## Installation
+## What to build
 
-```bash
-composer require filament/filament
-php artisan filament:install --panels
-php artisan make:filament-user
-```
+Produce a fully working Filament panel surface. Typically this spans:
 
-## Resource Structure
+- A **Panel Provider** (`app/Providers/Filament/<Panel>Provider.php`) when a new panel is requested,
+  with plugins, discovery, auth guard, and theme registration.
+- A **Resource** (`app/Filament/Resources/<Name>Resource.php`) per model the user names, including:
+  - `form()` schema with sections, relationship selects, uploads, and dependent fields
+  - `table()` schema with searchable/sortable columns, filters, and row + bulk actions
+  - Pages (`List`, `Create`, `Edit`) and relation managers where relationships exist
+- **Widgets** (stats overview, charts) and **custom pages** when a dashboard is requested
+- **Authorization**: Shield-based permissions when Shield is present, else explicit
+  `canViewAny`/`canCreate`/`canEdit`/`canDelete` checks
 
-```php
-<?php
+The exact set depends on `$ARGUMENTS`. Create only what the requirements imply; do not
+invent resources the user did not ask for.
 
-namespace App\Filament\Resources;
+## Key rules
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Models\Product;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
+1. Detect the installed Filament major version (v3 vs v4) and target it — APIs differ. Confirm via
+   `composer show filament/filament`.
+2. `declare(strict_types=1)` and `final class` on every generated PHP file.
+3. Resources use the singular model + plural resource convention; every resource needs a
+   `$navigationIcon` and lives under `App\Filament\Resources`.
+4. Form field names MUST match real model attributes/columns — no silent renames.
+5. Add `searchable()` + `preload()` to relationship selects that may grow large.
+6. Authorization is mandatory: Shield when installed, explicit policy/closure checks otherwise.
+7. For soft-deleted models, add `TrashedFilter` plus `RestoreAction`/`ForceDeleteAction`.
+8. Keep heavy computation out of the table — use accessors or eager `withSum`, not per-row closures.
 
-final class ProductResource extends Resource
-{
-    protected static ?string $model = Product::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
-    protected static ?string $navigationGroup = 'Shop';
+## Deferral
 
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\Section::make()->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
+This skill is the task prompt only. The agent carries the full Filament knowledge base:
+component catalogs, Shield setup, relation-manager templates, v3/v4 API differences,
+package integrations, and pitfalls. Consult the agent for the deep how-to rather than
+duplicating it here.
 
-                Forms\Components\TextInput::make('price')
-                    ->required()
-                    ->numeric()
-                    ->prefix('$'),
+## Output
 
-                Forms\Components\RichEditor::make('description')
-                    ->columnSpanFull(),
-
-                Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'name')
-                    ->searchable()
-                    ->preload(),
-
-                Forms\Components\Toggle::make('is_active')
-                    ->default(true),
-            ])->columns(2),
-        ]);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('price')
-                    ->money()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('category.name')
-                    ->sortable(),
-
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean(),
-            ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('category')
-                    ->relationship('category', 'name'),
-
-                Tables\Filters\TernaryFilter::make('is_active'),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListProducts::route('/'),
-            'create' => Pages\CreateProduct::route('/create'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
-        ];
-    }
-}
-```
-
-## Key Components
-
-### Form Components
-- TextInput, Textarea, RichEditor
-- Select, Radio, Checkbox, Toggle
-- DatePicker, TimePicker
-- FileUpload, SpatieMediaLibraryFileUpload
-- Repeater, Builder, KeyValue
-
-### Table Features
-- Searchable, Sortable columns
-- Filters (Select, Ternary, Custom)
-- Actions (Edit, Delete, Custom)
-- Bulk actions
-
-### Widgets
-```php
-final class StatsOverview extends BaseWidget
-{
-    protected function getStats(): array
-    {
-        return [
-            Stat::make('Total Orders', Order::count()),
-            Stat::make('Revenue', '$' . Order::sum('total')),
-        ];
-    }
-}
-```
-
-## Relation Managers
-
-```php
-<?php
-
-namespace App\Filament\Resources\ProductResource\RelationManagers;
-
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-
-final class ReviewsRelationManager extends RelationManager
-{
-    protected static string $relationship = 'reviews';
-
-    public function form(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\Textarea::make('content')
-                ->required()
-                ->maxLength(1000),
-
-            Forms\Components\Select::make('rating')
-                ->options([1 => '1 Star', 2 => '2 Stars', 3 => '3 Stars', 4 => '4 Stars', 5 => '5 Stars'])
-                ->required(),
-        ]);
-    }
-
-    public function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('user.name'),
-                Tables\Columns\TextColumn::make('rating'),
-                Tables\Columns\TextColumn::make('created_at')->dateTime(),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ]);
-    }
-}
-```
-
-## Custom Actions
-
-```php
-use Filament\Tables\Actions\Action;
-
-Tables\Actions\Action::make('approve')
-    ->icon('heroicon-o-check')
-    ->color('success')
-    ->requiresConfirmation()
-    ->action(fn (Product $record) => $record->approve())
-    ->visible(fn (Product $record) => $record->isPending()),
-
-Tables\Actions\Action::make('export')
-    ->icon('heroicon-o-arrow-down-tray')
-    ->action(function () {
-        return response()->download(
-            (new ProductExport)->store('exports/products.xlsx')
-        );
-    }),
-```
-
-## Custom Pages
-
-```php
-<?php
-
-namespace App\Filament\Pages;
-
-use Filament\Pages\Page;
-
-final class Dashboard extends Page
-{
-    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
-    protected static string $view = 'filament.pages.dashboard';
-
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            StatsOverview::class,
-            OrdersChart::class,
-        ];
-    }
-}
-```
-
-## Form Dependencies
-
-```php
-Forms\Components\Select::make('country_id')
-    ->relationship('country', 'name')
-    ->live()
-    ->afterStateUpdated(fn (Set $set) => $set('city_id', null)),
-
-Forms\Components\Select::make('city_id')
-    ->options(fn (Get $get) => City::where('country_id', $get('country_id'))->pluck('name', 'id'))
-    ->disabled(fn (Get $get) => !$get('country_id')),
-```
-
-## Authorization
-
-```php
-// In Resource
-public static function canViewAny(): bool
-{
-    return auth()->user()->can('view_products');
-}
-
-public static function canCreate(): bool
-{
-    return auth()->user()->can('create_products');
-}
-
-public static function canEdit(Model $record): bool
-{
-    return auth()->user()->can('edit_products');
-}
-
-public static function canDelete(Model $record): bool
-{
-    return auth()->user()->can('delete_products');
-}
-```
-
-## Common Pitfalls
-
-1. **Missing Navigation Icon** - Filament requires icons
-   ```php
-   protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-   ```
-
-2. **Not Registering Resources** - Add to Panel Provider
-   ```php
-   ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-   ```
-
-3. **Form Field Name Mismatch** - Field names must match model attributes
-   ```php
-   // Bad - if column is 'product_name'
-   Forms\Components\TextInput::make('name'),
-
-   // Good
-   Forms\Components\TextInput::make('product_name'),
-   ```
-
-4. **Missing Relationship Method** - Ensure model has the relationship
-   ```php
-   // Model must have:
-   public function category(): BelongsTo
-   {
-       return $this->belongsTo(Category::class);
-   }
-   ```
-
-5. **Select Without Searchable** - Large lists need search
-   ```php
-   Forms\Components\Select::make('category_id')
-       ->relationship('category', 'name')
-       ->searchable()  // Add this!
-       ->preload(),
-   ```
-
-6. **Not Using Soft Deletes** - Add restore action
-   ```php
-   Tables\Actions\RestoreAction::make(),
-   Tables\Actions\ForceDeleteAction::make(),
-
-   // And in filters
-   Tables\Filters\TrashedFilter::make(),
-   ```
-
-7. **Heavy Queries in Table** - Use column relationships
-   ```php
-   // Bad
-   Tables\Columns\TextColumn::make('total')
-       ->getStateUsing(fn ($record) => $record->items->sum('price')),
-
-   // Good - add accessor or use withSum
-   Tables\Columns\TextColumn::make('items_sum_price')
-       ->label('Total'),
-   ```
-
-## Package Integration
-
-- **bezhansalleh/filament-shield** - Roles and permissions
-- **ralphjsmit/laravel-seo** - SEO fields
-- **filament/spatie-laravel-media-library-plugin** - Media management
-- **filament/spatie-laravel-settings-plugin** - Settings management
-
-## Best Practices
-
-- Use Sections to organize forms
-- Add search to Select fields
-- Use soft deletes with restore action
-- Implement proper authorization
-- Add global search
-- Use relation managers for related data
-- Keep forms under 15 fields per section
-- Use tabs for complex resources
-
-## Related Commands
-
-- `/laravel-agent:filament:make` - Create Filament resources, pages, or widgets
-
-## Related Agents
-
-- `laravel-filament` - Filament admin panel specialist
+After completing all files, list each path created or modified, one per line, prefixed with
+`[created]` or `[modified]`. Close with a one-paragraph summary noting the panel/resource name,
+Filament version targeted, Shield usage, and any deviations from the spec.
