@@ -1,8 +1,20 @@
 {
   "name": "laravel-agent",
-  "version": "3.0.0-dev",
+  "version": "3.0.0",
   "description": "AI-powered Laravel development assistant: skills (reference, scaffolder, utility) + specialized agents, following the Claude Code skill standard.",
-  "author": { "name": "Laravel Agent" },
+  "author": {
+    "name": "Laravel Agent"
+  },
   "license": "MIT",
-  "keywords": ["laravel", "skills", "agents", "architecture", "testing", "api", "security", "claude-code", "plugin"]
+  "keywords": [
+    "laravel",
+    "skills",
+    "agents",
+    "architecture",
+    "testing",
+    "api",
+    "security",
+    "claude-code",
+    "plugin"
+  ]
 }
