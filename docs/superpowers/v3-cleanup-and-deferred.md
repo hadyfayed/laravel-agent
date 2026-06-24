@@ -101,6 +101,9 @@ Fix approach: drive the stat cards + listings from the generated `CATALOG.md`/a 
 - §E generator idempotency: ✅ FIXED (commit 86871f6) — docs/index.html + docs/commands.html count targets were frozen; now re-matchable + regression-tested. Docs counts refreshed to 65 skills / 11 agents.
 
 ## STILL PENDING
+
+0. **README body** still lists the old `## Available Commands` taxonomy (a v3 banner was added pointing to the migration table, but the per-command listing needs rewriting to the new `/laravel-agent:<skill>` set). Higher-visibility than the Jekyll site — do first in the docs pass.
+
 1. **Docs-site full regeneration (§D):** the prose count lines are now correct & generator-owned, BUT the homepage **stat cards** (bare `23`/`42`/`12` in `<div>`s) + nav badges still show old numbers, and `docs/agents/*.html` / `docs/commands/*.html` / `docs/skills/*.html` per-item pages still reflect the OLD taxonomy (deleted agents, old command names). Needs a Jekyll data/template pass or site regen. Lower-value than shipping; can be post-ship.
 2. **Cosmetic minors (§C):** passport.md `APPS` typo, filament `3/4` vs `v3/v4`, app/Builders note, reverb-setup/laravel-websocket dedup, a few utility SKILL.md slightly >150. Batchable polish pass.
 3. **SHIP (§F) — gated on user:** delete `commands/` (53), write CHANGELOG migration table, bump 3.0.0-dev→3.0.0, merge to main, tag v3.0.0, push.
