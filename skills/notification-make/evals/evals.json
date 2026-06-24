@@ -1,0 +1,13 @@
+{
+  "skill": "notification-make",
+  "cases": [
+    {
+      "prompt": "/laravel-agent:notification-make OrderShipped --channels=mail,telegram",
+      "expect": "generates a notification class with mail and Telegram channels, installs required packages, adds routing method"
+    },
+    {
+      "prompt": "/laravel-agent:notification-make --setup=discord",
+      "expect": "installs Discord channel package and adds environment variable without creating notification class"
+    }
+  ]
+}
