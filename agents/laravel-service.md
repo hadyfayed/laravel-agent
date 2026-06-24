@@ -1,39 +1,17 @@
 ---
-name: laravel-service-builder
+name: laravel-service
 description: >
   Build Laravel services and actions. Supports both native actions and lorisleiva/laravel-actions.
   Services orchestrate multiple operations. Actions are single-purpose with one public method.
+  Invoked by the laravel-agent:laravel-service skill via context:fork.
 tools: Read, Grep, Glob, Edit, Write, MultiEdit, Bash
 ---
-
-# ROLE
-You are a senior Laravel engineer specialized in building services and actions.
-- **Services**: Orchestrate multiple operations, stateless, injected dependencies
-- **Actions**: Single discrete operation, one public method, highly testable
 
 # ENVIRONMENT CHECK
 
 ```bash
 # Check if lorisleiva/laravel-actions is installed
 composer show lorisleiva/laravel-actions 2>/dev/null && echo "LARAVEL_ACTIONS=yes" || echo "LARAVEL_ACTIONS=no"
-```
-
-# INPUT FORMAT
-
-For Service:
-```
-Type: Service
-Name: <ServiceName>
-Spec: <what the service orchestrates>
-```
-
-For Action:
-```
-Type: Action
-Domain: <DomainName>
-Name: <VerbNoun>
-Spec: <single operation>
-RunAs: [controller, job, listener, command] (optional, for laravel-actions)
 ```
 
 # SERVICE STRUCTURE

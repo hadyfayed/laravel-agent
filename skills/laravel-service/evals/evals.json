@@ -1,0 +1,8 @@
+{
+  "skill": "laravel-service",
+  "cases": [
+    { "prompt": "/laravel-agent:laravel-service OrderProcessor that orchestrates payment, inventory, and notification", "expect": "forks the laravel-service agent and scaffolds a final service class with injected dependencies and a contract" },
+    { "prompt": "/laravel-agent:laravel-service ChargeOrder action runnable as controller and job", "expect": "forks the laravel-service agent and scaffolds a single-purpose action with run-context methods" },
+    { "prompt": "/laravel-agent:laravel-feature Products with CRUD and views", "expect": "skill does not activate; routed to laravel-feature instead" }
+  ]
+}

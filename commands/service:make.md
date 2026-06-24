@@ -49,7 +49,7 @@ Examples:
 
 4. **Invoke Service Builder**
 
-   Use Task tool with subagent_type `laravel-service-builder`:
+   Use Task tool with subagent_type `laravel-service`:
    ```
    Create:
 
