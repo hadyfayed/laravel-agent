@@ -1,0 +1,13 @@
+{
+  "skill": "plugin-publish",
+  "cases": [
+    {
+      "prompt": "Publish the plugin with version 2.0.0",
+      "expect": "Updates plugin.json and marketplace.json, creates git commit and tag v2.0.0, and publishes to GitHub"
+    },
+    {
+      "prompt": "Release this plugin to GitHub only",
+      "expect": "Bumps patch version, validates manifest, creates release on GitHub with changelog"
+    }
+  ]
+}
