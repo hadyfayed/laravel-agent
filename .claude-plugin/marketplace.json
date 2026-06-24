@@ -1,6 +1,6 @@
 {
   "name": "laravel-agent",
-  "description": "AI-powered Laravel development assistant with Claude Code plugin development tools. 40 skills, 30 agents.",
+  "description": "AI-powered Laravel development assistant with Claude Code plugin development tools. 47 skills, 30 agents.",
   "owner": {
     "name": "Laravel Agent",
     "url": "https://github.com/hadyfayed/laravel-agent"
